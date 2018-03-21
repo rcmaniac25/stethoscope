@@ -3,24 +3,18 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "stethoscope", "stethoscope.vcxproj", "{C698C1FC-86F7-49CB-8294-05677C9171B5}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "LogTracker", "LogTracker\LogTracker.xproj", "{C401A78E-34F2-4D82-AAB4-9FE8BD8FE44A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|x64 = Debug|x64
-		Debug|x86 = Debug|x86
-		Release|x64 = Release|x64
-		Release|x86 = Release|x86
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{C698C1FC-86F7-49CB-8294-05677C9171B5}.Debug|x64.ActiveCfg = Debug|x64
-		{C698C1FC-86F7-49CB-8294-05677C9171B5}.Debug|x64.Build.0 = Debug|x64
-		{C698C1FC-86F7-49CB-8294-05677C9171B5}.Debug|x86.ActiveCfg = Debug|Win32
-		{C698C1FC-86F7-49CB-8294-05677C9171B5}.Debug|x86.Build.0 = Debug|Win32
-		{C698C1FC-86F7-49CB-8294-05677C9171B5}.Release|x64.ActiveCfg = Release|x64
-		{C698C1FC-86F7-49CB-8294-05677C9171B5}.Release|x64.Build.0 = Release|x64
-		{C698C1FC-86F7-49CB-8294-05677C9171B5}.Release|x86.ActiveCfg = Release|Win32
-		{C698C1FC-86F7-49CB-8294-05677C9171B5}.Release|x86.Build.0 = Release|Win32
+		{C401A78E-34F2-4D82-AAB4-9FE8BD8FE44A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C401A78E-34F2-4D82-AAB4-9FE8BD8FE44A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C401A78E-34F2-4D82-AAB4-9FE8BD8FE44A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C401A78E-34F2-4D82-AAB4-9FE8BD8FE44A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
