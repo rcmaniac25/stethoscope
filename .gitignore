@@ -27,6 +27,12 @@ bld/
 # Visual Studio 2017 auto generated files
 Generated\ Files/
 
+# .NET Core
+project.lock.json
+project.fragment.lock.json
+artifacts/
+**/Properties/launchSettings.json
+
 # Visual C++ cache files
 ipch/
 *.aps
