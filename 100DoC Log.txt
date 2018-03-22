@@ -12,3 +12,6 @@ Format: #<day number>.<attempt number>. <date>
 - Already a bit overthinking it because I started trying to do streaming log parsing... just parse the log right now.
 - Initial log format is XML. I'm gonna have to make a config file to determine what properties describe the log, just so the log format isn't hardcoded... but that's for a bit later. Maybe tomorrow?
 - Initial plan was for a C++ program... but XML parsing, streaming logs, json parsing too (config and I'm sure someone logs in JSON) are not pleasent to work with in C++ and since I want to get something running instead of dealing with frameworks and C++ package systems, I'm just gonna start with C#
+
+#3.1. 3/21/2018:
+- I wanted to try and start processing the actual log data, so I finished the XML parsing part. Should still work on making it stream the input. Noted for later.

@@ -2,6 +2,7 @@
 using System.IO;
 using System.Text;
 using System.Xml;
+using System.Xml.Linq;
 
 namespace LogTracker
 {
@@ -35,13 +36,68 @@ namespace LogTracker
                 ms.Position = 0L;
                 using (var xmlReader = XmlReader.Create(ms))
                 {
-                    while (xmlReader.Read())
+                    XElement element = null;
+                    bool exitLoop = false;
+
+                    while (!exitLoop && xmlReader.Read())
                     {
-                        //TODO
-                        if (!parser.HandleNewXmlElement(null))
+                        switch (xmlReader.NodeType)
                         {
-                            break;
+                            case XmlNodeType.Element:
+                                var name = XName.Get(xmlReader.Name, xmlReader.NamespaceURI);
+                                if (element == null)
+                                {
+                                    element = new XElement(name);
+                                }
+                                else
+                                {
+                                    var ele = new XElement(name);
+                                    element.Add(ele);
+                                    element = ele;
+                                }
+                                if (xmlReader.HasAttributes)
+                                {
+                                    while (xmlReader.MoveToNextAttribute())
+                                    {
+                                        var attName = XName.Get(xmlReader.Name, xmlReader.NamespaceURI);
+                                        var att = new XAttribute(attName, xmlReader.Value);
+                                        element.Add(att);
+                                    }
+                                    xmlReader.MoveToElement();
+                                }
+                                break;
+                            case XmlNodeType.EndElement:
+                                if (xmlReader.Name == element.Name)
+                                {
+                                    var ele = element;
+                                    element = element.Parent;
+                                    if (element != null && element.Name == "root")
+                                    {
+                                        if (!parser.HandleXmlElement(ele))
+                                        {
+                                            exitLoop = true;
+                                            break;
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    Console.Error.WriteLine($"Element {element.Name} ended, but the name of the ending element {xmlReader.Name} doesn't match. Possibly out of sync...");
+                                }
+                                break;
+                            case XmlNodeType.CDATA:
+                                element.Add(new XCData(xmlReader.Value));
+                                break;
+                            case XmlNodeType.Whitespace:
+                                break;
+                            default:
+                                break;
                         }
+                    }
+
+                    if (element?.Parent != null)
+                    {
+                        Console.Error.WriteLine("Root element didn't end");
                     }
                 }
             }

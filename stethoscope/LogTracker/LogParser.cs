@@ -9,10 +9,11 @@ namespace LogTracker
 {
     public class LogParser
     {
-        public bool HandleNewXmlElement(XElement element)
+        public bool HandleXmlElement(XElement element)
         {
+            Console.WriteLine($"=> {element.Attribute("src").Value}:{element.Attribute("sln").Value} - {element.Attribute("fun").Value}");
             //TODO
-            return false;
+            return true;
         }
     }
 }
