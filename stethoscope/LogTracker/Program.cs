@@ -101,6 +101,8 @@ namespace LogTracker
                     }
                 }
             }
+            
+            parser.PrintTrace();
         }
     }
 }
