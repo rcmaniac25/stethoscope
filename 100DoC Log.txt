@@ -15,3 +15,8 @@ Format: #<day number>.<attempt number>. <date>
 
 #3.1. 3/21/2018:
 - I wanted to try and start processing the actual log data, so I finished the XML parsing part. Should still work on making it stream the input. Noted for later.
+
+#4.1. 3/22/2018:
+- Late commit again.
+- Plan: initial orginization of log output, get streaming XML working (need option parsing so I can turn this on only if needed), have log values determined by config (requires JSON parsing)
+- I started late, so I only go the first one done and will do the others tomorrow
