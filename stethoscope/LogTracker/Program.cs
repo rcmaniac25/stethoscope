@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+
+using System;
 using System.IO;
 using System.Text;
 using System.Xml;
@@ -12,11 +14,27 @@ namespace LogTracker
         {
             if (args.Length < 1)
             {
-                Console.Error.WriteLine("Need a XML document to load of log info");
+                Console.Error.WriteLine("Usage: LogTracker <xml log file> [<xml log config json>]");
                 return;
             }
 
-            var parser = new LogParser();
+            var logConfig = new LogConfig();
+            if (args.Length > 1)
+            {
+                using (var fs = new FileStream(args[1], FileMode.Open))
+                {
+                    using (var sr = new StreamReader(fs))
+                    {
+                        using (var jr = new JsonTextReader(sr))
+                        {
+                            var serializer = new JsonSerializer();
+                            logConfig = serializer.Deserialize<LogConfig>(jr);
+                        }
+                    }
+                }
+            }
+
+            var parser = new LogParser(logConfig);
 
             using (var ms = new MemoryStream())
             {

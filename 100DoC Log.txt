@@ -20,3 +20,8 @@ Format: #<day number>.<attempt number>. <date>
 - Late commit again.
 - Plan: initial orginization of log output, get streaming XML working (need option parsing so I can turn this on only if needed), have log values determined by config (requires JSON parsing)
 - I started late, so I only go the first one done and will do the others tomorrow
+
+$5.1. 3/23/2018:
+- If yesterday was late, this one is later...
+- I load a config file of info about parsing logs. As it's very late for me, I will test this tomorrow.
+- For the "temp" C# project, I decided to be a little curious and use .Net Portable Framework. I'm kinda regretting it. So many APIs just aren't available. I get it's purpose and it should be used, but going 2 levels deep to open a StreamReader? The main library just opened one internally anyway.

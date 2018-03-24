@@ -68,20 +68,36 @@ namespace LogTracker
     {
         private Dictionary<string, ThreadLog> logThreads = new Dictionary<string, ThreadLog>();
 
+        private LogConfig config;
+
+        public LogParser(LogConfig config)
+        {
+            this.config = config;
+        }
+
         public bool HandleXmlElement(XElement element)
         {
+            if (!config.IsValid)
+            {
+                //TODO: try and guess the parameters from a log line
+            }
+            if (!config.IsValid)
+            {
+                return false;
+            }
+
             //Console.WriteLine($"=> {element.Attribute("src").Value}:{element.Attribute("sln").Value} - {element.Attribute("fun").Value}");
 
             //XXX while logs shouldn't be out of order, it's possible
 
-            var threadId = element.Attribute("thrd").Value;
+            var threadId = element.Attribute(config.ThreadIDAttributeName).Value;
             if (!logThreads.ContainsKey(threadId))
             {
                 logThreads.Add(threadId, new ThreadLog(threadId));
             }
 
             var thread = logThreads[threadId];
-            thread.AddLog(element.Attribute("src").Value, element.Attribute("fun").Value, (element.LastNode as XCData).Value);
+            thread.AddLog(element.Attribute(config.SourceFileAttributeName).Value, element.Attribute(config.FunctionAttributeName).Value, (element.LastNode as XCData).Value); //TODO: node path
 
             //TODO
             return true;
