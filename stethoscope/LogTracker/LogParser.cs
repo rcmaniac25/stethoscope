@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Xml;
 using System.Xml.Linq;
 
 namespace LogTracker
@@ -75,6 +77,75 @@ namespace LogTracker
             this.config = config;
         }
 
+        //XXX This is way overcomplicated, and yet I want to extend it further... leave it for now and if it becomes a performance bottleneck, we'll replace it
+        private string GetElementDataFromPath(string path, XElement element)
+        {
+            if (string.IsNullOrWhiteSpace(path) || path == "/")
+            {
+                // Just using the existing node's data
+                return element.Value;
+            }
+            else if (path[0] == '!')
+            {
+                // Use an attribute
+                return element.Attribute(path.Substring(1)).Value;
+            }
+            var sections = path.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+            XNode curItem = element;
+            foreach (var section in sections)
+            {
+                if (section[0] == '#')
+                {
+                    // Index syntax
+                    if (curItem is XContainer)
+                    {
+                        curItem = (curItem as XContainer).Nodes().ElementAt(int.Parse(section.Substring(1)));
+                    }
+                    else
+                    {
+                        curItem = null;
+                        break;
+                    }
+                }
+                else if(section[0] == '$')
+                {
+                    // Filter syntax
+                    switch (section.Substring(1))
+                    {
+                        case "cdata":
+                            if (curItem.NodeType != XmlNodeType.CDATA)
+                            {
+                                curItem = null;
+                            }
+                            break;
+                        case "text":
+                            if (curItem.NodeType != XmlNodeType.Text)
+                            {
+                                curItem = null;
+                            }
+                            break;
+                    }
+                    break;
+                }
+            }
+            if (curItem != null)
+            {
+                if (curItem is XElement)
+                {
+                    return (curItem as XElement).Value;
+                }
+                else if (curItem is XCData)
+                {
+                    return (curItem as XCData).Value;
+                }
+                else if (curItem is XText)
+                {
+                    return (curItem as XText).Value;
+                }
+            }
+            return "<could not parse path>";
+        }
+
         public bool HandleXmlElement(XElement element)
         {
             if (!config.IsValid)
@@ -85,9 +156,7 @@ namespace LogTracker
             {
                 return false;
             }
-
-            //Console.WriteLine($"=> {element.Attribute("src").Value}:{element.Attribute("sln").Value} - {element.Attribute("fun").Value}");
-
+            
             //XXX while logs shouldn't be out of order, it's possible
 
             var threadId = element.Attribute(config.ThreadIDAttributeName).Value;
@@ -97,7 +166,7 @@ namespace LogTracker
             }
 
             var thread = logThreads[threadId];
-            thread.AddLog(element.Attribute(config.SourceFileAttributeName).Value, element.Attribute(config.FunctionAttributeName).Value, (element.LastNode as XCData).Value); //TODO: node path
+            thread.AddLog(element.Attribute(config.SourceFileAttributeName).Value, element.Attribute(config.FunctionAttributeName).Value, GetElementDataFromPath(config.LogMessagePath, element));
 
             //TODO
             return true;

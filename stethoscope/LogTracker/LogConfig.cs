@@ -1,4 +1,6 @@
-﻿namespace LogTracker
+﻿using Newtonsoft.Json;
+
+namespace LogTracker
 {
     public struct LogConfig
     {
@@ -8,6 +10,7 @@
         public string LogLineAttributeName { get; set; }
         public string LogMessagePath { get; set; }
 
+        [JsonIgnore]
         public bool IsValid
         {
             get
