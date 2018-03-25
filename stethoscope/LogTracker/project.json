@@ -2,7 +2,7 @@
   "title": "Log Tracker",
   "copyright": "2018 Vincent Simonetti",
   "description": "PoC for loading a log file and following what it does",
-  "version": "1.0.0-*",
+  "version": "0.0.1-*",
   "buildOptions": {
     "emitEntryPoint": true
   },
