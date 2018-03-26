@@ -4,10 +4,10 @@ namespace LogTracker
 {
     public struct LogConfig
     {
-        public string ThreadIDAttributeName { get; set; }
-        public string SourceFileAttributeName { get; set; }
-        public string FunctionAttributeName { get; set; }
-        public string LogLineAttributeName { get; set; }
+        public string ThreadIDPath { get; set; }
+        public string SourceFilePath { get; set; }
+        public string FunctionPath { get; set; }
+        public string LogLinePath { get; set; }
         public string LogMessagePath { get; set; }
 
         [JsonIgnore]
@@ -15,9 +15,9 @@ namespace LogTracker
         {
             get
             {
-                return !(string.IsNullOrWhiteSpace(ThreadIDAttributeName) || 
-                    string.IsNullOrWhiteSpace(SourceFileAttributeName) || 
-                    string.IsNullOrWhiteSpace(FunctionAttributeName) || 
+                return !(string.IsNullOrWhiteSpace(ThreadIDPath) || 
+                    string.IsNullOrWhiteSpace(SourceFilePath) || 
+                    string.IsNullOrWhiteSpace(FunctionPath) || 
                     string.IsNullOrWhiteSpace(LogMessagePath));
             }
         }

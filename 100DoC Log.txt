@@ -1,5 +1,7 @@
 Format: #<day number>.<attempt number>. <date>
 
+Note: running log of progress and notes that may not be code related.
+
 #0.1. 3/18/2018:
 - Project name determined thanks to a friend
 
@@ -41,3 +43,7 @@ Format: #<day number>.<attempt number>. <date>
 -- I'd assume info will be cached so it's not constantly parsing. It may be useful to do some tricks, like loading whole sections of the logs into RAM but not parsing them, that way parsing is fast when it is needed.
 -- While I'm thinking about some of these things, I will eventually need logging and unit tests. I know I eventually will need to parse source code, if anything, for determining the end of a function and maybe when a function is container within the calling function. Log parsing, code parsing, etc. should all be seperate components so new ones can be used as needed...
 -- ...I'm starting to overthink things. Just get some useful parsing done. Tomorrow.
+
+#7.1. 3/25/2018:
+- I did not accomplish useful parsing. Instead I refactored code, got a option parser included, and allowed XML parsing to be more "advanced" for each element instead of just the log message itself.
+- PSA: Socialize. You'll get good ideas by talking with people about what you're working on. In my case, I didn't do more code (and much of anything else) because I played Fortnite for the whole day. It was fun, especially with friends.

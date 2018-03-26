@@ -156,17 +156,17 @@ namespace LogTracker
             {
                 return false;
             }
-            
+
             //XXX while logs shouldn't be out of order, it's possible
 
-            var threadId = element.Attribute(config.ThreadIDAttributeName).Value;
+            var threadId = GetElementDataFromPath(config.ThreadIDPath, element);
             if (!logThreads.ContainsKey(threadId))
             {
                 logThreads.Add(threadId, new ThreadLog(threadId));
             }
 
             var thread = logThreads[threadId];
-            thread.AddLog(element.Attribute(config.SourceFileAttributeName).Value, element.Attribute(config.FunctionAttributeName).Value, GetElementDataFromPath(config.LogMessagePath, element));
+            thread.AddLog(GetElementDataFromPath(config.SourceFilePath, element), GetElementDataFromPath(config.FunctionPath, element), GetElementDataFromPath(config.LogMessagePath, element));
 
             //TODO
             return true;
