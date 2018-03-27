@@ -153,9 +153,28 @@ namespace LogTracker
             }
             if (!string.IsNullOrWhiteSpace(config.LogLinePath))
             {
-                attributePaths.Add(LogAttribute.LogLine, config.LogLinePath);
+                attributePaths.Add(LogAttribute.SourceLine, config.LogLinePath);
             }
-            //TODO
+            if (!string.IsNullOrWhiteSpace(config.LogLevelPath))
+            {
+                attributePaths.Add(LogAttribute.Level, config.LogLevelPath);
+            }
+            if (!string.IsNullOrWhiteSpace(config.LogSequencePath))
+            {
+                attributePaths.Add(LogAttribute.SequenceNumber, config.LogSequencePath);
+            }
+            if (!string.IsNullOrWhiteSpace(config.ModulePath))
+            {
+                attributePaths.Add(LogAttribute.Module, config.ModulePath);
+            }
+            if (!string.IsNullOrWhiteSpace(config.LogTypePath))
+            {
+                attributePaths.Add(LogAttribute.Type, config.LogTypePath);
+            }
+            if (!string.IsNullOrWhiteSpace(config.SectionPath))
+            {
+                attributePaths.Add(LogAttribute.Section, config.SectionPath);
+            }
         }
     }
 }

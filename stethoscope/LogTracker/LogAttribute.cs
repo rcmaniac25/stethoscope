@@ -8,6 +8,11 @@
         ThreadID,
         SourceFile,
         Function,
-        LogLine
+        SourceLine,
+        Level,
+        SequenceNumber,
+        Module,
+        Type,
+        Section
     }
 }
