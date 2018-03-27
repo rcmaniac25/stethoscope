@@ -47,3 +47,7 @@ Note: running log of progress and notes that may not be code related.
 #7.1. 3/25/2018:
 - I did not accomplish useful parsing. Instead I refactored code, got a option parser included, and allowed XML parsing to be more "advanced" for each element instead of just the log message itself.
 - PSA: Socialize. You'll get good ideas by talking with people about what you're working on. In my case, I didn't do more code (and much of anything else) because I played Fortnite for the whole day. It was fun, especially with friends.
+
+#8.1. 3/26/2018:
+- I realized to bring about the idea that's in my head, I need a better way of processing through the logs. This makes me think "database" so I can do queries, but I'm not ready for that point.
+- Bsically, gather all the logs together, then do a "get by thread ID" or "get by function" or "get by <random attribute>", and then breaking it down further. Hmm... this sounds like a LINQ query. Fine will we're in .Net, but may be more difficult in C++ (unless I use Rx/Ix)

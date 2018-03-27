@@ -70,106 +70,22 @@ namespace LogTracker
     {
         private Dictionary<string, ThreadLog> logThreads = new Dictionary<string, ThreadLog>();
 
-        private LogConfig config;
+        private ILogParser<XElement> logParser;
+        private LogRegistry registry;
 
         public LogParser(LogConfig config)
         {
-            this.config = config;
-        }
+            registry = new LogRegistry();
 
-        //XXX This is way overcomplicated, and yet I want to extend it further... leave it for now and if it becomes a performance bottleneck, we'll replace it
-        private string GetElementDataFromPath(string path, XElement element)
-        {
-            if (string.IsNullOrWhiteSpace(path) || path == "/")
-            {
-                // Just using the existing node's data
-                return element.Value;
-            }
-            else if (path[0] == '!')
-            {
-                // Use an attribute
-                return element.Attribute(path.Substring(1)).Value;
-            }
-            var sections = path.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
-            XNode curItem = element;
-            foreach (var section in sections)
-            {
-                if (section[0] == '#')
-                {
-                    // Index syntax
-                    if (curItem is XContainer)
-                    {
-                        curItem = (curItem as XContainer).Nodes().ElementAt(int.Parse(section.Substring(1)));
-                    }
-                    else
-                    {
-                        curItem = null;
-                        break;
-                    }
-                }
-                else if(section[0] == '$')
-                {
-                    // Filter syntax
-                    switch (section.Substring(1))
-                    {
-                        case "cdata":
-                            if (curItem.NodeType != XmlNodeType.CDATA)
-                            {
-                                curItem = null;
-                            }
-                            break;
-                        case "text":
-                            if (curItem.NodeType != XmlNodeType.Text)
-                            {
-                                curItem = null;
-                            }
-                            break;
-                    }
-                    break;
-                }
-            }
-            if (curItem != null)
-            {
-                if (curItem is XElement)
-                {
-                    return (curItem as XElement).Value;
-                }
-                else if (curItem is XCData)
-                {
-                    return (curItem as XCData).Value;
-                }
-                else if (curItem is XText)
-                {
-                    return (curItem as XText).Value;
-                }
-            }
-            return "<could not parse path>";
+            logParser = new XMLLogParser();
+            logParser.SetConfig(config);
+            logParser.SetRegistry(registry);
         }
 
         public bool HandleXmlElement(XElement element)
         {
-            if (!config.IsValid)
-            {
-                //TODO: try and guess the parameters from a log line
-            }
-            if (!config.IsValid)
-            {
-                return false;
-            }
-
-            //XXX while logs shouldn't be out of order, it's possible
-
-            var threadId = GetElementDataFromPath(config.ThreadIDPath, element);
-            if (!logThreads.ContainsKey(threadId))
-            {
-                logThreads.Add(threadId, new ThreadLog(threadId));
-            }
-
-            var thread = logThreads[threadId];
-            thread.AddLog(GetElementDataFromPath(config.SourceFilePath, element), GetElementDataFromPath(config.FunctionPath, element), GetElementDataFromPath(config.LogMessagePath, element));
-
-            //TODO
-            return true;
+            var error = logParser.ProcessLog(element);
+            return error == LogParserErrors.OK;
         }
 
         public void ResetLogs()

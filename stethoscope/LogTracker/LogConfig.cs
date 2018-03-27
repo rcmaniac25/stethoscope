@@ -8,6 +8,8 @@ namespace LogTracker
         public string SourceFilePath { get; set; }
         public string FunctionPath { get; set; }
         public string LogLinePath { get; set; }
+
+        public string TimestampPath { get; set; }
         public string LogMessagePath { get; set; }
 
         [JsonIgnore]
@@ -15,9 +17,7 @@ namespace LogTracker
         {
             get
             {
-                return !(string.IsNullOrWhiteSpace(ThreadIDPath) || 
-                    string.IsNullOrWhiteSpace(SourceFilePath) || 
-                    string.IsNullOrWhiteSpace(FunctionPath) || 
+                return !(string.IsNullOrWhiteSpace(TimestampPath) || 
                     string.IsNullOrWhiteSpace(LogMessagePath));
             }
         }
