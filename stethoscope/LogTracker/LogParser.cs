@@ -6,70 +6,8 @@ using System.Xml.Linq;
 
 namespace LogTracker
 {
-    public class FunctionLog
-    {
-        public string Name { get; private set; }
-        public IList<string> Logs { get; private set; }
-
-        public FunctionLog(string name)
-        {
-            Name = name;
-            Logs = new List<string>();
-        }
-    }
-
-    public class FileLog
-    {
-        public string Path { get; private set; }
-        public IList<FunctionLog> Functions { get; private set; }
-
-        private string lastFunction;
-
-        public FileLog(string path)
-        {
-            Path = path;
-            Functions = new List<FunctionLog>();
-        }
-
-        public void AddLog(string function, string log)
-        {
-            if (lastFunction != function)
-            {
-                Functions.Add(new FunctionLog(function));
-                lastFunction = function;
-            }
-            Functions[Functions.Count - 1].Logs.Add(log);
-        }
-    }
-
-    public class ThreadLog
-    {
-        public string ThreadID { get; private set; }
-        public IList<FileLog> Files { get; private set; }
-
-        private string lastFile;
-        
-        public ThreadLog(string id)
-        {
-            ThreadID = id;
-            Files = new List<FileLog>();
-        }
-
-        public void AddLog(string file, string function, string log)
-        {
-            if (lastFile != file)
-            {
-                Files.Add(new FileLog(file));
-                lastFile = file;
-            }
-            Files[Files.Count - 1].AddLog(function, log);
-        }
-    }
-
     public class LogParser
     {
-        private Dictionary<string, ThreadLog> logThreads = new Dictionary<string, ThreadLog>();
-
         private ILogParser<XElement> logParser;
         private LogRegistry registry;
 
@@ -87,11 +25,6 @@ namespace LogTracker
             var error = logParser.ProcessLog(element);
             return error == LogParserErrors.OK;
         }
-
-        public void ResetLogs()
-        {
-            logThreads.Clear();
-        }
         
         private static string GenerateIndentLog(int indent)
         {
@@ -100,26 +33,37 @@ namespace LogTracker
 
         public void PrintTrace()
         {
-            foreach (var thread in logThreads.Values)
+            var threads = registry.GetBy(LogAttribute.ThreadID);
+            foreach (var thread in threads)
             {
                 int indent = 0;
-                Console.WriteLine($"Thread {thread.ThreadID}");
-                foreach (var file in thread.Files)
+                Console.WriteLine($"Thread {thread.Key}");
+
+                var initSrc = thread.Value[0].GetAttribute<string>(LogAttribute.SourceFile);
+                var lastFunc = thread.Value[0].GetAttribute<string>(LogAttribute.Function);
+
+                var lastFuncSrc = $"{initSrc}.{lastFunc}";
+
+                Console.WriteLine($"Start {lastFunc} // {initSrc}");
+                foreach (var log in thread.Value)
                 {
-                    foreach (var function in file.Functions)
+                    var src = log.GetAttribute<string>(LogAttribute.SourceFile);
+                    var function = log.GetAttribute<string>(LogAttribute.Function);
+                    var funcSrc = $"{src}.{function}";
+
+                    if (funcSrc != lastFuncSrc)
                     {
-                        Console.WriteLine($"Start {function.Name} // {file.Path}");
+                        Console.WriteLine($"End {lastFunc}");
+                        Console.WriteLine($"Start {function} // {src}");
 
-                        indent++;
-                        foreach (var log in function.Logs)
-                        {
-                            Console.WriteLine($"{GenerateIndentLog(indent)}{log}");
-                        }
-                        indent--;
-
-                        Console.WriteLine($"End {function.Name}");
+                        lastFuncSrc = funcSrc;
+                        lastFunc = function;
                     }
+
+                    Console.WriteLine($"{GenerateIndentLog(indent + 1)}{log.Message}");
                 }
+
+                Console.WriteLine($"End {lastFunc}");
                 Console.WriteLine();
             }
         }

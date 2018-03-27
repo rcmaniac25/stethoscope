@@ -3,12 +3,6 @@ using System.Collections.Generic;
 
 namespace LogTracker
 {
-    public enum LogAttribute
-    {
-        Timestamp,
-        Message
-    }
-
     public class LogEntry
     {
         Lazy<DateTime> lazyTimestamp;

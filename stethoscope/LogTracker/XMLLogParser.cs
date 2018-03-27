@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
 
@@ -10,7 +9,11 @@ namespace LogTracker
     public class XMLLogParser : ILogParser<XElement>
     {
         private LogRegistry registry;
-        private LogConfig config;
+
+        private bool validConfigs;
+        private string timestampPath;
+        private string messagePath;
+        private Dictionary<LogAttribute, string> attributePaths = new Dictionary<LogAttribute, string>();
 
         //XXX This is way overcomplicated, and yet I want to extend it further... leave it for now and if it becomes a performance bottleneck, we'll replace it
         private string GetElementDataFromPath(string path, XElement element)
@@ -83,7 +86,7 @@ namespace LogTracker
 
         public LogParserErrors ProcessLog(XElement element)
         {
-            if (!config.IsValid)
+            if (!validConfigs)
             {
                 return LogParserErrors.ConfigNotInitialized;
             }
@@ -94,29 +97,29 @@ namespace LogTracker
 
             //XXX while logs shouldn't be out of order, it's possible
 
-            var timestamp = GetElementDataFromPath(config.TimestampPath, element);
+            var timestamp = GetElementDataFromPath(timestampPath, element);
             if (timestamp == null)
             {
                 return LogParserErrors.MissingTimestamp;
             }
 
-            var message = GetElementDataFromPath(config.LogMessagePath, element);
+            var message = GetElementDataFromPath(messagePath, element);
             if (message == null)
             {
                 return LogParserErrors.MissingMessage;
             }
 
             var entry = registry.AddLog(timestamp, message);
-            //TODO: parse other attributes
 
-            //var threadId = GetElementDataFromPath(config.ThreadIDPath, element);
-            //if (!logThreads.ContainsKey(threadId))
-            //{
-            //    logThreads.Add(threadId, new ThreadLog(threadId));
-            //}
-
-            //var thread = logThreads[threadId];
-            //thread.AddLog(GetElementDataFromPath(config.SourceFilePath, element), GetElementDataFromPath(config.FunctionPath, element), GetElementDataFromPath(config.LogMessagePath, element));
+            foreach (var kv in attributePaths)
+            {
+                //XXX Only supports strings right now
+                var value = GetElementDataFromPath(kv.Value, element);
+                if (value != null)
+                {
+                    registry.AddValueToLog(entry, kv.Key, value);
+                }
+            }
 
             return LogParserErrors.OK;
         }
@@ -128,7 +131,31 @@ namespace LogTracker
 
         public void SetConfig(LogConfig config)
         {
-            this.config = config;
+            validConfigs = config.IsValid;
+
+            timestampPath = config.TimestampPath;
+            messagePath = config.LogMessagePath;
+
+            attributePaths.Clear();
+
+            //XXX too manual... how do we get this from LogConfig?
+            if (!string.IsNullOrWhiteSpace(config.ThreadIDPath))
+            {
+                attributePaths.Add(LogAttribute.ThreadID, config.ThreadIDPath);
+            }
+            if (!string.IsNullOrWhiteSpace(config.SourceFilePath))
+            {
+                attributePaths.Add(LogAttribute.SourceFile, config.SourceFilePath);
+            }
+            if (!string.IsNullOrWhiteSpace(config.FunctionPath))
+            {
+                attributePaths.Add(LogAttribute.Function, config.FunctionPath);
+            }
+            if (!string.IsNullOrWhiteSpace(config.LogLinePath))
+            {
+                attributePaths.Add(LogAttribute.LogLine, config.LogLinePath);
+            }
+            //TODO
         }
     }
 }

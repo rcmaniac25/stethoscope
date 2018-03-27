@@ -20,6 +20,7 @@ namespace LogTracker
             parser = new LogParser(config);
         }
 
+        //XXX refactor to XMLLogParser
         public void Process(string logFile)
         {
             using (var ms = new MemoryStream())
