@@ -1,4 +1,4 @@
-﻿namespace LogTracker
+﻿namespace LogTracker.Common
 {
     public enum LogAttribute
     {

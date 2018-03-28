@@ -1,4 +1,4 @@
-﻿namespace LogTracker
+﻿namespace LogTracker.Common
 {
     public enum LogParserErrors
     {
@@ -11,12 +11,12 @@
         MissingTimestamp,
         MissingMessage
     }
-
-    public interface ILogParser<T>
+    
+    public interface ILogParser
     {
-        LogParserErrors ProcessLog(T rawLogElement);
+        void Parse(string logFile);
 
-        void SetRegistry(LogRegistry registry);
+        void SetRegistry(ILogRegistry registry);
         void SetConfig(LogConfig config);
     }
 }

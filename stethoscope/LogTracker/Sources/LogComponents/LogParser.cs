@@ -1,14 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Xml;
-using System.Xml.Linq;
+﻿using LogTracker.Common;
+using LogTracker.Parsers.XML;
 
-namespace LogTracker
+using System;
+
+namespace LogTracker.Log
 {
     public class LogParser
     {
-        private ILogParser<XElement> logParser;
+        private ILogParser logParser;
         private LogRegistry registry;
 
         public LogParser(LogConfig config)
@@ -19,16 +18,15 @@ namespace LogTracker
             logParser.SetConfig(config);
             logParser.SetRegistry(registry);
         }
-
-        public bool HandleXmlElement(XElement element)
-        {
-            var error = logParser.ProcessLog(element);
-            return error == LogParserErrors.OK;
-        }
         
         private static string GenerateIndentLog(int indent)
         {
             return new string(' ', indent * 2); //XXX config for indent size
+        }
+
+        public void Process(string logFile)
+        {
+            logParser.Parse(logFile);
         }
 
         public void PrintTrace()

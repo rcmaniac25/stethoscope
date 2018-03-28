@@ -1,13 +1,16 @@
-﻿using System;
+﻿using LogTracker.Common;
+using LogTracker.Log.Internal;
+
+using System;
 using System.Collections.Generic;
 
-namespace LogTracker
+namespace LogTracker.Log
 {
-    public class LogRegistry
+    public class LogRegistry : ILogRegistry
     {
         private List<LogEntry> logs = new List<LogEntry>();
 
-        public LogEntry AddLog(string timestamp, string message)
+        public ILogEntry AddLog(string timestamp, string message)
         {
             DateTime time;
             if (!DateTime.TryParse(timestamp, out time))
@@ -19,14 +22,15 @@ namespace LogTracker
             return entry;
         }
 
-        public bool AddValueToLog(LogEntry entry, LogAttribute attribute, object value)
+        public bool AddValueToLog(ILogEntry entry, LogAttribute attribute, object value)
         {
             if (attribute == LogAttribute.Message || 
-                attribute == LogAttribute.Timestamp)
+                attribute == LogAttribute.Timestamp ||
+                !(entry is IMutableLogEntry))
             {
                 return false;
             }
-            entry.AddAttribute(attribute, value);
+            (entry as IMutableLogEntry).AddAttribute(attribute, value);
             return true;
         }
 

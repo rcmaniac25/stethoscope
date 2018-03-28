@@ -1,9 +1,12 @@
-﻿using System;
+﻿using LogTracker.Common;
+using LogTracker.Log.Internal;
+
+using System;
 using System.Collections.Generic;
 
-namespace LogTracker
+namespace LogTracker.Log
 {
-    public class LogEntry
+    public class LogEntry : IMutableLogEntry
     {
         Lazy<DateTime> lazyTimestamp;
         Lazy<string> lazyMessage;
@@ -53,7 +56,7 @@ namespace LogTracker
             return default(T);
         }
 
-        internal void AddAttribute(LogAttribute attribute, object value)
+        public void AddAttribute(LogAttribute attribute, object value)
         {
             attributes.Add(attribute, value);
         }

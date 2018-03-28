@@ -1,14 +1,18 @@
-﻿using System;
+﻿using LogTracker.Common;
+
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Xml;
 using System.Xml.Linq;
 
-namespace LogTracker
+namespace LogTracker.Parsers.XML
 {
-    public class XMLLogParser : ILogParser<XElement>
+    public class XMLLogParser : ILogParser
     {
-        private LogRegistry registry;
+        private ILogRegistry registry;
 
         private bool validConfigs;
         private string timestampPath;
@@ -26,7 +30,7 @@ namespace LogTracker
             else if (path[0] == '!')
             {
                 // Use an attribute
-                return element.Attribute(path.Substring(1)).Value;
+                return element.Attribute(path.Substring(1))?.Value;
             }
             var sections = path.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
             XNode curItem = element;
@@ -84,7 +88,7 @@ namespace LogTracker
             return null;
         }
 
-        public LogParserErrors ProcessLog(XElement element)
+        private LogParserErrors ProcessElement(XElement element)
         {
             if (!validConfigs)
             {
@@ -98,7 +102,7 @@ namespace LogTracker
             //XXX while logs shouldn't be out of order, it's possible
 
             var timestamp = GetElementDataFromPath(timestampPath, element);
-            if (timestamp == null)
+            if (string.IsNullOrWhiteSpace(timestamp))
             {
                 return LogParserErrors.MissingTimestamp;
             }
@@ -115,7 +119,7 @@ namespace LogTracker
             {
                 //XXX Only supports strings right now
                 var value = GetElementDataFromPath(kv.Value, element);
-                if (value != null)
+                if (!string.IsNullOrWhiteSpace(value))
                 {
                     registry.AddValueToLog(entry, kv.Key, value);
                 }
@@ -124,7 +128,94 @@ namespace LogTracker
             return LogParserErrors.OK;
         }
 
-        public void SetRegistry(LogRegistry registry)
+        public void Parse(string logFile)
+        {
+            using (var ms = new MemoryStream())
+            {
+                var rootElementStringBytes = Encoding.UTF8.GetBytes("<root>");
+                ms.Write(rootElementStringBytes, 0, rootElementStringBytes.Length);
+
+                //TODO: this doesn't work for streaming, but read/write streams don't really work/exist right now
+                using (var fr = new FileStream(logFile, FileMode.Open))
+                {
+                    fr.CopyTo(ms);
+                }
+
+                //XXX: not going to show up in streaming log
+                var rootEndElementStringBytes = Encoding.UTF8.GetBytes("</root>");
+                ms.Write(rootEndElementStringBytes, 0, rootEndElementStringBytes.Length);
+
+                ms.Position = 0L;
+                using (var xmlReader = XmlReader.Create(ms))
+                {
+                    XElement element = null;
+                    bool exitLoop = false;
+
+                    while (!exitLoop && xmlReader.Read())
+                    {
+                        switch (xmlReader.NodeType)
+                        {
+                            case XmlNodeType.Element:
+                                var name = XName.Get(xmlReader.Name, xmlReader.NamespaceURI);
+                                if (element == null)
+                                {
+                                    element = new XElement(name);
+                                }
+                                else
+                                {
+                                    var ele = new XElement(name);
+                                    element.Add(ele);
+                                    element = ele;
+                                }
+                                if (xmlReader.HasAttributes)
+                                {
+                                    while (xmlReader.MoveToNextAttribute())
+                                    {
+                                        var attName = XName.Get(xmlReader.Name, xmlReader.NamespaceURI);
+                                        var att = new XAttribute(attName, xmlReader.Value);
+                                        element.Add(att);
+                                    }
+                                    xmlReader.MoveToElement();
+                                }
+                                break;
+                            case XmlNodeType.EndElement:
+                                if (xmlReader.Name == element.Name)
+                                {
+                                    var ele = element;
+                                    element = element.Parent;
+                                    if (element != null && element.Name == "root")
+                                    {
+                                        if (ProcessElement(ele) != LogParserErrors.OK)
+                                        {
+                                            exitLoop = true;
+                                            break;
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    Console.Error.WriteLine($"Element {element.Name} ended, but the name of the ending element {xmlReader.Name} doesn't match. Possibly out of sync...");
+                                }
+                                break;
+                            case XmlNodeType.CDATA:
+                                element.Add(new XCData(xmlReader.Value));
+                                break;
+                            case XmlNodeType.Whitespace:
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+
+                    if (element?.Parent != null)
+                    {
+                        Console.Error.WriteLine("Root element didn't end");
+                    }
+                }
+            }
+        }
+
+        public void SetRegistry(ILogRegistry registry)
         {
             this.registry = registry;
         }
