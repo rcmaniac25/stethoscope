@@ -15,58 +15,63 @@ namespace LogTracker.Parsers.XML
         private ILogRegistry registry;
 
         private bool validConfigs;
-        private string timestampPath;
-        private string messagePath;
-        private Dictionary<LogAttribute, string> attributePaths = new Dictionary<LogAttribute, string>();
+        private ParserPathElement[] timestampPath;
+        private ParserPathElement[] messagePath;
+        private Dictionary<LogAttribute, ParserPathElement[]> attributePaths = new Dictionary<LogAttribute, ParserPathElement[]>();
 
-        //XXX This is way overcomplicated, and yet I want to extend it further... leave it for now and if it becomes a performance bottleneck, we'll replace it
-        private string GetElementDataFromPath(string path, XElement element)
+        private string GetElementDataFromPath(ParserPathElement[] path, XElement element)
         {
-            if (string.IsNullOrWhiteSpace(path) || path == "/")
+            if (path == null)
+            {
+                return null;
+            }
+            else if (path.Length == 0)
             {
                 // Just using the existing node's data
                 return element.Value;
             }
-            else if (path[0] == '!')
+            else if (path[0].Type == ParserPathElementType.NamedField)
             {
                 // Use an attribute
-                return element.Attribute(path.Substring(1))?.Value;
+                return element.Attribute(path[0].StringValue)?.Value;
             }
-            var sections = path.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
             XNode curItem = element;
-            foreach (var section in sections)
+            foreach (var section in path)
             {
-                if (section[0] == '#')
+                var breakOut = false;
+                switch (section.Type)
                 {
-                    // Index syntax
-                    if (curItem is XContainer)
-                    {
-                        curItem = (curItem as XContainer).Nodes().ElementAt(int.Parse(section.Substring(1)));
-                    }
-                    else
-                    {
-                        curItem = null;
+                    case ParserPathElementType.IndexField:
+                        if (curItem is XContainer)
+                        {
+                            curItem = (curItem as XContainer).Nodes().ElementAt(section.IndexValue);
+                        }
+                        else
+                        {
+                            curItem = null;
+                            breakOut = true;
+                        }
                         break;
-                    }
+                    case ParserPathElementType.FilterField:
+                        switch (section.StringValue)
+                        {
+                            case "cdata":
+                                if (curItem.NodeType != XmlNodeType.CDATA)
+                                {
+                                    curItem = null;
+                                }
+                                break;
+                            case "text":
+                                if (curItem.NodeType != XmlNodeType.Text)
+                                {
+                                    curItem = null;
+                                }
+                                break;
+                        }
+                        break;
                 }
-                else if (section[0] == '$')
+                if (breakOut || curItem == null)
                 {
-                    // Filter syntax
-                    switch (section.Substring(1))
-                    {
-                        case "cdata":
-                            if (curItem.NodeType != XmlNodeType.CDATA)
-                            {
-                                curItem = null;
-                            }
-                            break;
-                        case "text":
-                            if (curItem.NodeType != XmlNodeType.Text)
-                            {
-                                curItem = null;
-                            }
-                            break;
-                    }
                     break;
                 }
             }
@@ -87,7 +92,7 @@ namespace LogTracker.Parsers.XML
             }
             return null;
         }
-
+        
         private LogParserErrors ProcessElement(XElement element)
         {
             if (!validConfigs)
@@ -97,6 +102,10 @@ namespace LogTracker.Parsers.XML
             if (registry == null)
             {
                 return LogParserErrors.RegistryNotSet;
+            }
+            if (timestampPath == null || messagePath == null)
+            {
+                return LogParserErrors.ConfigValueInvalid;
             }
 
             //XXX while logs shouldn't be out of order, it's possible
@@ -118,8 +127,9 @@ namespace LogTracker.Parsers.XML
             foreach (var kv in attributePaths)
             {
                 //XXX Only supports strings right now
-                var value = GetElementDataFromPath(kv.Value, element);
-                if (!string.IsNullOrWhiteSpace(value))
+                var rawValue = GetElementDataFromPath(kv.Value, element);
+                var value = ParserUtil.CastField(rawValue, kv.Value.Last().FieldType);
+                if (value != null)
                 {
                     registry.AddValueToLog(entry, kv.Key, value);
                 }
@@ -220,52 +230,37 @@ namespace LogTracker.Parsers.XML
             this.registry = registry;
         }
 
+        private void AddAttributePath(LogAttribute attribute, string path)
+        {
+            if (!string.IsNullOrWhiteSpace(path))
+            {
+                var parsedPath = ParserUtil.ParsePath(path);
+                if (parsedPath != null)
+                {
+                    attributePaths.Add(attribute, parsedPath);
+                }
+            }
+        }
+
         public void SetConfig(LogConfig config)
         {
             validConfigs = config.IsValid;
 
-            timestampPath = config.TimestampPath;
-            messagePath = config.LogMessagePath;
+            timestampPath = ParserUtil.ParsePath(config.TimestampPath);
+            messagePath = ParserUtil.ParsePath(config.LogMessagePath);
 
             attributePaths.Clear();
 
             //XXX too manual... how do we get this from LogConfig?
-            if (!string.IsNullOrWhiteSpace(config.ThreadIDPath))
-            {
-                attributePaths.Add(LogAttribute.ThreadID, config.ThreadIDPath);
-            }
-            if (!string.IsNullOrWhiteSpace(config.SourceFilePath))
-            {
-                attributePaths.Add(LogAttribute.SourceFile, config.SourceFilePath);
-            }
-            if (!string.IsNullOrWhiteSpace(config.FunctionPath))
-            {
-                attributePaths.Add(LogAttribute.Function, config.FunctionPath);
-            }
-            if (!string.IsNullOrWhiteSpace(config.LogLinePath))
-            {
-                attributePaths.Add(LogAttribute.SourceLine, config.LogLinePath);
-            }
-            if (!string.IsNullOrWhiteSpace(config.LogLevelPath))
-            {
-                attributePaths.Add(LogAttribute.Level, config.LogLevelPath);
-            }
-            if (!string.IsNullOrWhiteSpace(config.LogSequencePath))
-            {
-                attributePaths.Add(LogAttribute.SequenceNumber, config.LogSequencePath);
-            }
-            if (!string.IsNullOrWhiteSpace(config.ModulePath))
-            {
-                attributePaths.Add(LogAttribute.Module, config.ModulePath);
-            }
-            if (!string.IsNullOrWhiteSpace(config.LogTypePath))
-            {
-                attributePaths.Add(LogAttribute.Type, config.LogTypePath);
-            }
-            if (!string.IsNullOrWhiteSpace(config.SectionPath))
-            {
-                attributePaths.Add(LogAttribute.Section, config.SectionPath);
-            }
+            AddAttributePath(LogAttribute.ThreadID, config.ThreadIDPath);
+            AddAttributePath(LogAttribute.SourceFile, config.SourceFilePath);
+            AddAttributePath(LogAttribute.Function, config.FunctionPath);
+            AddAttributePath(LogAttribute.SourceLine, config.LogLinePath);
+            AddAttributePath(LogAttribute.Level, config.LogLevelPath);
+            AddAttributePath(LogAttribute.SequenceNumber, config.LogSequencePath);
+            AddAttributePath(LogAttribute.Module, config.ModulePath);
+            AddAttributePath(LogAttribute.Type, config.LogTypePath);
+            AddAttributePath(LogAttribute.Section, config.SectionPath);
         }
     }
 }

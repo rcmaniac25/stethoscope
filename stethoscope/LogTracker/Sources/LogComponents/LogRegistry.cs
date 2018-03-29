@@ -39,7 +39,7 @@ namespace LogTracker.Log
             logs.Clear();
         }
 
-        public static IDictionary<string, LogEntry[]> GetLogBy(LogAttribute attribute, IEnumerable<LogEntry> entries)
+        public static IDictionary<object, LogEntry[]> GetLogBy(LogAttribute attribute, IEnumerable<LogEntry> entries)
         {
             //XXX Initial implementation... should stream instead of building a dictionary (like when doing a groupBy)
             switch (attribute)
@@ -48,12 +48,12 @@ namespace LogTracker.Log
                 case LogAttribute.Timestamp:
                     return null;
             }
-            var tmpResult = new Dictionary<string, List<LogEntry>>();
+            var tmpResult = new Dictionary<object, List<LogEntry>>();
             foreach (var log in entries)
             {
                 if (log.HasAttribute(attribute))
                 {
-                    var key = log.GetAttribute<string>(attribute);
+                    var key = log.GetAttribute<object>(attribute);
                     if (!tmpResult.ContainsKey(key))
                     {
                         tmpResult.Add(key, new List<LogEntry>());
@@ -62,7 +62,7 @@ namespace LogTracker.Log
                 }
             }
 
-            var result = new Dictionary<string, LogEntry[]>();
+            var result = new Dictionary<object, LogEntry[]>();
             foreach (var kv in tmpResult)
             {
                 result.Add(kv.Key, kv.Value.ToArray());
@@ -70,7 +70,7 @@ namespace LogTracker.Log
             return result;
         }
 
-        public IDictionary<string, LogEntry[]> GetBy(LogAttribute attribute)
+        public IDictionary<object, LogEntry[]> GetBy(LogAttribute attribute)
         {
             return GetLogBy(attribute, logs);
         }

@@ -57,3 +57,9 @@ Note: running log of progress and notes that may not be code related.
 #9.1. 3/27/2018:
 - Orginized the files into folders and added one more parameter. Also fixed a bug where missing parameters could cause the program to crash
 - Needed a bit of abstraction for reorginizing sources
+- Just realized I finished 10 days of 100 Days of Code. Woot.
+
+#10.1. 3/28/2018:
+- Late start, but today's goal was parsing attribute types (and inadvertently formalizing the "path" syntax so I don't have to do string parsing the whole time)
+- Needed to touch a little more code then I wanted... but it works, and in theory could be faster then the string parsing from before
+- The path system could be expanded... but at that point, it's probably better to revisit the idea of using "paths". Speaking of which, a side reason for formalizing "paths" is because when JSON and other formats are added, we don't want to need special configs for each parser type (though we should support it...)
