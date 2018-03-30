@@ -13,6 +13,7 @@
         SequenceNumber,
         Module,
         Type,
-        Section
+        Section,
+        Context
     }
 }

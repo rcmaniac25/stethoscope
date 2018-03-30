@@ -66,3 +66,4 @@ Note: running log of progress and notes that may not be code related.
 
 #11.1. 3/29/2018:
 - Added key-value pair support for context attributes, which should simplify things later when we want to trace by a value
+- Wasn't working... found out I forgot to actually register the attribute. Yay, copy-paste bugs

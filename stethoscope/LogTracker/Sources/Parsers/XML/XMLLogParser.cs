@@ -261,6 +261,7 @@ namespace LogTracker.Parsers.XML
             AddAttributePath(LogAttribute.Module, config.ModulePath);
             AddAttributePath(LogAttribute.Type, config.LogTypePath);
             AddAttributePath(LogAttribute.Section, config.SectionPath);
+            AddAttributePath(LogAttribute.Context, config.ContextPath);
         }
     }
 }

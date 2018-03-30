@@ -55,7 +55,11 @@ namespace LogTracker.Parsers
                     {
                         kv.Add(pair);
                     }
-                    return kv;
+                    if (kv.Count > 0)
+                    {
+                        return kv;
+                    }
+                    break;
             }
             return null;
         }
