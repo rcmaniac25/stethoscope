@@ -16,7 +16,8 @@
 
         Bool,
         Int,
-        String
+        String,
+        KeyValue
     }
 
     class ParserPathElement

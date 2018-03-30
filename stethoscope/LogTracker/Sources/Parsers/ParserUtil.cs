@@ -46,6 +46,16 @@ namespace LogTracker.Parsers
                         return iValue;
                     }
                     break;
+                case ParserPathElementFieldType.KeyValue:
+                    IDictionary<string, string> kv = new Dictionary<string, string>();
+                    var pairs = from value in rawValue.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries)
+                                where value.IndexOf('=') > 0
+                                select new KeyValuePair<string, string>(value.Substring(0, value.IndexOf('=')), value.Substring(value.IndexOf('=') + 1));
+                    foreach (var pair in pairs)
+                    {
+                        kv.Add(pair);
+                    }
+                    return kv;
             }
             return null;
         }
@@ -68,6 +78,8 @@ namespace LogTracker.Parsers
                     return ParserPathElementFieldType.Int;
                 case "bool":
                     return ParserPathElementFieldType.Bool;
+                case "kv":
+                    return ParserPathElementFieldType.KeyValue;
             }
             return ParserPathElementFieldType.Unknown;
         }

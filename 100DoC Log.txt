@@ -63,3 +63,6 @@ Note: running log of progress and notes that may not be code related.
 - Late start, but today's goal was parsing attribute types (and inadvertently formalizing the "path" syntax so I don't have to do string parsing the whole time)
 - Needed to touch a little more code then I wanted... but it works, and in theory could be faster then the string parsing from before
 - The path system could be expanded... but at that point, it's probably better to revisit the idea of using "paths". Speaking of which, a side reason for formalizing "paths" is because when JSON and other formats are added, we don't want to need special configs for each parser type (though we should support it...)
+
+#11.1. 3/29/2018:
+- Added key-value pair support for context attributes, which should simplify things later when we want to trace by a value
