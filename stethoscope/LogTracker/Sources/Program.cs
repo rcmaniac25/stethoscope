@@ -1,4 +1,6 @@
 ﻿using LogTracker.Log;
+using LogTracker.Parsers;
+using LogTracker.Printers;
 
 using Mono.Options;
 
@@ -16,7 +18,10 @@ namespace LogTracker
 
         public Program(LogConfig config)
         {
-            parser = new LogParser(config);
+            var parserFactory = LogParserFactory.GetParserForFileExtension("xml");
+            var printerFactory = PrinterFactory.CrateConsoleFactory();
+
+            parser = new LogParser(config, parserFactory, printerFactory);
         }
         
         public void Process(string logFile)

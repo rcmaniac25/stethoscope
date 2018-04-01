@@ -71,3 +71,18 @@ Note: running log of progress and notes that may not be code related.
 #12.1. 3/30/2018:
 - Next couple days are with family, so I can't get as much done as I would like...
 - Added a printer class so I can support files, console, etc. printouts without needing to rewrite systems
+
+#13.1. 3/31/2018:
+- I did one more abstraction to get the parsers and printers from a factory.
+- I expect 3 reactions: why? ah, good decision, and premature optimization...
+- It's not premature optmization... it's premature generalization. Something of equivilent badness, but only if it's actually going to have an effect.
+- In this case, and to awnser the "why", is to shrink the classes down a bit, allow for easy testing with mocks, and to prepare for the inevitable expansion of functionality.
+- See, I thought up some ideas on how I want this to operate (I should write them down in some document...), and they all revolved around the GUI. But I know some of the people who have voiced interest are CLI users. Others only use a IDE like Eclipse, VS Code, or Sublime (depending on how you set it up, it can act like an IDE...)
+- I can write a single app (that I would still need to move to C++) that has tens of hundreds of options and configs, letting you do anything you wanted... or I can try and be "smart". "What file type are you using? XML? Ok, I should get the XML parser." "I'm a CLI app, so I will print to the console... wait, you specifed you wanted a file, so I will now print to a file"
+- How about for "how do I know I didn't break XML parsing by switching from parser X to parser Y?" Easy: tests. But, I need to expose interfaces and internal structures to change values... or I can mock them, abstracted by interfaces, to control within the actual execution class.
+- And that darn porting thing. I want this in C++ so instead of requiring *nix users to install C++, or have Java installed... or some other framework. How about "extract a program from the zip, and it runs". Like a good-old portable app.
+- Here's what now happens:
+-- 1. Bunch of small classes, as independent functionality and decision making is broken up, makes it easier to port eventually. It also allows for making focused classes, such as one that says "what do we need to parse" and "how do we need to present it" instead of a giant code block that's all tangled together.
+-- 2. Tests now can be more complex, test more functionality because it doesn't have to test functions with 30 if statements in them, and actually be written without modifying the real code. Need to start this while things are small...
+-- 3. Lastly, every time I say "let me add a new feature", I don't have to "make it fit". I should have a class that defines that functionnal "idea" and where it fits in.
+- TL:DR: I didn't need to do this now, but it will be easier now then when the code is already tangled.

@@ -1,6 +1,4 @@
 ﻿using LogTracker.Common;
-using LogTracker.Parsers.XML;
-using LogTracker.Printers;
 
 namespace LogTracker.Log
 {
@@ -10,17 +8,12 @@ namespace LogTracker.Log
         private IPrinter printer;
         private LogRegistry registry;
 
-        public LogParser(LogConfig config)
+        public LogParser(LogConfig config, ILogParserFactory parserFactory, IPrinterFactory printerFactory)
         {
             registry = new LogRegistry();
-
-            logParser = new XMLLogParser();
-            logParser.SetConfig(config);
-            logParser.SetRegistry(registry);
-
-            printer = new ConsolePrinter();
-            printer.SetConfig(config);
-            printer.SetRegistry(registry);
+            
+            logParser = parserFactory.Create(registry, config);
+            printer = printerFactory.Create(registry, config);
         }
         
         public void Process(string logFile)

@@ -6,8 +6,5 @@
 
         void Setup();
         void Teardown();
-
-        void SetRegistry(ILogRegistry registry);
-        void SetConfig(LogConfig config);
     }
 }
