@@ -1,4 +1,5 @@
-﻿using LogTracker.Log;
+﻿using LogTracker.Common;
+using LogTracker.Log;
 using LogTracker.Parsers;
 using LogTracker.Printers;
 
@@ -14,27 +15,17 @@ namespace LogTracker
 {
     public class Program
     {
-        private LogParser parser;
+        private LogConfig config;
+        private string[] extraParserArguments;
 
-        public Program(LogConfig config)
-        {
-            var parserFactory = LogParserFactory.GetParserForFileExtension("xml");
-            var printerFactory = PrinterFactory.CrateConsoleFactory();
+        private ILogParser logFileParser;
+        private IPrinter printer;
 
-            parser = new LogParser(config, parserFactory, printerFactory);
-        }
-        
-        public void Process(string logFile)
-        {
-            parser.Process(logFile);
-        }
+        private LogRegistry registry;
 
-        public void Print()
-        {
-            parser.PrintTrace();
-        }
+        #region Argument Parsing
 
-        public static void Main(string[] args)
+        public bool ParseArguments(string[] args)
         {
             string logConfigPath = null;
 
@@ -51,16 +42,18 @@ namespace LogTracker
             catch (OptionException e)
             {
                 //TODO
-                return;
+                return false;
             }
 
             if (extraArgs.Count == 0)
             {
                 Console.Error.WriteLine("Usage: LogTracker <xml log file> [<xml log config json>]");
-                return;
+                return false;
             }
 
-            var logConfig = new LogConfig();
+            extraParserArguments = extraArgs.ToArray();
+
+            config = new LogConfig();
             if (!string.IsNullOrWhiteSpace(logConfigPath))
             {
                 using (var fs = new FileStream(logConfigPath, FileMode.Open))
@@ -70,17 +63,51 @@ namespace LogTracker
                         using (var jr = new JsonTextReader(sr))
                         {
                             var serializer = new JsonSerializer();
-                            logConfig = serializer.Deserialize<LogConfig>(jr);
+                            config = serializer.Deserialize<LogConfig>(jr);
                         }
                     }
                 }
             }
 
-            var program = new Program(logConfig);
+            return true;
+        }
 
-            program.Process(extraArgs[0]);
+        #endregion
 
-            program.Print();
+        public void Setup()
+        {
+            //XXX use config to get this info
+            var parserFactory = LogParserFactory.GetParserForFileExtension("xml");
+            var printerFactory = PrinterFactory.CrateConsoleFactory();
+
+            registry = new LogRegistry();
+
+            logFileParser = parserFactory.Create(registry, config);
+            printer = printerFactory.Create(registry, config);
+        }
+        
+        public void Process()
+        {
+            logFileParser.Parse(extraParserArguments[0]);
+        }
+
+        public void Print()
+        {
+            printer.Setup();
+            printer.Print();
+            printer.Teardown();
+        }
+
+        public static void Main(string[] args)
+        {
+            var program = new Program();
+
+            if (program.ParseArguments(args))
+            {
+                program.Setup();
+                program.Process();
+                program.Print();
+            }
         }
     }
 }
