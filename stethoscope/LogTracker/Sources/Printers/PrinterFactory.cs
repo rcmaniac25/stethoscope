@@ -1,4 +1,5 @@
 ﻿using LogTracker.Common;
+using LogTracker.Printers.Internal;
 
 namespace LogTracker.Printers
 {

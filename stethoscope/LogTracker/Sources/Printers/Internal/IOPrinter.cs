@@ -2,7 +2,7 @@
 
 using System.IO;
 
-namespace LogTracker.Printers
+namespace LogTracker.Printers.Internal
 {
     public abstract class IOPrinter : IPrinter
     {

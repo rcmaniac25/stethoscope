@@ -86,3 +86,6 @@ Note: running log of progress and notes that may not be code related.
 -- 2. Tests now can be more complex, test more functionality because it doesn't have to test functions with 30 if statements in them, and actually be written without modifying the real code. Need to start this while things are small...
 -- 3. Lastly, every time I say "let me add a new feature", I don't have to "make it fit". I should have a class that defines that functionnal "idea" and where it fits in.
 - TL:DR: I didn't need to do this now, but it will be easier now then when the code is already tangled.
+
+#14.1. 4/1/2018:
+- Moved a couple classes that I didn't get to yesterday, since the factories imply the internal/implementation details don't need to know. Trust the interface.

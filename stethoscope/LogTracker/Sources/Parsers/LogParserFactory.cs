@@ -1,4 +1,5 @@
 ﻿using LogTracker.Common;
+using LogTracker.Parsers.Internal.XML;
 
 namespace LogTracker.Parsers
 {
@@ -22,7 +23,7 @@ namespace LogTracker.Parsers
         {
             public ILogParser Create(ILogRegistry registry, LogConfig config)
             {
-                var parser = new XML.XMLLogParser();
+                var parser = new XMLLogParser();
                 parser.SetRegistry(registry);
                 parser.SetConfig(config);
                 return parser;

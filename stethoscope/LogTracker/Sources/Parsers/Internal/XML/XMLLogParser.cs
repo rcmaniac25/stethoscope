@@ -8,7 +8,7 @@ using System.Text;
 using System.Xml;
 using System.Xml.Linq;
 
-namespace LogTracker.Parsers.XML
+namespace LogTracker.Parsers.Internal.XML
 {
     public class XMLLogParser : ILogParser
     {

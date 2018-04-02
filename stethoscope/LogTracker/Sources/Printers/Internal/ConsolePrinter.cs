@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace LogTracker.Printers
+namespace LogTracker.Printers.Internal
 {
     public class ConsolePrinter : IOPrinter
     {
