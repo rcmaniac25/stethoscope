@@ -92,3 +92,7 @@ Note: running log of progress and notes that may not be code related. Also, I'm 
 - PSA: don't kill yourself coding. It's never worth it. Take it from my own experience: I keep wanting to get a bunch of stuff done, and end up staying up late. Doing that and getting up late, so you get the sleep, is fine (so long as work, school, whatever is your real life allows it). In my case, I have been getting what I mentally averaged to 4-5 hours a sleep a night... for like 6+ months. It's made me more tired, sluggish, harder to focus, and I've gotten more sick then I'm used to. I need to break this habit...
 - ...which brings me to: I'm sick and need rest. So I did an additional refactor which got rid of a redudent class, though at the detriment of being able to insert mocks easily... (didn't I write about this yesterday?). I will probably reintroduce the class or an equiv. component.
 - For now, I sleep. Tomorrow, I'd like to plan further moves and maybe get a public list of tasks I'm trying to do.
+
+#15.1. 4/2/2018:
+- PSA: being sick is annoying. Take care of yourself.
+- Today I worked on docs... a needed evil
