@@ -43,6 +43,10 @@ So... high level design? At least for a first go, PoC, etc.
 
 {rcm}That's enough for now. Once a clearer picture of code progress is determined, this will be updated.{/rcm}
 
+### Details and Timeline
+
+See [Tasks](Docs/Tasks.md)
+
 ## Disclamer
 
 Disclamers exist for the sake of preventing the wrong idea about a project:

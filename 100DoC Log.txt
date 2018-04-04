@@ -96,3 +96,12 @@ Note: running log of progress and notes that may not be code related. Also, I'm 
 #15.1. 4/2/2018:
 - PSA: being sick is annoying. Take care of yourself.
 - Today I worked on docs... a needed evil
+
+#16.1. 4/3/2018:
+- More doc work. I had a timeline to follow, but it was agressive when I wrote it, and probably can't do such a thing (and ideas for how/what to do also became more concrete between then and now). Simplified:
+-- Day 1. figure out program name
+-- Day 25. Have a library that can parse a large-ish log quickly
+-- Day 50. Initial GUI that can visually show the flow of the logs
+-- Day 75. Have a working library for parsing, GUI for visually debugging through the logs, support for RPCs and message tracing, have let others (I know directly) try it out and see what they think and what they want/have issues with, and start working on an offical CLI and search capability
+-- Day 100. Version 1.0, with a bit of polish, integration with a real debugger (at the time, I assumed to augment a debugger with log info... but I'm not sure how much that would actually be needed), and possibly work on any stretch goals I could think of along the way.
+- Talk about agressive...
