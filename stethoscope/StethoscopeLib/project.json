@@ -1,12 +1,13 @@
-﻿{
+{
   "title": "Stethoscope Library",
   "copyright": "2018 Vincent Simonetti",
   "description": "Workhorse functions and classes for log processing",
   "version": "0.0.1-*",
 
   "dependencies": {
-    "NETStandard.Library": "1.6.1",
-    "Newtonsoft.Json": "11.0.2"
+    "NETStandard.Library": "2.0.1",
+    "Newtonsoft.Json": "11.0.2",
+    "NUnit": "3.10.1"
   },
 
   "frameworks": {

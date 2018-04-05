@@ -109,3 +109,4 @@ Note: running log of progress and notes that may not be code related. Also, I'm 
 #17.1. 4/4/2018:
 - Thought a bit and opted to just split the program and library portions. There was no good abstract interface that would allow unit testing AND be usable by more then just one class/program.
 - Instead decided to start trying to get unit tests setup, starting with spliting the program and library.
+- At least add NUnit reference
