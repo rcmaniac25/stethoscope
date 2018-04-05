@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 // associated with an assembly.
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("LogTracker")]
+[assembly: AssemblyProduct("StethoscopeLib")]
 [assembly: AssemblyTrademark("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible
@@ -16,4 +16,4 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("c401a78e-34f2-4d82-aab4-9fe8bd8fe44a")]
+[assembly: Guid("ebb61fcc-b474-42ff-b377-19a743cdf9e1")]

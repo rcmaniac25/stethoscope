@@ -47,7 +47,7 @@ namespace LogTracker
 
             if (extraArgs.Count == 0)
             {
-                Console.Error.WriteLine("Usage: LogTracker <xml log file> [<xml log config json>]");
+                Console.Error.WriteLine("Usage: Tracker <xml log file> [<xml log config json>]");
                 return false;
             }
 
@@ -85,7 +85,7 @@ namespace LogTracker
             logFileParser = parserFactory.Create(registry, config);
             printer = printerFactory.Create(registry, config);
         }
-        
+
         public void Process()
         {
             logFileParser.Parse(extraParserArguments[0]);

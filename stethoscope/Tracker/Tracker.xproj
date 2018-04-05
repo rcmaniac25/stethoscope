@@ -7,8 +7,8 @@
 
   <Import Project="$(VSToolsPath)\DotNet\Microsoft.DotNet.Props" Condition="'$(VSToolsPath)' != ''" />
   <PropertyGroup Label="Globals">
-    <ProjectGuid>c401a78e-34f2-4d82-aab4-9fe8bd8fe44a</ProjectGuid>
-    <RootNamespace>LogTracker</RootNamespace>
+    <ProjectGuid>67604f5c-ee98-4486-acd0-5a4d7aeff990</ProjectGuid>
+    <RootNamespace>Tracker</RootNamespace>
     <BaseIntermediateOutputPath Condition="'$(BaseIntermediateOutputPath)'=='' ">.\obj</BaseIntermediateOutputPath>
     <OutputPath Condition="'$(OutputPath)'=='' ">.\bin\</OutputPath>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>

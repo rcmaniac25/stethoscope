@@ -4,7 +4,6 @@
 
 What needs to get done. Should make some of them tickets... (some of these may be trains of thought)
 
-- Removed LogParser class... which now makes it harder to unit test. Define something new so we can unit test, but try not to make it a pass-through class (that was the problem with prior one: DoWork() { innerClass->DoWork(); }, so why did we have it?)
 - Add unit tests. If anything, it will add a bit of accountability in case I random start breaking things.
 - Aquire bigger logs (I'm testing on like a 6 line file... I have files in the GB range, but that might be too big for now, so I need something smaller. Note: can't post these...)
     - See how long these take to parse, and see where we can speed up processing (background threads? Queues?)
