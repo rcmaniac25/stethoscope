@@ -110,3 +110,7 @@ Note: running log of progress and notes that may not be code related. Also, I'm 
 - Thought a bit and opted to just split the program and library portions. There was no good abstract interface that would allow unit testing AND be usable by more then just one class/program.
 - Instead decided to start trying to get unit tests setup, starting with spliting the program and library.
 - At least add NUnit reference
+
+#18.1. 4/5/2018:
+- I've been struggling with the "dedicate 1 hour" for the 100 Days of Code project. First it was habit, next sickness, now is the disease all software engineers have: time. I look at a clock and say "I have time" and then when I next look, it's time for bed.
+- Realized I missed one attribute within the logs I'm testing. Also realized the names of those attributes are not always the best, so added some docs around them.
