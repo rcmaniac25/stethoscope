@@ -6,8 +6,7 @@
 
   "dependencies": {
     "NETStandard.Library": "2.0.1",
-    "Newtonsoft.Json": "11.0.2",
-    "NUnit": "3.10.1"
+    "Newtonsoft.Json": "11.0.2"
   },
 
   "frameworks": {

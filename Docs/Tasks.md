@@ -5,6 +5,10 @@
 What needs to get done. Should make some of them tickets... (some of these may be trains of thought)
 
 - Add unit tests. If anything, it will add a bit of accountability in case I randomly start breaking things.
+    - Get first test working (need to be able to reference library)
+	- Think about if namespace is "good" for library? (gut feeling: no)
+	- Write tests...
+	- Update code so it passes tests (TDD...)
 - Acquire bigger logs (I'm testing on like a 6 line file... I have files in the GB range, but that might be too big for now, so I need something smaller. Note: can't post these...)
     - See how long these take to parse, and see where we can speed up processing (background threads? Queues?)
 - Determine program arguments and the config file usage (are they redundent? Complementary? Can I setup everything with program arguments?)

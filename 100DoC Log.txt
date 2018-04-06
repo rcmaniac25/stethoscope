@@ -114,3 +114,5 @@ Note: running log of progress and notes that may not be code related. Also, I'm 
 #18.1. 4/5/2018:
 - I've been struggling with the "dedicate 1 hour" for the 100 Days of Code project. First it was habit, next sickness, now is the disease all software engineers have: time. I look at a clock and say "I have time" and then when I next look, it's time for bed.
 - Realized I missed one attribute within the logs I'm testing. Also realized the names of those attributes are not always the best, so added some docs around them.
+- Wanted to get the test project setup with at least one test. Didn't like the tutorials for using NUnit within Visual Studio, but found http://www.dotnetcurry.com/visualstudio/1352/nunit-testing-visual-studio-2015 which I liked.
+- So I got the test project and what would be test #0... and Visual Studio is complaining about the lib not having a .exe or .dll extension (according to the bin dir, it has a .dll extension). If it was earlier, I'd try to fix it. For now, tests pass
