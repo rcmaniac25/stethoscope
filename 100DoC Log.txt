@@ -116,3 +116,13 @@ Note: running log of progress and notes that may not be code related. Also, I'm 
 - Realized I missed one attribute within the logs I'm testing. Also realized the names of those attributes are not always the best, so added some docs around them.
 - Wanted to get the test project setup with at least one test. Didn't like the tutorials for using NUnit within Visual Studio, but found http://www.dotnetcurry.com/visualstudio/1352/nunit-testing-visual-studio-2015 which I liked.
 - So I got the test project and what would be test #0... and Visual Studio is complaining about the lib not having a .exe or .dll extension (according to the bin dir, it has a .dll extension). If it was earlier, I'd try to fix it. For now, tests pass
+
+#19.1. 4/6/2018:
+- I'm sad... I'm sad because I can't get a simple test project to work. I can and should upgrade to VS 2017, but I fail to see that as a requirement to get these tests working with .Net Core. Nearly every tutorial talks like it's so easy "add this dependency and your done" but know what, I add the dependency and my tests don't show up in the test explorer.
+- It doesn't help that I'm half asleep (if you ever meet me IRL, you'll find out I'm perpetually tired. I have a small window where I can focus and get stuff done. Today I used that period to play video games)
+- Welp... looks like I get to reset my progress back to 0 because I couldn't get anything done today. I am very unhappy with Visual Studio, NUnit, and the tech results I'm getting back from doing searches. This should've been "Visual Studio wants to run tests, NUnit looked for NUnit references... found them, VS is now happy to show the tests". But this isn't the case.
+- I'm not calling it defeat but this is truely annoying. It's stuff like this that makes me drop projects... dependency? Right click dependencies and add to it. Good. Unit test? Seems like a half-hearted attempt to add test support but not maintain consistancy throughout (and I'm a stickler for consistancy). Packaging? I'd like to offer a single sentence response, but there are too many variables for it. Zipping a directory doesn't count, that's a hack.
+- Still firm belief this is because I'm really tired.
+
+#0.2. 4/7/2018:
+- <todo...>
