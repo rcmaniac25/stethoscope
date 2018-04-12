@@ -47,6 +47,12 @@ What needs to get done. Should make some of them tickets... (some of these may b
 - Can plugins be made for debugging from an IDE? Can Eclipse, Visual Studio, Sublime, VS Code, etc. add a debugger? Can we then automatically parse the code in use, debug some logs as if it's a debugger for following instructions made by the code.
 - {that's all for now...}
 
+### Outside Tasks
+
+Tasks that are out of scope, but nice to have
+
+- Contribute to NUnit for docs (bring more emphesis to "you can't use .Net Standard, only .Net Core and .Net Framework for tests") and try to add an automated sanity check that looks at the TargetFrameworkAttribute that assemblies can have, that states what it was built under, in an effort to early exit and say "tests won't be run for that library because it's not a supported library: {link to docs}"
+
 ## Architecture
 
 Note: section is fine, but content is... not really an architecture
