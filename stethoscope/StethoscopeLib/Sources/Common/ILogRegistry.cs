@@ -9,6 +9,6 @@ namespace LogTracker.Common
         ILogEntry AddLog(string timestamp, string message);
         bool AddValueToLog(ILogEntry entry, LogAttribute attribute, object value);
 
-        IDictionary<object, LogEntry[]> GetBy(LogAttribute attribute);
+        IDictionary<object, ILogEntry[]> GetBy(LogAttribute attribute);
     }
 }

@@ -140,3 +140,7 @@ Note: running log of progress and notes that may not be code related. Also, I'm 
 - I started off tests by... reading. RTFM. If I didn't, I would've just did the "classic model" of "Assert.Equal(X, Y)" which is not what NUnit prefers. So I did a bunch of reading...
 - ...and redid the existing test.
 - I started late, so I didn't get to anything else. Oops. Time to get back into the habit.
+
+#2.2. 4/13/2018:
+- Wanted to spend more time on this, but I need to be up early.
+- I was trying to figure out what to write a test for next and realized I had defined an ILogEntry interface, used it in ILogRegistry, but... the actual GetBy function (basically a DB/dictionary query) had hardcoded LogEntry instead of ILogEntry. So that needed to change.
