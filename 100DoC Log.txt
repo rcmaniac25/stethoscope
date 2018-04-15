@@ -148,3 +148,4 @@ Note: running log of progress and notes that may not be code related. Also, I'm 
 #3.2. 4/14/2018:
 - So I always start late and commit on the following day then the one I log for. I will probably still do that, but as I had to do stuff early yesterday, I need to commit today and "tomorrow" so it doesn't appear I skipped a day.
 - Started working on more tests. First up: factories. Gave me a reason to add a mocking library (NSubstitute) and to use it. I need to read the docs a bit. I'm used to gmock/gtest, where I expect something to be called and then it complains when it is called (and wasn't expected) or isn't called (and was expected). NSubstitute seems to work off a "check after the fact" but won't tell me if something got called unexpectedly. I feel like that isn't actually the case, but I haven't gone through the logs (or written something that does that). Yet.
+- Started working on LogEntry tests.

@@ -17,3 +17,5 @@ using System.Runtime.InteropServices;
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("ebb61fcc-b474-42ff-b377-19a743cdf9e1")]
+
+[assembly: InternalsVisibleTo("StethoscopeLib.Tests")]
