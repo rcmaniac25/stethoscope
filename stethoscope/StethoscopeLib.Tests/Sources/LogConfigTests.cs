@@ -5,17 +5,6 @@ namespace LogTracker.Tests
     [TestFixture(TestOf = typeof(LogConfig))]
     public class LogConfigTest
     {
-        // TODO: remove once we get a test that actually requires setup
-        [SetUp]
-        public void Setup()
-        {
-        }
-
-        [TearDown]
-        public void Teardown()
-        {
-        }
-
         [Test]
         public void IsValidDefault()
         {
