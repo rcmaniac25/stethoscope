@@ -45,15 +45,12 @@ namespace LogTracker.Log
 
         public T GetAttribute<T>(LogAttribute attribute)
         {
-            if (attributes.ContainsKey(attribute))
+            if (!attributes.ContainsKey(attribute))
             {
-                var att = attributes[attribute];
-                if (att is T)
-                {
-                    return (T)att;
-                }
+                throw new KeyNotFoundException();
             }
-            return default(T);
+
+            return (T)attributes[attribute];
         }
 
         public void AddAttribute(LogAttribute attribute, object value)

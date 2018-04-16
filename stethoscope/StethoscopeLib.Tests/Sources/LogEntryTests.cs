@@ -3,22 +3,50 @@
 using NUnit.Framework;
 
 using System;
+using System.Collections.Generic;
 
-namespace LogTracker.Tests.Sources
+namespace LogTracker.Tests
 {
     [TestFixture(TestOf = typeof(LogEntry))]
     public class LogEntryTests
     {
         [Test]
-        public void PropertyNotSet()
+        public void AttributeNotSet()
         {
             var entry = new LogEntry(DateTime.Now, "testmsg");
             Assert.That(entry.HasAttribute(Common.LogAttribute.ThreadID), Is.False);
         }
 
-        //TODO: invalid type cast
-        //TODO: get attribute, value doesn't exist
-        //TODO: add attribute
+        [Test]
+        public void AttributeTypeCast()
+        {
+            var entry = new LogEntry(DateTime.Now, "testmsg");
+            Assert.Throws<InvalidCastException>(() =>
+            {
+                entry.GetAttribute<int>(Common.LogAttribute.Message);
+            });
+        }
+
+        [Test]
+        public void AttributeNotExist()
+        {
+            var entry = new LogEntry(DateTime.Now, "testmsg");
+            Assert.Throws<KeyNotFoundException>(() =>
+            {
+                entry.GetAttribute<string>(Common.LogAttribute.ThreadID);
+            });
+        }
+
+        [Test]
+        public void AddAttribute()
+        {
+            var entry = new LogEntry(DateTime.Now, "testmsg");
+            Assert.That(entry.HasAttribute(Common.LogAttribute.ThreadID), Is.False);
+
+            entry.AddAttribute(Common.LogAttribute.ThreadID, "threadid");
+
+            Assert.That(entry.HasAttribute(Common.LogAttribute.ThreadID), Is.True);
+        }
 
         [Test]
         public void LogMessageProperty()
