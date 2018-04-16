@@ -1,6 +1,4 @@
-﻿using LogTracker.Log; //XXX temp
-
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace LogTracker.Common
 {
