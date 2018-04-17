@@ -15,6 +15,7 @@ What needs to get done. Should make some of them tickets... (some of these may b
 - Acquire bigger logs (I'm testing on like a 6 line file... I have files in the GB range, but that might be too big for now, so I need something smaller. Note: can't post these...)
     - See how long these take to parse, and see where we can speed up processing (background threads? Queues?)
 - Determine program arguments and the config file usage (are they redundent? Complementary? Can I setup everything with program arguments?)
+- Add logging (ironic... a log handling system, writing it's own logs). Will be useful when trying to figure out what went wrong with accesing remote logs and doing more advanced work.
 - Support remote logs
 - (large) With larger logs, start to flesh out LogRegistry... maybe allow LINQ usage so components of logs can be searched through.
     - Also try to figure out a good way to represent all this, as the idea seems like a DB. But it would be a DB with a dictionary... and that implies a NoSQL DB.
@@ -22,6 +23,7 @@ What needs to get done. Should make some of them tickets... (some of these may b
     - Needs to support multiple sources (so there may be logs from same time but different log files), and how to query through that
     - How much metadata do we want? (log file names, sources, etc.)
     - Can we parse sub-logs? Like, running an inner process that makes it's own logs (different style, different functions, etc.)... but it outputs to the same log handler. End result: all the logs show up as "myLogHandler: {sublog}"
+	- How can we handle log-level structures? As in, some loggers can have a single log line and still write when a function started and when it ended. Knowing something like that would mean that instead of needing to guess at the start and end of a function, or requiring a templeted system, I can just look at a log and say "start and end" and move on.
 - Doc and UT work (any areas to catch up on for these?)
 - Streaming logs (use a sliding window or similar so we can discard what we don't care about... but what don't we care about?)
     - Are we sure we want to discard? What happens if someone searches for something we don't have? We don't want to read everything every time.

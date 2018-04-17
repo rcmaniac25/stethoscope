@@ -1,6 +1,7 @@
 ﻿using LogTracker.Common;
 
 using System.IO;
+using System.Linq;
 
 namespace LogTracker.Printers.Internal
 {
@@ -31,8 +32,9 @@ namespace LogTracker.Printers.Internal
                 int indent = 0;
                 TextWriter.WriteLine($"Thread {thread.Key}");
 
-                var initSrc = thread.Value[0].GetAttribute<string>(LogAttribute.SourceFile);
-                var lastFunc = thread.Value[0].GetAttribute<string>(LogAttribute.Function);
+                var firstAttribute = thread.Value.First();
+                var initSrc = firstAttribute.GetAttribute<string>(LogAttribute.SourceFile);
+                var lastFunc = firstAttribute.GetAttribute<string>(LogAttribute.Function);
 
                 var lastFuncSrc = $"{initSrc}.{lastFunc}";
 

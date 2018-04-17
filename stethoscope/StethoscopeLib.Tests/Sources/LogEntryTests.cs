@@ -49,6 +49,15 @@ namespace LogTracker.Tests
         }
 
         [Test]
+        public void InvalidMessage()
+        {
+            Assert.Throws<ArgumentNullException>(() =>
+            {
+                new LogEntry(DateTime.Now, null);
+            });
+        }
+
+        [Test]
         public void LogMessageProperty()
         {
             var msg = "testmsg";

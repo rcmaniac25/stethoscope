@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace LogTracker.Log
 {
-    public class LogEntry : IMutableLogEntry
+    public class LogEntry : IMutableLogEntry, IComparable<LogEntry>
     {
         Lazy<DateTime> lazyTimestamp;
         Lazy<string> lazyMessage;
@@ -31,6 +31,11 @@ namespace LogTracker.Log
 
         internal LogEntry(DateTime timestamp, string logMessage)
         {
+            if (logMessage == null)
+            {
+                throw new ArgumentNullException("logMessage");
+            }
+
             AddAttribute(LogAttribute.Timestamp, timestamp);
             AddAttribute(LogAttribute.Message, logMessage);
 
@@ -56,6 +61,11 @@ namespace LogTracker.Log
         public void AddAttribute(LogAttribute attribute, object value)
         {
             attributes.Add(attribute, value);
+        }
+
+        public int CompareTo(LogEntry other)
+        {
+            return Timestamp.CompareTo(other.Timestamp);
         }
     }
 }

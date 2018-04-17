@@ -10,23 +10,56 @@ namespace LogTracker.Log
     {
         private List<LogEntry> logs = new List<LogEntry>();
 
+        private void AddLogSorted(LogEntry entry)
+        {
+            // From https://stackoverflow.com/a/22801345/492347
+            if (logs.Count == 0 || logs[logs.Count - 1].CompareTo(entry) <= 0)
+            {
+                logs.Add(entry);
+            }
+            else if (logs[0].CompareTo(entry) >= 0)
+            {
+                logs.Insert(0, entry);
+            }
+            else
+            {
+                var index = logs.BinarySearch(entry);
+                if (index < 0)
+                {
+                    index = ~index;
+                }
+                logs.Insert(index, entry);
+            }
+        }
+
         public ILogEntry AddLog(string timestamp, string message)
         {
+            if (timestamp == null)
+            {
+                throw new ArgumentNullException("timestamp");
+            }
+            if (message == null)
+            {
+                throw new ArgumentNullException("message");
+            }
+
             DateTime time;
             if (!DateTime.TryParse(timestamp, out time))
             {
-                return null;
+                throw new ArgumentException("Could not parse timestamp", "timestamp");
             }
             var entry = new LogEntry(time, message);
-            logs.Add(entry);
+            AddLogSorted(entry);
             return entry;
         }
 
         public bool AddValueToLog(ILogEntry entry, LogAttribute attribute, object value)
         {
-            if (attribute == LogAttribute.Message || 
-                attribute == LogAttribute.Timestamp ||
-                !(entry is IMutableLogEntry))
+            if (!(entry is IMutableLogEntry))
+            {
+                return false;
+            }
+            if (entry.HasAttribute(attribute) || entry == null || value == null)
             {
                 return false;
             }
@@ -39,14 +72,12 @@ namespace LogTracker.Log
             logs.Clear();
         }
 
-        public static IDictionary<object, ILogEntry[]> GetLogBy(LogAttribute attribute, IEnumerable<ILogEntry> entries)
+        public static IDictionary<object, IEnumerable<ILogEntry>> GetLogBy(LogAttribute attribute, IEnumerable<ILogEntry> entries)
         {
             //XXX Initial implementation... should stream instead of building a dictionary (like when doing a groupBy)
-            switch (attribute)
+            if (attribute == LogAttribute.Timestamp)
             {
-                case LogAttribute.Message:
-                case LogAttribute.Timestamp:
-                    return null;
+                return null;
             }
             var tmpResult = new Dictionary<object, List<ILogEntry>>();
             foreach (var log in entries)
@@ -62,19 +93,24 @@ namespace LogTracker.Log
                 }
             }
 
-            var result = new Dictionary<object, ILogEntry[]>();
+            var result = new Dictionary<object, IEnumerable<ILogEntry>>();
             foreach (var kv in tmpResult)
             {
-                result.Add(kv.Key, kv.Value.ToArray());
+                result.Add(kv.Key, kv.Value.AsReadOnly());
             }
             return result;
         }
 
-        public IDictionary<object, ILogEntry[]> GetBy(LogAttribute attribute)
+        public IDictionary<object, IEnumerable<ILogEntry>> GetBy(LogAttribute attribute)
         {
             return GetLogBy(attribute, logs);
         }
-        
+
+        public IEnumerable<ILogEntry> GetByTimetstamp()
+        {
+            return logs.AsReadOnly();
+        }
+
         //TODO: special get functions - get by function, get by thread ID, get by <key>, etc.
         /* TODO: LINQ support?
          * 

@@ -156,3 +156,37 @@ Note: running log of progress and notes that may not be code related. Also, I'm 
 - TDD time again... this is a habit I need to get into in general. At my work, it's always easy to spend a day or two working on a class, then spend a few hours on tests and know all the paths to test. But the point is to write how you expect the program to work, not how you know it already works.
 - I got a couple tests, only to realize my implementation work as I expected. Initial thought was "what am I doing wrong", then looked at the impl. and realized "I don't want that..." (getting logs by their message or timestamp). See the "todos" in LogRegistryTests.cs
 - I also made the mistake of doing too much in a unit test, and it didn't work because of my GetBy impl. anyway
+
+#5.2. 4/16/2018:
+- Wrote a lot more LogRegistry tests. Half TDDed, half "was updating something in LogRegistry when I noticed a case I coded to handle, but didn't write a test for".
+- The big question for this evening is "return error, or exception?" So this has been a struggle recently for me. All the time I did C# (Java, F#, and others), throwing an exception "is what you do" (TM). Then along comes C/C++. C++ has exceptions, but I've become a bit more "I want a good, clean, end-to-end opcodes" when doing native development. As such, I've seen how Windows and Linux handle exceptions, and it's not pretty. I've also learned that "-O3 optomized" tends to not mean squat if your code isn't in a specific format. Also, C++ is a lot easier to forget to cleanup a resource that was mid-process. Think:
+int main()
+{
+    try
+    {
+        myFunc();
+    }
+    catch
+    {
+    }
+    return 0;
+}
+
+void myFunc()
+{
+    std::ifstream in("log.txt", std::ios_base::in);
+    doSomethingCool(in);
+}
+
+void doSomethingCool(std::ifstream& input)
+{
+    //...
+    throw new std::exception("oops");
+}
+- I'd expect that the input stream would cleanup. But... I don't know. I'd like to not know, because it would make programming easier (I.e. assuming that stuff gets cleaned up for you). It's not naive, it's taking the human element into account when designing a language.
+- Meanwhile, in my preferred native language: C... what's an exception?
+- So with plans to move this to C++ at a later point, I had to decide: do I write C# functions without exceptions or not?
+- My answer was: depends. If what I was dealing with something had a return status (either from the function itself, or as a different function), I didn't throw an exception. If it didn't, then I threw the exception.
+- The way I figure it: if I'm saying "add this value to the log entry" and I want to know if it got added, instead of getting said value and comparing, I'll just look at a return code. So for all failures, return according to return code. Else, I have no idea I did something wrong... so throw the exception.
+- Bonus: unrelated to ^^, I added a GetByTimestamp function to LogRegistry and changed the return from GetBy from IDictionary<object, IEnumerable<ILogEntry>> which allows me to support getting by log message* AND still works in pretty much any way I expect.
+- * so, to make a grouped dictionary, I need to go through every single log...  working with yield would be better but it's still going to be very challenging to deal with large logs.
