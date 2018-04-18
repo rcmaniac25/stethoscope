@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace LogTracker.Log
 {
-    public class LogEntry : IMutableLogEntry, IComparable<LogEntry>
+    public class LogEntry : IMutableLogEntry, IComparable<LogEntry>, IEquatable<LogEntry>
     {
         Lazy<DateTime> lazyTimestamp;
         Lazy<string> lazyMessage;
@@ -65,7 +65,39 @@ namespace LogTracker.Log
 
         public int CompareTo(LogEntry other)
         {
+            if (other == null)
+            {
+                return 1;
+            }
             return Timestamp.CompareTo(other.Timestamp);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj != null && obj is LogEntry)
+            {
+                return Equals((LogEntry)obj);
+            }
+            return false;
+        }
+
+        public bool Equals(LogEntry other)
+        {
+            if (other != null)
+            {
+                return other.Timestamp == Timestamp && other.Message == Message;
+            }
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            return Timestamp.GetHashCode() * 31 + Message.GetHashCode();
+        }
+
+        public override string ToString()
+        {
+            return $"{Timestamp} : {Message}";
         }
     }
 }

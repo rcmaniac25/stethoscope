@@ -196,7 +196,43 @@ namespace LogTracker.Tests
             Assert.That(entryFromEnumeration, Is.EqualTo(entry)); //TODO: need equals (and probably ToString and GetHashCode) functions
         }
 
-        //TODO: check that enumeration is ordered
+        [Test]
+        public void GetByTimetstampOrdered()
+        {
+            var time = DateTime.Now;
+
+            var registry = new LogRegistry();
+            var entry = registry.AddLog(time.ToString(), "testmsg1");
+            Assert.That(registry.AddValueToLog(entry, LogAttribute.Level, 1), Is.True);
+
+            entry = registry.AddLog(time.AddSeconds(1).ToString(), "testmsg2");
+            Assert.That(registry.AddValueToLog(entry, LogAttribute.Level, 2), Is.True);
+
+            var logs = registry.GetByTimetstamp();
+            Assert.That(logs, Is.Not.Empty);
+
+            Assert.That(logs.First().GetAttribute<int>(LogAttribute.Level), Is.EqualTo(1));
+            Assert.That(logs.Last().GetAttribute<int>(LogAttribute.Level), Is.EqualTo(2));
+        }
+
+        [Test]
+        public void GetByTimetstampOrderedReversed()
+        {
+            var time = DateTime.Now;
+
+            var registry = new LogRegistry();
+            var entry = registry.AddLog(time.AddSeconds(1).ToString(), "testmsg2");
+            Assert.That(registry.AddValueToLog(entry, LogAttribute.Level, 2), Is.True);
+
+            entry = registry.AddLog(time.ToString(), "testmsg1");
+            Assert.That(registry.AddValueToLog(entry, LogAttribute.Level, 1), Is.True);
+
+            var logs = registry.GetByTimetstamp();
+            Assert.That(logs, Is.Not.Empty);
+
+            Assert.That(logs.First().GetAttribute<int>(LogAttribute.Level), Is.EqualTo(1));
+            Assert.That(logs.Last().GetAttribute<int>(LogAttribute.Level), Is.EqualTo(2));
+        }
 
 #if false
         [Test]

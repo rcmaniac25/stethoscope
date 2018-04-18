@@ -30,7 +30,7 @@ namespace LogTracker.Tests
         {
         }
 
-        [Test]
+        [Test(TestOf = typeof(PrinterFactory))]
         public void PrinterFactoryProducesConsole()
         {
             var factory = PrinterFactory.CrateConsoleFactory();
@@ -43,7 +43,7 @@ namespace LogTracker.Tests
             Assert.That(printer, Is.TypeOf<Printers.Internal.ConsolePrinter>());
         }
 
-        [Test]
+        [Test(TestOf = typeof(LogParserFactory))]
         public void LogParserFactoryUnknownFileExtension()
         {
             var factory = LogParserFactory.GetParserForFileExtension("notAnExt");
@@ -51,7 +51,7 @@ namespace LogTracker.Tests
             Assert.That(factory, Is.Null);
         }
 
-        [Test]
+        [Test(TestOf = typeof(LogParserFactory))]
         public void LogParserFactoryXmlParser()
         {
             var factory = LogParserFactory.GetParserForFileExtension("xml");

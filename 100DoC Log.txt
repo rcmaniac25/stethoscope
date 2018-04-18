@@ -190,3 +190,8 @@ void doSomethingCool(std::ifstream& input)
 - The way I figure it: if I'm saying "add this value to the log entry" and I want to know if it got added, instead of getting said value and comparing, I'll just look at a return code. So for all failures, return according to return code. Else, I have no idea I did something wrong... so throw the exception.
 - Bonus: unrelated to ^^, I added a GetByTimestamp function to LogRegistry and changed the return from GetBy from IDictionary<object, IEnumerable<ILogEntry>> which allows me to support getting by log message* AND still works in pretty much any way I expect.
 - * so, to make a grouped dictionary, I need to go through every single log...  working with yield would be better but it's still going to be very challenging to deal with large logs.
+
+#6.2. 4/16/2018:
+- I wanted to get many things done today... and it came at the fall of the unit tests.
+- I didn't miss a commit or need to start the countdown again, but plans will have to be tomorrow.
+- Instead I added a couple more tests and ensured LogEntry supports Equals, GetHashCode, and ToString.
