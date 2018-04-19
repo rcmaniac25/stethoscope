@@ -90,5 +90,7 @@ namespace LogTracker.Tests
             Assert.That(entry.HasAttribute(Common.LogAttribute.Timestamp), Is.True);
             Assert.That(entry.GetAttribute<DateTime>(Common.LogAttribute.Timestamp), Is.EqualTo(time));
         }
+
+        //TODO: test Equals, GetHashCode, and ToString
     }
 }

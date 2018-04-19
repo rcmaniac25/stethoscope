@@ -191,7 +191,13 @@ void doSomethingCool(std::ifstream& input)
 - Bonus: unrelated to ^^, I added a GetByTimestamp function to LogRegistry and changed the return from GetBy from IDictionary<object, IEnumerable<ILogEntry>> which allows me to support getting by log message* AND still works in pretty much any way I expect.
 - * so, to make a grouped dictionary, I need to go through every single log...  working with yield would be better but it's still going to be very challenging to deal with large logs.
 
-#6.2. 4/16/2018:
+#6.2. 4/17/2018:
 - I wanted to get many things done today... and it came at the fall of the unit tests.
 - I didn't miss a commit or need to start the countdown again, but plans will have to be tomorrow.
 - Instead I added a couple more tests and ensured LogEntry supports Equals, GetHashCode, and ToString.
+
+#7.2. 4/18/2018:
+- I typo-ed dates in my logs. I was panicking for a moment as I thought I somehow missed a day of work.
+- Spent most of the time trying to see if I could get code coverage. It's something I look at work, possibly too much. Not because I'm required to, but because I want to make sure if I do anything. If I sneeze and hit a key on my keyboard, I don't cause errors. True story (sneezed, hit a key while typing a string. Compile worked, but runtime failed. Eventually found I was looking for the wrong input file). So, I write a lot of tests and want to make sure everything is covered.
+- Long story short: maybe in the future, but not now. VS2017 Community doesn't support code coverage. OpenCover looks nice, but I need to make sure to have the correct command line. NUnit keeps crying it can't find nunit.framework and Google points to semi-relevant responses, but none of them "NUnit cannot find framework" so I couldn't do anything without spending much too long on it. Instead, I looked and found "dotnet test" will do the work without a hitch... except the only output format it supports is trx... and OpenCover doesn't have a clue what to do with those. So it's one step foward and one step back.
+- Planned to do some additional work, but will push it to tomorrow.
