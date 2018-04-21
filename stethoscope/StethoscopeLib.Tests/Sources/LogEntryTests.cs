@@ -10,6 +10,8 @@ namespace LogTracker.Tests
     [TestFixture(TestOf = typeof(LogEntry))]
     public class LogEntryTests
     {
+        #region TestObject
+
         //XXX do we want to use TestCaseData?
         public struct TestObject
         {
@@ -21,9 +23,16 @@ namespace LogTracker.Tests
             public bool useMessage;
 
             public bool IsLogEntryTest { get; private set; }
-            
+            private Func<object, LogEntry> SourceFunc { get; set; }
+
             public LogEntry GetSourceLogEntry()
             {
+                if (SourceFunc != null)
+                {
+                    var generator = (Func<object>)value;
+                    return SourceFunc(generator());
+                }
+
                 var msg = SourceLogMessage;
                 if (useMessage)
                 {
@@ -31,7 +40,7 @@ namespace LogTracker.Tests
                 }
 
                 var time = DateTime.Now;
-                if (useMessage)
+                if (useTimestamp)
                 {
                     time = ((LogEntry)value).Timestamp;
                 }
@@ -41,8 +50,12 @@ namespace LogTracker.Tests
 
             public override string ToString()
             {
-                var valueString = value == null ? "null" : value.ToString();
-                return $"Test=({valueString}), Result={result}, Copy=(time={useTimestamp}, {useMessage})";
+                if (SourceFunc == null)
+                {
+                    var valueString = value == null ? "null" : (value is LogEntry ? ((LogEntry)value).Message : value.ToString());
+                    return $"Test=({valueString}), Result={result}, Copy=(time={useTimestamp}, msg={useMessage})";
+                }
+                return "RCM-TODO";
             }
 
             public static TestObject CreateObjectTest(object value, bool result)
@@ -58,7 +71,21 @@ namespace LogTracker.Tests
                     result = result,
                     useTimestamp = useTimestamp,
                     useMessage = useMessage,
-                    IsLogEntryTest = false
+                    IsLogEntryTest = false,
+                    SourceFunc = null
+                };
+            }
+
+            public static TestObject CreateObjectTest(Func<object> valueFunc, bool result, Func<object, LogEntry> sourceFunc)
+            {
+                return new TestObject()
+                {
+                    value = valueFunc,
+                    result = result,
+                    useTimestamp = false,
+                    useMessage = false,
+                    IsLogEntryTest = false,
+                    SourceFunc = sourceFunc
                 };
             }
 
@@ -75,10 +102,26 @@ namespace LogTracker.Tests
                     result = result,
                     useTimestamp = useTimestamp,
                     useMessage = useMessage,
-                    IsLogEntryTest = true
+                    IsLogEntryTest = true,
+                    SourceFunc = null
+                };
+            }
+
+            public static TestObject CreateLogEntryTest(Func<LogEntry> valueFunc, bool result, Func<LogEntry, LogEntry> sourceFunc)
+            {
+                return new TestObject()
+                {
+                    value = new Func<object>(() => valueFunc()),
+                    result = result,
+                    useTimestamp = false,
+                    useMessage = false,
+                    IsLogEntryTest = true,
+                    SourceFunc = new Func<object, LogEntry>((value) => sourceFunc((LogEntry)value))
                 };
             }
         }
+
+        #endregion
 
         private static TestObject[] EqualsObjectCases =
         {
