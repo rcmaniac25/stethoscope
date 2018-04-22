@@ -81,23 +81,63 @@ namespace LogTracker.Log
             return false;
         }
 
+        private bool AttributeEquals(LogEntry other)
+        {
+            // Increasingly complex tests
+
+            if (attributes.Count != other.attributes.Count)
+            {
+                return false;
+            }
+            if (attributes.Count == 0)
+            {
+                // Early out
+                return true;
+            }
+
+            foreach (var key in attributes.Keys)
+            {
+                if (!other.attributes.ContainsKey(key))
+                {
+                    return false;
+                }
+            }
+
+            foreach (var kv in attributes)
+            {
+                var otherValue = other.attributes[kv.Key];
+                if (otherValue == null && kv.Value == null)
+                {
+                    continue;
+                }
+                if (otherValue == null || !otherValue.Equals(kv.Value))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
         public bool Equals(LogEntry other)
         {
             if (other != null)
             {
-                return other.Timestamp == Timestamp && other.Message == Message;
+                return other.Timestamp == Timestamp && // Internally, number comparsion: fast
+                    other.Message == Message && // Internally, data comparison: O(n)
+                    AttributeEquals(other); // Slowest test (see above)
             }
             return false;
         }
 
         public override int GetHashCode()
         {
-            return Timestamp.GetHashCode() * 31 + Message.GetHashCode();
+            return Timestamp.GetHashCode() * 31 + Message.GetHashCode(); //TODO: attributes
         }
 
         public override string ToString()
         {
-            return $"{Timestamp} : {Message}";
+            return $"{Timestamp} : {Message}"; //TODO: attributes?
         }
     }
 }
