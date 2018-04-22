@@ -1,4 +1,5 @@
-﻿using LogTracker.Log;
+﻿using LogTracker.Common;
+using LogTracker.Log;
 
 using NUnit.Framework;
 
@@ -12,141 +13,169 @@ namespace LogTracker.Tests
     {
         #region TestObject
 
-        //XXX do we want to use TestCaseData?
-        public struct TestObject
+        public enum LogEntryMsg
         {
-            public const string SourceLogMessage = "test-logmsg";
+            Source,
+            Test,
 
-            public object value;
-            public bool result;
-            public bool useTimestamp;
-            public bool useMessage;
+            User
+        }
 
-            public bool IsLogEntryTest { get; private set; }
-            private Func<object, LogEntry> SourceFunc { get; set; }
+        public enum LogEntryTime
+        {
+            Source,
+            Test,
 
-            public LogEntry GetSourceLogEntry()
+            Now
+        }
+
+        public class LogEntryBuilder
+        {
+            private LogEntry entry;
+
+            private LogEntryBuilder(LogEntry entry)
             {
-                if (SourceFunc != null)
+                this.entry = entry;
+            }
+
+            private static DateTime sourceDataTime = new DateTime(2018, 4, 22);
+            private static DateTime testDataTime = new DateTime(2018, 4, 21);
+
+            public static LogEntryBuilder LogEntry(LogEntryTime time = LogEntryTime.Source, LogEntryMsg msg = LogEntryMsg.Source, string userMsg = null)
+            {
+                DateTime timestamp;
+                switch (time)
                 {
-                    var generator = (Func<object>)value;
-                    return SourceFunc(generator());
+                    case LogEntryTime.Source:
+                        timestamp = sourceDataTime;
+                        break;
+                    case LogEntryTime.Test:
+                        timestamp = testDataTime;
+                        break;
+                    case LogEntryTime.Now:
+                    default:
+                        timestamp = DateTime.Now;
+                        break;
                 }
 
-                var msg = SourceLogMessage;
-                if (useMessage)
+                string logMsg;
+                switch (msg)
                 {
-                    msg = ((LogEntry)value).Message;
+                    case LogEntryMsg.Source:
+                        logMsg = "source-msg";
+                        break;
+                    case LogEntryMsg.Test:
+                        logMsg = "test-msg";
+                        break;
+                    case LogEntryMsg.User:
+                    default:
+                        logMsg = userMsg;
+                        break;
                 }
 
-                var time = DateTime.Now;
-                if (useTimestamp)
-                {
-                    time = ((LogEntry)value).Timestamp;
-                }
-
-                return new LogEntry(time, msg);
+                return new LogEntryBuilder(new LogEntry(timestamp, logMsg));
             }
 
-            public override string ToString()
+            public LogEntryBuilder And(LogAttribute attribute, object value)
             {
-                if (SourceFunc == null)
-                {
-                    var valueString = value == null ? "null" : (value is LogEntry ? ((LogEntry)value).Message : value.ToString());
-                    return $"Test=({valueString}), Result={result}, Copy=(time={useTimestamp}, msg={useMessage})";
-                }
-                return "RCM-TODO";
+                entry.AddAttribute(attribute, value);
+                return this;
             }
 
-            public static TestObject CreateObjectTest(object value, bool result)
+            public LogEntry Build()
             {
-                return CreateObjectTest(value, result, false, false);
-            }
-
-            public static TestObject CreateObjectTest(object value, bool result, bool useTimestamp, bool useMessage)
-            {
-                return new TestObject()
-                {
-                    value = value,
-                    result = result,
-                    useTimestamp = useTimestamp,
-                    useMessage = useMessage,
-                    IsLogEntryTest = false,
-                    SourceFunc = null
-                };
-            }
-
-            public static TestObject CreateObjectTest(Func<object> valueFunc, bool result, Func<object, LogEntry> sourceFunc)
-            {
-                return new TestObject()
-                {
-                    value = valueFunc,
-                    result = result,
-                    useTimestamp = false,
-                    useMessage = false,
-                    IsLogEntryTest = false,
-                    SourceFunc = sourceFunc
-                };
-            }
-
-            public static TestObject CreateLogEntryTest(LogEntry value, bool result)
-            {
-                return CreateLogEntryTest(value, result, false, false);
-            }
-
-            public static TestObject CreateLogEntryTest(LogEntry value, bool result, bool useTimestamp, bool useMessage)
-            {
-                return new TestObject()
-                {
-                    value = value,
-                    result = result,
-                    useTimestamp = useTimestamp,
-                    useMessage = useMessage,
-                    IsLogEntryTest = true,
-                    SourceFunc = null
-                };
-            }
-
-            public static TestObject CreateLogEntryTest(Func<LogEntry> valueFunc, bool result, Func<LogEntry, LogEntry> sourceFunc)
-            {
-                return new TestObject()
-                {
-                    value = new Func<object>(() => valueFunc()),
-                    result = result,
-                    useTimestamp = false,
-                    useMessage = false,
-                    IsLogEntryTest = true,
-                    SourceFunc = new Func<object, LogEntry>((value) => sourceFunc((LogEntry)value))
-                };
+                return entry;
             }
         }
 
+        public class LogEntryTestDataBuilder
+        {
+            private TestCaseData testData;
+
+            private LogEntryTestDataBuilder(TestCaseData testData)
+            {
+                this.testData = testData;
+            }
+
+            private static LogEntry CreateTestLogEntry()
+            {
+                return LogEntryBuilder.LogEntry(LogEntryTime.Test, LogEntryMsg.Test).Build();
+            }
+
+            public static LogEntryTestDataBuilder TestAgainst(object testData)
+            {
+                return new LogEntryTestDataBuilder(new TestCaseData(testData, CreateTestLogEntry()));
+            }
+
+            public static LogEntryTestDataBuilder TestAgainst(LogEntryBuilder logEntryBuilder)
+            {
+                if (logEntryBuilder == null)
+                {
+                    // Fix for C# liking to default "null" to this function instead of the object one
+                    return TestAgainst((object)logEntryBuilder);
+                }
+                return TestAgainst(logEntryBuilder.Build());
+            }
+
+            public static LogEntryTestDataBuilder TestAgainstLogEntry(LogEntryTime time = LogEntryTime.Source, LogEntryMsg msg = LogEntryMsg.Source, string userMsg = null)
+            {
+                return TestAgainst(LogEntryBuilder.LogEntry(time, msg, userMsg).Build());
+            }
+
+            public LogEntryTestDataBuilder For(string testName)
+            {
+                testData = testData.SetName(testName);
+                return this;
+            }
+
+            public LogEntryTestDataBuilder AndHas(LogAttribute attribute, object value)
+            {
+                ((LogEntry)testData.OriginalArguments[1]).AddAttribute(attribute, value); // Changes both OriginalArguments and Arguments
+                //((LogEntry)testData.Arguments[1]).AddAttribute(attribute, value);
+                return this;
+            }
+
+            public TestCaseData Which()
+            {
+                return Build();
+            }
+
+            public TestCaseData Build()
+            {
+                return testData;
+            }
+        }
+        
         #endregion
 
-        private static TestObject[] EqualsObjectCases =
+        private static TestCaseData[] EqualsObjectCases =
         {
-            TestObject.CreateObjectTest(null, false), // null
-            TestObject.CreateObjectTest("notobj", false), // nullable
-            TestObject.CreateObjectTest(10, false), // non-nullable
-            TestObject.CreateObjectTest(new LogEntry(DateTime.Now, "logmsg"), false, false, false), // (mismatch, mismatch)
-            TestObject.CreateObjectTest(new LogEntry(DateTime.Now, TestObject.SourceLogMessage), false, false, false), // (mismatch, match-org)
-            TestObject.CreateObjectTest(new LogEntry(DateTime.Now, "logmsg"), false, false, true), // (mismatch, match-copy)
-            TestObject.CreateObjectTest(new LogEntry(DateTime.Now, "logmsg"), false, true, false), // (match, mismatch)
-            TestObject.CreateObjectTest(new LogEntry(DateTime.Now, "logmsg"), true, true, true) // (match, match)
-            //TODO: setting parameter values
+            LogEntryTestDataBuilder.TestAgainst(null).For("Equals(Object) null").Which().Returns(false),
+            LogEntryTestDataBuilder.TestAgainst("notobj").For("Equals(Object) nullable type").Which().Returns(false),
+            LogEntryTestDataBuilder.TestAgainst(10).For("Equals(Object) non-nullable type").Which().Returns(false),
+            LogEntryTestDataBuilder.TestAgainstLogEntry().For("Equals(Object) LogEntry(diff, diff)").Which().Returns(false),
+            LogEntryTestDataBuilder.TestAgainstLogEntry(msg: LogEntryMsg.Test).For("Equals(Object) LogEntry(diff, same)").Which().Returns(false),
+            LogEntryTestDataBuilder.TestAgainstLogEntry(time: LogEntryTime.Test).For("Equals(Object) LogEntry(same, diff)").Which().Returns(false),
+            LogEntryTestDataBuilder.TestAgainstLogEntry(LogEntryTime.Test, LogEntryMsg.Test).For("Equals(Object) LogEntry(same, same)").Which().Returns(true),
+            LogEntryTestDataBuilder.TestAgainst(LogEntryBuilder.LogEntry(LogEntryTime.Test, LogEntryMsg.Test).And(LogAttribute.Module, "test")).For("Equals(Object) LogEntry(att:mod-null)").Which().Returns(false),
+            LogEntryTestDataBuilder.TestAgainstLogEntry(LogEntryTime.Test, LogEntryMsg.Test).For("Equals(Object) LogEntry(att:null-mod)").AndHas(LogAttribute.Module, "test").Which().Returns(false),
+            LogEntryTestDataBuilder.TestAgainst(LogEntryBuilder.LogEntry(LogEntryTime.Test, LogEntryMsg.Test).And(LogAttribute.Module, "test")).For("Equals(Object) LogEntry(att:mod-sect)").AndHas(LogAttribute.Section, "test").Which().Returns(false),
+            LogEntryTestDataBuilder.TestAgainst(LogEntryBuilder.LogEntry(LogEntryTime.Test, LogEntryMsg.Test).And(LogAttribute.Module, "test")).For("Equals(Object) LogEntry(att:mod-mod)").AndHas(LogAttribute.Module, "test").Which().Returns(true)
         };
 
-        private static TestObject[] EqualsLogEntryCases =
+        private static TestCaseData[] EqualsLogEntryCases =
         {
-            TestObject.CreateLogEntryTest(null, false), // null
-            TestObject.CreateLogEntryTest(new LogEntry(DateTime.Now, "logmsg"), false), // (mismatch, mismatch)
-            TestObject.CreateLogEntryTest(new LogEntry(DateTime.Now, TestObject.SourceLogMessage), false), // (mismatch, match-org)
-            TestObject.CreateLogEntryTest(new LogEntry(DateTime.Now, "logmsg"), false, false, true), // (mismatch, match-copy)
-            TestObject.CreateLogEntryTest(new LogEntry(DateTime.Now, "logmsg"), false, true, false), // (match, mismatch)
-            TestObject.CreateLogEntryTest(new LogEntry(DateTime.Now, "logmsg"), true, true, true) // (match, match)
-            //TODO: setting parameter values
+            LogEntryTestDataBuilder.TestAgainst(null).For("Equals(LogEntry) null").Which().Returns(false),
+            LogEntryTestDataBuilder.TestAgainstLogEntry().For("Equals(LogEntry) LogEntry(diff, diff)").Which().Returns(false),
+            LogEntryTestDataBuilder.TestAgainstLogEntry(msg: LogEntryMsg.Test).For("Equals(LogEntry) LogEntry(diff, same)").Which().Returns(false),
+            LogEntryTestDataBuilder.TestAgainstLogEntry(time: LogEntryTime.Test).For("Equals(LogEntry) LogEntry(same, diff)").Which().Returns(false),
+            LogEntryTestDataBuilder.TestAgainstLogEntry(LogEntryTime.Test, LogEntryMsg.Test).For("Equals(LogEntry) LogEntry(same, same)").Which().Returns(true),
+            LogEntryTestDataBuilder.TestAgainst(LogEntryBuilder.LogEntry(LogEntryTime.Test, LogEntryMsg.Test).And(LogAttribute.Module, "test")).For("Equals(LogEntry) LogEntry(att:mod-null)").Which().Returns(false),
+            LogEntryTestDataBuilder.TestAgainstLogEntry(LogEntryTime.Test, LogEntryMsg.Test).For("Equals(LogEntry) LogEntry(att:null-mod)").AndHas(LogAttribute.Module, "test").Which().Returns(false),
+            LogEntryTestDataBuilder.TestAgainst(LogEntryBuilder.LogEntry(LogEntryTime.Test, LogEntryMsg.Test).And(LogAttribute.Module, "test")).For("Equals(LogEntry) LogEntry(att:mod-sect)").AndHas(LogAttribute.Section, "test").Which().Returns(false),
+            LogEntryTestDataBuilder.TestAgainst(LogEntryBuilder.LogEntry(LogEntryTime.Test, LogEntryMsg.Test).And(LogAttribute.Module, "test")).For("Equals(LogEntry) LogEntry(att:mod-mod)").AndHas(LogAttribute.Module, "test").Which().Returns(true)
         };
-
+        
         [Test]
         public void AttributeNotSet()
         {
@@ -227,23 +256,17 @@ namespace LogTracker.Tests
             Assert.That(entry.HasAttribute(Common.LogAttribute.Timestamp), Is.True);
             Assert.That(entry.GetAttribute<DateTime>(Common.LogAttribute.Timestamp), Is.EqualTo(time));
         }
-        
-        [TestCaseSource("EqualsObjectCases")]
-        public void EqualsObject(TestObject setup)
-        {
-            Assert.That(setup.IsLogEntryTest, Is.False); // Ensure correct source data is being used
 
-            var entry = setup.GetSourceLogEntry();
-            Assert.That(entry.Equals(setup.value), Is.EqualTo(setup.result));
+        [TestCaseSource("EqualsObjectCases")]
+        public bool EqualsObject(object testData, LogEntry logEntry)
+        {
+            return logEntry.Equals(testData);
         }
 
         [TestCaseSource("EqualsLogEntryCases")]
-        public void EqualsLogEntry(TestObject setup)
+        public bool EqualsLogEntry(LogEntry testData, LogEntry logEntry)
         {
-            Assert.That(setup.IsLogEntryTest, Is.True); // Ensure correct source data is being used
-
-            var entry = setup.GetSourceLogEntry();
-            Assert.That(entry.Equals((LogEntry)setup.value), Is.EqualTo(setup.result));
+            return logEntry.Equals(testData);
         }
         
         //TODO: test GetHashCode, and ToString

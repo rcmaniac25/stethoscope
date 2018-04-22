@@ -221,3 +221,10 @@ void doSomethingCool(std::ifstream& input)
 - Doesn't help that I might have to do this 3 times: Equals, ToString, and GetHashCode.
 - Bonus: I may have figured out an issue with tests yesterday. NUnit (or Visual Studio) use names to define tests. My helper class did a printout of LogEntry, which prints a date-time. Suddenly, all my tests pass. But then I run again a little later, and it's a _new_ set of tests, and some generic case claims it didn't run. BUT WAIT, there's more: I... scrolled down. I never scrolled up to see a couple tests were failing in general. That has been fixed, but the others haven't (and I haven't tested tests with the same name, but different classes, to see if they all show up or only one).
 - For tomorrow...
+
+#10.2. 4/21/2018:
+- Yay, back to double digts in progress.
+- I did a full rewrite of the Equals tests. Now with a builder for the test data
+- "A BUILDER?!" says a set of devs... yes, a builder. The builder code is slightly longer then the "still in progress" TestObject (since deleted), but instead of `TestObject(arg, arg, arg, arg, arg, arg, arg, () => fancy work)`, it's closer to an explanation of what the heck it's doing.
+- Also, the builder outputs a TestCaseData, which has it's own set of functions. So I'm able to utilize it to do additional work for me.
+- Long story short: I can do more complex tests with less work. Only hacky element is adding attributes to the LogEntry to test against... it was either that, or make the whole thing Lazy and that would just be ugly.
