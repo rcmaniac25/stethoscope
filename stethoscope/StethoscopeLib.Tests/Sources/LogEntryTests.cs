@@ -49,6 +49,7 @@ namespace LogTracker.Tests
             {
                 var newTest = new TestCaseParameters(test);
                 newTest.TestName = newTest.TestName.Replace("Equals(LogEntry)", "GetHashCode");
+                newTest.ExpectedResult = test.OriginalArguments[1].GetHashCode();
                 return newTest;
             })
             .ToArray();
@@ -148,9 +149,9 @@ namespace LogTracker.Tests
 
         //XXX I'm not sure how useful this is, but we'll leave it for now
         [TestCaseSource("HashCodeCases")]
-        public bool CheckHashCode(LogEntry testData, LogEntry logEntry)
+        public int CheckHashCode(LogEntry testData, LogEntry logEntry)
         {
-            return logEntry.GetHashCode() == testData.GetHashCode();
+            return testData.GetHashCode();
         }
 
         //TODO: test ToString
