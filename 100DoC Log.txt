@@ -235,3 +235,4 @@ void doSomethingCool(std::ifstream& input)
 - A quick test laid to rest that "same name tests won't be shown as seperate tests". They show up with the same name, but indicate they have different sources.
 - Attempted to setup GetHashCode tests... but a couple tests are failing...
 - Attempt #2... this time, return the actual hash code. Somehow, the first attempt had 2 failed tests. This one has 8 failed tests. I don't know if testing hash codes is a thing. I guess it's worth testing, but I also worry about how Dictionary GetHashCode works. If it's implemented somewhere, I haven't found it. I worry it's producing some random results for me (attribute order?) but regardless, this isn't working and I can't figure what went wrong. So I'm going to trash it.
+- Realized I test two attributes that are tested a second time later. So changed the Equals operation to get the values directly from the attributes, and to test the other values.

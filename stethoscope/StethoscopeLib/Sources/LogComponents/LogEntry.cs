@@ -3,6 +3,7 @@ using LogTracker.Log.Internal;
 
 using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace LogTracker.Log
 {
@@ -89,7 +90,7 @@ namespace LogTracker.Log
             {
                 return false;
             }
-            if (attributes.Count == 0)
+            if (attributes.Count == 2) // Already have (and tested) Timestamp and Message
             {
                 // Early out
                 return true;
@@ -97,6 +98,11 @@ namespace LogTracker.Log
 
             foreach (var key in attributes.Keys)
             {
+                // We test these already
+                if (key == LogAttribute.Timestamp || key == LogAttribute.Message)
+                {
+                    continue;
+                }
                 if (!other.attributes.ContainsKey(key))
                 {
                     return false;
@@ -105,6 +111,11 @@ namespace LogTracker.Log
 
             foreach (var kv in attributes)
             {
+                // We test these already
+                if (kv.Key == LogAttribute.Timestamp || kv.Key == LogAttribute.Message)
+                {
+                    continue;
+                }
                 var otherValue = other.attributes[kv.Key];
                 if (otherValue == null && kv.Value == null)
                 {
@@ -123,8 +134,8 @@ namespace LogTracker.Log
         {
             if (other != null)
             {
-                return other.Timestamp == Timestamp && // Internally, number comparsion: fast
-                    other.Message == Message && // Internally, data comparison: O(n)
+                return other.attributes[LogAttribute.Timestamp].Equals(attributes[LogAttribute.Timestamp]) && // Internally, number comparsion: fast
+                    other.attributes[LogAttribute.Message].Equals(attributes[LogAttribute.Message]) && // Internally, data comparison: O(n)
                     AttributeEquals(other); // Slowest test (see above)
             }
             return false;
@@ -132,16 +143,18 @@ namespace LogTracker.Log
 
         public override int GetHashCode()
         {
-            int hash = 178571;
-            hash = hash * 1852909 + Timestamp.GetHashCode();
-            hash = hash * 1852909 + Message.GetHashCode();
-            hash = hash * 1852909 + attributes.GetHashCode();
-            return hash;
+            return 1852909 ^ attributes.GetHashCode();
         }
 
         public override string ToString()
         {
-            return $"{Timestamp} : {Message}"; //TODO: attributes?
+            var sb = new StringBuilder();
+            sb.AppendFormat("{0} : {1}", Timestamp, Message);
+            if (attributes.Count > 2)
+            {
+                sb.AppendFormat("; attributes={0}", attributes.Count - 2);
+            }
+            return sb.ToString();
         }
     }
 }
