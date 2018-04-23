@@ -3,9 +3,11 @@ using LogTracker.Log;
 using LogTracker.Tests.Helpers;
 
 using NUnit.Framework;
+using NUnit.Framework.Internal;
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace LogTracker.Tests
 {
@@ -39,7 +41,18 @@ namespace LogTracker.Tests
             LogEntryTestDataBuilder.TestAgainst(LogEntryBuilder.LogEntry(LogEntryTime.Test, LogEntryMsg.Test).And(LogAttribute.Module, "test")).For("Equals(LogEntry) LogEntry(att:mod-sect)").AndHas(LogAttribute.Section, "test").Which().Returns(false),
             LogEntryTestDataBuilder.TestAgainst(LogEntryBuilder.LogEntry(LogEntryTime.Test, LogEntryMsg.Test).And(LogAttribute.Module, "test")).For("Equals(LogEntry) LogEntry(att:mod-mod)").AndHas(LogAttribute.Module, "test").Which().Returns(true)
         };
-        
+
+        // TestCaseParameters is possibly not the best type to use, but TestCaseData can't be copied
+        private static TestCaseParameters[] HashCodeCases = EqualsLogEntryCases
+            .Where(test => test.OriginalArguments[0] != null)
+            .Select(test =>
+            {
+                var newTest = new TestCaseParameters(test);
+                newTest.TestName = newTest.TestName.Replace("Equals(LogEntry)", "GetHashCode");
+                return newTest;
+            })
+            .ToArray();
+
         [Test]
         public void AttributeNotSet()
         {
@@ -132,7 +145,14 @@ namespace LogTracker.Tests
         {
             return logEntry.Equals(testData);
         }
-        
-        //TODO: test GetHashCode, and ToString
+
+        //XXX I'm not sure how useful this is, but we'll leave it for now
+        [TestCaseSource("HashCodeCases")]
+        public bool CheckHashCode(LogEntry testData, LogEntry logEntry)
+        {
+            return logEntry.GetHashCode() == testData.GetHashCode();
+        }
+
+        //TODO: test ToString
     }
 }

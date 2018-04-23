@@ -132,7 +132,11 @@ namespace LogTracker.Log
 
         public override int GetHashCode()
         {
-            return Timestamp.GetHashCode() * 31 + Message.GetHashCode(); //TODO: attributes
+            int hash = 178571;
+            hash = hash * 1852909 + Timestamp.GetHashCode();
+            hash = hash * 1852909 + Message.GetHashCode();
+            hash = hash * 1852909 + attributes.GetHashCode();
+            return hash;
         }
 
         public override string ToString()

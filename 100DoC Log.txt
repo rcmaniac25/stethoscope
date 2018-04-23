@@ -230,3 +230,7 @@ void doSomethingCool(std::ifstream& input)
 - Long story short: I can do more complex tests with less work. Only hacky element is adding attributes to the LogEntry to test against... it was either that, or make the whole thing Lazy and that would just be ugly.
 - Minor refactor so test helpers are located elsewhere
 - Now... fix the Equals functions so the tests pass
+
+#11.2. 4/22/2018:
+- A quick test laid to rest that "same name tests won't be shown as seperate tests". They show up with the same name, but indicate they have different sources.
+- Attempted to setup GetHashCode tests... but a couple tests are failing...
