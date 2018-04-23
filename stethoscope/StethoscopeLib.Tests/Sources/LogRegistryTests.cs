@@ -173,7 +173,45 @@ namespace LogTracker.Tests
             entry.Received().AddAttribute(LogAttribute.ThreadID, 1234);
         }
 
-        //TODO: GetBy (beyond the simple test we did)
+        [Test]
+        public void GetByLogsWithoutAttributes()
+        {
+            var registry = new LogRegistry();
+            var entry = registry.AddLog(DateTime.Now.ToString(), "testmsg");
+            Assert.That(entry, Is.Not.Null);
+
+            var logs = registry.GetBy(Common.LogAttribute.Level);
+            Assert.That(logs, Is.Empty);
+        }
+
+        [Test]
+        public void GetByLogsSomeAttributesWithUniqueValues()
+        {
+            var registry = new LogRegistry();
+            var entry = registry.AddLog(DateTime.Now.ToString(), "testmsg1");
+            Assert.That(entry, Is.Not.Null);
+
+            registry.AddValueToLog(entry, LogAttribute.Level, "cookie");
+
+            entry = registry.AddLog(DateTime.Now.ToString(), "testmsg2");
+            Assert.That(entry, Is.Not.Null);
+
+            registry.AddValueToLog(entry, LogAttribute.Level, "brownie");
+
+            entry = registry.AddLog(DateTime.Now.ToString(), "testmsg3");
+            Assert.That(entry, Is.Not.Null);
+
+            var logs = registry.GetBy(Common.LogAttribute.Level);
+            Assert.That(logs, Is.Not.Empty);
+
+            //TODO: test the expected values exist in the logs
+        }
+
+        //TODO: GetBy (some logs with attribute [unique values])
+
+        //TODO: GetBy (some logs with attribute [duplicate values])
+
+        //TODO: GetBy (all logs with attribute [unique values])
 
         [Test]
         public void GetByTimetstampEmpty()
@@ -193,7 +231,7 @@ namespace LogTracker.Tests
             Assert.That(logs, Is.Not.Empty);
 
             var entryFromEnumeration = logs.Last();
-            Assert.That(entryFromEnumeration, Is.EqualTo(entry)); //TODO: need equals (and probably ToString and GetHashCode) functions
+            Assert.That(entryFromEnumeration, Is.EqualTo(entry));
         }
 
         [Test]
