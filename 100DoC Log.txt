@@ -239,3 +239,6 @@ void doSomethingCool(std::ifstream& input)
 - I opted not to do a ToString, because the Printers will be doing the work, not the ToString.
 - Now to ginally get back to what I really wanted to work on: TDD. I want to write all the remaining tests, without running them and without fixing the failures. Then test and fix failures...
 - ...and I got 1.5 of 5 tests in before I need to call it quits. Sigh.
+
+#12.2. 4/23/2018:
+- Finished GetBy tests for LogRegistry. Technically still have to make tests for the actual implementation, but that's for another time.

@@ -1,6 +1,7 @@
 ﻿using LogTracker.Common;
 using LogTracker.Log;
 using LogTracker.Log.Internal;
+using LogTracker.Tests.Helpers;
 
 using NSubstitute;
 
@@ -18,7 +19,7 @@ namespace LogTracker.Tests
         public void GetLogsEmpty()
         {
             var registry = new LogRegistry();
-            var logs = registry.GetBy(Common.LogAttribute.Level);
+            var logs = registry.GetBy(LogAttribute.Level);
             Assert.That(logs, Is.Empty);
         }
 
@@ -29,7 +30,7 @@ namespace LogTracker.Tests
             var entry = registry.AddLog(DateTime.Now.ToString(), "testmsg");
             Assert.That(entry, Is.Not.Null);
             
-            var logs = registry.GetBy(Common.LogAttribute.Message);
+            var logs = registry.GetBy(LogAttribute.Message);
             Assert.That(logs, Is.Not.Empty);
         }
 
@@ -74,15 +75,15 @@ namespace LogTracker.Tests
             var entry = registry.AddLog(DateTime.Now.ToString(), "testmsg");
             Assert.That(entry, Is.Not.Null);
 
-            Assert.That(entry.HasAttribute(Common.LogAttribute.ThreadID), Is.False);
+            Assert.That(entry.HasAttribute(LogAttribute.ThreadID), Is.False);
 
             var threadId = 1234;
-            var added = registry.AddValueToLog(entry, Common.LogAttribute.ThreadID, threadId);
+            var added = registry.AddValueToLog(entry, LogAttribute.ThreadID, threadId);
 
             Assert.That(added, Is.True);
-            Assert.That(entry.HasAttribute(Common.LogAttribute.ThreadID), Is.True);
+            Assert.That(entry.HasAttribute(LogAttribute.ThreadID), Is.True);
 
-            Assert.That(entry.GetAttribute<int>(Common.LogAttribute.ThreadID), Is.EqualTo(threadId));
+            Assert.That(entry.GetAttribute<int>(LogAttribute.ThreadID), Is.EqualTo(threadId));
         }
 
         [Test]
@@ -92,13 +93,13 @@ namespace LogTracker.Tests
             var entry = registry.AddLog(DateTime.Now.ToString(), "testmsg");
             Assert.That(entry, Is.Not.Null);
 
-            Assert.That(entry.HasAttribute(Common.LogAttribute.ThreadID), Is.False);
+            Assert.That(entry.HasAttribute(LogAttribute.ThreadID), Is.False);
             
-            var added = registry.AddValueToLog(entry, Common.LogAttribute.ThreadID, 1234);
+            var added = registry.AddValueToLog(entry, LogAttribute.ThreadID, 1234);
 
             Assert.That(added, Is.True);
 
-            added = registry.AddValueToLog(entry, Common.LogAttribute.ThreadID, 4321);
+            added = registry.AddValueToLog(entry, LogAttribute.ThreadID, 4321);
 
             Assert.That(added, Is.False);
         }
@@ -110,9 +111,9 @@ namespace LogTracker.Tests
             var entry = registry.AddLog(DateTime.Now.ToString(), "testmsg");
             Assert.That(entry, Is.Not.Null);
 
-            Assert.That(entry.HasAttribute(Common.LogAttribute.ThreadID), Is.False);
+            Assert.That(entry.HasAttribute(LogAttribute.ThreadID), Is.False);
 
-            var added = registry.AddValueToLog(entry, Common.LogAttribute.ThreadID, null);
+            var added = registry.AddValueToLog(entry, LogAttribute.ThreadID, null);
 
             Assert.That(added, Is.False);
         }
@@ -121,7 +122,7 @@ namespace LogTracker.Tests
         public void AddValueToLogNullEntry()
         {
             var registry = new LogRegistry();
-            var added = registry.AddValueToLog(null, Common.LogAttribute.ThreadID, 1234);
+            var added = registry.AddValueToLog(null, LogAttribute.ThreadID, 1234);
 
             Assert.That(added, Is.False);
         }
@@ -133,7 +134,7 @@ namespace LogTracker.Tests
             var entry = registry.AddLog(DateTime.Now.ToString(), "testmsg");
             Assert.That(entry, Is.Not.Null);
             
-            var added = registry.AddValueToLog(entry, Common.LogAttribute.Message, "new message");
+            var added = registry.AddValueToLog(entry, LogAttribute.Message, "new message");
 
             Assert.That(added, Is.False);
         }
@@ -145,7 +146,7 @@ namespace LogTracker.Tests
             var entry = registry.AddLog(DateTime.Now.ToString(), "testmsg");
             Assert.That(entry, Is.Not.Null);
             
-            var added = registry.AddValueToLog(entry, Common.LogAttribute.Timestamp, DateTime.Now);
+            var added = registry.AddValueToLog(entry, LogAttribute.Timestamp, DateTime.Now);
 
             Assert.That(added, Is.False);
         }
@@ -156,7 +157,7 @@ namespace LogTracker.Tests
             var registry = new LogRegistry();
             var entry = Substitute.For<ILogEntry>();
 
-            var added = registry.AddValueToLog(entry, Common.LogAttribute.ThreadID, 1234);
+            var added = registry.AddValueToLog(entry, LogAttribute.ThreadID, 1234);
 
             Assert.That(added, Is.False);
         }
@@ -167,7 +168,7 @@ namespace LogTracker.Tests
             var registry = new LogRegistry();
             var entry = Substitute.For<IMutableLogEntry>();
 
-            var added = registry.AddValueToLog(entry, Common.LogAttribute.ThreadID, 1234);
+            var added = registry.AddValueToLog(entry, LogAttribute.ThreadID, 1234);
 
             Assert.That(added, Is.True);
             entry.Received().AddAttribute(LogAttribute.ThreadID, 1234);
@@ -180,7 +181,7 @@ namespace LogTracker.Tests
             var entry = registry.AddLog(DateTime.Now.ToString(), "testmsg");
             Assert.That(entry, Is.Not.Null);
 
-            var logs = registry.GetBy(Common.LogAttribute.Level);
+            var logs = registry.GetBy(LogAttribute.Level);
             Assert.That(logs, Is.Empty);
         }
 
@@ -201,17 +202,62 @@ namespace LogTracker.Tests
             entry = registry.AddLog(DateTime.Now.ToString(), "testmsg3");
             Assert.That(entry, Is.Not.Null);
 
-            var logs = registry.GetBy(Common.LogAttribute.Level);
+            var logs = registry.GetBy(LogAttribute.Level);
             Assert.That(logs, Is.Not.Empty);
 
-            //TODO: test the expected values exist in the logs
+            Assert.That(logs.Keys, Is.SubsetOf(new string[] { "cookie", "brownie" }).And.Exactly(2).Items);
+            Assert.That(Util.ConcatMany(logs.Values).Select(log => log.Message), Is.SubsetOf(new string[] { "testmsg1", "testmsg2" }));
         }
 
-        //TODO: GetBy (some logs with attribute [unique values])
+        [Test]
+        public void GetByLogsSomeAttributesWithDuplicateValues()
+        {
+            var registry = new LogRegistry();
+            var entry = registry.AddLog(DateTime.Now.ToString(), "testmsg1");
+            Assert.That(entry, Is.Not.Null);
 
-        //TODO: GetBy (some logs with attribute [duplicate values])
+            registry.AddValueToLog(entry, LogAttribute.Level, "cookie");
 
-        //TODO: GetBy (all logs with attribute [unique values])
+            entry = registry.AddLog(DateTime.Now.ToString(), "testmsg2");
+            Assert.That(entry, Is.Not.Null);
+
+            registry.AddValueToLog(entry, LogAttribute.Level, "cookie");
+
+            entry = registry.AddLog(DateTime.Now.ToString(), "testmsg3");
+            Assert.That(entry, Is.Not.Null);
+
+            var logs = registry.GetBy(LogAttribute.Level);
+            Assert.That(logs, Is.Not.Empty);
+
+            Assert.That(logs.Keys, Has.Member("cookie").And.Exactly(1).Items);
+            Assert.That(Util.ConcatMany(logs.Values).Select(log => log.Message), Is.SubsetOf(new string[] { "testmsg1", "testmsg2" }));
+        }
+
+        [Test]
+        public void GetByLogsAllAttributesWithUniqueValues()
+        {
+            var registry = new LogRegistry();
+            var entry = registry.AddLog(DateTime.Now.ToString(), "testmsg1");
+            Assert.That(entry, Is.Not.Null);
+
+            registry.AddValueToLog(entry, LogAttribute.Level, "cookie");
+
+            entry = registry.AddLog(DateTime.Now.ToString(), "testmsg2");
+            Assert.That(entry, Is.Not.Null);
+
+            registry.AddValueToLog(entry, LogAttribute.Level, "brownie");
+
+            entry = registry.AddLog(DateTime.Now.ToString(), "testmsg3");
+            Assert.That(entry, Is.Not.Null);
+
+            registry.AddValueToLog(entry, LogAttribute.Level, "ice cream");
+
+            var logs = registry.GetBy(LogAttribute.Level);
+            Assert.That(logs, Is.Not.Empty);
+
+            Assert.That(logs.Keys, Is.SubsetOf(new string[] { "cookie", "brownie", "ice cream" }).And.Exactly(3).Items);
+            Assert.That(Util.ConcatMany(logs.Values).Select(log => log.Message), Is.SubsetOf(new string[] { "testmsg1", "testmsg2", "testmsg3" }));
+        }
 
         [Test]
         public void GetByTimetstampEmpty()
@@ -271,29 +317,7 @@ namespace LogTracker.Tests
             Assert.That(logs.First().GetAttribute<int>(LogAttribute.Level), Is.EqualTo(1));
             Assert.That(logs.Last().GetAttribute<int>(LogAttribute.Level), Is.EqualTo(2));
         }
-
-#if false
-        [Test]
-        public void AddLogAndTestContent()
-        {
-            var timestamp = DateTime.Now;
-            var msg = "testmsg";
-
-            var registry = new LogRegistry();
-            var entry = registry.AddLog(timestamp.ToString(), msg);
-            Assert.That(entry, Is.Not.Null);
-
-            Assert.That(entry.Message, Is.EqualTo(msg));
-            Assert.That(entry.Timestamp, Is.EqualTo(timestamp));
-
-            var logs = registry.GetBy(Common.LogAttribute.Message);
-            Assert.That(logs, Is.Not.Empty);
-
-            Assert.That(logs.ContainsKey(msg), Is.True);
-            Assert.That(logs[msg], Is.EqualTo(entry));
-        }
-#endif
-
+        
         //TODO: actual implementation tests
     }
 }
