@@ -260,6 +260,20 @@ namespace LogTracker.Tests
         }
 
         [Test]
+        public void GetByLogsInvalidAttribute()
+        {
+            var registry = new LogRegistry();
+            var entry = registry.AddLog(DateTime.Now.ToString(), "testmsg1");
+            Assert.That(entry, Is.Not.Null);
+
+            var logs = registry.GetBy(LogAttribute.Message);
+            Assert.That(logs, Is.Not.Empty);
+
+            logs = registry.GetBy(LogAttribute.Timestamp);
+            Assert.That(logs, Is.Null);
+        }
+
+        [Test]
         public void GetByTimetstampEmpty()
         {
             var registry = new LogRegistry();
@@ -294,7 +308,7 @@ namespace LogTracker.Tests
 
             var logs = registry.GetByTimetstamp();
             Assert.That(logs, Is.Not.Empty);
-
+            
             Assert.That(logs.First().GetAttribute<int>(LogAttribute.Level), Is.EqualTo(1));
             Assert.That(logs.Last().GetAttribute<int>(LogAttribute.Level), Is.EqualTo(2));
         }
@@ -317,7 +331,21 @@ namespace LogTracker.Tests
             Assert.That(logs.First().GetAttribute<int>(LogAttribute.Level), Is.EqualTo(1));
             Assert.That(logs.Last().GetAttribute<int>(LogAttribute.Level), Is.EqualTo(2));
         }
-        
-        //TODO: actual implementation tests
+
+        [Test]
+        public void Clear()
+        {
+            var registry = new LogRegistry();
+            var entry = registry.AddLog(DateTime.Now.ToString(), "testmsg");
+            Assert.That(entry, Is.Not.Null);
+
+            var logs = registry.GetByTimetstamp();
+            Assert.That(logs, Is.Not.Empty);
+
+            registry.Clear();
+
+            logs = registry.GetByTimetstamp();
+            Assert.That(logs, Is.Empty);
+        }
     }
 }

@@ -242,3 +242,15 @@ void doSomethingCool(std::ifstream& input)
 
 #12.2. 4/23/2018:
 - Finished GetBy tests for LogRegistry. Technically still have to make tests for the actual implementation, but that's for another time.
+- Nevermind. I wrote the remaining tests.
+- Next up: ConsolePrinter. I want to test this over IOPrinter because it will actually be used. If something gets changed in IOPrinter, suddenly there will be X tests breaking, where X is every implementor of IOPrinter.
+- Actually, writing that, I probably should do it for IOPrinter... Or at least have some tests "for" IOPrinter derived classes, but use the implementation (IOTester.Test(impl, outputGrabberDelegate)). This way I can run the tests on the impl, which will actually get used directly, and NOT have to write 10 tests the same way.
+- First tests are... sanity tests. What if there are no logs, and just make sure I can grab console output.
+- Both work, but the console output test is... not plesent. Can you imagine every test needing to check the NewLine? Probably be best to specify a new line...
+- But wait, there's more! I was under the impression that NUnit ran in parallel (at work, we started non-parallel, then wanted tests to run faster, switched to parallel, and watched many break).
+- As such, I wrote all the tests (at least I think so) with the expectation that they would run in parallel. Since the ConsolePrinter test would be changing the global Console.Out param, I couldn't have that run in parallel.
+- I marked the test as NonParallelizable. Curiosity, I looked into it and... apparently NUnit doesn't run in parallel by default. Probably a good default, but it now meant that I wanted everything to run in parallel (unless marked).
+- You can apparently mark assemblies, classes/fixtures, and methods as Parallelizable. I didn't want to go nuts right now, so I marked only fixtures (at an assembly level) as parallelizable.
+- But there was no place to put the attribute. Generating the test project apparently meant it would generate the assembly info at build time... but left me without a place to put assembly level attributes. Luckily, diff tools to the rescue.
+- There are attributes that tell the project not to generate the assembly info, and that left me with the ability to write my own.
+- All is good in the world. Next up: writing the rest of the ConsolePrinter tests, and doing the work mentioned above.

@@ -25,11 +25,6 @@ namespace LogTracker.Tests
             };
         }
 
-        [TearDown]
-        public void Teardown()
-        {
-        }
-
         [Test(TestOf = typeof(PrinterFactory))]
         public void PrinterFactoryProducesConsole()
         {
