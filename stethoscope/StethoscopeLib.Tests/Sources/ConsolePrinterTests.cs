@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 
-using LogTracker.Log;
 using LogTracker.Printers.Internal;
 
 using NUnit.Framework;
@@ -10,28 +9,21 @@ namespace LogTracker.Tests.Sources
 {
     // Since we're replacing standard out, we can't run this is parallel
     [TestFixture(TestOf = typeof(ConsolePrinter)), NonParallelizable]
-    public class ConsolePrinterTests
+    public class ConsolePrinterTests : IOPrinterTests
     {
         private TextWriter _originalStdOut;
         private StringWriter _fakeStdOut;
 
-        private LogRegistry logRegistry;
-        private LogConfig logConfig;
-
         [SetUp]
-        public void Setup()
+        public override void Setup()
         {
             _originalStdOut = Console.Out;
 
             _fakeStdOut = new StringWriter();
+            _fakeStdOut.NewLine = "\n";
             Console.SetOut(_fakeStdOut);
 
-            logRegistry = new LogRegistry();
-            logConfig = new LogConfig()
-            {
-                TimestampPath = "TimePath",
-                LogMessagePath = "MessagePath"
-            };
+            base.Setup();
         }
 
         [TearDown]
@@ -40,9 +32,14 @@ namespace LogTracker.Tests.Sources
             Console.SetOut(_originalStdOut);
         }
 
-        private string GetConsoleOutput()
+        private string GetConsoleOutput(bool stripEndingNewline = true)
         {
-            return _fakeStdOut.ToString();
+            var str = _fakeStdOut.ToString();
+            if (stripEndingNewline && str.EndsWith(_fakeStdOut.NewLine))
+            {
+                return str.Substring(0, str.Length - 1);
+            }
+            return str;
         }
 
         private ConsolePrinter CreateConsolePrinter()
@@ -55,20 +52,29 @@ namespace LogTracker.Tests.Sources
             return printer;
         }
 
+        protected override string PrintedDataNewLine
+        {
+            get
+            {
+                return _fakeStdOut.NewLine;
+            }
+        }
+
+        protected override string GetPrintedData()
+        {
+            return GetConsoleOutput();
+        }
+
+        protected override IOPrinter GetIOPrinter()
+        {
+            return CreateConsolePrinter();
+        }
+
         [Test]
         public void ConsoleSanityTest()
         {
             Console.WriteLine("test msg");
-            Assert.That(GetConsoleOutput(), Is.EqualTo($"test msg{_originalStdOut.NewLine}")); //XXX how can this be made... less ugly
+            Assert.That(GetConsoleOutput(), Is.EqualTo("test msg"));
         }
-
-        [Test]
-        public void NoLogs()
-        {
-            var printer = CreateConsolePrinter();
-            printer.Print();
-        }
-
-        //TODO: tests
     }
 }

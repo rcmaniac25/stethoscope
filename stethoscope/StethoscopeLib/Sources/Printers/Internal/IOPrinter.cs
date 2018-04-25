@@ -16,7 +16,7 @@ namespace LogTracker.Printers.Internal
 
         protected void SetTextWriter(TextWriter textWriter)
         {
-            this.TextWriter = textWriter;
+            TextWriter = textWriter;
         }
 
         protected static string GenerateIndentLog(int indent)

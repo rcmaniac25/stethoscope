@@ -254,3 +254,9 @@ void doSomethingCool(std::ifstream& input)
 - But there was no place to put the attribute. Generating the test project apparently meant it would generate the assembly info at build time... but left me without a place to put assembly level attributes. Luckily, diff tools to the rescue.
 - There are attributes that tell the project not to generate the assembly info, and that left me with the ability to write my own.
 - All is good in the world. Next up: writing the rest of the ConsolePrinter tests, and doing the work mentioned above.
+
+#13.2. 4/24/2018:
+- Specify our own newline, so changes in platform are easier to handle
+- Abstracted IOPrinter tests
+- Started working on IOPrinter tests... this is going to be either annoying, or complex.
+- ...and would you look at the time. *cough* Yea, it's late (again) and I want to be able to focus on this then to be half-asleep while trying to ensure print outs occur as expected
