@@ -35,9 +35,9 @@ namespace LogTracker.Tests.Sources
         private string GetConsoleOutput(bool stripEndingNewline = true)
         {
             var str = _fakeStdOut.ToString();
-            if (stripEndingNewline && str.EndsWith(_fakeStdOut.NewLine))
+            while (stripEndingNewline && str.EndsWith(_fakeStdOut.NewLine)) // Not perfect, but we don't want to start adding newlines in places we don't expect them to be
             {
-                return str.Substring(0, str.Length - 1);
+                str = str.Substring(0, str.Length - 1);
             }
             return str;
         }

@@ -260,3 +260,7 @@ void doSomethingCool(std::ifstream& input)
 - Abstracted IOPrinter tests
 - Started working on IOPrinter tests... this is going to be either annoying, or complex.
 - ...and would you look at the time. *cough* Yea, it's late (again) and I want to be able to focus on this then to be half-asleep while trying to ensure print outs occur as expected
+
+#14.2. 4/25/2018:
+- Started off trying to finish the IOPrinter tests. Made good progress, if not completed it.
+- And... not feeling good. Occured just after I ate some food... that can't be good. I'm gonna have to call it a night early (unintentionally this time)

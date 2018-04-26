@@ -56,6 +56,21 @@ namespace LogTracker.Tests.Sources
             Assert.That(data, Is.Empty);
         }
 
+        /*
+         * For now (4/26/2018) this is the general format of printing
+         * 
+         * Thread num
+         * Start funct // ../my/src/path.cpp
+         *   log message
+         * End funct
+         * 
+         * Thread num
+         * Start funct // ../my/src/path.cpp
+         *   log message
+         *   log message
+         * End funct
+         */
+
         [Test]
         public void SimpleLogEntry()
         {
@@ -63,11 +78,93 @@ namespace LogTracker.Tests.Sources
             Assert.That(entry, Is.Not.Null);
 
             var data = PrintData();
-
-            //XXX is this what we're expecting?
+            
             Assert.That(data, Is.Empty);
         }
 
-        //TODO: tests
+        private void AddLog(string message, object thread, object function, object path, int timeOffsetSec = -1, bool assertCreated = false)
+        {
+            var time = DateTime.Now;
+            if (timeOffsetSec >= 0)
+            {
+                time = new DateTime(2018, 4, 26, 0, 38, 58).AddSeconds(timeOffsetSec);
+            }
+
+            var entry = logRegistry.AddLog(time.ToString(), message);
+            if (assertCreated)
+            {
+                Assert.That(entry, Is.Not.Null);
+            }
+
+            logRegistry.AddValueToLog(entry, Common.LogAttribute.ThreadID, thread);
+            logRegistry.AddValueToLog(entry, Common.LogAttribute.Function, function);
+            logRegistry.AddValueToLog(entry, Common.LogAttribute.SourceFile, path);
+        }
+
+        [Test]
+        public void PopulatedLogEntry()
+        {
+            AddLog("testentry", 123, "myFunc", "path/to/location.cpp");
+
+            var expectedLogPrintout = "Thread 123\nStart myFunc // path/to/location.cpp\n  testentry\nEnd myFunc";
+
+            var data = PrintData();
+
+            Assert.That(data, Is.EqualTo(expectedLogPrintout));
+        }
+
+        [Test]
+        public void DifferentThreads()
+        {
+            AddLog("testentry1", 123, "myFunc", "path/to/location.cpp");
+            AddLog("testentry2", 321, "myFunc", "path/to/location.cpp");
+
+            var expectedLogPrintout = "Thread 123\nStart myFunc // path/to/location.cpp\n  testentry1\nEnd myFunc\n\nThread 321\nStart myFunc // path/to/location.cpp\n  testentry2\nEnd myFunc";
+
+            var data = PrintData();
+
+            Assert.That(data, Is.EqualTo(expectedLogPrintout));
+        }
+
+        [Test]
+        public void SameThreads()
+        {
+            AddLog("testentry1", 123, "myFunc", "path/to/location.cpp");
+            AddLog("testentry2", 123, "myFunc", "path/to/location.cpp");
+
+            var expectedLogPrintout = "Thread 123\nStart myFunc // path/to/location.cpp\n  testentry1\n  testentry2\nEnd myFunc";
+
+            var data = PrintData();
+
+            Assert.That(data, Is.EqualTo(expectedLogPrintout));
+        }
+
+        [Test]
+        public void DifferentFunctions()
+        {
+            AddLog("testentry1", 123, "myFunc", "path/to/location.cpp");
+            AddLog("testentry2", 123, "myOtherFunc", "path/to/location.cpp");
+
+            var expectedLogPrintout = "Thread 123\nStart myFunc // path/to/location.cpp\n  testentry1\nEnd myFunc\nStart myOtherFunc // path/to/location.cpp\n  testentry2\nEnd myOtherFunc";
+
+            var data = PrintData();
+
+            Assert.That(data, Is.EqualTo(expectedLogPrintout));
+        }
+
+        [Test]
+        public void SameFunctions()
+        {
+            AddLog("testentry1", 123, "myFunc", "path/to/location.cpp");
+            AddLog("testentry2", 123, "myFunc", "path/to/location.cpp");
+
+            var expectedLogPrintout = "Thread 123\nStart myFunc // path/to/location.cpp\n  testentry1\n  testentry2\nEnd myFunc";
+
+            var data = PrintData();
+
+            Assert.That(data, Is.EqualTo(expectedLogPrintout));
+        }
+
+        //TODO: others
     }
 }
