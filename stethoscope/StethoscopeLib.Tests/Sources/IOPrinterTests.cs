@@ -152,19 +152,21 @@ namespace LogTracker.Tests.Sources
             Assert.That(data, Is.EqualTo(expectedLogPrintout));
         }
 
+        // Same functions is the same as SameThreads
+
         [Test]
-        public void SameFunctions()
+        public void SameSources()
         {
             AddLog("testentry1", 123, "myFunc", "path/to/location.cpp");
-            AddLog("testentry2", 123, "myFunc", "path/to/location.cpp");
+            AddLog("testentry2", 123, "myFunc", "path/to/other/location.cpp");
 
-            var expectedLogPrintout = "Thread 123\nStart myFunc // path/to/location.cpp\n  testentry1\n  testentry2\nEnd myFunc";
+            var expectedLogPrintout = "Thread 123\nStart myFunc // path/to/location.cpp\n  testentry1\nEnd myFunc\nStart myFunc // path/to/other/location.cpp\n  testentry2\nEnd myFunc";
 
             var data = PrintData();
 
             Assert.That(data, Is.EqualTo(expectedLogPrintout));
         }
 
-        //TODO: others
+        // Same sources is the same as SameThreads
     }
 }
