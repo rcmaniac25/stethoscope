@@ -132,5 +132,7 @@ namespace LogTracker.Tests
         {
             return logEntry.Equals(testData);
         }
+
+        //TODO: re-add the GetHashCode tests
     }
 }

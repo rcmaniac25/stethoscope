@@ -265,3 +265,10 @@ void doSomethingCool(std::ifstream& input)
 - Started off trying to finish the IOPrinter tests. Made good progress, if not completed it.
 - And... not feeling good. Occured just after I ate some food... that can't be good. I'm gonna have to call it a night early (unintentionally this time)
 - One more, different sources
+
+#15.2. 4/26/2018:
+- Late day... probably should've done something before playing games.
+- So right before I finished yesterday, I saw I had opened a tab about GetHashCode and it, like StackOverflow and others, basically said: if Equals is true, GetHashCode should too (hey, that rhymes).
+- I added a GetHashCode test to the equals tests. If it's not equal, it won't test hash code. If equals, it will test hash code.
+- After a short thought, I will add the GetHashCode tests, but they're simply going to be comparing the values. The && I was doing in the equals tests would mean that "equals = T && hash code = F" would tell me the test failed, but I wouldn't know where. Likewise, "equals = F && hash code = T" would mean we can have a colision between LogEntrys, but would never know because the && made it false. So a seperate test would be better. Will do this another time.
+- I would've liked to start implementing the tests for ParserUtil (at least the InternalsVisibleTo is working), but as stated: it's late. And stated at another time, don't kill yourself over code. I haven't been too good at that lately. Make myself too busy.
