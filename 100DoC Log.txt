@@ -272,3 +272,10 @@ void doSomethingCool(std::ifstream& input)
 - I added a GetHashCode test to the equals tests. If it's not equal, it won't test hash code. If equals, it will test hash code.
 - After a short thought, I will add the GetHashCode tests, but they're simply going to be comparing the values. The && I was doing in the equals tests would mean that "equals = T && hash code = F" would tell me the test failed, but I wouldn't know where. Likewise, "equals = F && hash code = T" would mean we can have a colision between LogEntrys, but would never know because the && made it false. So a seperate test would be better. Will do this another time.
 - I would've liked to start implementing the tests for ParserUtil (at least the InternalsVisibleTo is working), but as stated: it's late. And stated at another time, don't kill yourself over code. I haven't been too good at that lately. Make myself too busy.
+
+#16.2. 4/27/2018:
+- I'm still standing. Somehow. I could only spend a portion of time on this, so I started implementing test cases for ParserUtil.
+- I realized part way through that I could use TestCases (instead of test) to vastly increase the number of tests without making the test file giant.
+- (You don't realize the difficulty it was to write ^^. I need to go to bed. Late night D&D didn't help with being tired)
+- For some reason, doing invalid tests resulted in CS0051 coming from C#. I tried changing the values, but C# continues to complain. When I didn't do TestCase, I didn't get errors... but I also didn't try compiling, so it may have happened there.
+- Regardless, this kind of work should be easy. Just need to _not_ be asleep.
