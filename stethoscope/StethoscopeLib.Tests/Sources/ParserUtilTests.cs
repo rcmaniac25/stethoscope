@@ -9,9 +9,9 @@ namespace LogTracker.Tests
     {
         [TestCase(ParserPathElementFieldType.Unknown, ExpectedResult = null)]
         [TestCase(ParserPathElementFieldType.NotAValue, ExpectedResult = null)]
-        public object InvalidCastType(ParserPathElementFieldType castType)
+        public object InvalidCastType(object castType) // Parameter can't be a ParserPathElementFieldType because it would expose a internal/private type publically. Those types can be used as params though
         {
-            return ParserUtil.CastField("true", castType);
+            return ParserUtil.CastField("true", (ParserPathElementFieldType)castType);
         }
 
         [TestCase("", ExpectedResult = null)]

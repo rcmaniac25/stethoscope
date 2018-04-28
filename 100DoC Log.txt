@@ -279,3 +279,6 @@ void doSomethingCool(std::ifstream& input)
 - (You don't realize the difficulty it was to write ^^. I need to go to bed. Late night D&D didn't help with being tired)
 - For some reason, doing invalid tests resulted in CS0051 coming from C#. I tried changing the values, but C# continues to complain. When I didn't do TestCase, I didn't get errors... but I also didn't try compiling, so it may have happened there.
 - Regardless, this kind of work should be easy. Just need to _not_ be asleep.
+
+#17.2. 4/28/2018:
+- Fixed the CS0051 issue with a test
