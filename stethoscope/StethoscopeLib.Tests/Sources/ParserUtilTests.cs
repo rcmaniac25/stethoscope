@@ -2,6 +2,8 @@
 
 using NUnit.Framework;
 
+using System.Collections.Generic;
+
 namespace LogTracker.Tests
 {
     [TestFixture(TestOf = typeof(ParserUtil))]
@@ -23,12 +25,31 @@ namespace LogTracker.Tests
         [TestCase("False", ExpectedResult = false)]
         [TestCase("TrUe", ExpectedResult = true)]
         [TestCase("FaLsE", ExpectedResult = false)]
-        public object CastBool(string boolCast)
+        [TestCase("vanilla", ExpectedResult = null)]
+        public object CastBool(string value)
         {
-            return ParserUtil.CastField(boolCast, ParserPathElementFieldType.Bool);
+            return ParserUtil.CastField(value, ParserPathElementFieldType.Bool);
         }
 
-        //TODO: CastField
+        [TestCase("", ExpectedResult = "")]
+        [TestCase("  ", ExpectedResult = "  ")]
+        [TestCase("hi", ExpectedResult = "hi")]
+        public object CastString(string value)
+        {
+            return ParserUtil.CastField(value, ParserPathElementFieldType.String);
+        }
+
+        [TestCase("", ExpectedResult = null)]
+        [TestCase("0", ExpectedResult = 0)]
+        [TestCase("12345", ExpectedResult = 12345)]
+        [TestCase("-4321", ExpectedResult = -4321)]
+        [TestCase("chocolate", ExpectedResult = null)]
+        public object CastInt(string value)
+        {
+            return ParserUtil.CastField(value, ParserPathElementFieldType.Int);
+        }
+
+        //TODO: CastField: KeyValue (will need to do something similar to LogEntryTests.EqualsObject)
 
         //TODO: ParsePath (and ParseFieldType)
     }

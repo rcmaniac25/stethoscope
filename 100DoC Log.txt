@@ -282,3 +282,5 @@ void doSomethingCool(std::ifstream& input)
 
 #17.2. 4/28/2018:
 - Fixed the CS0051 issue with a test
+- Added the string and int tests for casts.
+- Was preparing to work on Key-Value tests, but realized it would be a bit more work then I have (the joys of working on this, late, again). I will do this tomorrow and start on testing the parser itself
