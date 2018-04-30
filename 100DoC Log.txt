@@ -284,3 +284,18 @@ void doSomethingCool(std::ifstream& input)
 - Fixed the CS0051 issue with a test
 - Added the string and int tests for casts.
 - Was preparing to work on Key-Value tests, but realized it would be a bit more work then I have (the joys of working on this, late, again). I will do this tomorrow and start on testing the parser itself
+
+#18.2. 4/29/2018:
+- Right after writing yesterday's note about Key-Value tests, I realized "this is basically the same as the LogEntry tests, but with a different expected data. Instead of writing a whole new builder, I should just extend the other one."
+- This was followed closely with "Wait, even better. Common logic in a parent class, then simplified top-classes". Then I was done for the night.
+- I went about to do just that... and basically wrote a whole new builder. The abstractions are useful, as it will make it easy to create more advanced tests (I'm imagining XML parsing tests, and maybe GUI work too? We'll see when the time comes). The basic need is for tests that produce non-const data AND takea variable input.
+- Simple input or complex setup means needing individual test cases. But complex input can't be compiled in, so it would need individual tests. But then it's a lot of copy-paste and/or a helper function to do the work. The TestCase attributes simplify testing.
+- Casting Key-Value tests needed some additional helpers to make these work better. Also, adding an extension class made me very happy... because it meant that I didn't need to have some ever expanding base class AND it meant I could now do something fancy (see TestDataBuilderExtensions.For and explain how to do that in a base class. As in, C# syntax won't allow you to have a base class do some action and return a child class. But it can do it as an extension function)
+- Now... the tests I came up with. Most are obvious, the last couple are going to be a pain. I put them in because I can easily see logs coming in that go "uuid=XXX-XXX-XXX; name=Smith; userData={\"name\":\"John Smith\", \"userNotes\":[\"I'm debating on if the data should be A;B;C or A,B,C. I need the result to be key=value and...
+- ...that isn't going to be pretty doing a naive split right now. I'd rather the parsers NOT have to have to handle the complex cases individually. Instead, do it in the cross-parser utility classes.
+- In addition, in keeping with "TDD" (notice the quotes, since I haven't been doing to good with it), I can plan these cases now and worry fix implementation later.
+- It also sets up later implementations/tests such as "implicit parsing" (I don't have a better name). At some point in the future, I'd like to be able to get log data and, if the log data didn't have a specific type or there was a type mismatch, have the system determine the data type ahead of time.
+- A parser (utility) that can split data without mixing up quoted data means that I can take the sample from above and do an implicit parse of the userData to JSON.
+- I'm getting ahead of myself. I've spent a long time on making UT. I hope it all pays off in the end, so I can build and know all the old code still works.
+- Also, these new tests broke the 100 tests count.
+- I didn't get to the parser testing or ParsePath tests, but I hope to get to those within the coming days (one of those days will be catching up on movies, the other will be watching Infinity Wars. So I expect both of those to be slightly smaller updates in an effort to get to get enough sleep)

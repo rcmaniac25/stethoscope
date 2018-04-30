@@ -5,13 +5,10 @@ using NUnit.Framework;
 
 namespace LogTracker.Tests.Helpers
 {
-    public class LogEntryTestDataBuilder
+    public class LogEntryTestDataBuilder : TestDataBuilder
     {
-        private TestCaseData testData;
-
-        private LogEntryTestDataBuilder(TestCaseData testData)
+        private LogEntryTestDataBuilder(TestCaseData testData) : base(testData)
         {
-            this.testData = testData;
         }
 
         private static LogEntry CreateTestLogEntry()
@@ -39,27 +36,11 @@ namespace LogTracker.Tests.Helpers
             return TestAgainst(LogEntryBuilder.LogEntry(time, msg, userMsg).Build());
         }
 
-        public LogEntryTestDataBuilder For(string testName)
-        {
-            testData = testData.SetName(testName);
-            return this;
-        }
-
         public LogEntryTestDataBuilder AndHas(LogAttribute attribute, object value)
         {
             ((LogEntry)testData.OriginalArguments[1]).AddAttribute(attribute, value); // Changes both OriginalArguments and Arguments
             //((LogEntry)testData.Arguments[1]).AddAttribute(attribute, value);
             return this;
-        }
-
-        public TestCaseData Which()
-        {
-            return Build();
-        }
-
-        public TestCaseData Build()
-        {
-            return testData;
         }
     }
 }
