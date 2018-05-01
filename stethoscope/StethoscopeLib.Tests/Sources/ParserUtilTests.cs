@@ -3,8 +3,6 @@ using LogTracker.Tests.Helpers;
 
 using NUnit.Framework;
 
-using System.Collections.Generic;
-
 namespace LogTracker.Tests
 {
     [TestFixture(TestOf = typeof(ParserUtil))]
@@ -64,7 +62,9 @@ namespace LogTracker.Tests
             DictionaryTestDataBuilder.TestAgainst("k1=v1;k2=v2").For("CastKeyValue(k1=v1;k2=v2)").WhichWill().ReturnWith("k1", "v1").And("k2", "v2"),
             DictionaryTestDataBuilder.TestAgainst("k1=v1,k2=v2").For("CastKeyValue(k1=v1,k2=v2)").WhichWill().ReturnWith("k1", "v1").And("k2", "v2"),
             DictionaryTestDataBuilder.TestAgainst("\"key=value\"=\"test=pain1\"").For("CastKeyValue(\"key=value\"=\"test=pain1\")").WhichWill().ReturnWith("key=value", "test=pain1"),
-            DictionaryTestDataBuilder.TestAgainst("\"key=value;oh=boy\"=\"test=pain1\"").For("CastKeyValue(\"key=value;oh=boy\"=\"test=pain1\")").WhichWill().ReturnWith("key=value;oh=boy", "test=pain1")
+            DictionaryTestDataBuilder.TestAgainst("\"key=value;oh=boy\"=\"test=pain1\"").For("CastKeyValue(\"key=value;oh=boy\"=\"test=pain1\")").WhichWill().ReturnWith("key=value;oh=boy", "test=pain1"),
+            DictionaryTestDataBuilder.TestAgainst("\"key=value;oh=boy\"=\"test=pain1\";yep=\"this=pain2\"").For("CastKeyValue(\"key=value;oh=boy\"=\"test=pain1\";yep=\"this=pain2\")").WhichWill().ReturnWith("key=value;oh=boy", "test=pain1").And("yep", "this=pain2"),
+            DictionaryTestDataBuilder.TestAgainst("\"let's \\\"use=more\\\" quotes\"=\"oh boy\"").For("CastKeyValue(\"let's \\\"use=more\\\" quotes\"=\"oh boy\")").WhichWill().ReturnWith("let's \"use=more\" quotes", "oh boy"),
         };
 
         [TestCaseSource("CastKeyValueCases")]

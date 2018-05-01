@@ -299,3 +299,16 @@ void doSomethingCool(std::ifstream& input)
 - I'm getting ahead of myself. I've spent a long time on making UT. I hope it all pays off in the end, so I can build and know all the old code still works.
 - Also, these new tests broke the 100 tests count.
 - I didn't get to the parser testing or ParsePath tests, but I hope to get to those within the coming days (one of those days will be catching up on movies, the other will be watching Infinity Wars. So I expect both of those to be slightly smaller updates in an effort to get to get enough sleep)
+
+#19.2. 4/30/2018:
+- So when I said "smaller updates", it ended up being very small.
+- I started looking into the string split. This seems to be a perpetual problem with strings. Or at least I always seem to encounter "split a string, but if there's a quote inside the string, don't split on that"
+- This might be something I spend one day on, then leave it for another time.
+- In the mean time, I fixed the null case and added an additional seperator key (gut feeling is this should be a config value)
+- I also added ever increasingly complex cast key-value tests...
+- Note: I looked at https://stackoverflow.com/questions/554013/regular-expression-to-split-on-spaces-unless-in-quotes and it looks good, now I just need to use different seperators
+- Note 2: These are the test strings that are failing because of quotes (without the C# escaping):
+1. "key=value"="test=pain1"
+2. "key=value;oh=boy"="test=pain1"
+3. "key=value;oh=boy"="test=pain1";yep="this=pain2"
+4. "let's \"use=more\" quotes"="oh boy"

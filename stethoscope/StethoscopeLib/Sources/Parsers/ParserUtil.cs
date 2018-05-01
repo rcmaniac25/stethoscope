@@ -25,6 +25,22 @@ namespace LogTracker.Parsers
         private const char FILTER_MARKER = '$';
         private const char TYPE_MARKER = '&';
 
+#if true
+        private static IEnumerable<KeyValuePair<string, string>> CastKeyValueSplit(string rawValue)
+        {
+            return from value in rawValue.Split(new char[] { ';', ',' }, StringSplitOptions.RemoveEmptyEntries) //XXX config value for what to use for splits?
+                   where value.IndexOf('=') > 0
+                   select new KeyValuePair<string, string>(value.Substring(0, value.IndexOf('=')), value.Substring(value.IndexOf('=') + 1));
+        }
+#else
+        private static IEnumerable<KeyValuePair<string, string>> CastKeyValueSplit(string rawValue)
+        {
+            from System.Text.RegularExpressions.Match m in System.Text.RegularExpressions.Regex.Matches(rawValue, @"(?<match>\w+)|\""(?<match>[\w\s]*)""")
+            let mv = m.Groups["match"].Value
+            where mv.IndexOf('=') > 0 && m.Index()
+        }
+#endif
+
         public static object CastField(string rawValue, ParserPathElementFieldType fieldType)
         {
             switch (fieldType)
@@ -46,11 +62,12 @@ namespace LogTracker.Parsers
                     }
                     break;
                 case ParserPathElementFieldType.KeyValue:
+                    if (rawValue == null)
+                    {
+                        return null;
+                    }
                     IDictionary<string, string> kv = new Dictionary<string, string>();
-                    var pairs = from value in rawValue.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries)
-                                where value.IndexOf('=') > 0
-                                select new KeyValuePair<string, string>(value.Substring(0, value.IndexOf('=')), value.Substring(value.IndexOf('=') + 1));
-                    foreach (var pair in pairs)
+                    foreach (var pair in CastKeyValueSplit(rawValue))
                     {
                         kv.Add(pair);
                     }
