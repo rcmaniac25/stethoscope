@@ -312,3 +312,10 @@ void doSomethingCool(std::ifstream& input)
 2. "key=value;oh=boy"="test=pain1"
 3. "key=value;oh=boy"="test=pain1";yep="this=pain2"
 4. "let's \"use=more\" quotes"="oh boy"
+
+#20.2. 5/1/2018:
+- Oh snap, we passed our earlier "best number of build days"
+- I started working on the splitting work. General idea is go through the string and mark the contents as either quoted or not. Then iterate through non-quoted and group everything by the delimiters that split up different vey-value pairs. Lastly, go through each of those groups to split it by seperator and create the key-value pairs.
+- The hope is that reduces and simplifes the work needed without doing a bunch of crazy regex or writing one massive function to do the work (always a bad idea)
+- Also, it occured to me: this is all overkill. I want to finish it as the above concept simplifes it to a point where I can focus on individual pieces of logic without needing to know the whole (though I've done the problem in reverse to get to the different "how" steps).
+- If this doesn't work, then I'm back at my starting point. I disable the old logic, make a note to work on it (or maybe at some point add stat gathering and see how many logs actually have quoted strings), and move on. For now: one attempt.

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace LogTracker.Parsers
 {
@@ -25,21 +26,83 @@ namespace LogTracker.Parsers
         private const char FILTER_MARKER = '$';
         private const char TYPE_MARKER = '&';
 
-#if true
+        private static char[] KV_DELIMITERS = new char[] { ';', ',' }; //XXX config value for what to use for splits?
+        private const char KV_SEPERATOR = '='; //XXX config?
+
+        private static IEnumerable<Tuple<bool,string>> QuoteGroup(string rawValue)
+        {
+            //TODO: everying in quotes is returned true,quoted value. While everything else is false,value.
+            return null;
+        }
+
+        private static IEnumerable<IEnumerable<Tuple<bool, string>>> GroupSplit(string rawValue)
+        {
+            //TODO: split all the results of QuoteGroup by KV_DELIMITERS, so each inner-enumerable is seperated from others by the KV_DELIMITERS
+            return null;
+        }
+
+        private static IEnumerable<KeyValuePair<string, string>> QuotedCastKeyValueSplit(string rawValue)
+        {
+            StringBuilder[] buffers = null;
+
+            foreach (var group in GroupSplit(rawValue))
+            {
+                buffers = new StringBuilder[2];
+
+                buffers[0] = new StringBuilder();
+                buffers[1] = new StringBuilder();
+
+                var bufferIndex = 0;
+
+                foreach (var value in group)
+                {
+                    if (value.Item1)
+                    {
+                        buffers[bufferIndex].Append(value.Item2);
+                    }
+                    else
+                    {
+                        var sepIndex = value.Item2.IndexOf(KV_SEPERATOR);
+                        if (bufferIndex == 0 && sepIndex >= 0)
+                        {
+                            buffers[bufferIndex].Append(value.Item2.Substring(0, sepIndex));
+                            bufferIndex++;
+                            buffers[bufferIndex].Append(value.Item2.Substring(sepIndex + 1));
+                        }
+                        else
+                        {
+                            buffers[bufferIndex].Append(value.Item2);
+                        }
+                    }
+                }
+
+                if (buffers[0].Length > 0 || buffers[1].Length > 0)
+                {
+                    yield return new KeyValuePair<string, string>(buffers[0].ToString(), buffers[1].ToString());
+                }
+            }
+
+            if (buffers != null && (buffers[0].Length > 0 || buffers[1].Length > 0))
+            {
+                yield return new KeyValuePair<string, string>(buffers[0].ToString(), buffers[1].ToString());
+            }
+        }
+
+        private static IEnumerable<KeyValuePair<string, string>> FastCastKeyValueSplit(string rawValue)
+        {
+            return from value in rawValue.Split(KV_DELIMITERS, StringSplitOptions.RemoveEmptyEntries)
+                   where value.IndexOf(KV_SEPERATOR) > 0
+                   select new KeyValuePair<string, string>(value.Substring(0, value.IndexOf(KV_SEPERATOR)), value.Substring(value.IndexOf(KV_SEPERATOR) + 1));
+        }
+
         private static IEnumerable<KeyValuePair<string, string>> CastKeyValueSplit(string rawValue)
         {
-            return from value in rawValue.Split(new char[] { ';', ',' }, StringSplitOptions.RemoveEmptyEntries) //XXX config value for what to use for splits?
-                   where value.IndexOf('=') > 0
-                   select new KeyValuePair<string, string>(value.Substring(0, value.IndexOf('=')), value.Substring(value.IndexOf('=') + 1));
+            if (rawValue.IndexOf('"') < 0)
+            {
+                return FastCastKeyValueSplit(rawValue);
+            }
+            return QuotedCastKeyValueSplit(rawValue);
         }
-#else
-        private static IEnumerable<KeyValuePair<string, string>> CastKeyValueSplit(string rawValue)
-        {
-            from System.Text.RegularExpressions.Match m in System.Text.RegularExpressions.Regex.Matches(rawValue, @"(?<match>\w+)|\""(?<match>[\w\s]*)""")
-            let mv = m.Groups["match"].Value
-            where mv.IndexOf('=') > 0 && m.Index()
-        }
-#endif
 
         public static object CastField(string rawValue, ParserPathElementFieldType fieldType)
         {
@@ -67,7 +130,7 @@ namespace LogTracker.Parsers
                         return null;
                     }
                     IDictionary<string, string> kv = new Dictionary<string, string>();
-                    foreach (var pair in CastKeyValueSplit(rawValue))
+                    foreach (var pair in FastCastKeyValueSplit(rawValue)) //XXX once working, use CastKeyValueSplit
                     {
                         kv.Add(pair);
                     }
