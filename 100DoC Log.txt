@@ -319,3 +319,15 @@ void doSomethingCool(std::ifstream& input)
 - The hope is that reduces and simplifes the work needed without doing a bunch of crazy regex or writing one massive function to do the work (always a bad idea)
 - Also, it occured to me: this is all overkill. I want to finish it as the above concept simplifes it to a point where I can focus on individual pieces of logic without needing to know the whole (though I've done the problem in reverse to get to the different "how" steps).
 - If this doesn't work, then I'm back at my starting point. I disable the old logic, make a note to work on it (or maybe at some point add stat gathering and see how many logs actually have quoted strings), and move on. For now: one attempt.
+
+#21.2. 5/2/2018:
+- So I didn't mention it yesterday: one other reason I want to get this working is I always seem to hit this problem, but I never get a real working solution. If I can get something working, I can say I actually have a solution and can reference it whenever I hit this problem again.
+- So a goal I had with CastKeyValueSplit function is to use data once. It was kind of a challenge.
+- This is important to note, as I thought about how to do the next step (I got taking a individual group and turning it into a key-value pair. Now I needed to go from a single list of strings and turn them into different groups. Essentially the individual sets that make up a single key-value pair).
+- ...it involved multiple loops (think: iterate; skip(x) then iterate; skip(x+y) then iterate). But I could only imagine iterating through a process, stopping, then doing it again but ignoring the results until we get to a certain point. Also, I'd need to count elements and a number of other variable creation steps to know where I was.
+- So, how do I do it in one loop? Enumerator (instead of Enumerable). In order to make this work, I need to be able to return leftover data outside of the processing loop (GroupSplitExtractGroup) which would return an enumerable itself.
+- C# doesn't allow yielding inside of yielding, so the seperate function was needed anyway. Wait, what's this error? I can't return anything in a yield function? Well this is a problem...
+- ...one that can be fixed with a hack: class variables, like arrays, persist stack traversal. I've done this for years. It is a hack and a feature of programming languages. If this was F#, there are helper functions for enumerations that let me pass state. That would do the same thing.
+- So now I define an array, save sepecific data in it, and move on. I did test it and it worked. I'm very happy.
+- This may make that function non-thread safe... but only if multi-threaded/async work is done with the resulting iteration. I'm not sure and have no intention of testing it... because I have no intention of making CastField or CastKeyValueSplit async/multi-threaded.
+- With that done, and working, all that's left is the QuoteGroup function. I talked with a friend who is into this kind of work and they simply stated "state machine". We'll see. It sounds nice, though I don't want to go that crazy if I can avoid it.

@@ -35,10 +35,58 @@ namespace LogTracker.Parsers
             return null;
         }
 
+        private static IEnumerable<Tuple<bool, string>> GroupSplitExtractGroup(IEnumerator<Tuple<bool, string>> groupEnumerator, Tuple<bool, string>[] leftover, int priorIndex)
+        {
+            var remainsIndex = (priorIndex + 1) % 2;
+
+            if (leftover[priorIndex].Item2 != null)
+            {
+                yield return leftover[priorIndex];
+            }
+            while (groupEnumerator.MoveNext())
+            {
+                var group = groupEnumerator.Current;
+                if (group.Item1)
+                {
+                    yield return group;
+                }
+                else
+                {
+                    var index = group.Item2.IndexOfAny(KV_DELIMITERS);
+                    if (index >= 0)
+                    {
+                        if (index > 0)
+                        {
+                            yield return new Tuple<bool, string>(group.Item1, group.Item2.Substring(0, index));
+                        }
+                        leftover[remainsIndex] = new Tuple<bool, string>(group.Item1, group.Item2.Substring(index + 1));
+                        yield break;
+                    }
+                    else
+                    {
+                        yield return group;
+                    }
+                }
+            }
+
+            leftover[remainsIndex] = null;
+        }
+
+        // Note: possibly not thread safe (because of the "leftover" data). Don't multi-thread this iteration.
         private static IEnumerable<IEnumerable<Tuple<bool, string>>> GroupSplit(string rawValue)
         {
-            //TODO: split all the results of QuoteGroup by KV_DELIMITERS, so each inner-enumerable is seperated from others by the KV_DELIMITERS
-            return null;
+            var groups = QuoteGroup(rawValue).GetEnumerator();
+
+            // This is a workaround for iterators not being able to use out or ref. It's probably a bad idea...
+            var priorIndex = 0;
+            var leftover = new Tuple<bool, string>[2];
+            leftover[0] = new Tuple<bool, string>(false, null);
+
+            while (leftover[priorIndex] != null)
+            {
+                yield return GroupSplitExtractGroup(groups, leftover, priorIndex);
+                priorIndex = (priorIndex + 1) % 2;
+            }
         }
 
         private static IEnumerable<KeyValuePair<string, string>> QuotedCastKeyValueSplit(string rawValue)
