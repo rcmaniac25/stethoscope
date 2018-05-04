@@ -331,3 +331,10 @@ void doSomethingCool(std::ifstream& input)
 - So now I define an array, save sepecific data in it, and move on. I did test it and it worked. I'm very happy.
 - This may make that function non-thread safe... but only if multi-threaded/async work is done with the resulting iteration. I'm not sure and have no intention of testing it... because I have no intention of making CastField or CastKeyValueSplit async/multi-threaded.
 - With that done, and working, all that's left is the QuoteGroup function. I talked with a friend who is into this kind of work and they simply stated "state machine". We'll see. It sounds nice, though I don't want to go that crazy if I can avoid it.
+
+#22.2. 5/3/2018:
+- I didn't actually get code done today. Instead of was trying to figure out what is needed to split the quoted elements from the string.
+- A processing state or state machine would be useful. I can see the states being: Normal, Quoted, and EscapeCheck.
+- The last one counts escape chars to ensure it's not a quote. \" is 2 chars. So if I encounter " but \ is before it, I can ignore it.
+- States then are Normal -> EscapeCheck -> Quoted -> EscapeCheck -> Normal
+- Tomorrow will be a short day as well.

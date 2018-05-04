@@ -32,6 +32,8 @@ namespace LogTracker.Parsers
         private static IEnumerable<Tuple<bool,string>> QuoteGroup(string rawValue)
         {
             //TODO: everying in quotes is returned true,quoted value. While everything else is false,value.
+            //XXX: seems simple, just find the first quote with no escapes, and then the keep iterating until the end is reached or the a matching quote is found. The key is still to check escapes. Because \\\" will show as a quote, 
+            //     but it's escaped to \", which is probably an inner quote then an outer one. We'll see if I really think it's simple later.
             return null;
         }
 
