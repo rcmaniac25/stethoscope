@@ -338,3 +338,13 @@ void doSomethingCool(std::ifstream& input)
 - The last one counts escape chars to ensure it's not a quote. \" is 2 chars. So if I encounter " but \ is before it, I can ignore it.
 - States then are Normal -> EscapeCheck -> Quoted -> EscapeCheck -> Normal
 - Tomorrow will be a short day as well.
+
+#23.2. 5/4/2018:
+- Before I ended all activity for yesterday, I thought "do I really need the EscapeCheck state?"
+- Fast foward to today: I talked to the same friend as before, and they indicated all they needed was a single char look-ahead.
+- I thought for a short bit and realized it would work. Though I can make life a little easier by looking behind instead of ahead.
+- Looking ahead involves range checks, a complex internal state (if the char ahead of current is " and current is \, then add current AND next, then move 2 ahead. If not, then add current and continue). What's to stop trying to optimize by working two chars at a time?
+- Looking behind simply means "check if it's \. If so, add char. Else, return"
+- You'll notice the code is under 30 lines (excluding comments), including newline braces. There is a couple additional state elements to watch. I didn't want to return empty groups because the string was "\"", and some other pairs I checked.
+- While testing, all but one test passed. After looking it over, I realized I mis-escaped the "correct" result. So I had to fix the result for the test, as the code worked just fine.
+- Yay!

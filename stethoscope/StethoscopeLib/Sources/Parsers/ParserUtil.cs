@@ -29,12 +29,36 @@ namespace LogTracker.Parsers
         private static char[] KV_DELIMITERS = new char[] { ';', ',' }; //XXX config value for what to use for splits?
         private const char KV_SEPERATOR = '='; //XXX config?
 
-        private static IEnumerable<Tuple<bool,string>> QuoteGroup(string rawValue)
+        private static IEnumerable<Tuple<bool, string>> QuoteGroup(string rawValue)
         {
-            //TODO: everying in quotes is returned true,quoted value. While everything else is false,value.
-            //XXX: seems simple, just find the first quote with no escapes, and then the keep iterating until the end is reached or the a matching quote is found. The key is still to check escapes. Because \\\" will show as a quote, 
-            //     but it's escaped to \", which is probably an inner quote then an outer one. We'll see if I really think it's simple later.
-            return null;
+            var lastChar = '\0';
+            var processingQuote = false;
+            var firstExecution = true;
+            var builder = new StringBuilder();
+            foreach (var c in rawValue)
+            {
+                if (c == '"' && lastChar != '\\')
+                {
+                    if (!firstExecution)
+                    {
+                        yield return new Tuple<bool, string>(processingQuote, builder.ToString());
+                    }
+                    builder.Length = 0;
+                    processingQuote = !processingQuote;
+                }
+                else
+                {
+                    builder.Append(c);
+                }
+                firstExecution = false;
+                lastChar = c;
+            }
+            if (builder.Length > 0)
+            {
+                // Theory that we're in a quoted string... but never have an ending quote. Simply use the processingQuote to determine what to return.
+                // If we were in a quote, we have no way of knowing if it was supposed to be a quoted string or not.
+                yield return new Tuple<bool, string>(processingQuote, builder.ToString());
+            }
         }
 
         private static IEnumerable<Tuple<bool, string>> GroupSplitExtractGroup(IEnumerator<Tuple<bool, string>> groupEnumerator, Tuple<bool, string>[] leftover, int priorIndex)
@@ -129,6 +153,8 @@ namespace LogTracker.Parsers
                 if (buffers[0].Length > 0 || buffers[1].Length > 0)
                 {
                     yield return new KeyValuePair<string, string>(buffers[0].ToString(), buffers[1].ToString());
+                    buffers[0].Length = 0;
+                    buffers[1].Length = 0;
                 }
             }
 
@@ -180,7 +206,7 @@ namespace LogTracker.Parsers
                         return null;
                     }
                     IDictionary<string, string> kv = new Dictionary<string, string>();
-                    foreach (var pair in FastCastKeyValueSplit(rawValue)) //XXX once working, use CastKeyValueSplit
+                    foreach (var pair in CastKeyValueSplit(rawValue))
                     {
                         kv.Add(pair);
                     }
