@@ -67,10 +67,7 @@ namespace LogTracker.Log
             return true;
         }
 
-        public void Clear()
-        {
-            logs.Clear();
-        }
+        public void Clear() => logs.Clear();
 
         public static IDictionary<object, IEnumerable<ILogEntry>> GetLogBy(LogAttribute attribute, IEnumerable<ILogEntry> entries)
         {
@@ -101,15 +98,9 @@ namespace LogTracker.Log
             return result;
         }
 
-        public IDictionary<object, IEnumerable<ILogEntry>> GetBy(LogAttribute attribute)
-        {
-            return GetLogBy(attribute, logs);
-        }
+        public IDictionary<object, IEnumerable<ILogEntry>> GetBy(LogAttribute attribute) => GetLogBy(attribute, logs);
 
-        public IEnumerable<ILogEntry> GetByTimetstamp()
-        {
-            return logs.AsReadOnly();
-        }
+        public IEnumerable<ILogEntry> GetByTimetstamp() => logs.AsReadOnly();
 
         //TODO: special get functions - get by function, get by thread ID, get by <key>, etc.
         /* TODO: LINQ support?

@@ -9,20 +9,12 @@ namespace LogTracker.Printers.Internal
     {
         protected ILogRegistry logRegistry;
 
-        protected TextWriter TextWriter { get; private set; }
+        protected TextWriter TextWriter { get; set; }
 
         public abstract void Setup();
         public abstract void Teardown();
 
-        protected void SetTextWriter(TextWriter textWriter)
-        {
-            TextWriter = textWriter;
-        }
-
-        protected static string GenerateIndentLog(int indent)
-        {
-            return new string(' ', indent * 2); //XXX config for indent size
-        }
+        protected static string GenerateIndentLog(int indent) => new string(' ', indent * 2); //XXX config for indent size
 
         protected void PrintThreadTraces()
         {
@@ -62,10 +54,7 @@ namespace LogTracker.Printers.Internal
             }
         }
 
-        public virtual void Print()
-        {
-            PrintThreadTraces();
-        }
+        public virtual void Print() => PrintThreadTraces();
 
         public void SetConfig(LogConfig config)
         {

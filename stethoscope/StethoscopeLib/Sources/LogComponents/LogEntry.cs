@@ -14,18 +14,12 @@ namespace LogTracker.Log
 
         public DateTime Timestamp
         {
-            get
-            {
-                return lazyTimestamp.Value;
-            }
+            get => lazyTimestamp.Value;
         }
 
         public string Message
         {
-            get
-            {
-                return lazyMessage.Value;
-            }
+            get => lazyMessage.Value;
         }
 
         private Dictionary<LogAttribute, object> attributes = new Dictionary<LogAttribute, object>();
@@ -44,10 +38,7 @@ namespace LogTracker.Log
             lazyMessage = new Lazy<string>(() => GetAttribute<string>(LogAttribute.Message), true);
         }
 
-        public bool HasAttribute(LogAttribute attribute)
-        {
-            return attributes.ContainsKey(attribute);
-        }
+        public bool HasAttribute(LogAttribute attribute) => attributes.ContainsKey(attribute);
 
         public T GetAttribute<T>(LogAttribute attribute)
         {
@@ -59,10 +50,7 @@ namespace LogTracker.Log
             return (T)attributes[attribute];
         }
 
-        public void AddAttribute(LogAttribute attribute, object value)
-        {
-            attributes.Add(attribute, value);
-        }
+        public void AddAttribute(LogAttribute attribute, object value) => attributes.Add(attribute, value);
 
         public int CompareTo(LogEntry other)
         {
@@ -141,10 +129,7 @@ namespace LogTracker.Log
             return false;
         }
 
-        public override int GetHashCode()
-        {
-            return 1852909 ^ attributes.GetHashCode();
-        }
+        public override int GetHashCode() => 1852909 ^ attributes.GetHashCode();
 
         public override string ToString()
         {

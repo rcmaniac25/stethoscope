@@ -26,6 +26,8 @@ namespace LogTracker.Parsers
         private const char FILTER_MARKER = '$';
         private const char TYPE_MARKER = '&';
 
+        #region Cast (Key-Value)
+
         private static char[] KV_DELIMITERS = new char[] { ';', ',' }; //XXX config value for what to use for splits?
         private const char KV_SEPERATOR = '='; //XXX config?
 
@@ -179,6 +181,8 @@ namespace LogTracker.Parsers
             }
             return QuotedCastKeyValueSplit(rawValue);
         }
+
+        #endregion
 
         public static object CastField(string rawValue, ParserPathElementFieldType fieldType)
         {

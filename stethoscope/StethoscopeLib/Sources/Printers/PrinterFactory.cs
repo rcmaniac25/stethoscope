@@ -9,10 +9,7 @@ namespace LogTracker.Printers
         {
         }
 
-        public static IPrinterFactory CrateConsoleFactory()
-        {
-            return new ConsolePrinterFactory();
-        }
+        public static IPrinterFactory CrateConsoleFactory() => new ConsolePrinterFactory();
 
         private class ConsolePrinterFactory : IPrinterFactory
         {

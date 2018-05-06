@@ -348,3 +348,13 @@ void doSomethingCool(std::ifstream& input)
 - You'll notice the code is under 30 lines (excluding comments), including newline braces. There is a couple additional state elements to watch. I didn't want to return empty groups because the string was "\"", and some other pairs I checked.
 - While testing, all but one test passed. After looking it over, I realized I mis-escaped the "correct" result. So I had to fix the result for the test, as the code worked just fine.
 - Yay!
+
+#24.2. 5/5/2018:
+- I've been going through gui.cs (https://github.com/migueldeicaza/gui.cs) and it's pretty cool. If it wasn't for the fact that this project is _not_ going to remain in C# forever, I'd probably want to use it and see if I can extend it as a wrapper around either WPF or WinForms. It would be awesome to make a window, add a button, add a menu, etc. and... if it's running in a command line (or a flag indicates it's in command line), then run in the window like a Curses app. Else, open a GUI and run there.
+- Maybe I can port it to C++... but I'm pretty sure that's what Curses and others are for. But a single UI framework for CLI and GUI would be quite nice.
+- And... just found out the first version of it came out in 2007. o_o
+- Slight more thought: it could be useful to basically clone the API (they aren't Oracle, and the license is MIT) and have the "driver" be able to switch between console and GUI.
+- For C#, the Console driver will use gui.cs, while the GUI driver will use something else (or I'll have to write it).
+- The upside is this abstraction lets me rewrite/reproduce it in C++. This way I can keep writting, the code, but now don't need to worry about the backends/drivers. C#? gui.cs and other. C++? Qt, wxWidgets, other. Heck (I both like and abhore this idea), in theory a small webserver can be started by a driver and "suddenly" the whole thing runs in a webpage. And by "run" I mean "the UI" as nobody in their right mind would use JS unless you're making a Todo app. Jokes aside, I'll note it but it's below every other task.
+- One thing I got out of looking at the code, some of the newer syntax is useful. Instead of `public int Value { get { return _innerField.Value; } }` you can now do `public int Value { get => _innerField.Value; }` and if `_innerField` exists because you need to set a default? `public int Value { get; } = 1337;` I've not done C# in a bit.
+- I updated some code with those new syntax nuggets.

@@ -6,7 +6,7 @@ namespace LogTracker.Printers.Internal
     {
         public override void Setup()
         {
-            SetTextWriter(Console.Out);
+            TextWriter = Console.Out;
         }
 
         public override void Teardown()
