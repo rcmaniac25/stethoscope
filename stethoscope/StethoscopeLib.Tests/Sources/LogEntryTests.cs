@@ -16,7 +16,7 @@ namespace LogTracker.Tests
         public void AttributeNotSet()
         {
             var entry = new LogEntry(DateTime.Now, "testmsg");
-            Assert.That(entry.HasAttribute(Common.LogAttribute.ThreadID), Is.False);
+            Assert.That(entry.HasAttribute(LogAttribute.ThreadID), Is.False);
         }
 
         [Test]
@@ -25,7 +25,7 @@ namespace LogTracker.Tests
             var entry = new LogEntry(DateTime.Now, "testmsg");
             Assert.Throws<InvalidCastException>(() =>
             {
-                entry.GetAttribute<int>(Common.LogAttribute.Message);
+                entry.GetAttribute<int>(LogAttribute.Message);
             });
         }
 
@@ -35,7 +35,7 @@ namespace LogTracker.Tests
             var entry = new LogEntry(DateTime.Now, "testmsg");
             Assert.Throws<KeyNotFoundException>(() =>
             {
-                entry.GetAttribute<string>(Common.LogAttribute.ThreadID);
+                entry.GetAttribute<string>(LogAttribute.ThreadID);
             });
         }
 
@@ -43,11 +43,11 @@ namespace LogTracker.Tests
         public void AddAttribute()
         {
             var entry = new LogEntry(DateTime.Now, "testmsg");
-            Assert.That(entry.HasAttribute(Common.LogAttribute.ThreadID), Is.False);
+            Assert.That(entry.HasAttribute(LogAttribute.ThreadID), Is.False);
 
             entry.AddAttribute(Common.LogAttribute.ThreadID, "threadid");
 
-            Assert.That(entry.HasAttribute(Common.LogAttribute.ThreadID), Is.True);
+            Assert.That(entry.HasAttribute(LogAttribute.ThreadID), Is.True);
         }
 
         [Test]
@@ -72,8 +72,8 @@ namespace LogTracker.Tests
         {
             var msg = "testmsg";
             var entry = new LogEntry(DateTime.Now, msg);
-            Assert.That(entry.HasAttribute(Common.LogAttribute.Message), Is.True);
-            Assert.That(entry.GetAttribute<string>(Common.LogAttribute.Message), Is.EqualTo(msg));
+            Assert.That(entry.HasAttribute(LogAttribute.Message), Is.True);
+            Assert.That(entry.GetAttribute<string>(LogAttribute.Message), Is.EqualTo(msg));
         }
 
         [Test]
@@ -90,7 +90,7 @@ namespace LogTracker.Tests
             var time = DateTime.Now;
             var entry = new LogEntry(time, "testmsg");
             Assert.That(entry.HasAttribute(Common.LogAttribute.Timestamp), Is.True);
-            Assert.That(entry.GetAttribute<DateTime>(Common.LogAttribute.Timestamp), Is.EqualTo(time));
+            Assert.That(entry.GetAttribute<DateTime>(LogAttribute.Timestamp), Is.EqualTo(time));
         }
 
         private static TestCaseData[] EqualsObjectCases =

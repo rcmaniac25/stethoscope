@@ -73,6 +73,13 @@ namespace LogTracker.Tests
             return ParserUtil.CastField(value, ParserPathElementFieldType.KeyValue);
         }
 
+        [TestCase(null, ExpectedResult = null)]
+        [TestCase("", ExpectedResult = null)]
+        public object ParsePath(string value)
+        {
+            return ParserUtil.ParsePath(value);
+        }
+
         //TODO: ParsePath (and ParseFieldType)
     }
 }

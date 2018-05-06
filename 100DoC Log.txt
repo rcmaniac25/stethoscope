@@ -1,6 +1,7 @@
 Format: #<day number>.<attempt number>. <date>
 
 Note: running log of progress and notes that may not be code related. Also, I'm not the best speller.
+Note 2: I think outloud, so the posts may be wordier then others, because I'm thinking out the process and alternatives.
 
 #0.1. 3/18/2018:
 - Project name determined thanks to a friend
@@ -358,3 +359,19 @@ void doSomethingCool(std::ifstream& input)
 - The upside is this abstraction lets me rewrite/reproduce it in C++. This way I can keep writting, the code, but now don't need to worry about the backends/drivers. C#? gui.cs and other. C++? Qt, wxWidgets, other. Heck (I both like and abhore this idea), in theory a small webserver can be started by a driver and "suddenly" the whole thing runs in a webpage. And by "run" I mean "the UI" as nobody in their right mind would use JS unless you're making a Todo app. Jokes aside, I'll note it but it's below every other task.
 - One thing I got out of looking at the code, some of the newer syntax is useful. Instead of `public int Value { get { return _innerField.Value; } }` you can now do `public int Value { get => _innerField.Value; }` and if `_innerField` exists because you need to set a default? `public int Value { get; } = 1337;` I've not done C# in a bit.
 - I updated some code with those new syntax nuggets.
+- My intention was to work on the ParsePath function, but I couldn't figure out how to properly test it.
+- NUnit doesn't seem to have something akin to "Does.Contain(<item>).AtIndex(<index>)" or "Contains.Item(<item>).AtIndex(<index>).And.Has.Property(<property name>).EqualTo(<value>)" or "Has.Member(<item>).With.Property(<peroperty name>).EqualTo(<value>).After.IndexOf(<index>)".
+- That syntax could get quite ugly... but the alternative is to ensure "ParserPathElement" has an equals function and make a whole array of items then test the results.
+- Challenge is the solutions I can think of has one or more of the following traits:
+    - Requires a bunch of extensions that may or may not require NUnit to be updated.
+    - Requires a bunch of work in the library/test set to enable writing a test.
+    - Makes the test too rigid. It was a tip by a senior dev of mine: "If you write a test too rigid, every time you change the code and get the same outcome but it returns a different result, the test will break".
+- The first would make me want to do the second instead. The second would possibly be a ton of boiler plate (or a IComparer) that would remind me greatly of the first attempt to write the equals tests for LogEntry.
+- But the biggest worry is the 3rd case. The 2nd would imply the 3rd. The goal of the ParserPathElement is to provide a "path" to getting a piece of data out of what is generally a complex piece of data (logs aren't just a string).
+- So if, for now, I say "Type, FieldType, StringValue, and IndexValue" need to be checked, then I realize that I can add a SubType for something, I can end up with tests still passing. But what if the StringValue is different based off the SubType? Like it's all lowercase or something?
+- Now it becomes "all your values are wrong". Ok, fix. "Wait, I got a bug that & is not a char in Chinese. I will add a test for that". "Wait, I got the wrong Type now. Let me fix that" The SubType changes without me knowing. "Wait, now all the values are wrong again"
+- The correct course of action is to add SubType checks. Guess what, now all the tests fail because SubType isn't set. Ok, set all of them. But am I now just mimicing the ParsePath function to get all the path fields? As in, writing a test that will always pass as the test comparision is written to the parser result?
+- One more: what if I do some updates to ParsePath and end up never setting IndexValue anymore because it's never used in code. All tests with IndexValue now fail. Let me remove those tests...
+- Back to reality: I'm now writing tests to always pass. It's not how it should work. Aside from some basic tests, I don't care about most of the contents. I just care about the last element.
+- ...am I now writing a LINQ expression to get the last element or skip values (which doesn't exist as a modifier/constraint in NUnit either). I just want an index.. I want a "Last/First" option. `Is.First.Item(<item>)` or something.
+- I feel like I could ramble on about this more... obviously, this isn't as easy as it could seem. It could also be that I'm overthinking it and just doing the LINQ expression/getting the value from the array is the easiest.
