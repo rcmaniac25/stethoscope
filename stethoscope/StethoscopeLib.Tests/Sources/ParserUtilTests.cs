@@ -64,7 +64,7 @@ namespace LogTracker.Tests
             DictionaryTestDataBuilder.TestAgainst("\"key=value\"=\"test=pain1\"").For("CastKeyValue(\"key=value\"=\"test=pain1\")").WhichWill().ReturnWith("key=value", "test=pain1"),
             DictionaryTestDataBuilder.TestAgainst("\"key=value;oh=boy\"=\"test=pain1\"").For("CastKeyValue(\"key=value;oh=boy\"=\"test=pain1\")").WhichWill().ReturnWith("key=value;oh=boy", "test=pain1"),
             DictionaryTestDataBuilder.TestAgainst("\"key=value;oh=boy\"=\"test=pain1\";yep=\"this=pain2\"").For("CastKeyValue(\"key=value;oh=boy\"=\"test=pain1\";yep=\"this=pain2\")").WhichWill().ReturnWith("key=value;oh=boy", "test=pain1").And("yep", "this=pain2"),
-            DictionaryTestDataBuilder.TestAgainst("\"let's \\\"use=more\\\" quotes\"=\"oh boy\"").For("CastKeyValue(\"let's \\\"use=more\\\" quotes\"=\"oh boy\")").WhichWill().ReturnWith("let's \\\"use=more\\\" quotes", "oh boy"),
+            DictionaryTestDataBuilder.TestAgainst("\"let's \\\"use=more\\\" quotes\"=\"oh boy\"").For("CastKeyValue(\"let's \\\"use=more\\\" quotes\"=\"oh boy\")").WhichWill().ReturnWith("let's \\\"use=more\\\" quotes", "oh boy") //XXX this still looks weird
         };
 
         [TestCaseSource("CastKeyValueCases")]
@@ -75,11 +75,44 @@ namespace LogTracker.Tests
 
         [TestCase(null, ExpectedResult = null)]
         [TestCase("", ExpectedResult = null)]
-        public object ParsePath(string value)
+        [TestCase("!", ExpectedResult = null)]
+        [TestCase("#", ExpectedResult = null)]
+        [TestCase("$", ExpectedResult = null)]
+        [TestCase("&", ExpectedResult = null)]
+        [TestCase("&int", ExpectedResult = null)]
+        public object ParsePathNull(string value)
         {
             return ParserUtil.ParsePath(value);
         }
 
-        //TODO: ParsePath (and ParseFieldType)
+        [Test]
+        public void ParsePathNamedMarker()
+        {
+            var path = ParserUtil.ParsePath("!name");
+            Assert.That(path, Is.Not.Null.And.Length.EqualTo(1));
+            Assert.That(path[0], Has.Property("Type").EqualTo(ParserPathElementType.NamedField).And.Property("StringValue").EqualTo("name"));
+            // FieldType is tested by ParsePathFieldType
+        }
+
+        [TestCase("!name", ExpectedResult = ParserPathElementFieldType.String)]
+        [TestCase("!name&str", ExpectedResult = ParserPathElementFieldType.String)]
+        [TestCase("!name&string", ExpectedResult = ParserPathElementFieldType.String)]
+        [TestCase("!name&StRinG", ExpectedResult = ParserPathElementFieldType.String)]
+        [TestCase("!name&bool", ExpectedResult = ParserPathElementFieldType.Bool)]
+        [TestCase("!name&boolean", ExpectedResult = ParserPathElementFieldType.Bool)]
+        [TestCase("!name&int", ExpectedResult = ParserPathElementFieldType.Int)]
+        [TestCase("!name&INT", ExpectedResult = ParserPathElementFieldType.Int)]
+        [TestCase("!name&kv", ExpectedResult = ParserPathElementFieldType.KeyValue)]
+        [TestCase("!name&value&kv", ExpectedResult = ParserPathElementFieldType.KeyValue)]
+        [TestCase("!name&kv&value", ExpectedResult = ParserPathElementFieldType.Unknown)]
+        [TestCase("!name&cookie", ExpectedResult = ParserPathElementFieldType.Unknown)]
+        public object ParsePathFieldType(string value)
+        {
+            var path = ParserUtil.ParsePath(value);
+            Assert.That(path, Is.Not.Null.And.Length.EqualTo(1));
+            return path[0].FieldType;
+        }
+        
+        //TODO: ParsePath
     }
 }

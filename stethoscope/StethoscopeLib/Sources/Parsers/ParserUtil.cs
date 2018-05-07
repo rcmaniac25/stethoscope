@@ -237,9 +237,13 @@ namespace LogTracker.Parsers
             }
             switch (fieldType.ToLower())
             {
+                case "str":
+                case "string":
+                    return ParserPathElementFieldType.String;
                 case "int":
                     return ParserPathElementFieldType.Int;
                 case "bool":
+                case "boolean":
                     return ParserPathElementFieldType.Bool;
                 case "kv":
                     return ParserPathElementFieldType.KeyValue;
