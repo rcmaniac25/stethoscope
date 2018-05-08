@@ -383,3 +383,11 @@ void doSomethingCool(std::ifstream& input)
 - #2 is more true then people think. How much time has been spent on optimizing a function, method, process that... will only get used once? Or infrequently? (note: there is an inverse of this too. Not optimizing something because it's not used frequently. Often has to do with complexity and time spent on it. Like manually running tests...)
 - In this case, the simplist way to do this is... to just manually interact with it. No fancy syntax. No updating of NUnit. No equality functions and tests to check them. Just write a bunch of tests and figure out optimizations once you've had to write something 40 times.
 - In this process, I realized if someone wanted to manually specify field type for a string, it wasn't possible. I also realized not everyone would get the type names easily (Java dev will say boolean, C#/C++ would say bool, C would say BOOL), so I added some aliases and luckily already had a ToLower written in.
+
+#26.2. 5/7/2018:
+- Started working on individual field tests for ParsePath.
+- Not too much to say today. Only a few more tests to write for ParsePath, then the last software element: the XML parser (which will probably be the largest test set of all of them)
+- If there's one thing I realized: You can create this "path" but none of the values let you specify a name. I have a "named field" type, but it's under the expectation that the root log has a set of attributes that can be accessed. Reality is, it may not. Indexes don't work unless order is guarenteed.
+- So <root at="hello">Message</root> and {"at": "hello", "msg": "Message"} can both be parsed, but <root at="hello"><Primary>Message</Primary><Second>Other</Second></root> and {"at": "hello", "logs": {"Second": "Other", "Primary": "Message"}} would not be parsable.
+- Now, if I had a named field, I could say "/!Primary" and "/!logs/!Primary" and they would be parsable. Unlike the other tests written for the parsers, where I checked the code for what I could do (parsers are "fun" in that they aren't obvious)... the named field tests I intend to write before I implement.
+- Last tests after that is to actually make some paths. I may try to take advantage of NUnit's randomization so it can make random paths to test against.

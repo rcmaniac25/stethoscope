@@ -80,21 +80,36 @@ namespace LogTracker.Tests
         [TestCase("$", ExpectedResult = null)]
         [TestCase("&", ExpectedResult = null)]
         [TestCase("&int", ExpectedResult = null)]
+        [TestCase("/!", ExpectedResult = null)]
+        [TestCase("/#", ExpectedResult = null)]
+        [TestCase("/$", ExpectedResult = null)]
+        [TestCase("/#cake", ExpectedResult = null)]
+        [TestCase("/#NaN", ExpectedResult = null)]
+        [TestCase("/#-1", ExpectedResult = null)]
+        [TestCase("/@bob", ExpectedResult = null)] // Unknown field type
         public object ParsePathNull(string value)
         {
             return ParserUtil.ParsePath(value);
         }
 
         [Test]
-        public void ParsePathNamedMarker()
+        public void ParsePathEmpty()
         {
-            var path = ParserUtil.ParsePath("!name");
+            Assert.That(ParserUtil.ParsePath("/"), Is.Empty);
+        }
+
+        [Test]
+        public void ParsePathNamedField([Values("!name", "!name&str", "!name&boolean", "!name&INT", "!name&kv", "!name&cookie")]string value)
+        {
+            var path = ParserUtil.ParsePath(value);
             Assert.That(path, Is.Not.Null.And.Length.EqualTo(1));
             Assert.That(path[0], Has.Property("Type").EqualTo(ParserPathElementType.NamedField).And.Property("StringValue").EqualTo("name"));
             // FieldType is tested by ParsePathFieldType
         }
 
         [TestCase("!name", ExpectedResult = ParserPathElementFieldType.String)]
+        [TestCase("!name&", ExpectedResult = ParserPathElementFieldType.String)]
+        [TestCase("!name&   ", ExpectedResult = ParserPathElementFieldType.String)]
         [TestCase("!name&str", ExpectedResult = ParserPathElementFieldType.String)]
         [TestCase("!name&string", ExpectedResult = ParserPathElementFieldType.String)]
         [TestCase("!name&StRinG", ExpectedResult = ParserPathElementFieldType.String)]
@@ -113,6 +128,24 @@ namespace LogTracker.Tests
             return path[0].FieldType;
         }
         
-        //TODO: ParsePath
+        [Test]
+        public void ParsePathIndexField([Random(0, 20, 5, Distinct = true)]int value, [Values("", "&int")]string type) // Max can be int.MaxValue, but if you have that many children within a log, you're doing something wrong.
+        {
+            var path = ParserUtil.ParsePath($"/#{value}{type}");
+            Assert.That(path, Is.Not.Null.And.Length.EqualTo(1));
+            Assert.That(path[0], Has.Property("Type").EqualTo(ParserPathElementType.IndexField).And.Property("IndexValue").EqualTo(value));
+        }
+
+        [Test]
+        public void ParsePathFilterField([Values("/$name", "/$name&int")]string value)
+        {
+            var path = ParserUtil.ParsePath(value);
+            Assert.That(path, Is.Not.Null.And.Length.EqualTo(1));
+            Assert.That(path[0], Has.Property("Type").EqualTo(ParserPathElementType.FilterField).And.Property("StringValue").EqualTo("name"));
+        }
+        
+        //TODO: ParsePath: name only
+
+        //TODO: ParsePath: multi fields (including one to check that the field type is set only in the last)
     }
 }

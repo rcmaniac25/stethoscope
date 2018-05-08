@@ -305,8 +305,7 @@ namespace LogTracker.Parsers
                     }
                     if (section[0] == INDEX_MARKER)
                     {
-                        int value;
-                        if (!int.TryParse(section.Substring(1), out value) || value < 0)
+                        if (!int.TryParse(section.Substring(1), out int value) || value < 0)
                         {
                             // Is not an int or is a negative value
                             return null;
