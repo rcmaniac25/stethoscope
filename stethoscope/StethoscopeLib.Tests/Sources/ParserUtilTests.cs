@@ -3,11 +3,38 @@ using LogTracker.Tests.Helpers;
 
 using NUnit.Framework;
 
+using System;
+using System.Text;
+
 namespace LogTracker.Tests
 {
     [TestFixture(TestOf = typeof(ParserUtil))]
     public class ParserUtilTests
     {
+        private static Tuple<string, ParserPathElementFieldType>[] PathFieldTypes;
+        private static Tuple<string, ParserPathElementType>[] PathElementTypes;
+
+        static ParserUtilTests()
+        {
+            PathFieldTypes = new Tuple<string, ParserPathElementFieldType>[]
+            {
+                new Tuple<string, ParserPathElementFieldType>("string", ParserPathElementFieldType.String), // Keep this first, as it's a default
+
+                new Tuple<string, ParserPathElementFieldType>("bool", ParserPathElementFieldType.Bool),
+                new Tuple<string, ParserPathElementFieldType>("int", ParserPathElementFieldType.Int),
+                new Tuple<string, ParserPathElementFieldType>("kv", ParserPathElementFieldType.KeyValue)
+
+                // If edited, make sure to update ParsePathFieldType
+            };
+
+            PathElementTypes = new Tuple<string, ParserPathElementType>[]
+            {
+                new Tuple<string, ParserPathElementType>("!", ParserPathElementType.NamedField),
+                new Tuple<string, ParserPathElementType>("$", ParserPathElementType.FilterField),
+                new Tuple<string, ParserPathElementType>("#", ParserPathElementType.IndexField)
+            };
+        }
+
         [TestCase(ParserPathElementFieldType.Unknown, ExpectedResult = null)]
         [TestCase(ParserPathElementFieldType.NotAValue, ExpectedResult = null)]
         public object InvalidCastType(object castType) // Parameter can't be a ParserPathElementFieldType because it would expose a internal/private type publically. Those types can be used as params though
@@ -99,7 +126,7 @@ namespace LogTracker.Tests
         }
 
         [Test]
-        public void ParsePathNamedField([Values("!name", "!name&str", "!name&boolean", "!name&INT", "!name&kv", "!name&cookie")]string value)
+        public void ParsePathDirectNamedField([Values("!name", "!name&str", "!name&boolean", "!name&INT", "!name&kv", "!name&cookie")]string value)
         {
             var path = ParserUtil.ParsePath(value);
             Assert.That(path, Is.Not.Null.And.Length.EqualTo(1));
@@ -143,9 +170,89 @@ namespace LogTracker.Tests
             Assert.That(path, Is.Not.Null.And.Length.EqualTo(1));
             Assert.That(path[0], Has.Property("Type").EqualTo(ParserPathElementType.FilterField).And.Property("StringValue").EqualTo("name"));
         }
-        
-        //TODO: ParsePath: name only
 
-        //TODO: ParsePath: multi fields (including one to check that the field type is set only in the last)
+        [Test]
+        public void ParsePathNamedField([Values("/!name", "/!name&int")]string value)
+        {
+            var path = ParserUtil.ParsePath(value);
+            Assert.That(path, Is.Not.Null.And.Length.EqualTo(1));
+            Assert.That(path[0], Has.Property("Type").EqualTo(ParserPathElementType.NamedField).And.Property("StringValue").EqualTo("name"));
+        }
+
+        [Test]
+        public void VariableTest()
+        {
+            Assert.That(PathFieldTypes.Length, Is.EqualTo(Enum.GetValues(typeof(ParserPathElementFieldType)).Length - 2)); // Don't count unknown and not-a-value
+            Assert.That(PathFieldTypes[0], Is.EqualTo(new Tuple<string, ParserPathElementFieldType>("string", ParserPathElementFieldType.String)));
+
+            Assert.That(PathElementTypes.Length, Is.EqualTo(Enum.GetValues(typeof(ParserPathElementType)).Length - 1)); // Don't count unknown
+        }
+
+        [Test]
+        public void ParsePath([Random(0, int.MaxValue, 20, Distinct = true)]int seed)
+        {
+            // Probably a bit more complex then desired, but it does make something...
+            var rand = new Random(seed);
+            var pathCount = rand.Next(2, 9);
+
+            var pathBuilder = new StringBuilder();
+            var expectedPath = new Tuple<ParserPathElementType, object>[pathCount];
+            for (int i = 0; i < pathCount; i++)
+            {
+                var type = PathElementTypes[rand.Next(0, PathElementTypes.Length)];
+                object value;
+
+                if (type.Item2 == ParserPathElementType.IndexField)
+                {
+                    // Int
+                    value = rand.Next();
+                }
+                else
+                {
+                    // String
+                    var bytes = new byte[16];
+                    rand.NextBytes(bytes);
+                    value = new Guid(bytes).ToString();
+                }
+
+                pathBuilder.AppendFormat("/{0}{1}", type.Item1, value);
+                expectedPath[i] = new Tuple<ParserPathElementType, object>(type.Item2, value);
+            }
+
+            var appendType = rand.Next(0, 100) < 50;
+            var typeInfo = PathFieldTypes[rand.Next(0, PathFieldTypes.Length)];
+            if (appendType)
+            {
+                pathBuilder.AppendFormat("&{0}", typeInfo.Item1);
+            }
+            else
+            {
+                typeInfo = PathFieldTypes[0]; // Get the string type, since it's default
+            }
+
+            // For debugging
+            Console.WriteLine(pathBuilder);
+
+            // Actual tests
+            var path = ParserUtil.ParsePath(pathBuilder.ToString());
+            Assert.That(path, Is.Not.Null.And.Length.EqualTo(pathCount));
+            for (int i = 0; i < pathCount; i++)
+            {
+                var typeExpression = Has.Property("Type").EqualTo(expectedPath[i].Item1);
+                var valueExpression = typeExpression.And.Property(expectedPath[i].Item1 == ParserPathElementType.IndexField ? "IndexValue" : "StringValue").EqualTo(expectedPath[i].Item2);
+
+                NUnit.Framework.Constraints.IResolveConstraint finalExpression;
+                if (i == (pathCount - 1))
+                {
+                    finalExpression = valueExpression.And.Property("FieldType").EqualTo(typeInfo.Item2);
+                }
+                else
+                {
+                    finalExpression = valueExpression.And.Property("FieldType").EqualTo(ParserPathElementFieldType.NotAValue);
+                }
+
+                Assert.That(path[i], finalExpression);
+            }
+        }
     }
 }

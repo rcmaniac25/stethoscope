@@ -328,6 +328,16 @@ namespace LogTracker.Parsers
                             StringValue = section.Substring(1)
                         });
                     }
+                    else if (section[0] == NAMED_MARKER)
+                    {
+                        elements.Add(new ParserPathElement()
+                        {
+                            Type = ParserPathElementType.NamedField,
+                            FieldType = ParserPathElementFieldType.NotAValue,
+
+                            StringValue = section.Substring(1)
+                        });
+                    }
                     else
                     {
                         // Don't know what this is

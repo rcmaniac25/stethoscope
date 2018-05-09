@@ -391,3 +391,18 @@ void doSomethingCool(std::ifstream& input)
 - So <root at="hello">Message</root> and {"at": "hello", "msg": "Message"} can both be parsed, but <root at="hello"><Primary>Message</Primary><Second>Other</Second></root> and {"at": "hello", "logs": {"Second": "Other", "Primary": "Message"}} would not be parsable.
 - Now, if I had a named field, I could say "/!Primary" and "/!logs/!Primary" and they would be parsable. Unlike the other tests written for the parsers, where I checked the code for what I could do (parsers are "fun" in that they aren't obvious)... the named field tests I intend to write before I implement.
 - Last tests after that is to actually make some paths. I may try to take advantage of NUnit's randomization so it can make random paths to test against.
+
+#27.2. 5/8/2018:
+- Goal: finish ParseUtil.ParsePath
+- 1. I need to be able to parse named fields... but I wrote the test first, and it indeed failed. I implemented the code (easy...) and it passed.
+- 2. Parse an actual path... this was more tedious then tough.
+- I have the unit tests generate a seed, then I use that in a Random number generator. This way the results are always reproducable, yet easy to be different.
+- Next I need a path... and the data I plan to test against. It's easier to just look at the code then for me to explain.
+- I also needed to test type... but only sometimes.
+- Path creation requires variable lookup (for simplicity sake), but I want to ensure I don't miss a value. So I wrote a test to make sure my data sets are good. :D
+- Now for the actual test: generally easy, especially since the "test" portion is basically a Builder type. I could do it in sections.
+- And... it works! Yay. Means I get to move onto something else, and simple debug output means I get to double check it's actually making a path. (it was)
+- Tomorrow starts the fun task of an XML parser. This will be interesting because of the complexity of writing tests for a parser AND the fact that the ParsePath util has just enabled me to create some pretty complex paths.
+- I know that the XML parser pretty much doesn't let use a filter field for anything except the last element. It was written like "now that you have the field, you wnat to double check it's type". The reality is, between the possibility of a mid-path filter and the addition of the named field, you could end up with "filter to only XML elements, now give me 'UserData'".
+- It makes me think "I need to keep a collection of child elements" instead of what I do now.
+- But that's for tomorrow-me. Today-me is done.

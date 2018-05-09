@@ -6,7 +6,6 @@ What needs to get done. Should make some of them tickets... (some of these may b
 
 - Add unit tests. If anything, it will add a bit of accountability in case I randomly start breaking things.
 	- Write tests...
-        - ParseUtil
         - XMLLogParser
 	- Update code so it passes tests (TDD...)
     - Think about if namespace is "good" for library? (gut feeling: no)
