@@ -406,3 +406,7 @@ void doSomethingCool(std::ifstream& input)
 - I know that the XML parser pretty much doesn't let use a filter field for anything except the last element. It was written like "now that you have the field, you wnat to double check it's type". The reality is, between the possibility of a mid-path filter and the addition of the named field, you could end up with "filter to only XML elements, now give me 'UserData'".
 - It makes me think "I need to keep a collection of child elements" instead of what I do now.
 - But that's for tomorrow-me. Today-me is done.
+
+#28.2. 5/9/2018:
+- Today was namely looking at the XMLLogParser and figuring out what can be tested, and what should be tested.
+- Tomorrow I will start working on SetConfig, which will be a little weird because it doesn't "do" anything. It affects how Parse works, but I don't want to go testing Parse to test SetConfig.
