@@ -410,3 +410,8 @@ void doSomethingCool(std::ifstream& input)
 #28.2. 5/9/2018:
 - Today was namely looking at the XMLLogParser and figuring out what can be tested, and what should be tested.
 - Tomorrow I will start working on SetConfig, which will be a little weird because it doesn't "do" anything. It affects how Parse works, but I don't want to go testing Parse to test SetConfig.
+
+#29.2. 5/10/2018:
+- VS 2017 15.7.1 came out. After updating, the Test Explorer showed tests as a hierarchy instead of list a list. It make me realize that the ConsolePrinterTests and IOPrinterTests were in the wrong namespace. Fixed.
+- Otherwise, I spent nearly all night working on a different programming project. Can't release it for reasons, but I can say if you ever need formalized JSON, JSON-schema is pretty good...
+- It's now too late to really do anything except look at the XML parser and go "this needs some work to make it usable for testing"

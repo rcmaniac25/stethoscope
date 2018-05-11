@@ -5,7 +5,7 @@ using LogTracker.Printers.Internal;
 
 using NUnit.Framework;
 
-namespace LogTracker.Tests.Sources
+namespace LogTracker.Tests
 {
     // Since we're replacing standard out, we can't run this is parallel
     [TestFixture(TestOf = typeof(ConsolePrinter)), NonParallelizable]

@@ -5,7 +5,7 @@ using NUnit.Framework;
 
 using System;
 
-namespace LogTracker.Tests.Sources
+namespace LogTracker.Tests
 {
     public abstract class IOPrinterTests
     {
