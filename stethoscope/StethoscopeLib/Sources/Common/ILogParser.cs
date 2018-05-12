@@ -1,7 +1,9 @@
-﻿namespace LogTracker.Common
+﻿using System.IO;
+
+namespace LogTracker.Common
 {
     public interface ILogParser
     {
-        void Parse(string logFile);
+        void Parse(Stream logStream);
     }
 }

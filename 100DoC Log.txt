@@ -415,3 +415,13 @@ void doSomethingCool(std::ifstream& input)
 - VS 2017 15.7.1 came out. After updating, the Test Explorer showed tests as a hierarchy instead of list a list. It make me realize that the ConsolePrinterTests and IOPrinterTests were in the wrong namespace. Fixed.
 - Otherwise, I spent nearly all night working on a different programming project. Can't release it for reasons, but I can say if you ever need formalized JSON, JSON-schema is pretty good...
 - It's now too late to really do anything except look at the XML parser and go "this needs some work to make it usable for testing"
+
+#30.2. 5/11/2018:
+- Realized one change to make the XML Parser easier to test: don't require a file to read.
+- I like extension classes. I used them a bunch in C# before, then mainly went over to C++... and now working in C# again, I wish more languages had them. Core functionality in the class, then all the nice "I wish it had function X" in the extension class.
+- As such, file parsing is moved to the extension class.
+- As for the tests... it's too late for me to be working on this stuff, but I was at least able to squeeze in a basic test.
+- It was a catch 22 for me: in order to test the log parsing, I need to ensure SetConfig works. In order to test SetConfig, I need to parse data.
+- One solution is the provide "get" functions for config data out of the parser. But I like the concept of a black box. I don't want to know what it's doing, I just want to provide it parameters and tell it to go.
+- So providing a config and a registry and then saying "here's a log. Go" is nice.
+- So basic test is just an ideal, minimal case of what to expect. I will try to get more done tomorrow. I just need to not do it late...

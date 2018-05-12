@@ -138,7 +138,7 @@ namespace LogTracker.Parsers.Internal.XML
             return LogParserErrors.OK;
         }
 
-        public void Parse(string logFile)
+        public void Parse(Stream logStream)
         {
             using (var ms = new MemoryStream())
             {
@@ -146,10 +146,7 @@ namespace LogTracker.Parsers.Internal.XML
                 ms.Write(rootElementStringBytes, 0, rootElementStringBytes.Length);
 
                 //TODO: this doesn't work for streaming, but read/write streams don't really work/exist right now
-                using (var fr = new FileStream(logFile, FileMode.Open))
-                {
-                    fr.CopyTo(ms);
-                }
+                logStream.CopyTo(ms);
 
                 //XXX: not going to show up in streaming log
                 var rootEndElementStringBytes = Encoding.UTF8.GetBytes("</root>");
