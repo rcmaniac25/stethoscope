@@ -425,3 +425,14 @@ void doSomethingCool(std::ifstream& input)
 - One solution is the provide "get" functions for config data out of the parser. But I like the concept of a black box. I don't want to know what it's doing, I just want to provide it parameters and tell it to go.
 - So providing a config and a registry and then saying "here's a log. Go" is nice.
 - So basic test is just an ideal, minimal case of what to expect. I will try to get more done tomorrow. I just need to not do it late...
+
+#31.2. 5/12/2018:
+- Timing: still not working for me...
+- Finally got the SetConfig tests. They're peusdo parsing tests, but only to ensure that the config values are getting used.
+- If there's one thing I thought I needed, it was a multi-log test. I thought this because in my mind I thought "some logs could be "bad" and we want to skip them. So I need a test where we parse 1 and 2 logs. A test where a bad config results in no logs. And a test where a bad log results in missing logs. I need to ensure bad config and bad log are confused..."
+- Reality is: right now, implementation would simply stop parsing/ignore attribute on a bad log. So there is no way to confuse them.
+- I added a "todo" in the source for adding a config or some bit of code for handling bad logs without stopping parsing.
+- But a weird thought occured: what if, instead of ignoring the log message (which could become confusing), we created an invalid log AND only populated the values we knew? That way, we can have a config that stops parsing all together, skips any bad logs, AND still parses the bad logs but marks them as bad.
+- I like configs. It allows custimization (wow, can I not spell... I should spell check this whole document) without adding a ton of complexity. "Um, it adds complexity" then you're doing it wrong. "We accept one type of value as a key, then look for it in a dictionary" -> "we accept a customizable path to find the value, then we wrote a function that does the search". Suddenly, `dict[key]` -> `getValue(dict, key)`. You have added custimization without complexity.
+- of course, there are a tone of arguments that disprove my example. But I still think there's more value in adding the custimization then not.
+- Needless, the set config tests are done, and the Parse tests (including sub-tests) are next.

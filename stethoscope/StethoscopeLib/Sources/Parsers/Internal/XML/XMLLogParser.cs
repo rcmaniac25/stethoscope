@@ -126,7 +126,6 @@ namespace LogTracker.Parsers.Internal.XML
 
             foreach (var kv in attributePaths)
             {
-                //XXX Only supports strings right now
                 var rawValue = GetElementDataFromPath(kv.Value, element);
                 var value = ParserUtil.CastField(rawValue, kv.Value.Last().FieldType);
                 if (value != null)
