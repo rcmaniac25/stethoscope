@@ -11,8 +11,8 @@ namespace LogTracker.Tests
     [TestFixture(TestOf = typeof(ParserUtil))]
     public class ParserUtilTests
     {
-        private static Tuple<string, ParserPathElementFieldType>[] PathFieldTypes;
-        private static Tuple<string, ParserPathElementType>[] PathElementTypes;
+        private static readonly Tuple<string, ParserPathElementFieldType>[] PathFieldTypes;
+        private static readonly Tuple<string, ParserPathElementType>[] PathElementTypes;
 
         static ParserUtilTests()
         {
@@ -78,7 +78,7 @@ namespace LogTracker.Tests
             return ParserUtil.CastField(value, ParserPathElementFieldType.Int);
         }
 
-        private static TestCaseData[] CastKeyValueCases =
+        private static readonly TestCaseData[] CastKeyValueCases =
         {
             DictionaryTestDataBuilder.TestAgainst(null).For("CastKeyValue(null)").Which().Returns(null),
             DictionaryTestDataBuilder.TestAgainst("").For("CastKeyValue(\"\")").Which().Returns(null),

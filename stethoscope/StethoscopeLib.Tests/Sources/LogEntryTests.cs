@@ -93,7 +93,7 @@ namespace LogTracker.Tests
             Assert.That(entry.GetAttribute<DateTime>(LogAttribute.Timestamp), Is.EqualTo(time));
         }
 
-        private static TestCaseData[] EqualsObjectCases =
+        private static readonly TestCaseData[] EqualsObjectCases =
         {
             LogEntryTestDataBuilder.TestAgainst(null).For("Equals(Object) null").Which().Returns(false),
             LogEntryTestDataBuilder.TestAgainst("notobj").For("Equals(Object) nullable type").Which().Returns(false),
@@ -114,7 +114,7 @@ namespace LogTracker.Tests
             return logEntry.Equals(testData);
         }
 
-        private static TestCaseData[] EqualsLogEntryCases =
+        private static readonly TestCaseData[] EqualsLogEntryCases =
         {
             LogEntryTestDataBuilder.TestAgainst(null).For("Equals(LogEntry) null").Which().Returns(false),
             LogEntryTestDataBuilder.TestAgainstLogEntry().For("Equals(LogEntry) LogEntry(diff, diff)").Which().Returns(false),

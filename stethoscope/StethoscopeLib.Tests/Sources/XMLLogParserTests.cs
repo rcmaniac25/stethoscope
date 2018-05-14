@@ -5,6 +5,7 @@ using NSubstitute;
 
 using NUnit.Framework;
 
+using System;
 using System.IO;
 using System.Text;
 
@@ -13,6 +14,34 @@ namespace LogTracker.Tests
     [TestFixture(TestOf = typeof(XMLLogParser))]
     public class XMLLogParserTests
     {
+        private static readonly Tuple<LogAttribute, Func<LogConfig, string, LogConfig>>[] PossibleConfigs;
+
+        static XMLLogParserTests()
+        {
+            // Attempt to make things more readable... OMG this is ugly... I really wish this was F#... just for this line. In F# this would be `let makeTuple v1 v2 -> new Tuple<_,_>(v1, v2)`...
+            // ...and this would be `PossibleConfigs <- [| makeTuple(LogAttribute.ThreadID, fun conf name -> conf.ThreadIDPath <- printfn "!%s" name; conf)
+            //                                             ...
+            //                                          |]
+            // The worst part is printfn, and that may have been replaced by a similar syntax in newer F# versions. I'm just trying to make this easier to read. Typer inference would be beautiful
+
+            var makeTuple = new Func<LogAttribute, Func<LogConfig, string, LogConfig>, Tuple<LogAttribute, Func<LogConfig, string, LogConfig>>>((type, func) => new Tuple<LogAttribute, Func<LogConfig, string, LogConfig>>(type, func));
+
+            PossibleConfigs = new Tuple<LogAttribute, Func<LogConfig, string, LogConfig>>[]
+            {
+                makeTuple(LogAttribute.ThreadID, (conf, name) => { conf.ThreadIDPath = $"!{name}"; return conf; }),
+                makeTuple(LogAttribute.SourceFile, (conf, name) => { conf.SourceFilePath = $"!{name}"; return conf; }),
+                makeTuple(LogAttribute.Function, (conf, name) => { conf.FunctionPath = $"!{name}"; return conf; }),
+                makeTuple(LogAttribute.SourceLine, (conf, name) => { conf.LogLinePath = $"!{name}"; return conf; }),
+                makeTuple(LogAttribute.Level, (conf, name) => { conf.LogLevelPath = $"!{name}"; return conf; }),
+                makeTuple(LogAttribute.SequenceNumber, (conf, name) => { conf.LogSequencePath = $"!{name}"; return conf; }),
+                makeTuple(LogAttribute.Module, (conf, name) => { conf.ModulePath = $"!{name}"; return conf; }),
+                makeTuple(LogAttribute.Type, (conf, name) => { conf.LogTypePath = $"!{name}"; return conf; }),
+                makeTuple(LogAttribute.Section, (conf, name) => { conf.SectionPath = $"!{name}"; return conf; }),
+                makeTuple(LogAttribute.TraceID, (conf, name) => { conf.TraceIdPath = $"!{name}"; return conf; }),
+                makeTuple(LogAttribute.Context, (conf, name) => { conf.ContextPath = $"!{name}"; return conf; })
+            };
+        }
+
         private ILogRegistry logRegistry;
         private ILogEntry logEntry;
         private LogConfig logConfig;
@@ -85,9 +114,9 @@ namespace LogTracker.Tests
             var parser = new XMLLogParser();
             parser.SetRegistry(logRegistry);
 
-            logRegistry.AddLog("goodtime", Arg.Any<string>()).Returns(logEntry);
-            
-            var log = "<fakelog time=\"goodtime\" log=\"my log1\"></fakelog><fakelog time=\"goodtime\" log=\"my log2\"></fakelog>";
+            logRegistry.AddLog("goodtime", "my log").Returns(logEntry);
+
+            var log = "<fakelog time=\"goodtime\" log=\"my log\"></fakelog>";
             using (var ms = CreateStream(log))
             {
                 parser.Parse(ms);
@@ -103,7 +132,7 @@ namespace LogTracker.Tests
             var parser = new XMLLogParser();
             parser.SetConfig(logConfig);
 
-            var log = "<fakelog time=\"goodtime\" log=\"my log1\"></fakelog><fakelog time=\"goodtime\" log=\"my log2\"></fakelog>";
+            var log = "<fakelog time=\"goodtime\" log=\"my log\"></fakelog>";
             using (var ms = CreateStream(log))
             {
                 parser.Parse(ms);
@@ -153,27 +182,31 @@ namespace LogTracker.Tests
         }
 
         [Test]
-        public void SetConfigAdditionalAttribute()
+        public void VariableTest()
         {
-            //TODO: would be good to test every attribute
+            Assert.That(PossibleConfigs.Length, Is.EqualTo(Enum.GetValues(typeof(LogAttribute)).Length - 2)); // Don't count message or timestamp
+        }
 
-            logConfig.LogTypePath = "!type";
+        [TestCaseSource("PossibleConfigs")]
+        public void SetConfigAdditionalAttribute(Tuple<LogAttribute, Func<LogConfig, string, LogConfig>> attr)
+        {
+            var config = attr.Item2(logConfig, "custAttr");
 
             var parser = new XMLLogParser();
-            parser.SetConfig(logConfig);
+            parser.SetConfig(config);
             parser.SetRegistry(logRegistry);
 
             logRegistry.AddLog("goodtime", "my log").Returns(logEntry);
-            logRegistry.AddValueToLog(logEntry, LogAttribute.Type, "colorful").Returns(true);
+            logRegistry.AddValueToLog(logEntry, attr.Item1, "colorful").Returns(true);
 
-            var log = "<fakelog time=\"goodtime\" log=\"my log\" type=\"colorful\"></fakelog>";
+            var log = "<fakelog time=\"goodtime\" log=\"my log\" custAttr=\"colorful\"></fakelog>";
             using (var ms = CreateStream(log))
             {
                 parser.Parse(ms);
             }
 
             logRegistry.Received().AddLog("goodtime", "my log");
-            logRegistry.Received().AddValueToLog(logEntry, LogAttribute.Type, "colorful");
+            logRegistry.Received().AddValueToLog(logEntry, attr.Item1, "colorful");
         }
 
         //TODO: Parse
