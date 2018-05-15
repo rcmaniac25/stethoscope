@@ -466,3 +466,6 @@ void doSomethingCool(std::ifstream& input)
 
 #33.2. 5/14/2018:
 - Realized that SetConfig uses a helper function and wanted to ensure that it gets tested.
+- Started work on Parse tests... very quickly got to the end before realizing that my previously described failure tests were what I really need to test. Because the only things besides those is the failure tests, path tests, and checking files can be parsed.
+- I have improvements I want to make to the parser (like streaming) but it's not time for that yet.
+- Fixed the couple test failures I hit. That's it for tonight.

@@ -275,7 +275,54 @@ namespace LogTracker.Tests
             logRegistry.Received().AddValueToLog(logEntry, LogAttribute.Type, "nope");
         }
 
-        //TODO: Parse
-        // - (including testing "a" bad log. Maybe skip it or mark it's invalid? Config option?)
+        [Test]
+        public void ParseNullLog()
+        {
+            var parser = new XMLLogParser();
+            parser.SetConfig(logConfig);
+            parser.SetRegistry(logRegistry);
+
+            Assert.Catch(() => parser.Parse((Stream)null));
+
+            logRegistry.DidNotReceive().AddLog(Arg.Any<string>(), Arg.Any<string>());
+        }
+
+        [Test]
+        public void ParseNoLog()
+        {
+            var parser = new XMLLogParser();
+            parser.SetConfig(logConfig);
+            parser.SetRegistry(logRegistry);
+
+            var log = "";
+            using (var ms = CreateStream(log))
+            {
+                parser.Parse(ms);
+            }
+
+            logRegistry.DidNotReceive().AddLog(Arg.Any<string>(), Arg.Any<string>());
+        }
+
+        [Test]
+        public void ParseNoInvalidLog()
+        {
+            var parser = new XMLLogParser();
+            parser.SetConfig(logConfig);
+            parser.SetRegistry(logRegistry);
+
+            var log = "<chocolate";
+            using (var ms = CreateStream(log))
+            {
+                parser.Parse(ms);
+            }
+
+            logRegistry.DidNotReceive().AddLog(Arg.Any<string>(), Arg.Any<string>());
+        }
+
+        //TODO: Parse: multi-log failure cases (requires updating LogConfig. See the TODOs in that log. Will also require updating other tests)
+
+        //TODO: Parse-ext: file parse
+
+        //TODO: Parse: test many different parse paths to ensure they are parsed properly
     }
 }

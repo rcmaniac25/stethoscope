@@ -30,5 +30,9 @@ namespace LogTracker
                     string.IsNullOrWhiteSpace(LogMessagePath));
             }
         }
+
+        //TODO: log parse error handling: stop parsing log on bad entry, skip bad log entries, parse as much of bad log entry (marked as bad)
+
+        //TODO: get all path properties and their associated attribute
     }
 }

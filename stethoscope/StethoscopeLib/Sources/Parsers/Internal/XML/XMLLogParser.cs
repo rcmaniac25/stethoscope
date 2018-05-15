@@ -137,6 +137,76 @@ namespace LogTracker.Parsers.Internal.XML
             return LogParserErrors.OK;
         }
 
+        private void ParseLoop(Stream input)
+        {
+            using (var xmlReader = XmlReader.Create(input))
+            {
+                XElement element = null;
+                bool exitLoop = false;
+
+                while (!exitLoop && xmlReader.Read())
+                {
+                    switch (xmlReader.NodeType)
+                    {
+                        case XmlNodeType.Element:
+                            var name = XName.Get(xmlReader.Name, xmlReader.NamespaceURI);
+                            if (element == null)
+                            {
+                                element = new XElement(name);
+                            }
+                            else
+                            {
+                                var ele = new XElement(name);
+                                element.Add(ele);
+                                element = ele;
+                            }
+                            if (xmlReader.HasAttributes)
+                            {
+                                while (xmlReader.MoveToNextAttribute())
+                                {
+                                    var attName = XName.Get(xmlReader.Name, xmlReader.NamespaceURI);
+                                    var att = new XAttribute(attName, xmlReader.Value);
+                                    element.Add(att);
+                                }
+                                xmlReader.MoveToElement();
+                            }
+                            break;
+                        case XmlNodeType.EndElement:
+                            if (xmlReader.Name == element.Name)
+                            {
+                                var ele = element;
+                                element = element.Parent;
+                                if (element != null && element.Name == "root")
+                                {
+                                    if (ProcessElement(ele) != LogParserErrors.OK)
+                                    {
+                                        exitLoop = true;
+                                        break;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                Console.Error.WriteLine($"Element {element.Name} ended, but the name of the ending element {xmlReader.Name} doesn't match. Possibly out of sync...");
+                            }
+                            break;
+                        case XmlNodeType.CDATA:
+                            element.Add(new XCData(xmlReader.Value));
+                            break;
+                        case XmlNodeType.Whitespace:
+                            break;
+                        default:
+                            break;
+                    }
+                }
+
+                if (element?.Parent != null)
+                {
+                    Console.Error.WriteLine("Root element didn't end");
+                }
+            }
+        }
+
         public void Parse(Stream logStream)
         {
             using (var ms = new MemoryStream())
@@ -152,71 +222,13 @@ namespace LogTracker.Parsers.Internal.XML
                 ms.Write(rootEndElementStringBytes, 0, rootEndElementStringBytes.Length);
 
                 ms.Position = 0L;
-                using (var xmlReader = XmlReader.Create(ms))
+                try
                 {
-                    XElement element = null;
-                    bool exitLoop = false;
-
-                    while (!exitLoop && xmlReader.Read())
-                    {
-                        switch (xmlReader.NodeType)
-                        {
-                            case XmlNodeType.Element:
-                                var name = XName.Get(xmlReader.Name, xmlReader.NamespaceURI);
-                                if (element == null)
-                                {
-                                    element = new XElement(name);
-                                }
-                                else
-                                {
-                                    var ele = new XElement(name);
-                                    element.Add(ele);
-                                    element = ele;
-                                }
-                                if (xmlReader.HasAttributes)
-                                {
-                                    while (xmlReader.MoveToNextAttribute())
-                                    {
-                                        var attName = XName.Get(xmlReader.Name, xmlReader.NamespaceURI);
-                                        var att = new XAttribute(attName, xmlReader.Value);
-                                        element.Add(att);
-                                    }
-                                    xmlReader.MoveToElement();
-                                }
-                                break;
-                            case XmlNodeType.EndElement:
-                                if (xmlReader.Name == element.Name)
-                                {
-                                    var ele = element;
-                                    element = element.Parent;
-                                    if (element != null && element.Name == "root")
-                                    {
-                                        if (ProcessElement(ele) != LogParserErrors.OK)
-                                        {
-                                            exitLoop = true;
-                                            break;
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    Console.Error.WriteLine($"Element {element.Name} ended, but the name of the ending element {xmlReader.Name} doesn't match. Possibly out of sync...");
-                                }
-                                break;
-                            case XmlNodeType.CDATA:
-                                element.Add(new XCData(xmlReader.Value));
-                                break;
-                            case XmlNodeType.Whitespace:
-                                break;
-                            default:
-                                break;
-                        }
-                    }
-
-                    if (element?.Parent != null)
-                    {
-                        Console.Error.WriteLine("Root element didn't end");
-                    }
+                    ParseLoop(ms);
+                }
+                catch
+                {
+                    //XXX probably want to do something here...
                 }
             }
         }
@@ -260,5 +272,7 @@ namespace LogTracker.Parsers.Internal.XML
             AddAttributePath(LogAttribute.TraceID, config.TraceIdPath);
             AddAttributePath(LogAttribute.Context, config.ContextPath);
         }
+
+        //TODO: add some way to get any errors that the parser had when parsing (that isn't obvious)
     }
 }
