@@ -463,3 +463,6 @@ void doSomethingCool(std::ifstream& input)
 - I've heard JS devs talk about (this was a year or more ago) how in a year or so, they'd be able to use this new thing called "async and await, so we don't have to do Promises anymore". I first started using those 4-5 years prior.
 - This writeup is too large... basically, I got annoyed at what had to be written to make the test data more readable, it's not gonna be any better in C++, but I with that timeline would occur faster so I don't have to type out nearly all of this.
 - If one thing came to mind, it's that it might be useful to have LogConfig to have a static function for getting all the parameter names and what attributes they're associated with. I don't really want to have it do reflection, but the returns values could be useful for functions that are only executed on one-time, minimal-use functions. Would at least apply to XMLLogParser.SetConfig
+
+#33.2. 5/14/2018:
+- Realized that SetConfig uses a helper function and wanted to ensure that it gets tested.

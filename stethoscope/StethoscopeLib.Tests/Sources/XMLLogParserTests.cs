@@ -209,6 +209,72 @@ namespace LogTracker.Tests
             logRegistry.Received().AddValueToLog(logEntry, attr.Item1, "colorful");
         }
 
+        [Test]
+        public void SetConfigEmptyAttribute()
+        {
+            logConfig.LogTypePath = "";
+
+            var parser = new XMLLogParser();
+            parser.SetConfig(logConfig);
+            parser.SetRegistry(logRegistry);
+
+            logRegistry.AddLog("goodtime", "my log").Returns(logEntry);
+            logRegistry.AddValueToLog(logEntry, LogAttribute.Type, "nope").Returns(true);
+
+            var log = "<fakelog time=\"goodtime\" log=\"my log\" type=\"nope\"></fakelog>";
+            using (var ms = CreateStream(log))
+            {
+                parser.Parse(ms);
+            }
+
+            logRegistry.Received().AddLog("goodtime", "my log");
+            logRegistry.DidNotReceive().AddValueToLog(logEntry, Arg.Any<LogAttribute>(), Arg.Any<object>());
+        }
+
+        [Test]
+        public void SetConfigInvalidAttribute()
+        {
+            logConfig.LogTypePath = "!";
+
+            var parser = new XMLLogParser();
+            parser.SetConfig(logConfig);
+            parser.SetRegistry(logRegistry);
+
+            logRegistry.AddLog("goodtime", "my log").Returns(logEntry);
+            logRegistry.AddValueToLog(logEntry, LogAttribute.Type, "nope").Returns(true);
+
+            var log = "<fakelog time=\"goodtime\" log=\"my log\" type=\"nope\"></fakelog>";
+            using (var ms = CreateStream(log))
+            {
+                parser.Parse(ms);
+            }
+
+            logRegistry.Received().AddLog("goodtime", "my log");
+            logRegistry.DidNotReceive().AddValueToLog(logEntry, Arg.Any<LogAttribute>(), Arg.Any<object>());
+        }
+
+        [Test]
+        public void SetConfigValidAttribute()
+        {
+            logConfig.LogTypePath = "!type";
+
+            var parser = new XMLLogParser();
+            parser.SetConfig(logConfig);
+            parser.SetRegistry(logRegistry);
+
+            logRegistry.AddLog("goodtime", "my log").Returns(logEntry);
+            logRegistry.AddValueToLog(logEntry, LogAttribute.Type, "nope").Returns(true);
+
+            var log = "<fakelog time=\"goodtime\" log=\"my log\" type=\"nope\"></fakelog>";
+            using (var ms = CreateStream(log))
+            {
+                parser.Parse(ms);
+            }
+
+            logRegistry.Received().AddLog("goodtime", "my log");
+            logRegistry.Received().AddValueToLog(logEntry, LogAttribute.Type, "nope");
+        }
+
         //TODO: Parse
         // - (including testing "a" bad log. Maybe skip it or mark it's invalid? Config option?)
     }
