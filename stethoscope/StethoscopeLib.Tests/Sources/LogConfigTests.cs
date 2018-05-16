@@ -1,4 +1,8 @@
+using LogTracker.Common;
+
 using NUnit.Framework;
+
+using System;
 
 namespace LogTracker.Tests
 {
@@ -42,6 +46,12 @@ namespace LogTracker.Tests
             config.LogMessagePath = logMessage;
 
             return config.IsValid;
+        }
+
+        [Test]
+        public void GetAttributePaths()
+        {
+            Assert.That(LogConfig.GetAttributePaths(), Has.Exactly(Enum.GetValues(typeof(LogAttribute)).Length).Items);
         }
     }
 }

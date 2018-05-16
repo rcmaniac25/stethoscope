@@ -1,4 +1,8 @@
-﻿using Newtonsoft.Json;
+﻿using LogTracker.Common;
+
+using Newtonsoft.Json;
+
+using System.Collections.Generic;
 
 namespace LogTracker
 {
@@ -33,6 +37,29 @@ namespace LogTracker
 
         //TODO: log parse error handling: stop parsing log on bad entry, skip bad log entries, parse as much of bad log entry (marked as bad)
 
-        //TODO: get all path properties and their associated attribute
+        /// <summary>
+        /// Get all attributes and their associated variable names, for use by reflection.
+        /// </summary>
+        /// <returns>IDictionary of all attributes and their associated variable name.</returns>
+        public static IDictionary<LogAttribute, string> GetAttributePaths()
+        {
+            return new Dictionary<LogAttribute, string>
+            {
+                { LogAttribute.ThreadID, "ThreadIDPath" },
+                { LogAttribute.SourceFile, "SourceFilePath" },
+                { LogAttribute.Function, "FunctionPath" },
+                { LogAttribute.SourceLine, "LogLinePath" },
+                { LogAttribute.Level, "LogLevelPath" },
+                { LogAttribute.SequenceNumber, "LogSequencePath" },
+                { LogAttribute.Module, "ModulePath" },
+                { LogAttribute.Type, "LogTypePath" },
+                { LogAttribute.Section, "SectionPath" },
+                { LogAttribute.TraceID, "TraceIdPath" },
+                { LogAttribute.Context, "ContextPath" },
+
+                { LogAttribute.Timestamp, "TimestampPath" },
+                { LogAttribute.Message, "LogMessagePath" }
+            };
+        }
     }
 }

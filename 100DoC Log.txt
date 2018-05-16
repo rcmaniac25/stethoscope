@@ -469,3 +469,8 @@ void doSomethingCool(std::ifstream& input)
 - Started work on Parse tests... very quickly got to the end before realizing that my previously described failure tests were what I really need to test. Because the only things besides those is the failure tests, path tests, and checking files can be parsed.
 - I have improvements I want to make to the parser (like streaming) but it's not time for that yet.
 - Fixed the couple test failures I hit. That's it for tonight.
+
+#34.2. 5/15/2018:
+- Lost track of time. Only thing I really got done was adding a static function to get attributes and their associated "path" config.
+- My intention is to use this in XMLLogParser.SetConfig with some reflection. I don't "need" reflection, but the implementation could fit into the same space it occupies now. Benefit is that the log parsers don't need to be touched when new attributes are added.
+- The other reason I'm fine with using a bit of reflection is because SetConfig should not be called often. Reducing performance worries and adding complexity for the sake of coolness.
