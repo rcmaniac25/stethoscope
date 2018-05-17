@@ -259,7 +259,17 @@ namespace LogTracker.Parsers.Internal.XML
 
             attributePaths.Clear();
 
-            //XXX too manual... how do we get this from LogConfig?
+#if NETSTANDARD2_0
+            var logConfigType = typeof(LogConfig);
+            foreach (var attribute in LogConfig.GetAttributePaths())
+            {
+                if (attribute.Key == LogAttribute.Timestamp || attribute.Key == LogAttribute.Message)
+                {
+                    continue;
+                }
+                AddAttributePath(attribute.Key, logConfigType.GetProperty(attribute.Value).GetValue(config) as string);
+            }
+#else
             AddAttributePath(LogAttribute.ThreadID, config.ThreadIDPath);
             AddAttributePath(LogAttribute.SourceFile, config.SourceFilePath);
             AddAttributePath(LogAttribute.Function, config.FunctionPath);
@@ -271,6 +281,7 @@ namespace LogTracker.Parsers.Internal.XML
             AddAttributePath(LogAttribute.Section, config.SectionPath);
             AddAttributePath(LogAttribute.TraceID, config.TraceIdPath);
             AddAttributePath(LogAttribute.Context, config.ContextPath);
+#endif
         }
 
         //TODO: add some way to get any errors that the parser had when parsing (that isn't obvious)
