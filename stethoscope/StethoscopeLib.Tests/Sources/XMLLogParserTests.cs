@@ -319,7 +319,187 @@ namespace LogTracker.Tests
             logRegistry.DidNotReceive().AddLog(Arg.Any<string>(), Arg.Any<string>());
         }
 
-        //TODO: Parse: multi-log failure cases (requires updating LogConfig. See the TODOs in that log. Will also require updating other tests)
+        [Test]
+        public void ParseFailureStopIsDefault()
+        {
+            var parser = new XMLLogParser();
+            parser.SetConfig(logConfig);
+            parser.SetRegistry(logRegistry);
+
+            logRegistry.AddLog(Arg.Any<string>(), Arg.Any<string>()).Returns(logEntry);
+
+            var log = "<fakelog time=\"goodtime\" log=\"my log1\"></fakelog><fakelog log=\"my log2\"></fakelog>";
+            using (var ms = CreateStream(log))
+            {
+                parser.Parse(ms);
+            }
+
+            logRegistry.Received().AddLog("goodtime", "my log1");
+            logRegistry.DidNotReceive().AddLog(Arg.Any<string>(), "my log2");
+            logRegistry.DidNotReceive().AddValueToLog(logEntry, Arg.Any<LogAttribute>(), Arg.Any<object>());
+        }
+
+        [Test]
+        public void ParseFailureStop()
+        {
+            logConfig.ParsingFailureHandling = LogParserFailureHandling.StopParsing;
+
+            var parser = new XMLLogParser();
+            parser.SetConfig(logConfig);
+            parser.SetRegistry(logRegistry);
+
+            logRegistry.AddLog(Arg.Any<string>(), Arg.Any<string>()).Returns(logEntry);
+
+            var log = "<fakelog time=\"goodtime\" log=\"my log1\"></fakelog><fakelog log=\"my log2\"></fakelog>";
+            using (var ms = CreateStream(log))
+            {
+                parser.Parse(ms);
+            }
+
+            logRegistry.Received().AddLog("goodtime", "my log1");
+            logRegistry.DidNotReceive().AddLog(Arg.Any<string>(), "my log2");
+            logRegistry.DidNotReceive().AddValueToLog(logEntry, Arg.Any<LogAttribute>(), Arg.Any<object>());
+        }
+
+        [Test]
+        public void ParseFailureStopReversed()
+        {
+            logConfig.ParsingFailureHandling = LogParserFailureHandling.StopParsing;
+
+            var parser = new XMLLogParser();
+            parser.SetConfig(logConfig);
+            parser.SetRegistry(logRegistry);
+
+            logRegistry.AddLog(Arg.Any<string>(), Arg.Any<string>()).Returns(logEntry);
+
+            var log = "<fakelog log=\"my log1\"></fakelog><fakelog log=\"my log2\"></fakelog>";
+            using (var ms = CreateStream(log))
+            {
+                parser.Parse(ms);
+            }
+
+            logRegistry.DidNotReceive().AddLog(Arg.Any<string>(), Arg.Any<string>());
+            logRegistry.DidNotReceive().AddValueToLog(logEntry, Arg.Any<LogAttribute>(), Arg.Any<object>());
+        }
+
+        [Test]
+        public void ParseFailureSkip()
+        {
+            logConfig.ParsingFailureHandling = LogParserFailureHandling.SkipEntries;
+
+            var parser = new XMLLogParser();
+            parser.SetConfig(logConfig);
+            parser.SetRegistry(logRegistry);
+
+            logRegistry.AddLog(Arg.Any<string>(), Arg.Any<string>()).Returns(logEntry);
+
+            var log = "<fakelog time=\"goodtime\" log=\"my log1\"></fakelog><fakelog log=\"my log2\"></fakelog><fakelog time=\"goodtime\" log=\"my log3\"></fakelog>";
+            using (var ms = CreateStream(log))
+            {
+                parser.Parse(ms);
+            }
+
+            logRegistry.Received().AddLog("goodtime", "my log1");
+            logRegistry.DidNotReceive().AddLog(Arg.Any<string>(), "my log2");
+            logRegistry.Received().AddLog("goodtime", "my log3");
+            logRegistry.DidNotReceive().AddValueToLog(logEntry, Arg.Any<LogAttribute>(), Arg.Any<object>());
+        }
+
+        [Test]
+        public void ParseFailureSkipReversed()
+        {
+            logConfig.ParsingFailureHandling = LogParserFailureHandling.SkipEntries;
+
+            var parser = new XMLLogParser();
+            parser.SetConfig(logConfig);
+            parser.SetRegistry(logRegistry);
+
+            logRegistry.AddLog(Arg.Any<string>(), Arg.Any<string>()).Returns(logEntry);
+
+            var log = "<fakelog log=\"my log1\"></fakelog><fakelog time=\"goodtime\" log=\"my log2\"></fakelog><fakelog time=\"goodtime\" log=\"my log3\"></fakelog>";
+            using (var ms = CreateStream(log))
+            {
+                parser.Parse(ms);
+            }
+
+            logRegistry.DidNotReceive().AddLog(Arg.Any<string>(), "my log1");
+            logRegistry.Received().AddLog("goodtime", "my log2");
+            logRegistry.Received().AddLog("goodtime", "my log3");
+            logRegistry.DidNotReceive().AddValueToLog(logEntry, Arg.Any<LogAttribute>(), Arg.Any<object>());
+        }
+
+        [Test]
+        public void ParseFailureHandle()
+        {
+            logConfig.ParsingFailureHandling = LogParserFailureHandling.MarkEntriesAsFailed;
+
+            var parser = new XMLLogParser();
+            parser.SetConfig(logConfig);
+            parser.SetRegistry(logRegistry);
+
+            logRegistry.AddLog(Arg.Any<string>(), Arg.Any<string>()).Returns(logEntry);
+            //TODO: handling of failed log
+
+            var log = "<fakelog time=\"goodtime\" log=\"my log1\"></fakelog><fakelog log=\"my log2\"></fakelog>";
+            using (var ms = CreateStream(log))
+            {
+                parser.Parse(ms);
+            }
+
+            logRegistry.Received().AddLog("goodtime", "my log1");
+            //TODO: update registry to produce "failed" logs and update log entry/create new type to indicate it's a failed entry
+            Assert.That(true, Is.False); //XXX until ^^ is implemented
+            logRegistry.DidNotReceive().AddValueToLog(logEntry, Arg.Any<LogAttribute>(), Arg.Any<object>());
+        }
+
+        [Test]
+        public void ParseFailureHandleReversed()
+        {
+            logConfig.ParsingFailureHandling = LogParserFailureHandling.MarkEntriesAsFailed;
+
+            var parser = new XMLLogParser();
+            parser.SetConfig(logConfig);
+            parser.SetRegistry(logRegistry);
+
+            logRegistry.AddLog(Arg.Any<string>(), Arg.Any<string>()).Returns(logEntry);
+            //TODO: handling of failed log
+
+            var log = "<fakelog log=\"my log1\"></fakelog><fakelog time=\"goodtime\" log=\"my log2\"></fakelog>";
+            using (var ms = CreateStream(log))
+            {
+                parser.Parse(ms);
+            }
+            
+            //TODO: update registry to produce "failed" logs and update log entry/create new type to indicate it's a failed entry
+            Assert.That(true, Is.False); //XXX until ^^ is implemented
+            logRegistry.Received().AddLog("goodtime", "my log2");
+            logRegistry.DidNotReceive().AddValueToLog(logEntry, Arg.Any<LogAttribute>(), Arg.Any<object>());
+        }
+
+        [Test]
+        public void ParseFailureHandleCompleteInvalid()
+        {
+            logConfig.ParsingFailureHandling = LogParserFailureHandling.MarkEntriesAsFailed;
+
+            var parser = new XMLLogParser();
+            parser.SetConfig(logConfig);
+            parser.SetRegistry(logRegistry);
+
+            logRegistry.AddLog(Arg.Any<string>(), Arg.Any<string>()).Returns(logEntry);
+            //TODO: handling of failed log
+
+            var log = "<fakelog time=\"goodtime\" log=\"my log1\"></fakelog><fakelog log=\"my log2\"></fakelog><fakelog></fakelog>";
+            using (var ms = CreateStream(log))
+            {
+                parser.Parse(ms);
+            }
+
+            logRegistry.Received().AddLog("goodtime", "my log1");
+            //TODO: update registry to produce "failed" logs and update log entry/create new type to indicate it's a failed entry
+            Assert.That(true, Is.False); //XXX until ^^ is implemented
+            //TODO: need to count invocation number. Should be 1 AddLog, 1 <failed log>, and that's it. The last entry should be skipped since it had no data
+            logRegistry.DidNotReceive().AddValueToLog(logEntry, Arg.Any<LogAttribute>(), Arg.Any<object>());
+        }
 
         //TODO: Parse-ext: file parse
 

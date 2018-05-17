@@ -479,3 +479,5 @@ void doSomethingCool(std::ifstream& input)
 - Went to add reflection and... found out that nearly all the useful attributes in Type only exist in .Net Standard 2.0 and up.
 - Do to some weird bug... somewhere, when I first started the project (never had a need to mention this), it defaulted the .Net Standard versions to 1.6. I updated everything to 2.0. But while everything compiled, it wouldn't execute. It complained about .Net Standard version mismatch.
 - Needless to say, I didn't see a need to use 2.0 at the time, as much as I wanted to. Now I do and, luckily, it compiled and ran. I don't know if it's a newer version of VS or something. But no more crash on startup
+- Added the configurable failure handling enum and unit tests, but haven't implemented yet.
+- Also added more combinations for "LogConfig.IsValidValuesTest"

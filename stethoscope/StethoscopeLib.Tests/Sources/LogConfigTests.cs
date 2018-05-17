@@ -26,32 +26,25 @@ namespace LogTracker.Tests
 
             Assert.That(config.IsValid, Is.False);
         }
-
-        // Pairwise/combinatorial would be useful, but I need to check the expected result value
-        // XXX add null values
-        [TestCase("", "", ExpectedResult = false)]
-        [TestCase("    ", "", ExpectedResult = false)]
-        [TestCase("", "    ", ExpectedResult = false)]
-        [TestCase("    ", "    ", ExpectedResult = false)]
-        [TestCase("time", "", ExpectedResult = false)]
-        [TestCase("", "log", ExpectedResult = false)]
-        [TestCase("time", "    ", ExpectedResult = false)]
-        [TestCase("    ", "log", ExpectedResult = false)]
-        [TestCase("time", "log", ExpectedResult = true)]
-        public bool IsValidValuesTest(string timestamp, string logMessage)
+        
+        [Test]
+        public void IsValidValues([Values(null, "", "    ", "time")]string timestamp, [Values(null, "", "    ", "log")]string logPath)
         {
+            var isValid = "time".Equals(timestamp) && "log".Equals(logPath);
+
             var config = new LogConfig();
 
             config.TimestampPath = timestamp;
-            config.LogMessagePath = logMessage;
+            config.LogMessagePath = logPath;
 
-            return config.IsValid;
+            Assert.That(config.IsValid, Is.EqualTo(isValid));
         }
 
         [Test]
-        public void GetAttributePaths()
+        public void VariableTest()
         {
             Assert.That(LogConfig.GetAttributePaths(), Has.Exactly(Enum.GetValues(typeof(LogAttribute)).Length).Items);
+            Assert.That(Enum.GetValues(typeof(LogParserFailureHandling)), Has.Exactly(3).Items);
         }
     }
 }

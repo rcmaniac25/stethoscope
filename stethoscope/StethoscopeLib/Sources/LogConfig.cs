@@ -1,11 +1,36 @@
 ﻿using LogTracker.Common;
 
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 
 namespace LogTracker
 {
+    /// <summary>
+    /// How failure to parse a log entry should be handled
+    /// </summary>
+    public enum LogParserFailureHandling
+    {
+        /// <summary>
+        /// Failure to parse a log entry will stop the logger and skip any remaining log entries.
+        /// </summary>
+        [EnumMember(Value = "stop")]
+        StopParsing,
+        /// <summary>
+        /// Failure to parse a log entry will skip that log entry.
+        /// </summary>
+        [EnumMember(Value = "skip")]
+        SkipEntries,
+        /// <summary>
+        /// Failure to parse a log entry will result in creating a log entry that is not valid but will contain any entry data it could parse.
+        /// If no attributes were able to be parsed, the entry won't be saved as it contains no data of use.
+        /// </summary>
+        [EnumMember(Value = "mark")]
+        MarkEntriesAsFailed
+    }
+
     public struct LogConfig
     {
         // Opt
@@ -21,6 +46,9 @@ namespace LogTracker
         public string TraceIdPath { get; set; }
         public string ContextPath { get; set; }
 
+        [JsonConverter(typeof(StringEnumConverter))]
+        public LogParserFailureHandling ParsingFailureHandling { get; set; }
+
         // Req
         public string TimestampPath { get; set; }
         public string LogMessagePath { get; set; }
@@ -34,9 +62,7 @@ namespace LogTracker
                     string.IsNullOrWhiteSpace(LogMessagePath));
             }
         }
-
-        //TODO: log parse error handling: stop parsing log on bad entry, skip bad log entries, parse as much of bad log entry (marked as bad)
-
+        
         /// <summary>
         /// Get all attributes and their associated variable names, for use by reflection.
         /// </summary>
