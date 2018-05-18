@@ -44,6 +44,8 @@ namespace LogTracker.Tests
             var entry = registry.AddLog(timestamp.ToString(), logmsg);
             Assert.That(entry, Is.Not.Null);
 
+            Assert.That(entry.IsValid, Is.True);
+
             Assert.That(entry.Message, Is.EqualTo(logmsg));
             Assert.That(entry.Timestamp, Is.EqualTo(timestamp).Within(1).Seconds);
         }
@@ -66,6 +68,16 @@ namespace LogTracker.Tests
             {
                 registry.AddLog("cookie", "testmsg");
             });
+        }
+
+        [Test]
+        public void AddFailedLog()
+        {
+            var registry = new LogRegistry();
+            var entry = registry.AddFailedLog();
+            Assert.That(entry, Is.Not.Null);
+
+            Assert.That(entry.IsValid, Is.False);
         }
 
         [Test]
@@ -140,6 +152,18 @@ namespace LogTracker.Tests
         }
 
         [Test]
+        public void AddValueToFailedLogMessage()
+        {
+            var registry = new LogRegistry();
+            var entry = registry.AddFailedLog();
+            Assert.That(entry, Is.Not.Null);
+
+            var added = registry.AddValueToLog(entry, LogAttribute.Message, "new message");
+
+            Assert.That(added, Is.True);
+        }
+
+        [Test]
         public void AddValueToLogTimestamp()
         {
             var registry = new LogRegistry();
@@ -149,6 +173,18 @@ namespace LogTracker.Tests
             var added = registry.AddValueToLog(entry, LogAttribute.Timestamp, DateTime.Now);
 
             Assert.That(added, Is.False);
+        }
+
+        [Test]
+        public void AddValueToFailedLogTimestamp()
+        {
+            var registry = new LogRegistry();
+            var entry = registry.AddFailedLog();
+            Assert.That(entry, Is.Not.Null);
+
+            var added = registry.AddValueToLog(entry, LogAttribute.Timestamp, DateTime.Now);
+
+            Assert.That(added, Is.True);
         }
 
         [Test]
@@ -273,6 +309,8 @@ namespace LogTracker.Tests
             Assert.That(logs, Is.Null);
         }
 
+        //TODO: test GetBy with invalid logs
+
         [Test]
         public void GetByTimetstampEmpty()
         {
@@ -331,6 +369,8 @@ namespace LogTracker.Tests
             Assert.That(logs.First().GetAttribute<int>(LogAttribute.Level), Is.EqualTo(1));
             Assert.That(logs.Last().GetAttribute<int>(LogAttribute.Level), Is.EqualTo(2));
         }
+
+        //TODO: test GetByTimetstamp with invalid logs
 
         [Test]
         public void Clear()

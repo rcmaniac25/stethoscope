@@ -44,6 +44,7 @@ namespace LogTracker.Tests
 
         private ILogRegistry logRegistry;
         private ILogEntry logEntry;
+        private ILogEntry failedLogEntry;
         private LogConfig logConfig;
 
         [SetUp]
@@ -51,11 +52,15 @@ namespace LogTracker.Tests
         {
             logRegistry = Substitute.For<ILogRegistry>();
             logEntry = Substitute.For<ILogEntry>();
+            failedLogEntry = Substitute.For<ILogEntry>();
             logConfig = new LogConfig()
             {
                 TimestampPath = "!time",
                 LogMessagePath = "!log"
             };
+
+            logEntry.IsValid.Returns(true);
+            failedLogEntry.IsValid.Returns(false);
         }
 
         private static MemoryStream CreateStream(string data)
@@ -334,8 +339,9 @@ namespace LogTracker.Tests
                 parser.Parse(ms);
             }
 
-            logRegistry.Received().AddLog("goodtime", "my log1");
+            logRegistry.Received(1).AddLog("goodtime", "my log1");
             logRegistry.DidNotReceive().AddLog(Arg.Any<string>(), "my log2");
+            logRegistry.DidNotReceive().AddFailedLog();
             logRegistry.DidNotReceive().AddValueToLog(logEntry, Arg.Any<LogAttribute>(), Arg.Any<object>());
         }
 
@@ -356,8 +362,9 @@ namespace LogTracker.Tests
                 parser.Parse(ms);
             }
 
-            logRegistry.Received().AddLog("goodtime", "my log1");
+            logRegistry.Received(1).AddLog("goodtime", "my log1");
             logRegistry.DidNotReceive().AddLog(Arg.Any<string>(), "my log2");
+            logRegistry.DidNotReceive().AddFailedLog();
             logRegistry.DidNotReceive().AddValueToLog(logEntry, Arg.Any<LogAttribute>(), Arg.Any<object>());
         }
 
@@ -379,6 +386,7 @@ namespace LogTracker.Tests
             }
 
             logRegistry.DidNotReceive().AddLog(Arg.Any<string>(), Arg.Any<string>());
+            logRegistry.DidNotReceive().AddFailedLog();
             logRegistry.DidNotReceive().AddValueToLog(logEntry, Arg.Any<LogAttribute>(), Arg.Any<object>());
         }
 
@@ -399,9 +407,10 @@ namespace LogTracker.Tests
                 parser.Parse(ms);
             }
 
-            logRegistry.Received().AddLog("goodtime", "my log1");
+            logRegistry.Received(1).AddLog("goodtime", "my log1");
             logRegistry.DidNotReceive().AddLog(Arg.Any<string>(), "my log2");
-            logRegistry.Received().AddLog("goodtime", "my log3");
+            logRegistry.Received(1).AddLog("goodtime", "my log3");
+            logRegistry.DidNotReceive().AddFailedLog();
             logRegistry.DidNotReceive().AddValueToLog(logEntry, Arg.Any<LogAttribute>(), Arg.Any<object>());
         }
 
@@ -423,8 +432,9 @@ namespace LogTracker.Tests
             }
 
             logRegistry.DidNotReceive().AddLog(Arg.Any<string>(), "my log1");
-            logRegistry.Received().AddLog("goodtime", "my log2");
-            logRegistry.Received().AddLog("goodtime", "my log3");
+            logRegistry.Received(1).AddLog("goodtime", "my log2");
+            logRegistry.Received(1).AddLog("goodtime", "my log3");
+            logRegistry.DidNotReceive().AddFailedLog();
             logRegistry.DidNotReceive().AddValueToLog(logEntry, Arg.Any<LogAttribute>(), Arg.Any<object>());
         }
 
@@ -438,7 +448,7 @@ namespace LogTracker.Tests
             parser.SetRegistry(logRegistry);
 
             logRegistry.AddLog(Arg.Any<string>(), Arg.Any<string>()).Returns(logEntry);
-            //TODO: handling of failed log
+            logRegistry.AddFailedLog().Returns(failedLogEntry);
 
             var log = "<fakelog time=\"goodtime\" log=\"my log1\"></fakelog><fakelog log=\"my log2\"></fakelog>";
             using (var ms = CreateStream(log))
@@ -446,10 +456,10 @@ namespace LogTracker.Tests
                 parser.Parse(ms);
             }
 
-            logRegistry.Received().AddLog("goodtime", "my log1");
-            //TODO: update registry to produce "failed" logs and update log entry/create new type to indicate it's a failed entry
-            Assert.That(true, Is.False); //XXX until ^^ is implemented
+            logRegistry.Received(1).AddLog("goodtime", "my log1");
+            logRegistry.Received(1).AddFailedLog();
             logRegistry.DidNotReceive().AddValueToLog(logEntry, Arg.Any<LogAttribute>(), Arg.Any<object>());
+            logRegistry.Received().AddValueToLog(failedLogEntry, LogAttribute.Message, Arg.Any<object>());
         }
 
         [Test]
@@ -462,17 +472,17 @@ namespace LogTracker.Tests
             parser.SetRegistry(logRegistry);
 
             logRegistry.AddLog(Arg.Any<string>(), Arg.Any<string>()).Returns(logEntry);
-            //TODO: handling of failed log
+            logRegistry.AddFailedLog().Returns(failedLogEntry);
 
             var log = "<fakelog log=\"my log1\"></fakelog><fakelog time=\"goodtime\" log=\"my log2\"></fakelog>";
             using (var ms = CreateStream(log))
             {
                 parser.Parse(ms);
             }
-            
-            //TODO: update registry to produce "failed" logs and update log entry/create new type to indicate it's a failed entry
-            Assert.That(true, Is.False); //XXX until ^^ is implemented
-            logRegistry.Received().AddLog("goodtime", "my log2");
+
+            logRegistry.Received(1).AddFailedLog();
+            logRegistry.Received(1).AddLog("goodtime", "my log2");
+            logRegistry.Received().AddValueToLog(failedLogEntry, LogAttribute.Message, Arg.Any<object>());
             logRegistry.DidNotReceive().AddValueToLog(logEntry, Arg.Any<LogAttribute>(), Arg.Any<object>());
         }
 
@@ -486,7 +496,7 @@ namespace LogTracker.Tests
             parser.SetRegistry(logRegistry);
 
             logRegistry.AddLog(Arg.Any<string>(), Arg.Any<string>()).Returns(logEntry);
-            //TODO: handling of failed log
+            logRegistry.AddFailedLog().Returns(failedLogEntry);
 
             var log = "<fakelog time=\"goodtime\" log=\"my log1\"></fakelog><fakelog log=\"my log2\"></fakelog><fakelog></fakelog>";
             using (var ms = CreateStream(log))
@@ -494,11 +504,10 @@ namespace LogTracker.Tests
                 parser.Parse(ms);
             }
 
-            logRegistry.Received().AddLog("goodtime", "my log1");
-            //TODO: update registry to produce "failed" logs and update log entry/create new type to indicate it's a failed entry
-            Assert.That(true, Is.False); //XXX until ^^ is implemented
-            //TODO: need to count invocation number. Should be 1 AddLog, 1 <failed log>, and that's it. The last entry should be skipped since it had no data
+            logRegistry.Received(1).AddLog("goodtime", "my log1");
+            logRegistry.Received(1).AddFailedLog();
             logRegistry.DidNotReceive().AddValueToLog(logEntry, Arg.Any<LogAttribute>(), Arg.Any<object>());
+            logRegistry.Received(1).AddValueToLog(failedLogEntry, LogAttribute.Message, Arg.Any<object>());
         }
 
         //TODO: Parse-ext: file parse

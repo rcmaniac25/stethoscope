@@ -22,6 +22,11 @@ namespace LogTracker.Log
             get => lazyMessage.Value;
         }
 
+        public bool IsValid
+        {
+            get => true;
+        }
+
         private Dictionary<LogAttribute, object> attributes = new Dictionary<LogAttribute, object>();
 
         internal LogEntry(DateTime timestamp, string logMessage)

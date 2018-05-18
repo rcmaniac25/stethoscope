@@ -481,3 +481,12 @@ void doSomethingCool(std::ifstream& input)
 - Needless to say, I didn't see a need to use 2.0 at the time, as much as I wanted to. Now I do and, luckily, it compiled and ran. I don't know if it's a newer version of VS or something. But no more crash on startup
 - Added the configurable failure handling enum and unit tests, but haven't implemented yet.
 - Also added more combinations for "LogConfig.IsValidValuesTest"
+
+#36.2. 5/17/2018:
+- So today I wanted to add the enum for failure handling. Along the way I had a couple ideas and remembered something...
+- First, one of the failure handling options is to parse the log, but only the attributes it knows about and can parse. I call these "failed logs"
+- To test if a valid log or not, I added IsValid to ILogEntry. Simple, but effective. I expect it to be a shortcut for "do I have to pay attention to what I'm doing, or can I expect that some values will be there?"
+- But in order to have a failed log, without setting a variable, I need to register a failed log. Thus, ILogRegistry.AddFailedLog
+- I also happened to start documenting these... I'll see how I do later on.
+- While doing this, I remembered "Oh yea, I don't know the source of these log entries. I just know they exist". But I also stopped myself from giving myself more work to do right now. I can probably add that after I get failure handling added and either do or start working on the other parsing tests. Info noted in LogAttributeEnum as that's where I'd need to add an entry and what to do with it.
+- I added a few additional tests and finished the failure handling tests... which don't work right now as failure handling hasn't been implemented. But that's for tomorrow.

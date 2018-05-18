@@ -45,7 +45,7 @@ namespace LogTracker.Tests
             var entry = new LogEntry(DateTime.Now, "testmsg");
             Assert.That(entry.HasAttribute(LogAttribute.ThreadID), Is.False);
 
-            entry.AddAttribute(Common.LogAttribute.ThreadID, "threadid");
+            entry.AddAttribute(LogAttribute.ThreadID, "threadid");
 
             Assert.That(entry.HasAttribute(LogAttribute.ThreadID), Is.True);
         }
@@ -57,6 +57,13 @@ namespace LogTracker.Tests
             {
                 new LogEntry(DateTime.Now, null);
             });
+        }
+
+        [Test]
+        public void ValidLog()
+        {
+            var entry = new LogEntry(DateTime.Now, "testmsg");
+            Assert.That(entry.IsValid, Is.True);
         }
 
         [Test]
@@ -89,7 +96,7 @@ namespace LogTracker.Tests
         {
             var time = DateTime.Now;
             var entry = new LogEntry(time, "testmsg");
-            Assert.That(entry.HasAttribute(Common.LogAttribute.Timestamp), Is.True);
+            Assert.That(entry.HasAttribute(LogAttribute.Timestamp), Is.True);
             Assert.That(entry.GetAttribute<DateTime>(LogAttribute.Timestamp), Is.EqualTo(time));
         }
 

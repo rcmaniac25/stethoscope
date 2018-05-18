@@ -42,15 +42,20 @@ namespace LogTracker.Log
             {
                 throw new ArgumentNullException("message");
             }
-
-            DateTime time;
-            if (!DateTime.TryParse(timestamp, out time))
+            
+            if (!DateTime.TryParse(timestamp, out DateTime time))
             {
                 throw new ArgumentException("Could not parse timestamp", "timestamp");
             }
             var entry = new LogEntry(time, message);
             AddLogSorted(entry);
             return entry;
+        }
+
+        public ILogEntry AddFailedLog()
+        {
+            //TODO
+            throw new NotImplementedException();
         }
 
         public bool AddValueToLog(ILogEntry entry, LogAttribute attribute, object value)
