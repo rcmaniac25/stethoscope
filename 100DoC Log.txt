@@ -494,3 +494,10 @@ void doSomethingCool(std::ifstream& input)
 #37.2. 5/18/2018:
 - Ok, it's been a long week. I got home and fell asleep. But because I've been commiting the following day, I'm just really late on this... (I repeat "don't kill yourself for code", and didn't plan for falling asleep)
 - Mainly, just wrote the unit tests.
+
+#38.2. 5/19/2018:
+- Started working on FailedLogEntry. I say "started" because as I started working to integrate it into the registry and update tests, I had a bunch of questions...
+- Good questions, like can I compare LogEntry to FailedLogEntry? What about Equals?
+- It's a good start, and I like some of the ideas. Also, adding this functionality means the failure handling can work as a developer intents. Or maybe, how the log source can be used. A single log may want failure, multiple file logs may want to skip, while a log stream may want to attempt to parse.
+- ...and the handling questions will allow that to work without any "oh, BTW, the Equals function doesn't work if you set this one global value". It shouldn't care about your config.
+- I also learned that `Property { get => "hi"; }` can be simplified to `Property => "hi";`

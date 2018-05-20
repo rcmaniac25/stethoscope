@@ -54,8 +54,10 @@ namespace LogTracker.Log
 
         public ILogEntry AddFailedLog()
         {
-            //TODO
-            throw new NotImplementedException();
+            var entry = new FailedLogEntry();
+            //TODO: need to add to logs... while still allowing the sorted log functionality
+            //TODO: implement, but also need a way to verify that empty logs are removed (maybe with a "notify done parsing" call). Needs to also take all logs that have since gotten there timestamp to be sorted properly
+            return entry;
         }
 
         public bool AddValueToLog(ILogEntry entry, LogAttribute attribute, object value)
@@ -87,6 +89,11 @@ namespace LogTracker.Log
                 if (log.HasAttribute(attribute))
                 {
                     var key = log.GetAttribute<object>(attribute);
+                    if (!log.IsValid && attribute == LogAttribute.Message && !(key is string))
+                    {
+                        // Special case to ensure that message and timestamp (which doesn't work here anyway) match the expected types
+                        continue;
+                    }
                     if (!tmpResult.ContainsKey(key))
                     {
                         tmpResult.Add(key, new List<ILogEntry>());
@@ -105,7 +112,19 @@ namespace LogTracker.Log
 
         public IDictionary<object, IEnumerable<ILogEntry>> GetBy(LogAttribute attribute) => GetLogBy(attribute, logs);
 
-        public IEnumerable<ILogEntry> GetByTimetstamp() => logs.AsReadOnly();
+        public IEnumerable<ILogEntry> GetByTimetstamp()
+        {
+            foreach (var log in logs)
+            {
+                if (!log.IsValid && 
+                    (!log.HasAttribute(LogAttribute.Timestamp) || !(log.GetAttribute<object>(LogAttribute.Timestamp) is DateTime)))
+                {
+                    // Special case to ensure that message (which doesn't apply here anyway) and timestamp match the expected types
+                    continue;
+                }
+                yield return log;
+            }
+        }
 
         //TODO: special get functions - get by function, get by thread ID, get by <key>, etc.
         /* TODO: LINQ support?

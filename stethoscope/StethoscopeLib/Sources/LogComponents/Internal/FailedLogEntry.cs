@@ -1,38 +1,20 @@
-﻿using LogTracker.Common;
-using LogTracker.Log.Internal;
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace LogTracker.Log
+using LogTracker.Common;
+
+namespace LogTracker.Log.Internal
 {
-    public class LogEntry : IMutableLogEntry, IComparable<LogEntry>, IEquatable<LogEntry>
+    public class FailedLogEntry : IMutableLogEntry, IComparable<FailedLogEntry>, IEquatable<FailedLogEntry>
     {
-        Lazy<DateTime> lazyTimestamp;
-        Lazy<string> lazyMessage;
+        public DateTime Timestamp => (DateTime)attributes[LogAttribute.Timestamp];
 
-        public DateTime Timestamp => lazyTimestamp.Value;
+        public string Message => (string)attributes[LogAttribute.Message];
 
-        public string Message => lazyMessage.Value;
-
-        public bool IsValid => true;
+        public bool IsValid => false;
 
         private Dictionary<LogAttribute, object> attributes = new Dictionary<LogAttribute, object>();
-
-        internal LogEntry(DateTime timestamp, string logMessage)
-        {
-            if (logMessage == null)
-            {
-                throw new ArgumentNullException("logMessage");
-            }
-
-            AddAttribute(LogAttribute.Timestamp, timestamp);
-            AddAttribute(LogAttribute.Message, logMessage);
-
-            lazyTimestamp = new Lazy<DateTime>(() => GetAttribute<DateTime>(LogAttribute.Timestamp), true);
-            lazyMessage = new Lazy<string>(() => GetAttribute<string>(LogAttribute.Message), true);
-        }
 
         public bool HasAttribute(LogAttribute attribute) => attributes.ContainsKey(attribute);
 
@@ -50,33 +32,33 @@ namespace LogTracker.Log
 
         public int CompareTo(ILogEntry other)
         {
-            if (other is LogEntry)
+            if (other is FailedLogEntry)
             {
-                return CompareTo((LogEntry)other);
+                return CompareTo((FailedLogEntry)other);
             }
             //TODO: what is proper for IComparable? Does A.CompareTo(B) = 0 => A.Equals(B) = true?
             throw new NotImplementedException();
         }
 
-        public int CompareTo(LogEntry other)
+        public int CompareTo(FailedLogEntry other)
         {
             if (other == null)
             {
                 return 1;
             }
-            return Timestamp.CompareTo(other.Timestamp);
+            return Timestamp.CompareTo(other.Timestamp); //TODO: need proper comparision
         }
 
         public override bool Equals(object obj)
         {
-            if (obj != null && obj is LogEntry)
+            if (obj != null && obj is FailedLogEntry)
             {
-                return Equals((LogEntry)obj);
+                return Equals((FailedLogEntry)obj);
             }
             return false;
         }
 
-        private bool AttributeEquals(LogEntry other)
+        private bool AttributeEquals(FailedLogEntry other)
         {
             // Increasingly complex tests
 
@@ -84,19 +66,9 @@ namespace LogTracker.Log
             {
                 return false;
             }
-            if (attributes.Count == 2) // Already have (and tested) Timestamp and Message
-            {
-                // Early out
-                return true;
-            }
 
             foreach (var key in attributes.Keys)
             {
-                // We test these already
-                if (key == LogAttribute.Timestamp || key == LogAttribute.Message)
-                {
-                    continue;
-                }
                 if (!other.attributes.ContainsKey(key))
                 {
                     return false;
@@ -105,11 +77,6 @@ namespace LogTracker.Log
 
             foreach (var kv in attributes)
             {
-                // We test these already
-                if (kv.Key == LogAttribute.Timestamp || kv.Key == LogAttribute.Message)
-                {
-                    continue;
-                }
                 var otherValue = other.attributes[kv.Key];
                 if (otherValue == null && kv.Value == null)
                 {
@@ -124,21 +91,20 @@ namespace LogTracker.Log
             return true;
         }
 
-        public bool Equals(LogEntry other)
+        public bool Equals(FailedLogEntry other)
         {
             if (other != null)
             {
-                return other.attributes[LogAttribute.Timestamp].Equals(attributes[LogAttribute.Timestamp]) && // Internally, number comparsion: fast
-                    other.attributes[LogAttribute.Message].Equals(attributes[LogAttribute.Message]) && // Internally, data comparison: O(n)
-                    AttributeEquals(other); // Slowest test (see above)
+                return AttributeEquals(other);
             }
             return false;
         }
 
-        public override int GetHashCode() => 1852909 ^ attributes.GetHashCode();
+        public override int GetHashCode() => 91450537 ^ attributes.GetHashCode();
 
         public override string ToString()
         {
+            //TODO: rewrite
             var sb = new StringBuilder();
             sb.AppendFormat("{0} : {1}", Timestamp, Message);
             if (attributes.Count > 2)
@@ -147,5 +113,7 @@ namespace LogTracker.Log
             }
             return sb.ToString();
         }
+
+        //XXX does this need tests? it's mostly just copy-paste code from LogEntry
     }
 }

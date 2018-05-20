@@ -141,5 +141,7 @@ namespace LogTracker.Tests
         }
 
         //TODO: re-add the GetHashCode tests
+
+        //TODO: test against failed log entries? (should a LogEntry and FailedLogEntry with the same values == true? Gut feeling is no)
     }
 }
