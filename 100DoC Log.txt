@@ -490,3 +490,7 @@ void doSomethingCool(std::ifstream& input)
 - I also happened to start documenting these... I'll see how I do later on.
 - While doing this, I remembered "Oh yea, I don't know the source of these log entries. I just know they exist". But I also stopped myself from giving myself more work to do right now. I can probably add that after I get failure handling added and either do or start working on the other parsing tests. Info noted in LogAttributeEnum as that's where I'd need to add an entry and what to do with it.
 - I added a few additional tests and finished the failure handling tests... which don't work right now as failure handling hasn't been implemented. But that's for tomorrow.
+
+#37.2. 5/18/2018:
+- Ok, it's been a long week. I got home and fell asleep. But because I've been commiting the following day, I'm just really late on this... (I repeat "don't kill yourself for code", and didn't plan for falling asleep)
+- Mainly, just wrote the unit tests.

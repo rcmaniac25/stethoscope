@@ -309,7 +309,41 @@ namespace LogTracker.Tests
             Assert.That(logs, Is.Null);
         }
 
-        //TODO: test GetBy with invalid logs
+        [Test]
+        public void GetByLogsWithFailedLogs()
+        {
+            var registry = new LogRegistry();
+            var entry = registry.AddLog(DateTime.Now.ToString(), "msg1");
+            Assert.That(entry, Is.Not.Null);
+
+            entry = registry.AddFailedLog();
+            Assert.That(entry, Is.Not.Null);
+
+            registry.AddValueToLog(entry, LogAttribute.Message, "msg2");
+
+            var logs = registry.GetBy(LogAttribute.Message);
+            Assert.That(logs, Is.Not.Empty);
+
+            Assert.That(logs.Keys, Is.SubsetOf(new string[] { "msg1", "msg2" }).And.Exactly(2).Items);
+        }
+
+        [Test]
+        public void GetByLogsWithFailedLogsWithoutAttribute()
+        {
+            var registry = new LogRegistry();
+            var entry = registry.AddLog(DateTime.Now.ToString(), "msg1");
+            Assert.That(entry, Is.Not.Null);
+
+            entry = registry.AddFailedLog();
+            Assert.That(entry, Is.Not.Null);
+
+            registry.AddValueToLog(entry, LogAttribute.Level, "something");
+
+            var logs = registry.GetBy(LogAttribute.Message);
+            Assert.That(logs, Is.Not.Empty);
+
+            Assert.That(logs.Keys, Is.SubsetOf(new string[] { "msg1" }).And.Exactly(1).Items);
+        }
 
         [Test]
         public void GetByTimetstampEmpty()
@@ -370,7 +404,56 @@ namespace LogTracker.Tests
             Assert.That(logs.Last().GetAttribute<int>(LogAttribute.Level), Is.EqualTo(2));
         }
 
-        //TODO: test GetByTimetstamp with invalid logs
+        [Test]
+        public void GetByTimetstampWithFailedLogs()
+        {
+            var time = DateTime.Now;
+
+            var registry = new LogRegistry();
+            var entry = registry.AddLog(time.AddSeconds(1).ToString(), "msg1");
+
+            entry = registry.AddFailedLog();
+            registry.AddValueToLog(entry, LogAttribute.Timestamp, time);
+
+            var logs = registry.GetByTimetstamp();
+            Assert.That(logs, Is.Not.Empty);
+
+            Assert.That(logs, Has.Exactly(2).Items);
+        }
+
+        [Test]
+        public void GetByTimetstampWithFailedLogsWithoutAttribute()
+        {
+            var time = DateTime.Now;
+
+            var registry = new LogRegistry();
+            var entry = registry.AddLog(time.AddSeconds(1).ToString(), "msg1");
+
+            entry = registry.AddFailedLog();
+            registry.AddValueToLog(entry, LogAttribute.Message, "msg2");
+
+            var logs = registry.GetByTimetstamp();
+            Assert.That(logs, Is.Not.Empty);
+
+            Assert.That(logs, Has.Exactly(1).Items);
+        }
+
+        [Test]
+        public void GetByTimetstampWithFailedLogsInvalidTimestamp()
+        {
+            var time = DateTime.Now;
+
+            var registry = new LogRegistry();
+            var entry = registry.AddLog(time.AddSeconds(1).ToString(), "msg1");
+
+            entry = registry.AddFailedLog();
+            registry.AddValueToLog(entry, LogAttribute.Timestamp, "not-timestamp");
+
+            var logs = registry.GetByTimetstamp();
+            Assert.That(logs, Is.Not.Empty);
+
+            Assert.That(logs, Has.Exactly(1).Items);
+        }
 
         [Test]
         public void Clear()
