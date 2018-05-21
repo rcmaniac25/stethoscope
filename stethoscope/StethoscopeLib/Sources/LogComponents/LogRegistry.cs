@@ -8,22 +8,78 @@ namespace LogTracker.Log
 {
     public class LogRegistry : ILogRegistry
     {
-        private List<LogEntry> logs = new List<LogEntry>();
+        private class IlogEntryComparer : IComparer<ILogEntry>
+        {
+            private DateTime? GetTimestamp(ILogEntry entry)
+            {
+                if (entry.IsValid)
+                {
+                    return entry.GetAttribute<DateTime>(LogAttribute.Timestamp);
+                }
 
-        private void AddLogSorted(LogEntry entry)
+                if (entry.HasAttribute(LogAttribute.Timestamp))
+                {
+                    var timestamp = entry.GetAttribute<object>(LogAttribute.Timestamp);
+                    if (timestamp is DateTime)
+                    {
+                        return (DateTime)timestamp;
+                    }
+                }
+                
+                return null;
+            }
+
+            public int Compare(ILogEntry x, ILogEntry y)
+            {
+                if (x == null && y == null)
+                {
+                    return 0;
+                }
+                else if (x == null)
+                {
+                    return -1;
+                }
+                else if (y == null)
+                {
+                    return 1;
+                }
+
+                var xt = GetTimestamp(x);
+                var yt = GetTimestamp(y);
+
+                if (xt.HasValue && yt.HasValue)
+                {
+                    return xt.Value.CompareTo(yt.Value);
+                }
+                else if (xt.HasValue)
+                {
+                    return 1;
+                }
+                else if (yt.HasValue)
+                {
+                    return -1;
+                }
+                return 0;
+            }
+        }
+
+        private List<ILogEntry> logs = new List<ILogEntry>();
+        private readonly IlogEntryComparer logEntryComparer = new IlogEntryComparer();
+
+        private void AddLogSorted(ILogEntry entry)
         {
             // From https://stackoverflow.com/a/22801345/492347
-            if (logs.Count == 0 || logs[logs.Count - 1].CompareTo(entry) <= 0)
+            if (logs.Count == 0 || logEntryComparer.Compare(logs[logs.Count - 1], entry) <= 0)
             {
                 logs.Add(entry);
             }
-            else if (logs[0].CompareTo(entry) >= 0)
+            else if (logEntryComparer.Compare(logs[0], entry) >= 0)
             {
                 logs.Insert(0, entry);
             }
             else
             {
-                var index = logs.BinarySearch(entry);
+                var index = logs.BinarySearch(entry, logEntryComparer);
                 if (index < 0)
                 {
                     index = ~index;
@@ -55,7 +111,7 @@ namespace LogTracker.Log
         public ILogEntry AddFailedLog()
         {
             var entry = new FailedLogEntry();
-            //TODO: need to add to logs... while still allowing the sorted log functionality
+            //AddLogSorted(entry);
             //TODO: implement, but also need a way to verify that empty logs are removed (maybe with a "notify done parsing" call). Needs to also take all logs that have since gotten there timestamp to be sorted properly
             return entry;
         }

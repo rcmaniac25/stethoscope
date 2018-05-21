@@ -5,7 +5,7 @@ namespace LogTracker.Common
     /// <summary>
     /// An individual log entry within a log.
     /// </summary>
-    public interface ILogEntry : IComparable<ILogEntry>
+    public interface ILogEntry
     {
         /// <summary>
         /// Timestamp of the log entry.

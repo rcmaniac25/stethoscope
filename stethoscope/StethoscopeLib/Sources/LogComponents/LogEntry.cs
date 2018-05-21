@@ -7,7 +7,7 @@ using System.Text;
 
 namespace LogTracker.Log
 {
-    public class LogEntry : IMutableLogEntry, IComparable<LogEntry>, IEquatable<LogEntry>
+    public class LogEntry : IMutableLogEntry, IEquatable<LogEntry>
     {
         Lazy<DateTime> lazyTimestamp;
         Lazy<string> lazyMessage;
@@ -47,25 +47,6 @@ namespace LogTracker.Log
         }
 
         public void AddAttribute(LogAttribute attribute, object value) => attributes.Add(attribute, value);
-
-        public int CompareTo(ILogEntry other)
-        {
-            if (other is LogEntry)
-            {
-                return CompareTo((LogEntry)other);
-            }
-            //TODO: what is proper for IComparable? Does A.CompareTo(B) = 0 => A.Equals(B) = true?
-            throw new NotImplementedException();
-        }
-
-        public int CompareTo(LogEntry other)
-        {
-            if (other == null)
-            {
-                return 1;
-            }
-            return Timestamp.CompareTo(other.Timestamp);
-        }
 
         public override bool Equals(object obj)
         {

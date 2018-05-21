@@ -501,3 +501,13 @@ void doSomethingCool(std::ifstream& input)
 - It's a good start, and I like some of the ideas. Also, adding this functionality means the failure handling can work as a developer intents. Or maybe, how the log source can be used. A single log may want failure, multiple file logs may want to skip, while a log stream may want to attempt to parse.
 - ...and the handling questions will allow that to work without any "oh, BTW, the Equals function doesn't work if you set this one global value". It shouldn't care about your config.
 - I also learned that `Property { get => "hi"; }` can be simplified to `Property => "hi";`
+
+#39.2. 5/20/2018:
+- My intention today was to figure out CompareTo, ensure support in LogRegistry, and get some tests working.
+- My computer decided that all IO devices would no longer function. I got out my backup keyboard and mouse  (aka, spare) and tried those. Still didn't work. I'm literally sitting in front of my computer, with a laptop, remoted into it to write this info.
+- As such, I haven't gotten all that done. I realized CompareTo is probably not the correct thing to implement because I'm only doing a single-field comparision, and it could be easy to mistake CompareTo == 0 meaning Equals == true. Since it's more a domain specific task, and it only happens inside LogRegistry, I decided to do the comparision there.
+- By the time my IO devices failed, I realized "this still isn't right". Because the comparision is used for insertion, and failed logs won't have any fields upon addition. So the comparison will always follow the same path.
+- I don't want to fight with the computer right now, so I will do that work tomorrow. Unit tests passed, so it's at least at feature parity.
+- I wrote it at an earlier point, but one interesting aspect I'll have to write is lazy/post execution of sorting the failed resources. My head says "threadpool function to do the work when it has time, started after parsing ends" my gut says "when a parser is done, operate then". But for streams, this won't work as it may never end. But a threadpool is a bit much. Perhaps I need to be smart and if it's a stream, I need to do the parsing on the fly (with locks and all), but if a file, just do it when parsing finishes.
+- Reality check: just run when done for now and figure out fancy, smart, whatever term... (the word of the year is "AI" as "machine learning" was so 2017...). It also begs the question "what happens if we don't execute it or forget to?"
+- Tomorrow...

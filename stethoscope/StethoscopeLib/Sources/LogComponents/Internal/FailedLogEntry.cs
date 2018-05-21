@@ -6,7 +6,7 @@ using LogTracker.Common;
 
 namespace LogTracker.Log.Internal
 {
-    public class FailedLogEntry : IMutableLogEntry, IComparable<FailedLogEntry>, IEquatable<FailedLogEntry>
+    public class FailedLogEntry : IMutableLogEntry, IEquatable<FailedLogEntry>
     {
         public DateTime Timestamp => (DateTime)attributes[LogAttribute.Timestamp];
 
@@ -29,26 +29,7 @@ namespace LogTracker.Log.Internal
         }
 
         public void AddAttribute(LogAttribute attribute, object value) => attributes.Add(attribute, value);
-
-        public int CompareTo(ILogEntry other)
-        {
-            if (other is FailedLogEntry)
-            {
-                return CompareTo((FailedLogEntry)other);
-            }
-            //TODO: what is proper for IComparable? Does A.CompareTo(B) = 0 => A.Equals(B) = true?
-            throw new NotImplementedException();
-        }
-
-        public int CompareTo(FailedLogEntry other)
-        {
-            if (other == null)
-            {
-                return 1;
-            }
-            return Timestamp.CompareTo(other.Timestamp); //TODO: need proper comparision
-        }
-
+        
         public override bool Equals(object obj)
         {
             if (obj != null && obj is FailedLogEntry)

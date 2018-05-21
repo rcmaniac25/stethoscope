@@ -43,7 +43,7 @@ namespace LogTracker.Parsers
                 {
                     if (!firstExecution)
                     {
-                        yield return new Tuple<bool, string>(processingQuote, builder.ToString());
+                        yield return Tuple.Create(processingQuote, builder.ToString());
                     }
                     builder.Length = 0;
                     processingQuote = !processingQuote;
@@ -59,7 +59,7 @@ namespace LogTracker.Parsers
             {
                 // Theory that we're in a quoted string... but never have an ending quote. Simply use the processingQuote to determine what to return.
                 // If we were in a quote, we have no way of knowing if it was supposed to be a quoted string or not.
-                yield return new Tuple<bool, string>(processingQuote, builder.ToString());
+                yield return Tuple.Create(processingQuote, builder.ToString());
             }
         }
 
@@ -85,9 +85,9 @@ namespace LogTracker.Parsers
                     {
                         if (index > 0)
                         {
-                            yield return new Tuple<bool, string>(group.Item1, group.Item2.Substring(0, index));
+                            yield return Tuple.Create(group.Item1, group.Item2.Substring(0, index));
                         }
-                        leftover[remainsIndex] = new Tuple<bool, string>(group.Item1, group.Item2.Substring(index + 1));
+                        leftover[remainsIndex] = Tuple.Create(group.Item1, group.Item2.Substring(index + 1));
                         yield break;
                     }
                     else
