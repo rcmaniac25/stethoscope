@@ -511,3 +511,11 @@ void doSomethingCool(std::ifstream& input)
 - I wrote it at an earlier point, but one interesting aspect I'll have to write is lazy/post execution of sorting the failed resources. My head says "threadpool function to do the work when it has time, started after parsing ends" my gut says "when a parser is done, operate then". But for streams, this won't work as it may never end. But a threadpool is a bit much. Perhaps I need to be smart and if it's a stream, I need to do the parsing on the fly (with locks and all), but if a file, just do it when parsing finishes.
 - Reality check: just run when done for now and figure out fancy, smart, whatever term... (the word of the year is "AI" as "machine learning" was so 2017...). It also begs the question "what happens if we don't execute it or forget to?"
 - Tomorrow...
+
+#40.2. 5/21/2018:
+- So "what happens if we don't execute it or forget to?" Nothing, for the most part. The only time it has any effect is when GetByTimestamp is called. Because we don't want to to return a failed log that has no timestamp OR has a timestamp and hasn't be sorted properly.
+- Only thing I don't like is doing a simple iteration to find the failed log. Involves something I had very early on: an ID. I worried that just doing equality checks would 1) be slow. 2) Could result in two of the same logs being confused, but because they were classes, the wrong log could be returned.
+- With that done, the solution for "how do I know when it's done?" was to just have a function that notified the registry it was done. This would allow it to do any additional processing if needed.
+- None of this stuff would scale to streaming logs or, if needed, threadsafe.
+- In addition, IMutableLogEntry was originally intended for "I want to be able to modify some logs... period" and now it's expanding to an internal/LogRegistry ILogEntry... probably time to rename it.
+- In other news: tests before impl was good, as nearly all those tests were done by the time I did the implementation, and now I know that the only thing that needs work (because it wasn't implemented yet) is the parser itself.

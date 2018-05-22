@@ -11,14 +11,13 @@ namespace LogTracker.Log
     {
         Lazy<DateTime> lazyTimestamp;
         Lazy<string> lazyMessage;
+        private Dictionary<LogAttribute, object> attributes = new Dictionary<LogAttribute, object>();
 
         public DateTime Timestamp => lazyTimestamp.Value;
-
         public string Message => lazyMessage.Value;
-
         public bool IsValid => true;
-
-        private Dictionary<LogAttribute, object> attributes = new Dictionary<LogAttribute, object>();
+        public bool HasTimestampChanged => false;
+        public Guid ID { get; } = Guid.NewGuid();
 
         internal LogEntry(DateTime timestamp, string logMessage)
         {
@@ -32,6 +31,10 @@ namespace LogTracker.Log
 
             lazyTimestamp = new Lazy<DateTime>(() => GetAttribute<DateTime>(LogAttribute.Timestamp), true);
             lazyMessage = new Lazy<string>(() => GetAttribute<string>(LogAttribute.Message), true);
+        }
+
+        public void ResetTimestampChanged()
+        {
         }
 
         public bool HasAttribute(LogAttribute attribute) => attributes.ContainsKey(attribute);
@@ -109,9 +112,10 @@ namespace LogTracker.Log
         {
             if (other != null)
             {
-                return other.attributes[LogAttribute.Timestamp].Equals(attributes[LogAttribute.Timestamp]) && // Internally, number comparsion: fast
+                return other.ID == ID ||
+                    (other.attributes[LogAttribute.Timestamp].Equals(attributes[LogAttribute.Timestamp]) && // Internally, number comparsion: fast
                     other.attributes[LogAttribute.Message].Equals(attributes[LogAttribute.Message]) && // Internally, data comparison: O(n)
-                    AttributeEquals(other); // Slowest test (see above)
+                    AttributeEquals(other)); // Slowest test (see above)
             }
             return false;
         }

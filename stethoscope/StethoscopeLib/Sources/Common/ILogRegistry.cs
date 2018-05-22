@@ -31,6 +31,12 @@ namespace LogTracker.Common
         /// <returns><c>true</c> if the entry was added. <c>false</c> if otherwise.</returns>
         bool AddValueToLog(ILogEntry entry, LogAttribute attribute, object value);
 
+        /// <summary>
+        /// Notify the registry that the failed log has finished getting parsed. This does not indicate it has been successfully parsed, just that it is done parsing.
+        /// </summary>
+        /// <param name="entry">The failed log entry. Any other log entry will throw an exception.</param>
+        void NotifyFailedLogParsed(ILogEntry entry);
+
         //TODO: switch to an enumeration of IGrouping
         /// <summary>
         /// Get logs by a specific attribute.

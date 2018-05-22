@@ -81,6 +81,39 @@ namespace LogTracker.Tests
         }
 
         [Test]
+        public void NotifyFailedLogParsed()
+        {
+            var registry = new LogRegistry();
+            var entry = registry.AddFailedLog();
+            Assert.That(entry, Is.Not.Null);
+
+            registry.NotifyFailedLogParsed(entry);
+        }
+
+        [Test]
+        public void NotifyFailedLogParsedNull()
+        {
+            var registry = new LogRegistry();
+            Assert.Throws<ArgumentNullException>(() =>
+            {
+                registry.NotifyFailedLogParsed(null);
+            });
+        }
+
+        [Test]
+        public void NotifyFailedLogParsedWithGoodLog()
+        {
+            var registry = new LogRegistry();
+            var entry = registry.AddLog(DateTime.Now.ToString(), "testmsg");
+            Assert.That(entry, Is.Not.Null);
+
+            Assert.Throws<ArgumentException>(() =>
+            {
+                registry.NotifyFailedLogParsed(entry);
+            });
+        }
+
+        [Test]
         public void AddValueToLog()
         {
             var registry = new LogRegistry();
@@ -321,6 +354,26 @@ namespace LogTracker.Tests
 
             registry.AddValueToLog(entry, LogAttribute.Message, "msg2");
 
+            registry.NotifyFailedLogParsed(entry);
+
+            var logs = registry.GetBy(LogAttribute.Message);
+            Assert.That(logs, Is.Not.Empty);
+
+            Assert.That(logs.Keys, Is.SubsetOf(new string[] { "msg1", "msg2" }).And.Exactly(2).Items);
+        }
+
+        [Test]
+        public void GetByLogsWithFailedLogsMissingNotify()
+        {
+            var registry = new LogRegistry();
+            var entry = registry.AddLog(DateTime.Now.ToString(), "msg1");
+            Assert.That(entry, Is.Not.Null);
+
+            entry = registry.AddFailedLog();
+            Assert.That(entry, Is.Not.Null);
+
+            registry.AddValueToLog(entry, LogAttribute.Message, "msg2");
+
             var logs = registry.GetBy(LogAttribute.Message);
             Assert.That(logs, Is.Not.Empty);
 
@@ -414,11 +467,31 @@ namespace LogTracker.Tests
 
             entry = registry.AddFailedLog();
             registry.AddValueToLog(entry, LogAttribute.Timestamp, time);
+            registry.AddValueToLog(entry, LogAttribute.Message, "msg2");
+            registry.NotifyFailedLogParsed(entry);
 
             var logs = registry.GetByTimetstamp();
             Assert.That(logs, Is.Not.Empty);
 
-            Assert.That(logs, Has.Exactly(2).Items);
+            Assert.That(logs.Select(log => log.Message), Is.SubsetOf(new string[] { "msg2", "msg1" }).And.Exactly(2).Items);
+        }
+
+        [Test]
+        public void GetByTimetstampWithFailedLogsMissingNotify()
+        {
+            var time = DateTime.Now;
+
+            var registry = new LogRegistry();
+            var entry = registry.AddLog(time.AddSeconds(1).ToString(), "msg1");
+
+            entry = registry.AddFailedLog();
+            registry.AddValueToLog(entry, LogAttribute.Timestamp, time);
+            registry.AddValueToLog(entry, LogAttribute.Message, "msg2");
+
+            var logs = registry.GetByTimetstamp();
+            Assert.That(logs, Is.Not.Empty);
+
+            Assert.That(logs.Select(log => log.Message), Is.SubsetOf(new string[] { "msg1" }).And.Exactly(1).Items);
         }
 
         [Test]

@@ -9,6 +9,7 @@ What needs to get done. Should make some of them tickets... (some of these may b
         - XMLLogParser
 	- Update code so it passes tests (TDD...)
     - Think about if namespace is "good" for library? (gut feeling: no)
+- Make parser and registry threadsafe
 - Acquire bigger logs (I'm testing on like a 6 line file... I have files in the GB range, but that might be too big for now, so I need something smaller. Note: can't post these...)
     - See how long these take to parse, and see where we can speed up processing (background threads? Queues?)
 - Determine program arguments and the config file usage (are they redundent? Complementary? Can I setup everything with program arguments?)

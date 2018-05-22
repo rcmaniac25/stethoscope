@@ -88,6 +88,11 @@ namespace LogTracker.Log
             }
         }
 
+        private void AddLogUnsorted(ILogEntry entry)
+        {
+            logs.Add(entry);
+        }
+
         public ILogEntry AddLog(string timestamp, string message)
         {
             if (timestamp == null)
@@ -111,9 +116,34 @@ namespace LogTracker.Log
         public ILogEntry AddFailedLog()
         {
             var entry = new FailedLogEntry();
-            //AddLogSorted(entry);
-            //TODO: implement, but also need a way to verify that empty logs are removed (maybe with a "notify done parsing" call). Needs to also take all logs that have since gotten there timestamp to be sorted properly
+            AddLogUnsorted(entry);
             return entry;
+        }
+
+        public void NotifyFailedLogParsed(ILogEntry entry)
+        {
+            if (entry == null)
+            {
+                throw new ArgumentNullException("entry");
+            }
+            if (!(entry is FailedLogEntry))
+            {
+                throw new ArgumentException("Entry is not a failed log", "entry");
+            }
+
+            var failedLog = (FailedLogEntry)entry;
+            if (failedLog.HasTimestampChanged)
+            {
+                //XXX depending on the size of the log list, this could be a really long search. Perhaps have a function that marks the start of some parsing, or a general checkpoint, since all failed parses will be added to the end of the list. This way we can offset the search.
+                var index = logs.FindIndex(en => en is IMutableLogEntry && ((IMutableLogEntry)en).ID == failedLog.ID);
+                if (index < 0)
+                {
+                    throw new ArgumentException("Failed log does not exist in this registry", "entry");
+                }
+                logs.RemoveAt(index);
+                AddLogSorted(failedLog);
+            }
+            failedLog.ResetTimestampChanged();
         }
 
         public bool AddValueToLog(ILogEntry entry, LogAttribute attribute, object value)
@@ -172,10 +202,12 @@ namespace LogTracker.Log
         {
             foreach (var log in logs)
             {
-                if (!log.IsValid && 
-                    (!log.HasAttribute(LogAttribute.Timestamp) || !(log.GetAttribute<object>(LogAttribute.Timestamp) is DateTime)))
+                if (!log.IsValid &&
+                    ((log is IMutableLogEntry && ((IMutableLogEntry)log).HasTimestampChanged) || 
+                    !log.HasAttribute(LogAttribute.Timestamp) || !(log.GetAttribute<object>(LogAttribute.Timestamp) is DateTime)))
                 {
                     // Special case to ensure that message (which doesn't apply here anyway) and timestamp match the expected types
+                    // For failed logs, timestamps that haven't been sorted are ignored.
                     continue;
                 }
                 yield return log;
