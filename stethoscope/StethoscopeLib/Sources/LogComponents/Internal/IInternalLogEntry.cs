@@ -4,7 +4,7 @@ using System;
 
 namespace LogTracker.Log.Internal
 {
-    public interface IMutableLogEntry : ILogEntry
+    interface IInternalLogEntry : ILogEntry
     {
         Guid ID { get; }
         bool HasTimestampChanged { get; }

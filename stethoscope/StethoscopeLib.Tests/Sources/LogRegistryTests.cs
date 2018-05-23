@@ -235,7 +235,7 @@ namespace LogTracker.Tests
         public void AddValueToLogValidLogEntry()
         {
             var registry = new LogRegistry();
-            var entry = Substitute.For<IMutableLogEntry>();
+            var entry = Substitute.For<IInternalLogEntry>();
 
             var added = registry.AddValueToLog(entry, LogAttribute.ThreadID, 1234);
 

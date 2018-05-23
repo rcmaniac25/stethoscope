@@ -19,3 +19,4 @@ using System.Runtime.InteropServices;
 [assembly: Guid("ebb61fcc-b474-42ff-b377-19a743cdf9e1")]
 
 [assembly: InternalsVisibleTo("StethoscopeLib.Tests")]
+[assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]

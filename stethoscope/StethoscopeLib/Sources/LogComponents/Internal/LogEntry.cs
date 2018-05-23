@@ -1,13 +1,12 @@
 ﻿using LogTracker.Common;
-using LogTracker.Log.Internal;
 
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace LogTracker.Log
+namespace LogTracker.Log.Internal
 {
-    public class LogEntry : IMutableLogEntry, IEquatable<LogEntry>
+    public class LogEntry : IInternalLogEntry, IEquatable<LogEntry>
     {
         Lazy<DateTime> lazyTimestamp;
         Lazy<string> lazyMessage;

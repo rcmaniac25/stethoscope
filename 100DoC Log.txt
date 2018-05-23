@@ -519,3 +519,8 @@ void doSomethingCool(std::ifstream& input)
 - None of this stuff would scale to streaming logs or, if needed, threadsafe.
 - In addition, IMutableLogEntry was originally intended for "I want to be able to modify some logs... period" and now it's expanding to an internal/LogRegistry ILogEntry... probably time to rename it.
 - In other news: tests before impl was good, as nearly all those tests were done by the time I did the implementation, and now I know that the only thing that needs work (because it wasn't implemented yet) is the parser itself.
+
+#41.2. 5/22/2018:
+- I ran out of time today... but one thought that came up yesterday was that interaction LogEntry and FailedLogEntry are, and should be, only done through ILogEntry. As they are generated types, and both implement IMutableLogEntry (which requires renaming), let's move LogEntry and rename IMutableLogEntry.
+- Moved LogEntry into "Internal" and renamed IMutableLogEntry to... IInternalLogEntry. It's only "supposed" to be used by internal types, so I made it internal/package (I could probably set the access modifier to internal, but IIRC (it's been a bit), internal allows access from the entire assembly when the only elements that should care are LogRegistry and the log entries themseleves)
+- Want an example where unit tests are good? Ok, it's not a great example, as it was a failure of the unit test itself: the mocking library failed because it couldn't see internal types. But I wouldn't know why if I didn't have the tests.

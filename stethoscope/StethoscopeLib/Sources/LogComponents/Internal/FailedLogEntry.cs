@@ -6,7 +6,7 @@ using LogTracker.Common;
 
 namespace LogTracker.Log.Internal
 {
-    public class FailedLogEntry : IMutableLogEntry, IEquatable<FailedLogEntry>
+    public class FailedLogEntry : IInternalLogEntry, IEquatable<FailedLogEntry>
     {
         private Dictionary<LogAttribute, object> attributes = new Dictionary<LogAttribute, object>();
 

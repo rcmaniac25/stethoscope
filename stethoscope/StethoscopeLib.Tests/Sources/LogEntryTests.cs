@@ -1,5 +1,5 @@
 ﻿using LogTracker.Common;
-using LogTracker.Log;
+using LogTracker.Log.Internal;
 using LogTracker.Tests.Helpers;
 
 using NUnit.Framework;

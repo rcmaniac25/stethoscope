@@ -135,7 +135,7 @@ namespace LogTracker.Log
             if (failedLog.HasTimestampChanged)
             {
                 //XXX depending on the size of the log list, this could be a really long search. Perhaps have a function that marks the start of some parsing, or a general checkpoint, since all failed parses will be added to the end of the list. This way we can offset the search.
-                var index = logs.FindIndex(en => en is IMutableLogEntry && ((IMutableLogEntry)en).ID == failedLog.ID);
+                var index = logs.FindIndex(en => en is IInternalLogEntry && ((IInternalLogEntry)en).ID == failedLog.ID);
                 if (index < 0)
                 {
                     throw new ArgumentException("Failed log does not exist in this registry", "entry");
@@ -148,7 +148,7 @@ namespace LogTracker.Log
 
         public bool AddValueToLog(ILogEntry entry, LogAttribute attribute, object value)
         {
-            if (!(entry is IMutableLogEntry))
+            if (!(entry is IInternalLogEntry))
             {
                 return false;
             }
@@ -156,7 +156,7 @@ namespace LogTracker.Log
             {
                 return false;
             }
-            (entry as IMutableLogEntry).AddAttribute(attribute, value);
+            (entry as IInternalLogEntry).AddAttribute(attribute, value);
             return true;
         }
 
@@ -203,7 +203,7 @@ namespace LogTracker.Log
             foreach (var log in logs)
             {
                 if (!log.IsValid &&
-                    ((log is IMutableLogEntry && ((IMutableLogEntry)log).HasTimestampChanged) || 
+                    ((log is IInternalLogEntry && ((IInternalLogEntry)log).HasTimestampChanged) || 
                     !log.HasAttribute(LogAttribute.Timestamp) || !(log.GetAttribute<object>(LogAttribute.Timestamp) is DateTime)))
                 {
                     // Special case to ensure that message (which doesn't apply here anyway) and timestamp match the expected types
