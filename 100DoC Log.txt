@@ -524,3 +524,18 @@ void doSomethingCool(std::ifstream& input)
 - I ran out of time today... but one thought that came up yesterday was that interaction LogEntry and FailedLogEntry are, and should be, only done through ILogEntry. As they are generated types, and both implement IMutableLogEntry (which requires renaming), let's move LogEntry and rename IMutableLogEntry.
 - Moved LogEntry into "Internal" and renamed IMutableLogEntry to... IInternalLogEntry. It's only "supposed" to be used by internal types, so I made it internal/package (I could probably set the access modifier to internal, but IIRC (it's been a bit), internal allows access from the entire assembly when the only elements that should care are LogRegistry and the log entries themseleves)
 - Want an example where unit tests are good? Ok, it's not a great example, as it was a failure of the unit test itself: the mocking library failed because it couldn't see internal types. But I wouldn't know why if I didn't have the tests.
+
+#42.2. 5/23/2018:
+- Tasks for today: support failure handling, at least make the function for "config context", and ensure existing parser tests work.
+- I got 2 of 3.
+- The one that didn't work: existing parser tests. If you run this build, you'll find that everything worked... because I realized I wrote a couple tests wrong and "fixed" them but now they're no-ops for all intents and purposes. So I need to fix them.
+- Failure handling: done (simple refactor and making 2 functions: one for handling the good case, and one for the bad case)
+- Config context... this was what I mentioned some time ago (or at least wrote a code comment for) where you could specify config values for a temp parser.
+- Why? And what's with the name. Name: I couldn't think of anything better. It's a config... within a limited lifetime.
+- Why: Parsers are unlikely to be "lite", and could vary on backend implementation. I have thought for a bit that larger log parsings would do better with a database, not a sorted list. What would be more efficent: opening 40 databases and then needing a system or method to sync them, opening 40 database connections to 1 DB and invoking everything async/locked, or opening 1 database connection with 1 DB and doing interaction with async/locked?
+- My guess is the last one. First one: heck no. Second one: eh, each request would be async, but now it's network/io async instead of local statemachine within an application.
+- So maybe instead of CreateParser(src1), CreateParser(src2), CreateParser(src3), etc. we could just do CreateParser(config) and then invoke parser.Parse(src1), parser.Parse(src2), parser.Parse(src3), etc.
+- Wait... that's what we did. The problem space is how do we set the log source? (a file, a network stream, hostname, etc.). What if a file log we just want to stop parsing on bad entries, while a network we want to skip them. Now do we have to create multiple?
+- This is where the config context comes in: set the config values you want to use for a specific "context" and then go. Internally, all details will be taken care of. Continue to be async or threaded, maybe chain together contexts once the data is known.
+- In implementation, it allows reusing a potentially expensive parser to do lite work. I can now have 40 shims lock and unlock a mutex before adding to the list, or sending a DB command. I can do the per-stream failure handling.
+- And by putting the return in a context instead of an IDisposable or similar, I know it will go away and not be forgotten.

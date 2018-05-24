@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 
 namespace LogTracker.Common
 {
@@ -10,6 +12,15 @@ namespace LogTracker.Common
             {
                 parser.Parse(fr);
             }
+        }
+
+        public static void ApplyContextConfig(this ILogParser parser, ContextConfigs configName, object configValue, Action<ILogParser> context)
+        {
+            var config = new Dictionary<ContextConfigs, object>
+            {
+                { configName, configValue }
+            };
+            parser.ApplyContextConfig(config, context);
         }
     }
 }

@@ -15,6 +15,7 @@ namespace LogTracker.Log.Internal
         public bool IsValid => false;
         public bool HasTimestampChanged { get; private set; }
         public Guid ID { get; } = Guid.NewGuid();
+        public bool IsEmpty => attributes.Count == 0;
 
         public void ResetTimestampChanged()
         {

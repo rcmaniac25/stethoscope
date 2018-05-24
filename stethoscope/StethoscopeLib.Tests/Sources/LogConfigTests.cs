@@ -43,7 +43,7 @@ namespace LogTracker.Tests
         [Test]
         public void VariableTest()
         {
-            Assert.That(LogConfig.GetAttributePaths(), Has.Exactly(Enum.GetValues(typeof(LogAttribute)).Length).Items);
+            Assert.That(LogConfig.GetAttributePaths(), Has.Exactly(Enum.GetValues(typeof(LogAttribute)).Length - 1).Items); // Don't count LogSource
             Assert.That(Enum.GetValues(typeof(LogParserFailureHandling)), Has.Exactly(3).Items);
         }
     }

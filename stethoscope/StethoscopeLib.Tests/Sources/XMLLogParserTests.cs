@@ -59,8 +59,13 @@ namespace LogTracker.Tests
                 LogMessagePath = "!log"
             };
 
-            logEntry.IsValid.Returns(true);
-            failedLogEntry.IsValid.Returns(false);
+            SetupLogEntry(logEntry, true);
+            SetupLogEntry(failedLogEntry, false);
+        }
+
+        private static void SetupLogEntry(ILogEntry entry, bool isValid)
+        {
+            entry.IsValid.Returns(isValid);
         }
 
         private static MemoryStream CreateStream(string data)
@@ -189,7 +194,7 @@ namespace LogTracker.Tests
         [Test]
         public void VariableTest()
         {
-            Assert.That(PossibleConfigs.Length, Is.EqualTo(Enum.GetValues(typeof(LogAttribute)).Length - 2)); // Don't count message or timestamp
+            Assert.That(PossibleConfigs.Length, Is.EqualTo(Enum.GetValues(typeof(LogAttribute)).Length - 3)); // Don't count message, timestamp, or LogSource
         }
 
         [TestCaseSource("PossibleConfigs")]
@@ -505,12 +510,14 @@ namespace LogTracker.Tests
             }
 
             logRegistry.Received(1).AddLog("goodtime", "my log1");
-            logRegistry.Received(1).AddFailedLog();
+            logRegistry.Received(2).AddFailedLog();
             logRegistry.DidNotReceive().AddValueToLog(logEntry, Arg.Any<LogAttribute>(), Arg.Any<object>());
             logRegistry.Received(1).AddValueToLog(failedLogEntry, LogAttribute.Message, Arg.Any<object>());
-        }
+        } //TODO need a way to actually test these functions, as we might create an entry but then remove it later
 
         //TODO: Parse-ext: file parse
+
+        //TODO: ApplyContextConfig
 
         //TODO: Parse: test many different parse paths to ensure they are parsed properly
     }

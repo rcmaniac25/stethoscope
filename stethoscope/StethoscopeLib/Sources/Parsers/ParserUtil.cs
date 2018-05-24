@@ -352,5 +352,23 @@ namespace LogTracker.Parsers
 
             return elements.ToArray();
         }
+
+        public static bool IsFatal(LogParserErrors error, bool isRegistryRequired = true)
+        {
+            switch (error)
+            {
+                case LogParserErrors.ConfigNotInitialized:
+                case LogParserErrors.ConfigValueInvalid:
+                    return true;
+                case LogParserErrors.RegistryNotSet:
+                    if (isRegistryRequired)
+                    {
+                        return true;
+                    }
+                    return false;
+                default:
+                    return false;
+            }
+        }
     }
 }

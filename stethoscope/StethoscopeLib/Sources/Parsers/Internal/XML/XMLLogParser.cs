@@ -19,6 +19,10 @@ namespace LogTracker.Parsers.Internal.XML
         private ParserPathElement[] messagePath;
         private Dictionary<LogAttribute, ParserPathElement[]> attributePaths = new Dictionary<LogAttribute, ParserPathElement[]>();
 
+        private LogParserFailureHandling failureHandling;
+
+        #region GetElementDataFromPath
+
         private string GetElementDataFromPath(ParserPathElement[] path, XElement element)
         {
             if (path == null)
@@ -92,8 +96,27 @@ namespace LogTracker.Parsers.Internal.XML
             }
             return null;
         }
-        
-        private LogParserErrors ProcessElement(XElement element)
+
+        #endregion
+
+        #region ProcessElement
+
+        private LogParserErrors ProcessCommonLogAttributes(ILogEntry entry, XElement element)
+        {
+            foreach (var kv in attributePaths)
+            {
+                var rawValue = GetElementDataFromPath(kv.Value, element);
+                var value = ParserUtil.CastField(rawValue, kv.Value.Last().FieldType);
+                if (value != null)
+                {
+                    //XXX should probably have some test for checking if the value couldn't be added
+                    registry.AddValueToLog(entry, kv.Key, value);
+                }
+            }
+            return LogParserErrors.OK;
+        }
+
+        private LogParserErrors ProcessValidElement(XElement element)
         {
             if (!validConfigs)
             {
@@ -108,8 +131,6 @@ namespace LogTracker.Parsers.Internal.XML
                 return LogParserErrors.ConfigValueInvalid;
             }
 
-            //XXX while logs shouldn't be out of order, it's possible
-
             var timestamp = GetElementDataFromPath(timestampPath, element);
             if (string.IsNullOrWhiteSpace(timestamp))
             {
@@ -123,19 +144,52 @@ namespace LogTracker.Parsers.Internal.XML
             }
 
             var entry = registry.AddLog(timestamp, message);
+            return ProcessCommonLogAttributes(entry, element);
+        }
 
-            foreach (var kv in attributePaths)
+        private LogParserErrors ProcessInvalidElement(XElement element)
+        {
+            var entry = registry.AddFailedLog();
+
+            var timestamp = GetElementDataFromPath(timestampPath, element);
+            if (!string.IsNullOrWhiteSpace(timestamp) && DateTime.TryParse(timestamp, out DateTime time))
             {
-                var rawValue = GetElementDataFromPath(kv.Value, element);
-                var value = ParserUtil.CastField(rawValue, kv.Value.Last().FieldType);
-                if (value != null)
-                {
-                    registry.AddValueToLog(entry, kv.Key, value);
-                }
+                registry.AddValueToLog(entry, LogAttribute.Timestamp, time);
             }
 
-            return LogParserErrors.OK;
+            var message = GetElementDataFromPath(messagePath, element);
+            if (message != null)
+            {
+                registry.AddValueToLog(entry, LogAttribute.Message, message);
+            }
+
+            var result = ProcessCommonLogAttributes(entry, element);
+
+            registry.NotifyFailedLogParsed(entry);
+
+            return result;
         }
+
+        private LogParserErrors ProcessElement(XElement element)
+        {
+            var result = ProcessValidElement(element);
+            if (result != LogParserErrors.OK && !ParserUtil.IsFatal(result))
+            {
+                if (failureHandling == LogParserFailureHandling.SkipEntries)
+                {
+                    return LogParserErrors.OK;
+                }
+                else if (failureHandling == LogParserFailureHandling.MarkEntriesAsFailed)
+                {
+                    return ProcessInvalidElement(element);
+                }
+            }
+            return result;
+        }
+
+        #endregion
+
+        #region Parse Functions
 
         private void ParseLoop(Stream input)
         {
@@ -174,11 +228,11 @@ namespace LogTracker.Parsers.Internal.XML
                         case XmlNodeType.EndElement:
                             if (xmlReader.Name == element.Name)
                             {
-                                var ele = element;
+                                var finishedElement = element;
                                 element = element.Parent;
                                 if (element != null && element.Name == "root")
                                 {
-                                    if (ProcessElement(ele) != LogParserErrors.OK)
+                                    if (ProcessElement(finishedElement) != LogParserErrors.OK)
                                     {
                                         exitLoop = true;
                                         break;
@@ -233,6 +287,8 @@ namespace LogTracker.Parsers.Internal.XML
             }
         }
 
+        #endregion
+
         public void SetRegistry(ILogRegistry registry)
         {
             this.registry = registry;
@@ -256,6 +312,8 @@ namespace LogTracker.Parsers.Internal.XML
 
             timestampPath = ParserUtil.ParsePath(config.TimestampPath);
             messagePath = ParserUtil.ParsePath(config.LogMessagePath);
+
+            failureHandling = config.ParsingFailureHandling;
 
             attributePaths.Clear();
 
@@ -283,6 +341,16 @@ namespace LogTracker.Parsers.Internal.XML
             AddAttributePath(LogAttribute.Context, config.ContextPath);
 #endif
         }
+
+        #region ApplyContextConfig
+
+        public void ApplyContextConfig(IDictionary<ContextConfigs, object> config, Action<ILogParser> context)
+        {
+            //TODO
+            throw new NotImplementedException();
+        }
+
+        #endregion
 
         //TODO: add some way to get any errors that the parser had when parsing (that isn't obvious)
     }

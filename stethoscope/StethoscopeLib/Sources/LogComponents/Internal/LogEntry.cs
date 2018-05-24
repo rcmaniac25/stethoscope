@@ -17,6 +17,7 @@ namespace LogTracker.Log.Internal
         public bool IsValid => true;
         public bool HasTimestampChanged => false;
         public Guid ID { get; } = Guid.NewGuid();
+        public bool IsEmpty => false;
 
         internal LogEntry(DateTime timestamp, string logMessage)
         {
