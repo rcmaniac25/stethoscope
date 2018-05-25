@@ -463,6 +463,7 @@ namespace LogTracker.Tests
 
             logRegistry.Received(1).AddLog("goodtime", "my log1");
             logRegistry.Received(1).AddFailedLog();
+            logRegistry.Received(1).NotifyFailedLogParsed(failedLogEntry);
             logRegistry.DidNotReceive().AddValueToLog(logEntry, Arg.Any<LogAttribute>(), Arg.Any<object>());
             logRegistry.Received().AddValueToLog(failedLogEntry, LogAttribute.Message, Arg.Any<object>());
         }
@@ -487,12 +488,13 @@ namespace LogTracker.Tests
 
             logRegistry.Received(1).AddFailedLog();
             logRegistry.Received(1).AddLog("goodtime", "my log2");
+            logRegistry.Received(1).NotifyFailedLogParsed(failedLogEntry);
             logRegistry.Received().AddValueToLog(failedLogEntry, LogAttribute.Message, Arg.Any<object>());
             logRegistry.DidNotReceive().AddValueToLog(logEntry, Arg.Any<LogAttribute>(), Arg.Any<object>());
         }
 
         [Test]
-        public void ParseFailureHandleCompleteInvalid()
+        public void ParseFailureHandleEmptyEntry()
         {
             logConfig.ParsingFailureHandling = LogParserFailureHandling.MarkEntriesAsFailed;
 
@@ -511,13 +513,37 @@ namespace LogTracker.Tests
 
             logRegistry.Received(1).AddLog("goodtime", "my log1");
             logRegistry.Received(2).AddFailedLog();
+            logRegistry.Received(2).NotifyFailedLogParsed(failedLogEntry);
             logRegistry.DidNotReceive().AddValueToLog(logEntry, Arg.Any<LogAttribute>(), Arg.Any<object>());
             logRegistry.Received(1).AddValueToLog(failedLogEntry, LogAttribute.Message, Arg.Any<object>());
-        } //TODO need a way to actually test these functions, as we might create an entry but then remove it later
+        }
 
-        //TODO: Parse-ext: file parse
+        [Test]
+        public void LogFile()
+        {
+            var tmpLogFile = Path.GetTempFileName();
+            using (var sw = new StreamWriter(tmpLogFile))
+            {
+                sw.Write("<fakelog time=\"goodtime-file\" log=\"my log\"></fakelog>");
+            }
+
+            Console.WriteLine(tmpLogFile);
+
+            var parser = new XMLLogParser();
+            parser.SetConfig(logConfig);
+            parser.SetRegistry(logRegistry);
+
+            logRegistry.AddLog("goodtime-file", "my log").Returns(logEntry);
+
+            parser.Parse(tmpLogFile);
+
+            logRegistry.Received().AddLog("goodtime-file", "my log");
+            logRegistry.DidNotReceive().AddValueToLog(logEntry, Arg.Any<LogAttribute>(), Arg.Any<object>());
+        }
 
         //TODO: ApplyContextConfig
+        //void ApplyContextConfig(IDictionary<ContextConfigs, object> config, Action<ILogParser> context);
+        //public static void ApplyContextConfig(this ILogParser parser, ContextConfigs configName, object configValue, Action<ILogParser> context)
 
         //TODO: Parse: test many different parse paths to ensure they are parsed properly
     }

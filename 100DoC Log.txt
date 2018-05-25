@@ -539,3 +539,10 @@ void doSomethingCool(std::ifstream& input)
 - This is where the config context comes in: set the config values you want to use for a specific "context" and then go. Internally, all details will be taken care of. Continue to be async or threaded, maybe chain together contexts once the data is known.
 - In implementation, it allows reusing a potentially expensive parser to do lite work. I can now have 40 shims lock and unlock a mutex before adding to the list, or sending a DB command. I can do the per-stream failure handling.
 - And by putting the return in a context instead of an IDisposable or similar, I know it will go away and not be forgotten.
+
+#43.2. 5/24/2018:
+- Late... again...
+- After thinking about it a bit, I realized that the bad test wasn't actually bad. It was testing the parser, while I was expecting the registry to do what I was expecting (removing log entries)
+- Now, the parser test was still useful as it tested "there is an element, but it's empty"
+- I would add a count test, but it's really late for me so I'm going to have to put that off to tomorrow, along with writing tests for ApplyContextConfig
+- I did manage to get the log file test added to ensure the file streams work.

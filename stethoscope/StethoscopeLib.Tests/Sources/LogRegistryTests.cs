@@ -543,5 +543,7 @@ namespace LogTracker.Tests
             logs = registry.GetByTimetstamp();
             Assert.That(logs, Is.Empty);
         }
+
+        //TODO: add a count property and test it: good case, failed case (notify with value), failed (forget to notify with value), failed (notify without value)
     }
 }
