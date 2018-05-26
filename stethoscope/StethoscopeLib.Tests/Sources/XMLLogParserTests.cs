@@ -644,6 +644,21 @@ namespace LogTracker.Tests
         }
 
         [Test]
+        public void ApplyContextConfigLogSourceInvalid()
+        {
+            var parser = new XMLLogParser();
+            parser.SetConfig(logConfig);
+            parser.SetRegistry(logRegistry);
+
+            Assert.Throws<ArgumentException>(() =>
+            {
+                parser.ApplyContextConfig(ContextConfigs.LogSource, 123, contextParser =>
+                {
+                });
+            });
+        }
+
+        [Test]
         public void ApplyContextConfigLogParserFailureHandling()
         {
             var parser = new XMLLogParser();
@@ -669,6 +684,21 @@ namespace LogTracker.Tests
             logRegistry.Received(1).NotifyFailedLogParsed(failedLogEntry);
             logRegistry.DidNotReceive().AddValueToLog(logEntry, Arg.Any<LogAttribute>(), Arg.Any<object>());
             logRegistry.Received().AddValueToLog(failedLogEntry, LogAttribute.Message, Arg.Any<object>());
+        }
+
+        [Test]
+        public void ApplyContextConfigLogParserFailureHandlingInvalid()
+        {
+            var parser = new XMLLogParser();
+            parser.SetConfig(logConfig);
+            parser.SetRegistry(logRegistry);
+
+            Assert.Throws<ArgumentException>(() =>
+            {
+                parser.ApplyContextConfig(ContextConfigs.FailureHandling, false, contextParser =>
+                {
+                });
+            });
         }
 
         [Test]
