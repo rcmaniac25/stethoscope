@@ -6,6 +6,7 @@ using NSubstitute;
 using NUnit.Framework;
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
@@ -541,9 +542,167 @@ namespace LogTracker.Tests
             logRegistry.DidNotReceive().AddValueToLog(logEntry, Arg.Any<LogAttribute>(), Arg.Any<object>());
         }
 
-        //TODO: ApplyContextConfig
-        //void ApplyContextConfig(IDictionary<ContextConfigs, object> config, Action<ILogParser> context);
-        //public static void ApplyContextConfig(this ILogParser parser, ContextConfigs configName, object configValue, Action<ILogParser> context)
+        [Test]
+        public void ApplyContextConfigNullDictionary()
+        {
+            var parser = new XMLLogParser();
+            parser.SetConfig(logConfig);
+            parser.SetRegistry(logRegistry);
+
+            logRegistry.AddLog("goodtime", "my log").Returns(logEntry);
+
+            parser.ApplyContextConfig(null, contextParser =>
+            {
+                Assert.That(Object.ReferenceEquals(contextParser, parser), Is.False);
+
+                var log = "<fakelog time=\"goodtime\" log=\"my log\"></fakelog>";
+                using (var ms = CreateStream(log))
+                {
+                    contextParser.Parse(ms);
+                }
+            });
+
+            logRegistry.Received().AddLog("goodtime", "my log");
+            logRegistry.DidNotReceive().AddValueToLog(logEntry, Arg.Any<LogAttribute>(), Arg.Any<object>());
+        }
+
+        [Test]
+        public void ApplyContextConfigEmptyDictionary()
+        {
+            var parser = new XMLLogParser();
+            parser.SetConfig(logConfig);
+            parser.SetRegistry(logRegistry);
+
+            logRegistry.AddLog("goodtime", "my log").Returns(logEntry);
+
+            var configs = new Dictionary<ContextConfigs, object>();
+            parser.ApplyContextConfig(configs, contextParser =>
+            {
+                Assert.That(Object.ReferenceEquals(contextParser, parser), Is.False);
+
+                var log = "<fakelog time=\"goodtime\" log=\"my log\"></fakelog>";
+                using (var ms = CreateStream(log))
+                {
+                    contextParser.Parse(ms);
+                }
+            });
+
+            logRegistry.Received().AddLog("goodtime", "my log");
+            logRegistry.DidNotReceive().AddValueToLog(logEntry, Arg.Any<LogAttribute>(), Arg.Any<object>());
+        }
+
+        [Test]
+        public void ApplyContextConfigLogSource()
+        {
+            var parser = new XMLLogParser();
+            parser.SetConfig(logConfig);
+            parser.SetRegistry(logRegistry);
+
+            logRegistry.AddLog("goodtime", "my log").Returns(logEntry);
+
+            var configs = new Dictionary<ContextConfigs, object>
+            {
+                { ContextConfigs.LogSource, "tests" }
+            };
+            parser.ApplyContextConfig(configs, contextParser =>
+            {
+                Assert.That(Object.ReferenceEquals(contextParser, parser), Is.False);
+
+                var log = "<fakelog time=\"goodtime\" log=\"my log\"></fakelog>";
+                using (var ms = CreateStream(log))
+                {
+                    contextParser.Parse(ms);
+                }
+            });
+
+            logRegistry.Received().AddLog("goodtime", "my log");
+            logRegistry.Received(1).AddValueToLog(logEntry, LogAttribute.LogSource, "tests");
+        }
+
+        [Test]
+        public void ApplyContextConfigLogSourceExtension()
+        {
+            var parser = new XMLLogParser();
+            parser.SetConfig(logConfig);
+            parser.SetRegistry(logRegistry);
+
+            logRegistry.AddLog("goodtime", "my log").Returns(logEntry);
+            
+            parser.ApplyContextConfig(ContextConfigs.LogSource, "tests", contextParser =>
+            {
+                Assert.That(Object.ReferenceEquals(contextParser, parser), Is.False);
+
+                var log = "<fakelog time=\"goodtime\" log=\"my log\"></fakelog>";
+                using (var ms = CreateStream(log))
+                {
+                    contextParser.Parse(ms);
+                }
+            });
+
+            logRegistry.Received().AddLog("goodtime", "my log");
+            logRegistry.Received(1).AddValueToLog(logEntry, LogAttribute.LogSource, "tests");
+        }
+
+        [Test]
+        public void ApplyContextConfigLogParserFailureHandling()
+        {
+            var parser = new XMLLogParser();
+            parser.SetConfig(logConfig);
+            parser.SetRegistry(logRegistry);
+
+            logRegistry.AddLog(Arg.Any<string>(), Arg.Any<string>()).Returns(logEntry);
+            logRegistry.AddFailedLog().Returns(failedLogEntry);
+            
+            parser.ApplyContextConfig(ContextConfigs.FailureHandling, LogParserFailureHandling.MarkEntriesAsFailed, contextParser =>
+            {
+                Assert.That(Object.ReferenceEquals(contextParser, parser), Is.False);
+
+                var log = "<fakelog time=\"goodtime\" log=\"my log1\"></fakelog><fakelog log=\"my log2\"></fakelog>";
+                using (var ms = CreateStream(log))
+                {
+                    contextParser.Parse(ms);
+                }
+            });
+
+            logRegistry.Received(1).AddLog("goodtime", "my log1");
+            logRegistry.Received(1).AddFailedLog();
+            logRegistry.Received(1).NotifyFailedLogParsed(failedLogEntry);
+            logRegistry.DidNotReceive().AddValueToLog(logEntry, Arg.Any<LogAttribute>(), Arg.Any<object>());
+            logRegistry.Received().AddValueToLog(failedLogEntry, LogAttribute.Message, Arg.Any<object>());
+        }
+
+        [Test]
+        public void ApplyContextConfigMultiConfig()
+        {
+            var parser = new XMLLogParser();
+            parser.SetConfig(logConfig);
+            parser.SetRegistry(logRegistry);
+
+            logRegistry.AddLog(Arg.Any<string>(), Arg.Any<string>()).Returns(logEntry);
+            logRegistry.AddFailedLog().Returns(failedLogEntry);
+
+            var configs = new Dictionary<ContextConfigs, object>
+            {
+                { ContextConfigs.LogSource, "tests" },
+                { ContextConfigs.FailureHandling, LogParserFailureHandling.MarkEntriesAsFailed }
+            };
+            parser.ApplyContextConfig(configs, contextParser =>
+            {
+                Assert.That(Object.ReferenceEquals(contextParser, parser), Is.False);
+
+                var log = "<fakelog time=\"goodtime\" log=\"my log1\"></fakelog><fakelog log=\"my log2\"></fakelog>";
+                using (var ms = CreateStream(log))
+                {
+                    contextParser.Parse(ms);
+                }
+            });
+
+            logRegistry.Received(1).AddLog("goodtime", "my log1");
+            logRegistry.Received(1).AddFailedLog();
+            logRegistry.Received(1).NotifyFailedLogParsed(failedLogEntry);
+            logRegistry.Received(1).AddValueToLog(logEntry, LogAttribute.LogSource, "tests");
+            logRegistry.Received(2).AddValueToLog(failedLogEntry, Arg.Is<LogAttribute>(att => att == LogAttribute.Message || att == LogAttribute.LogSource), Arg.Any<object>());
+        }
 
         //TODO: Parse: test many different parse paths to ensure they are parsed properly
     }

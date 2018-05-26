@@ -550,3 +550,4 @@ void doSomethingCool(std::ifstream& input)
 #44.2. 5/25/2018:
 - It's that time of the week where I just want to sleep. So a quick one today...
 - Added a log count and tests for the work. Gave me a reason to remove a log that has no attributes.
+- I wanted to save some time tomorrow... so I wrote the tests for ApplyContextConfig
