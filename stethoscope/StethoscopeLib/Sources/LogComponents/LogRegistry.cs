@@ -66,6 +66,8 @@ namespace LogTracker.Log
         private List<ILogEntry> logs = new List<ILogEntry>();
         private readonly IlogEntryComparer logEntryComparer = new IlogEntryComparer();
 
+        public int LogCount => logs.Count;
+
         private void AddLogSorted(ILogEntry entry)
         {
             // From https://stackoverflow.com/a/22801345/492347
@@ -132,7 +134,7 @@ namespace LogTracker.Log
             }
 
             var failedLog = (FailedLogEntry)entry;
-            if (failedLog.HasTimestampChanged)
+            if (failedLog.HasTimestampChanged || failedLog.IsEmpty)
             {
                 //XXX depending on the size of the log list, this could be a really long search. Perhaps have a function that marks the start of some parsing, or a general checkpoint, since all failed parses will be added to the end of the list. This way we can offset the search.
                 var index = logs.FindIndex(en => en is IInternalLogEntry && ((IInternalLogEntry)en).ID == failedLog.ID);
@@ -141,7 +143,10 @@ namespace LogTracker.Log
                     throw new ArgumentException("Failed log does not exist in this registry", "entry");
                 }
                 logs.RemoveAt(index);
-                AddLogSorted(failedLog);
+                if (!failedLog.IsEmpty)
+                {
+                    AddLogSorted(failedLog);
+                }
             }
             failedLog.ResetTimestampChanged();
         }

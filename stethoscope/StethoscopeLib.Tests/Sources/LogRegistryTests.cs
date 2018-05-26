@@ -544,6 +544,71 @@ namespace LogTracker.Tests
             Assert.That(logs, Is.Empty);
         }
 
+        [Test]
+        public void LogCountEmpty()
+        {
+            var registry = new LogRegistry();
+            Assert.That(registry.LogCount, Is.Zero);
+        }
+
+        [Test]
+        public void LogCount()
+        {
+            var registry = new LogRegistry();
+            var entry = registry.AddLog(DateTime.Now.ToString(), "testmsg");
+            Assert.That(entry, Is.Not.Null);
+
+            Assert.That(registry.LogCount, Is.EqualTo(1));
+        }
+
         //TODO: add a count property and test it: good case, failed case (notify with value), failed (forget to notify with value), failed (notify without value)
+
+        [Test]
+        public void LogCountMixed()
+        {
+            var time = DateTime.Now;
+
+            var registry = new LogRegistry();
+            var entry = registry.AddLog(time.AddSeconds(1).ToString(), "msg1");
+
+            entry = registry.AddFailedLog();
+            registry.AddValueToLog(entry, LogAttribute.Timestamp, time);
+            registry.AddValueToLog(entry, LogAttribute.Message, "msg2");
+            registry.NotifyFailedLogParsed(entry);
+
+            Assert.That(registry.LogCount, Is.EqualTo(2));
+        }
+
+        [Test]
+        public void LogCountMixedMissingNotify()
+        {
+            var time = DateTime.Now;
+
+            var registry = new LogRegistry();
+            var entry = registry.AddLog(time.AddSeconds(1).ToString(), "msg1");
+
+            entry = registry.AddFailedLog();
+            registry.AddValueToLog(entry, LogAttribute.Timestamp, time);
+            registry.AddValueToLog(entry, LogAttribute.Message, "msg2");
+
+            Assert.That(registry.LogCount, Is.EqualTo(2));
+        }
+
+        [Test]
+        public void LogCountMixedEmptyFailed()
+        {
+            var time = DateTime.Now;
+
+            var registry = new LogRegistry();
+            var entry = registry.AddLog(time.AddSeconds(1).ToString(), "msg1");
+
+            entry = registry.AddFailedLog();
+
+            Assert.That(registry.LogCount, Is.EqualTo(2));
+
+            registry.NotifyFailedLogParsed(entry);
+
+            Assert.That(registry.LogCount, Is.EqualTo(1));
+        }
     }
 }

@@ -546,3 +546,7 @@ void doSomethingCool(std::ifstream& input)
 - Now, the parser test was still useful as it tested "there is an element, but it's empty"
 - I would add a count test, but it's really late for me so I'm going to have to put that off to tomorrow, along with writing tests for ApplyContextConfig
 - I did manage to get the log file test added to ensure the file streams work.
+
+#44.2. 5/25/2018:
+- It's that time of the week where I just want to sleep. So a quick one today...
+- Added a log count and tests for the work. Gave me a reason to remove a log that has no attributes.
