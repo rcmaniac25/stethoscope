@@ -543,6 +543,19 @@ namespace LogTracker.Tests
         }
 
         [Test]
+        public void ApplyContextConfigContextInvalid()
+        {
+            var parser = new XMLLogParser();
+            parser.SetConfig(logConfig);
+            parser.SetRegistry(logRegistry);
+
+            Assert.Throws<ArgumentNullException>(() =>
+            {
+                parser.ApplyContextConfig(null, null);
+            });
+        }
+
+        [Test]
         public void ApplyContextConfigNullDictionary()
         {
             var parser = new XMLLogParser();

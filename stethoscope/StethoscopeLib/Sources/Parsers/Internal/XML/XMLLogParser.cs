@@ -12,18 +12,24 @@ namespace LogTracker.Parsers.Internal.XML
 {
     public class XMLLogParser : ILogParser
     {
-        private ILogRegistry registry;
+        private struct TransientParserConfigs
+        {
+            public LogParserFailureHandling FailureHandling { get; set; }
+            public Dictionary<LogAttribute, object> AdditionalAttributes;
+        }
 
+        private ILogRegistry registry;
+        
         private bool validConfigs;
         private ParserPathElement[] timestampPath;
         private ParserPathElement[] messagePath;
-        private Dictionary<LogAttribute, ParserPathElement[]> attributePaths = new Dictionary<LogAttribute, ParserPathElement[]>();
+        private Dictionary<LogAttribute, ParserPathElement[]> attributePaths;
 
-        private LogParserFailureHandling failureHandling;
+        private TransientParserConfigs defaultTransientConfig;
 
         #region GetElementDataFromPath
 
-        private string GetElementDataFromPath(ParserPathElement[] path, XElement element)
+        private static string GetElementDataFromPath(ParserPathElement[] path, XElement element)
         {
             if (path == null)
             {
@@ -101,87 +107,94 @@ namespace LogTracker.Parsers.Internal.XML
 
         #region ProcessElement
 
-        private LogParserErrors ProcessCommonLogAttributes(ILogEntry entry, XElement element)
+        private static LogParserErrors ProcessCommonLogAttributes(XMLLogParser parser, ref TransientParserConfigs config, ILogEntry entry, XElement element)
         {
-            foreach (var kv in attributePaths)
+            foreach (var kv in parser.attributePaths)
             {
                 var rawValue = GetElementDataFromPath(kv.Value, element);
                 var value = ParserUtil.CastField(rawValue, kv.Value.Last().FieldType);
                 if (value != null)
                 {
                     //XXX should probably have some test for checking if the value couldn't be added
-                    registry.AddValueToLog(entry, kv.Key, value);
+                    parser.registry.AddValueToLog(entry, kv.Key, value);
+                }
+            }
+            if (config.AdditionalAttributes != null)
+            {
+                foreach (var kv in config.AdditionalAttributes)
+                {
+                    parser.registry.AddValueToLog(entry, kv.Key, kv.Value);
                 }
             }
             return LogParserErrors.OK;
         }
 
-        private LogParserErrors ProcessValidElement(XElement element)
+        private static LogParserErrors ProcessValidElement(XMLLogParser parser, ref TransientParserConfigs config, XElement element)
         {
-            if (!validConfigs)
+            if (!parser.validConfigs)
             {
                 return LogParserErrors.ConfigNotInitialized;
             }
-            if (registry == null)
+            if (parser.registry == null)
             {
                 return LogParserErrors.RegistryNotSet;
             }
-            if (timestampPath == null || messagePath == null)
+            if (parser.timestampPath == null || parser.messagePath == null)
             {
                 return LogParserErrors.ConfigValueInvalid;
             }
 
-            var timestamp = GetElementDataFromPath(timestampPath, element);
+            var timestamp = GetElementDataFromPath(parser.timestampPath, element);
             if (string.IsNullOrWhiteSpace(timestamp))
             {
                 return LogParserErrors.MissingTimestamp;
             }
 
-            var message = GetElementDataFromPath(messagePath, element);
+            var message = GetElementDataFromPath(parser.messagePath, element);
             if (message == null)
             {
                 return LogParserErrors.MissingMessage;
             }
 
-            var entry = registry.AddLog(timestamp, message);
-            return ProcessCommonLogAttributes(entry, element);
+            var entry = parser.registry.AddLog(timestamp, message);
+            return ProcessCommonLogAttributes(parser, ref config, entry, element);
         }
 
-        private LogParserErrors ProcessInvalidElement(XElement element)
+        private static LogParserErrors ProcessInvalidElement(XMLLogParser parser, ref TransientParserConfigs config, XElement element)
         {
-            var entry = registry.AddFailedLog();
+            var entry = parser.registry.AddFailedLog();
 
-            var timestamp = GetElementDataFromPath(timestampPath, element);
+            var timestamp = GetElementDataFromPath(parser.timestampPath, element);
             if (!string.IsNullOrWhiteSpace(timestamp) && DateTime.TryParse(timestamp, out DateTime time))
             {
-                registry.AddValueToLog(entry, LogAttribute.Timestamp, time);
+                parser.registry.AddValueToLog(entry, LogAttribute.Timestamp, time);
             }
 
-            var message = GetElementDataFromPath(messagePath, element);
+            var message = GetElementDataFromPath(parser.messagePath, element);
             if (message != null)
             {
-                registry.AddValueToLog(entry, LogAttribute.Message, message);
+                parser.registry.AddValueToLog(entry, LogAttribute.Message, message);
             }
 
-            var result = ProcessCommonLogAttributes(entry, element);
+            var result = ProcessCommonLogAttributes(parser, ref config, entry, element);
 
-            registry.NotifyFailedLogParsed(entry);
+            parser.registry.NotifyFailedLogParsed(entry);
 
             return result;
         }
 
-        private LogParserErrors ProcessElement(XElement element)
+        private static LogParserErrors ProcessElement(XMLLogParser parser, ref TransientParserConfigs config, XElement element)
         {
-            var result = ProcessValidElement(element);
+            var result = ProcessValidElement(parser, ref config, element);
             if (result != LogParserErrors.OK && !ParserUtil.IsFatal(result))
             {
-                if (failureHandling == LogParserFailureHandling.SkipEntries)
+                if (config.FailureHandling == LogParserFailureHandling.SkipEntries)
                 {
                     return LogParserErrors.OK;
                 }
-                else if (failureHandling == LogParserFailureHandling.MarkEntriesAsFailed)
+                else if (config.FailureHandling == LogParserFailureHandling.MarkEntriesAsFailed)
                 {
-                    return ProcessInvalidElement(element);
+                    return ProcessInvalidElement(parser, ref config, element);
                 }
             }
             return result;
@@ -191,7 +204,7 @@ namespace LogTracker.Parsers.Internal.XML
 
         #region Parse Functions
 
-        private void ParseLoop(Stream input)
+        private static void ParseLoop(XMLLogParser parser, ref TransientParserConfigs config, Stream input)
         {
             using (var xmlReader = XmlReader.Create(input))
             {
@@ -232,7 +245,7 @@ namespace LogTracker.Parsers.Internal.XML
                                 element = element.Parent;
                                 if (element != null && element.Name == "root")
                                 {
-                                    if (ProcessElement(finishedElement) != LogParserErrors.OK)
+                                    if (ProcessElement(parser, ref config, finishedElement) != LogParserErrors.OK)
                                     {
                                         exitLoop = true;
                                         break;
@@ -261,7 +274,7 @@ namespace LogTracker.Parsers.Internal.XML
             }
         }
 
-        public void Parse(Stream logStream)
+        private static void InternalParse(XMLLogParser parser, ref TransientParserConfigs config, Stream logStream)
         {
             using (var ms = new MemoryStream())
             {
@@ -278,13 +291,18 @@ namespace LogTracker.Parsers.Internal.XML
                 ms.Position = 0L;
                 try
                 {
-                    ParseLoop(ms);
+                    ParseLoop(parser, ref config, ms);
                 }
                 catch
                 {
                     //XXX probably want to do something here...
                 }
             }
+        }
+
+        public void Parse(Stream logStream)
+        {
+            XMLLogParser.InternalParse(this, ref defaultTransientConfig, logStream);
         }
 
         #endregion
@@ -308,14 +326,22 @@ namespace LogTracker.Parsers.Internal.XML
 
         public void SetConfig(LogConfig config)
         {
+            if (attributePaths != null)
+            {
+                throw new InvalidOperationException("Can onlys set config once");
+            }
+
             validConfigs = config.IsValid;
 
             timestampPath = ParserUtil.ParsePath(config.TimestampPath);
             messagePath = ParserUtil.ParsePath(config.LogMessagePath);
 
-            failureHandling = config.ParsingFailureHandling;
+            defaultTransientConfig = new TransientParserConfigs()
+            {
+                FailureHandling = config.ParsingFailureHandling
+            };
 
-            attributePaths.Clear();
+            attributePaths = new Dictionary<LogAttribute, ParserPathElement[]>();
 
 #if NETSTANDARD2_0
             var logConfigType = typeof(LogConfig);
@@ -344,10 +370,112 @@ namespace LogTracker.Parsers.Internal.XML
 
         #region ApplyContextConfig
 
+        #region XMLContextParser
+
+        private sealed class XMLContextParser : ILogParser
+        {
+            private XMLLogParser parser;
+            private TransientParserConfigs config;
+
+            public XMLContextParser(XMLLogParser parser, TransientParserConfigs priorConfig)
+            {
+                this.parser = parser;
+                this.config = priorConfig;
+                this.IsUsable = true;
+            }
+
+            public bool IsUsable { get; set; }
+
+            private void CheckUsability()
+            {
+                if (!IsUsable)
+                {
+                    throw new InvalidOperationException("Parser is no longer usable outside of context");
+                }
+            }
+
+            public void ApplyConfig(IDictionary<ContextConfigs, object> config)
+            {
+                CheckUsability();
+                if (config == null || config.Count == 0)
+                {
+                    return;
+                }
+
+                if (config.ContainsKey(ContextConfigs.LogSource))
+                {
+                    var value = config[ContextConfigs.LogSource];
+                    if (!(value is string))
+                    {
+                        throw new ArgumentException("LogSource must be a string", "config");
+                    }
+                    if (this.config.AdditionalAttributes == null)
+                    {
+                        this.config.AdditionalAttributes = new Dictionary<LogAttribute, object>();
+                    }
+                    else
+                    {
+                        // Copy so any other instances aren't affected by changes (could be even more specific and only copy if the LogSource is different from existing one, in which case make a helper function...)
+                        this.config.AdditionalAttributes = new Dictionary<LogAttribute, object>(this.config.AdditionalAttributes);
+                    }
+                    if (this.config.AdditionalAttributes.ContainsKey(LogAttribute.LogSource))
+                    {
+                        this.config.AdditionalAttributes[LogAttribute.LogSource] = (string)value;
+                    }
+                    else
+                    {
+                        this.config.AdditionalAttributes.Add(LogAttribute.LogSource, (string)value);
+                    }
+                }
+                if (config.ContainsKey(ContextConfigs.FailureHandling))
+                {
+                    var value = config[ContextConfigs.FailureHandling];
+                    if (!(value is LogParserFailureHandling))
+                    {
+                        throw new ArgumentException("FailureHandling must be a LogParserFailureHandling enum", "config");
+                    }
+                    this.config.FailureHandling = (LogParserFailureHandling)value;
+                }
+            }
+
+            public void ApplyContextConfig(IDictionary<ContextConfigs, object> config, Action<ILogParser> context)
+            {
+                CheckUsability();
+                XMLLogParser.InternalApplyContextConfig(parser, this.config, config, context);
+            }
+
+            public void Parse(Stream logStream)
+            {
+                CheckUsability();
+                XMLLogParser.InternalParse(parser, ref config, logStream);
+            }
+        }
+
+        #endregion
+
+        private static void InternalApplyContextConfig(XMLLogParser parser, TransientParserConfigs priorConfig, IDictionary<ContextConfigs, object> config, Action<ILogParser> context)
+        {
+            if (context == null)
+            {
+                throw new ArgumentNullException("context");
+            }
+
+            var contextParser = new XMLContextParser(parser, priorConfig);
+            contextParser.ApplyConfig(config);
+
+            try
+            {
+                context(contextParser);
+            }
+            finally
+            {
+                contextParser.IsUsable = false;
+            }
+        }
+
         public void ApplyContextConfig(IDictionary<ContextConfigs, object> config, Action<ILogParser> context)
         {
-            //TODO
-            throw new NotImplementedException();
+            InternalApplyContextConfig(this, defaultTransientConfig, config, context);
         }
 
         #endregion

@@ -551,3 +551,20 @@ void doSomethingCool(std::ifstream& input)
 - It's that time of the week where I just want to sleep. So a quick one today...
 - Added a log count and tests for the work. Gave me a reason to remove a log that has no attributes.
 - I wanted to save some time tomorrow... so I wrote the tests for ApplyContextConfig
+
+#45.2. 5/26/2018:
+- My attempt to save time yesterday... saved time.
+- With those tests, I had an idea of what to implement for ApplyContextConfig and went about doing such a thing.
+- ApplyContextConfig is now implemented. Not the cleanest method, but it does what it needs to do with minimal work.
+- The biggest challenge was all the parser paths. How I see it - Naive: pass everything as different variables. Intermediate: pass seperate class with configs. Best: just reference the main class instance.
+- C# has class and struct. Classes, when passed as arguments, are always by reference. Structs are copied.
+- As I didn't want to make a copy function for the configs, didn't want to need to populate a config class that could be cloned numerous times or would never be cloned at all
+- What I did:
+-- parser paths are the only thing constant between everything, and I don't want to clone/pass a config class just for those... so I pass the parser itself around.
+-- Specific config values change only when ApplyContextConfig is used, so put them into a struct so I only need to update the copy-on-set instance.
+-- Since ^^ config is copied through arguments, and it contains a dictionary (one value for now, but could grow) that needs to be cloned and updated, use a struct to cut the copying to just the dictionary (which I can do if the variable is set)
+-- Move all parsing functionality to static functions
+-- Instance functions will use defaults when calling the static functions
+-- All "context" usage will use their own config data for invoking static functions
+- In the end, tests passed, thought of at least one additional one, and it works as planned and desired. I also like the idea of stacking contexts, if desired. Allows for some additional flexability.
+- I'm done now... I keep adding/updating parts of this code. Thinking for a moment. Then removing them because they are not needed. Reduce, reuse(, recycle?)
