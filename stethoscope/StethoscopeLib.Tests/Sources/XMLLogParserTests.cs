@@ -8,6 +8,7 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace LogTracker.Tests
@@ -747,6 +748,75 @@ namespace LogTracker.Tests
             logRegistry.Received(2).AddValueToLog(failedLogEntry, Arg.Is<LogAttribute>(att => att == LogAttribute.Message || att == LogAttribute.LogSource), Arg.Any<object>());
         }
 
-        //TODO: Parse: test many different parse paths to ensure they are parsed properly
+        [Test]
+        public void ElementPathEmpty()
+        {
+            logConfig.LogTypePath = "/";
+
+            var parser = new XMLLogParser();
+            parser.SetConfig(logConfig);
+            parser.SetRegistry(logRegistry);
+
+            logRegistry.AddLog(Arg.Any<string>(), Arg.Any<string>()).Returns(logEntry);
+
+            var log = "<fakelog time=\"goodtime\" log=\"my log\">Element Data</fakelog>";
+            using (var ms = CreateStream(log))
+            {
+                parser.Parse(ms);
+            }
+
+            logRegistry.Received(1).AddValueToLog(logEntry, LogAttribute.Type, "Element Data");
+        }
+
+        [Test]
+        public void ElementPathDirectNamed()
+        {
+            logConfig.LogTypePath = "!type";
+
+            var parser = new XMLLogParser();
+            parser.SetConfig(logConfig);
+            parser.SetRegistry(logRegistry);
+
+            logRegistry.AddLog(Arg.Any<string>(), Arg.Any<string>()).Returns(logEntry);
+
+            var log = "<fakelog time=\"goodtime\" log=\"my log\" type=\"Element Data\"></fakelog>";
+            using (var ms = CreateStream(log))
+            {
+                parser.Parse(ms);
+            }
+
+            logRegistry.Received(1).AddValueToLog(logEntry, LogAttribute.Type, "Element Data");
+        }
+
+        [Test]
+        public void ElementPathIndex([Random(0, 10, 4, Distinct = true)]int index)
+        {
+            string[] PotentialValues = Enumerable.Range(0, 10).Select(i => $"Data{i}").ToArray();
+            Assert.That(PotentialValues, Has.Length.EqualTo(10));
+
+            logConfig.LogTypePath = $"/#{index}";
+
+            var parser = new XMLLogParser();
+            parser.SetConfig(logConfig);
+            parser.SetRegistry(logRegistry);
+
+            logRegistry.AddLog(Arg.Any<string>(), Arg.Any<string>()).Returns(logEntry);
+            
+            var log = $"<fakelog time=\"goodtime\" log=\"my log\">{string.Join("", PotentialValues.Select(value => $"<in>{value}</in>"))}</fakelog>";
+            using (var ms = CreateStream(log))
+            {
+                parser.Parse(ms);
+            }
+
+            logRegistry.Received(1).AddValueToLog(logEntry, LogAttribute.Type, PotentialValues[index]);
+        }
+
+        //TODO: Parse: filtered
+
+        //TODO: Parse: named (path)
+
+        //TODO: mutilple of a type (named and filtered)
+
+        //TODO: Parse: mixing types together
     }
 }

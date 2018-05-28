@@ -560,9 +560,7 @@ namespace LogTracker.Tests
 
             Assert.That(registry.LogCount, Is.EqualTo(1));
         }
-
-        //TODO: add a count property and test it: good case, failed case (notify with value), failed (forget to notify with value), failed (notify without value)
-
+        
         [Test]
         public void LogCountMixed()
         {

@@ -568,3 +568,9 @@ void doSomethingCool(std::ifstream& input)
 -- All "context" usage will use their own config data for invoking static functions
 - In the end, tests passed, thought of at least one additional one, and it works as planned and desired. I also like the idea of stacking contexts, if desired. Allows for some additional flexability.
 - I'm done now... I keep adding/updating parts of this code. Thinking for a moment. Then removing them because they are not needed. Reduce, reuse(, recycle?)
+
+#46.2. 5/27/2018:
+- Simple work today: started working on the tests for path usage within the XML parser.
+- One question that comes to mind is if "paths" should be generic enough that you don't need to know log data, or not.
+- Like: if you end up mixing JSON and XML, or maybe XML from multiple sources, should you specify the same path OR specify multiple configs?
+- I'll think about it tomorrow...
