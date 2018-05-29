@@ -574,3 +574,12 @@ void doSomethingCool(std::ifstream& input)
 - One question that comes to mind is if "paths" should be generic enough that you don't need to know log data, or not.
 - Like: if you end up mixing JSON and XML, or maybe XML from multiple sources, should you specify the same path OR specify multiple configs?
 - I'll think about it tomorrow...
+
+#47.2. 5/28/2018:
+- So I failed to think about yesterday's question... something for tomorrow.
+- I wanted to finish the parser unit tests, but just lacked the interest tonight. I finished non-combination unit tests though.
+- Another question that came up (and I determined) was how filters and similar should work. Basically: everything operates on the children of the current node, unless it doesn't have children, and then it operates upon the current node.
+- In this way, if the dev filters all elements, it will remove any child node that isn't an element... but if there is no child node, then it tests the existing node to determine if it is an element.
+- Do the same for each path type and you'll end up with lists of nodes. It's like tree traversal, done level by level. If more then one element exists at the end, it takes the first. Assuming the XML isn't randomly output, the parser will always read it in the same order.
+- It makes the system a bit more generic which means it can probably do a bit more complex processing.
+- I also realized that the named node idea, using the "if no children, use self" could apply to attributes and the prior "!<name>" becomes a shortcut for the root. So now a child node with attributes can be accessed.
