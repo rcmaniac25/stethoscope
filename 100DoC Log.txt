@@ -583,3 +583,24 @@ void doSomethingCool(std::ifstream& input)
 - Do the same for each path type and you'll end up with lists of nodes. It's like tree traversal, done level by level. If more then one element exists at the end, it takes the first. Assuming the XML isn't randomly output, the parser will always read it in the same order.
 - It makes the system a bit more generic which means it can probably do a bit more complex processing.
 - I also realized that the named node idea, using the "if no children, use self" could apply to attributes and the prior "!<name>" becomes a shortcut for the root. So now a child node with attributes can be accessed.
+
+#48.2. 5/29/2018:
+- Finished the unit tests(!!!)
+- Used "confusing XML" on self. It's confusing...
+- I'll work on making the tests pass tomorrow. I worry that some failures are because I'm not using NSubstitute correctly.
+- So, the question from the 27th... my thought is: maybe. I say this not because of indicision, but because the only thing that isn't generic is flters.
+- But filters vary by parser... isn't that the question? If those should be generic?
+- XML types (that matter): element, text, cdata. JSON types: object, array, string, int, number, boolean, null?
+- (XML and JSON are the two types I think _need_ support)
+- Now... the only overlap I can see is `text` <-> `string`. You could argue `cdata` is also similare to `string`. But `cdata` is not the same as `text`. So you can't do a real equivilance.
+- You could do `element` and `object` in theory. Though that too could be `element` and `array`, but `array` and `element` don't work.
+- So if I went with generic, it would be: object, array, string, char-array. But it leaves out JSON types or starts to say the same types could be the same, which makes things... weird.
+- I'd end up with needing a generic value type for the non-generic filters. Or to make the generic filters optional. I read an article a while ago that discussed "the power of defaults"
+- ...but I have also learned a less talked about development strategy that I bet you've never heard of: copy-paste.
+- Now combine the two and think of the outcomes:
+-- Generics only: people will write generics, docs will need to mention you can do non-generics... but people won't know when to use them or those that need it will have no need to speak about it.
+-- Non-generics only: people will ask why generics are needed...
+-- Mixed usage: people will pick the first examples or the shortest to type
+-- No docs: someone will figure something out, and it will become the de facto standard for how everyone writes configs.
+- Common theme: people will take what is shown and copy it for their needs. Other types will be left by the wayside.
+- Easy solution: the technical one. Instead of adding more complexity, just don't do generics.

@@ -872,9 +872,9 @@ namespace LogTracker.Tests
         }
 
         [Test]
-        public void ElementPathFilteredElement()
+        public void ElementPathFilteredElement([Values("element", "elem")]string pathKeyword)
         {
-            logConfig.LogTypePath = "/$element";
+            logConfig.LogTypePath = $"/${pathKeyword}";
 
             var parser = new XMLLogParser();
             parser.SetConfig(logConfig);
@@ -971,10 +971,168 @@ namespace LogTracker.Tests
             logRegistry.Received(1).AddValueToLog(logEntry, LogAttribute.Type, "Element Data");
         }
 
-        //XXX thought: operations are to occur on children nodes, unless none exist, then it applies to the current node.
+        [Test]
+        public void ElementPathMultiNamedNode()
+        {
+            logConfig.LogTypePath = "/!type";
 
-        //TODO: multiple of a type (named and filtered, and test child note and "current" node work)
+            var parser = new XMLLogParser();
+            parser.SetConfig(logConfig);
+            parser.SetRegistry(logRegistry);
 
-        //TODO: Parse: mixing types together
+            logRegistry.AddLog(Arg.Any<string>(), Arg.Any<string>()).Returns(logEntry);
+
+            var log = "<fakelog time=\"goodtime\" log=\"my log\"><type>Element Data</type><type>Not</type></fakelog>";
+            using (var ms = CreateStream(log))
+            {
+                parser.Parse(ms);
+            }
+
+            logRegistry.Received(1).AddValueToLog(logEntry, LogAttribute.Type, "Element Data");
+        }
+
+        [Test]
+        public void ElementPathMultiFiltered()
+        {
+            logConfig.LogTypePath = "/$cdata";
+
+            var parser = new XMLLogParser();
+            parser.SetConfig(logConfig);
+            parser.SetRegistry(logRegistry);
+
+            logRegistry.AddLog(Arg.Any<string>(), Arg.Any<string>()).Returns(logEntry);
+
+            var log = "<fakelog time=\"goodtime\" log=\"my log\"><![CDATA[CDat Data]]><![CDATA[Not]]></fakelog>";
+            using (var ms = CreateStream(log))
+            {
+                parser.Parse(ms);
+            }
+
+            logRegistry.Received(1).AddValueToLog(logEntry, LogAttribute.Type, "CDat Data");
+        }
+        
+        [Test]
+        public void ElementPathMixedChain()
+        {
+            logConfig.LogTypePath = "/$ele/#2/!type";
+
+            var parser = new XMLLogParser();
+            parser.SetConfig(logConfig);
+            parser.SetRegistry(logRegistry);
+
+            logRegistry.AddLog(Arg.Any<string>(), Arg.Any<string>()).Returns(logEntry);
+
+            var log = "<fakelog time=\"goodtime\" log=\"my log\"><ele><sub>Nope</sub><sub>Nope</sub><sub><type>MyType</type></sub></ele></fakelog>";
+            using (var ms = CreateStream(log))
+            {
+                parser.Parse(ms);
+            }
+
+            logRegistry.Received(1).AddValueToLog(logEntry, LogAttribute.Type, "MyType");
+        }
+
+        [Test]
+        public void ElementPathMixedChainAttribute()
+        {
+            logConfig.LogTypePath = "/$ele/#2/!type";
+
+            var parser = new XMLLogParser();
+            parser.SetConfig(logConfig);
+            parser.SetRegistry(logRegistry);
+
+            logRegistry.AddLog(Arg.Any<string>(), Arg.Any<string>()).Returns(logEntry);
+
+            var log = "<fakelog time=\"goodtime\" log=\"my log\"><ele><sub>Nope</sub><sub type=\"Att Data\">Nope</sub><sub type=\"Still Nope\">Nope</sub></ele></fakelog>";
+            using (var ms = CreateStream(log))
+            {
+                parser.Parse(ms);
+            }
+
+            logRegistry.Received(1).AddValueToLog(logEntry, LogAttribute.Type, "Att Data");
+        }
+
+        [Test]
+        public void ElementPathMixedFiltered()
+        {
+            logConfig.LogTypePath = "/$ele/$cdata";
+
+            var parser = new XMLLogParser();
+            parser.SetConfig(logConfig);
+            parser.SetRegistry(logRegistry);
+
+            logRegistry.AddLog(Arg.Any<string>(), Arg.Any<string>()).Returns(logEntry);
+
+            var log = "<fakelog time=\"goodtime\" log=\"my log\"><ele><sub>Nope</sub></ele><ele><sub>Nope</sub><sub type=\"Not\">Nope</sub><![CDATA[CDat Data]]><sub type=\"Not\">Nope</sub></ele></fakelog>";
+            using (var ms = CreateStream(log))
+            {
+                parser.Parse(ms);
+            }
+
+            logRegistry.Received(1).AddValueToLog(logEntry, LogAttribute.Type, "CDat Data");
+        }
+
+        [Test]
+        public void ElementPathMixedFilteredCdataFail()
+        {
+            logConfig.LogTypePath = "/$ele/$cdata/!dat";
+
+            var parser = new XMLLogParser();
+            parser.SetConfig(logConfig);
+            parser.SetRegistry(logRegistry);
+
+            logRegistry.AddLog(Arg.Any<string>(), Arg.Any<string>()).Returns(logEntry);
+
+            var log = "<fakelog time=\"goodtime\" log=\"my log\"><ele><sub>Nope</sub></ele><ele><sub>Nope</sub><sub type=\"Not\">Nope</sub><![CDATA[CDat Data]]><sub type=\"Not\">Nope</sub></ele></fakelog>";
+            using (var ms = CreateStream(log))
+            {
+                parser.Parse(ms);
+            }
+
+            logRegistry.DidNotReceive().AddValueToLog(logEntry, Arg.Any<LogAttribute>(), Arg.Any<object>());
+        }
+
+        [Test]
+        public void ElementPathAllIndex()
+        {
+            logConfig.LogTypePath = "/#1/#2/#0/#1";
+
+            var parser = new XMLLogParser();
+            parser.SetConfig(logConfig);
+            parser.SetRegistry(logRegistry);
+
+            logRegistry.AddLog(Arg.Any<string>(), Arg.Any<string>()).Returns(logEntry);
+
+            var log = "<fakelog time=\"goodtime\" log=\"my log\"><ele>Nope</ele><ele><ele>Nope</ele><ele>Nope</ele><ele><ele><ele>Nope</ele><ele>Yes</ele></ele><ele>Nope</ele></ele><ele>Nope</ele></ele><ele>Nope</ele></fakelog>";
+            using (var ms = CreateStream(log))
+            {
+                parser.Parse(ms);
+            }
+
+            logRegistry.Received(1).AddValueToLog(logEntry, LogAttribute.Type, "Yes");
+        }
+
+        [Test]
+        public void ElementPathAllIndexFields()
+        {
+            logConfig.LogTypePath = "/#1/#2/#0/#1";
+            logConfig.ThreadIDPath = "/#1/#1";
+            logConfig.LogLinePath = "/#1/#3&int";
+
+            var parser = new XMLLogParser();
+            parser.SetConfig(logConfig);
+            parser.SetRegistry(logRegistry);
+
+            logRegistry.AddLog(Arg.Any<string>(), Arg.Any<string>()).Returns(logEntry);
+
+            var log = "<fakelog time=\"goodtime\" log=\"my log\"><ele>Nope</ele><ele><ele>Nope</ele><ele>ThreadID</ele><ele><ele><ele>Nope</ele><ele>Type</ele></ele><ele>Nope</ele></ele><ele>1354</ele></ele><ele>Nope</ele></fakelog>";
+            using (var ms = CreateStream(log))
+            {
+                parser.Parse(ms);
+            }
+
+            logRegistry.Received(1).AddValueToLog(logEntry, LogAttribute.Type, "Type");
+            logRegistry.Received(1).AddValueToLog(logEntry, LogAttribute.ThreadID, "ThreadID");
+            logRegistry.Received(1).AddValueToLog(logEntry, LogAttribute.SourceLine, 1354);
+        }
     }
 }
