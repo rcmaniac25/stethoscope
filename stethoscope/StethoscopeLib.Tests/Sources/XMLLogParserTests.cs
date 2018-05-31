@@ -1014,7 +1014,7 @@ namespace LogTracker.Tests
         [Test]
         public void ElementPathMixedChain()
         {
-            logConfig.LogTypePath = "/$ele/#2/!type";
+            logConfig.LogTypePath = "/$elem/#2/!type";
 
             var parser = new XMLLogParser();
             parser.SetConfig(logConfig);
@@ -1034,7 +1034,7 @@ namespace LogTracker.Tests
         [Test]
         public void ElementPathMixedChainAttribute()
         {
-            logConfig.LogTypePath = "/$ele/#2/!type";
+            logConfig.LogTypePath = "/$elem/#2/!type";
 
             var parser = new XMLLogParser();
             parser.SetConfig(logConfig);
@@ -1054,7 +1054,7 @@ namespace LogTracker.Tests
         [Test]
         public void ElementPathMixedFiltered()
         {
-            logConfig.LogTypePath = "/$ele/$cdata";
+            logConfig.LogTypePath = "/$elem/$cdata";
 
             var parser = new XMLLogParser();
             parser.SetConfig(logConfig);
@@ -1074,7 +1074,7 @@ namespace LogTracker.Tests
         [Test]
         public void ElementPathMixedFilteredCdataFail()
         {
-            logConfig.LogTypePath = "/$ele/$cdata/!dat";
+            logConfig.LogTypePath = "/$elem/$cdata/!dat";
 
             var parser = new XMLLogParser();
             parser.SetConfig(logConfig);

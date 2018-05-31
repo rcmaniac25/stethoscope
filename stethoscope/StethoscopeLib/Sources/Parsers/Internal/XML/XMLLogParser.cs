@@ -45,59 +45,107 @@ namespace LogTracker.Parsers.Internal.XML
                 // Use an attribute
                 return element.Attribute(path[0].StringValue)?.Value;
             }
-            XNode curItem = element;
+            var currentNodes = new List<XNode>
+            {
+                element
+            };
+            List<XNode> buffer;
             foreach (var section in path)
             {
-                var breakOut = false;
                 switch (section.Type)
                 {
                     case ParserPathElementType.IndexField:
-                        if (curItem is XContainer)
+                        buffer = new List<XNode>();
+                        foreach (var node in currentNodes)
                         {
-                            curItem = (curItem as XContainer).Nodes().ElementAt(section.IndexValue);
+                            if (node is XContainer)
+                            {
+                                var newNode = (node as XContainer).Nodes().ElementAtOrDefault(section.IndexValue);
+                                if (newNode != null)
+                                {
+                                    buffer.Add(newNode);
+                                }
+                            }
                         }
-                        else
-                        {
-                            curItem = null;
-                            breakOut = true;
-                        }
+                        currentNodes = buffer;
                         break;
                     case ParserPathElementType.FilterField:
+                        var nodeType = XmlNodeType.None;
                         switch (section.StringValue)
                         {
                             case "cdata":
-                                if (curItem.NodeType != XmlNodeType.CDATA)
-                                {
-                                    curItem = null;
-                                }
+                                nodeType = XmlNodeType.CDATA;
                                 break;
                             case "text":
-                                if (curItem.NodeType != XmlNodeType.Text)
-                                {
-                                    curItem = null;
-                                }
+                                nodeType = XmlNodeType.Text;
+                                break;
+                            case "element":
+                            case "elem":
+                                nodeType = XmlNodeType.Element;
                                 break;
                         }
+
+                        buffer = new List<XNode>();
+                        foreach (var node in currentNodes)
+                        {
+                            var children = node is XContainer ? (node as XContainer).Nodes() : Enumerable.Empty<XNode>();
+                            var testSelf = !children.Any();
+                            if (testSelf)
+                            {
+                                if (node.NodeType == nodeType)
+                                {
+                                    buffer.Add(node);
+                                }
+                            }
+                            else
+                            {
+                                foreach (var child in children)
+                                {
+                                    if (child.NodeType == nodeType)
+                                    {
+                                        buffer.Add(child);
+                                    }
+                                }
+                            }
+                        }
+                        currentNodes = buffer;
+                        break;
+                    case ParserPathElementType.NamedField:
+                        buffer = new List<XNode>();
+                        var isLastNode = section.FieldType != ParserPathElementFieldType.NotAValue && section.FieldType != ParserPathElementFieldType.Unknown;
+                        foreach (var node in currentNodes)
+                        {
+                            if (node is XContainer)
+                            {
+                                buffer.AddRange((node as XContainer).Nodes().Where(child => child is XElement && (child as XElement).Name.LocalName == section.StringValue));
+                            }
+                            else if (isLastNode && node is XElement)
+                            {
+                                return (node as XElement).Attribute(section.StringValue)?.Value;
+                            }
+                        }
+                        currentNodes = buffer;
                         break;
                 }
-                if (breakOut || curItem == null)
+                if (currentNodes.Count == 0)
                 {
                     break;
                 }
             }
-            if (curItem != null)
+            if (currentNodes.Count > 0)
             {
-                if (curItem is XElement)
+                var topNode = currentNodes[0];
+                if (topNode is XElement)
                 {
-                    return (curItem as XElement).Value;
+                    return (topNode as XElement).Value;
                 }
-                else if (curItem is XCData)
+                else if (topNode is XCData)
                 {
-                    return (curItem as XCData).Value;
+                    return (topNode as XCData).Value;
                 }
-                else if (curItem is XText)
+                else if (topNode is XText)
                 {
-                    return (curItem as XText).Value;
+                    return (topNode as XText).Value;
                 }
             }
             return null;
