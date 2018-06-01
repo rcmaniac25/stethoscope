@@ -40,7 +40,7 @@ namespace LogTracker.Parsers.Internal.XML
                 // Just using the existing node's data
                 return element.Value;
             }
-            else if (path[0].Type == ParserPathElementType.NamedField)
+            else if (path[0].Type == ParserPathElementType.DirectNamedField)
             {
                 // Use an attribute
                 return element.Attribute(path[0].StringValue)?.Value;
@@ -115,11 +115,12 @@ namespace LogTracker.Parsers.Internal.XML
                         var isLastNode = section.FieldType != ParserPathElementFieldType.NotAValue && section.FieldType != ParserPathElementFieldType.Unknown;
                         foreach (var node in currentNodes)
                         {
+                            var bufferCount = buffer.Count;
                             if (node is XContainer)
                             {
                                 buffer.AddRange((node as XContainer).Nodes().Where(child => child is XElement && (child as XElement).Name.LocalName == section.StringValue));
                             }
-                            else if (isLastNode && node is XElement)
+                            if (isLastNode && node is XElement && bufferCount == buffer.Count)
                             {
                                 return (node as XElement).Attribute(section.StringValue)?.Value;
                             }
@@ -160,7 +161,12 @@ namespace LogTracker.Parsers.Internal.XML
             foreach (var kv in parser.attributePaths)
             {
                 var rawValue = GetElementDataFromPath(kv.Value, element);
-                var value = ParserUtil.CastField(rawValue, kv.Value.Last().FieldType);
+                var fieldType = ParserPathElementFieldType.String;
+                if (kv.Value.Length != 0)
+                {
+                    fieldType = kv.Value.Last().FieldType;
+                }
+                var value = ParserUtil.CastField(rawValue, fieldType);
                 if (value != null)
                 {
                     //XXX should probably have some test for checking if the value couldn't be added
@@ -307,6 +313,9 @@ namespace LogTracker.Parsers.Internal.XML
                             break;
                         case XmlNodeType.CDATA:
                             element.Add(new XCData(xmlReader.Value));
+                            break;
+                        case XmlNodeType.Text:
+                            element.Add(new XText(xmlReader.Value));
                             break;
                         case XmlNodeType.Whitespace:
                             break;

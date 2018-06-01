@@ -279,7 +279,7 @@ namespace LogTracker.Parsers
                 }
                 elements.Add(new ParserPathElement()
                 {
-                    Type = ParserPathElementType.NamedField,
+                    Type = ParserPathElementType.DirectNamedField,
                     FieldType = ParseFieldType(path),
 
                     StringValue = StripType(path.Substring(1))

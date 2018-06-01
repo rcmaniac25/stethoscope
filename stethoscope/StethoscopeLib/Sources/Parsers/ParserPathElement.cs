@@ -4,6 +4,7 @@
     {
         Unknown,
 
+        DirectNamedField,
         NamedField,
         IndexField,
         FilterField

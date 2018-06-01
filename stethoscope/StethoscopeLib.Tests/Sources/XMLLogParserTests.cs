@@ -1034,7 +1034,7 @@ namespace LogTracker.Tests
         [Test]
         public void ElementPathMixedChainAttribute()
         {
-            logConfig.LogTypePath = "/$elem/#2/!type";
+            logConfig.LogTypePath = "/$elem/#1/!type";
 
             var parser = new XMLLogParser();
             parser.SetConfig(logConfig);
@@ -1107,7 +1107,7 @@ namespace LogTracker.Tests
             {
                 parser.Parse(ms);
             }
-
+            
             logRegistry.Received(1).AddValueToLog(logEntry, LogAttribute.Type, "Yes");
         }
 

@@ -616,3 +616,12 @@ void doSomethingCool(std::ifstream& input)
 -- ...there are no child nodes in <child> #2, so check for attributes. You found one named "data", so return immediatly.
 - Now, with a slight change, the node list becomes: <data>value</data> and <child data=value></child>. We've collapsed the tree a bit... but is it correct?
 - Right now, because the unit tests aren't passing and some of them should (even before I had rewritten the path function), I think I'm using NSubstitute wrong... so I'm gonna work on that tomorrow before I try to fix the function more.
+
+#50.2. 5/31/2018:
+- 50 days! Half way (and I spent 48 days just doing unit tests. 50 if you count what I did when I restarted my counter... more if you count trying to get unit tests working prior).
+- Code will come. These are the last tests for the most part.
+- A moment of happiness: I decided to figure out what was going wrong, I needed to debug a unit test. The results I found online... basically said I needed a couple more Nuget packages, manual setup of a debug execution setting, and to run everything... and then I saw the blog was from 2004, then 2006, 2008, 2010, 2012...
+- That last one (https://stackoverflow.com/questions/4103712/stepping-through-and-debugging-code-in-unit-tests) gave the exact breakthrough I needed: Test -> Debug.
+- That simple bit of info meant that I was able to find out... I forgot to parse "Text" types. So I handled elements and cdata... but not text. 3 lines later, my failing tests went from 14 to 4.
+- Couple more small fixes and fixing a typo in a unit test: everything is passing!
+- Next up is... the stuff on the Tasks.md list... for tomorrow

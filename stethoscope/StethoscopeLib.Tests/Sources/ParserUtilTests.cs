@@ -130,7 +130,7 @@ namespace LogTracker.Tests
         {
             var path = ParserUtil.ParsePath(value);
             Assert.That(path, Is.Not.Null.And.Length.EqualTo(1));
-            Assert.That(path[0], Has.Property("Type").EqualTo(ParserPathElementType.NamedField).And.Property("StringValue").EqualTo("name"));
+            Assert.That(path[0], Has.Property("Type").EqualTo(ParserPathElementType.DirectNamedField).And.Property("StringValue").EqualTo("name"));
             // FieldType is tested by ParsePathFieldType
         }
 
@@ -185,7 +185,7 @@ namespace LogTracker.Tests
             Assert.That(PathFieldTypes.Length, Is.EqualTo(Enum.GetValues(typeof(ParserPathElementFieldType)).Length - 2)); // Don't count unknown and not-a-value
             Assert.That(PathFieldTypes[0], Is.EqualTo(new Tuple<string, ParserPathElementFieldType>("string", ParserPathElementFieldType.String)));
 
-            Assert.That(PathElementTypes.Length, Is.EqualTo(Enum.GetValues(typeof(ParserPathElementType)).Length - 1)); // Don't count unknown
+            Assert.That(PathElementTypes.Length, Is.EqualTo(Enum.GetValues(typeof(ParserPathElementType)).Length - 2)); // Don't count unknown and DirectNamedField (which is more for accessing the attributes)
         }
 
         [Test]
