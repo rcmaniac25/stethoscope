@@ -1,9 +1,9 @@
-﻿using LogTracker.Common;
-using LogTracker.Log.Internal;
+﻿using Stethoscope.Common;
+using Stethoscope.Log.Internal;
 
 using System;
 
-namespace LogTracker.Tests.Helpers
+namespace Stethoscope.Tests.Helpers
 {
     public enum LogEntryMsg
     {

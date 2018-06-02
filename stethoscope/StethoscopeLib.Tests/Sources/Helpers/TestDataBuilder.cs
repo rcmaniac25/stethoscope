@@ -1,6 +1,6 @@
 ﻿using NUnit.Framework;
 
-namespace LogTracker.Tests.Helpers
+namespace Stethoscope.Tests.Helpers
 {
     public abstract class TestDataBuilder
     {

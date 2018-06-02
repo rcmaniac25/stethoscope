@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace LogTracker.Tests.Helpers
+namespace Stethoscope.Tests.Helpers
 {
     public static class Util
     {

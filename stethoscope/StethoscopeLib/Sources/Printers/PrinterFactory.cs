@@ -1,7 +1,7 @@
-﻿using LogTracker.Common;
-using LogTracker.Printers.Internal;
+﻿using Stethoscope.Common;
+using Stethoscope.Printers.Internal;
 
-namespace LogTracker.Printers
+namespace Stethoscope.Printers
 {
     public class PrinterFactory
     {

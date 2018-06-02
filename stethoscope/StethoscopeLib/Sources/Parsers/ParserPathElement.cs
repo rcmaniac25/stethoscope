@@ -1,4 +1,4 @@
-﻿namespace LogTracker.Parsers
+﻿namespace Stethoscope.Parsers
 {
     enum ParserPathElementType
     {

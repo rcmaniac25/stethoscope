@@ -1,4 +1,4 @@
-﻿namespace LogTracker.Common
+﻿namespace Stethoscope.Common
 {
     public interface IPrinterFactory
     {

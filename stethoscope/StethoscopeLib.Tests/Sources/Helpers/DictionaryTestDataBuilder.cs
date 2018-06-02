@@ -2,7 +2,7 @@
 
 using System.Collections.Generic;
 
-namespace LogTracker.Tests.Helpers
+namespace Stethoscope.Tests.Helpers
 {
     public class DictionaryTestDataBuilder : TestDataBuilder
     {

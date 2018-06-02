@@ -1,5 +1,5 @@
-﻿using LogTracker.Common;
-using LogTracker.Parsers.Internal.XML;
+﻿using Stethoscope.Common;
+using Stethoscope.Parsers.Internal.XML;
 
 using NSubstitute;
 
@@ -11,7 +11,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace LogTracker.Tests
+namespace Stethoscope.Tests
 {
     [TestFixture(TestOf = typeof(XMLLogParser))]
     public class XMLLogParserTests

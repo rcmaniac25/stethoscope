@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace LogTracker.Printers.Internal
+namespace Stethoscope.Printers.Internal
 {
     public class ConsolePrinter : IOPrinter
     {

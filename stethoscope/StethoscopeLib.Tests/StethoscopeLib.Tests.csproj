@@ -6,7 +6,7 @@
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-    <RootNamespace>LogTracker.Tests</RootNamespace>
+    <RootNamespace>Stethoscope.Tests</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

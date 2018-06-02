@@ -4,8 +4,7 @@
 
 What needs to get done. Should make some of them tickets... (some of these may be trains of thought)
 
-- Add unit tests. If anything, it will add a bit of accountability in case I randomly start breaking things.
-    - Think about if namespace is "good" for library? (gut feeling: no)
+- Reread logs to see if there are any notes that were missed and should be added as tasks
 - Make parser and registry threadsafe
 - Acquire bigger logs (I'm testing on like a 6 line file... I have files in the GB range, but that might be too big for now, so I need something smaller. Note: can't post these...)
     - See how long these take to parse, and see where we can speed up processing (background threads? Queues?)

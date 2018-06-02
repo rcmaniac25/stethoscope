@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace LogTracker.Common
+namespace Stethoscope.Common
 {
     /// <summary>
     /// A registry for all log entries.

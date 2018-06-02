@@ -1,10 +1,10 @@
-﻿using LogTracker.Common;
+﻿using Stethoscope.Common;
 
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace LogTracker.Log.Internal
+namespace Stethoscope.Log.Internal
 {
     public class LogEntry : IInternalLogEntry, IEquatable<LogEntry>
     {

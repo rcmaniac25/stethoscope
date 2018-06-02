@@ -1,10 +1,10 @@
-﻿using LogTracker.Common;
-using LogTracker.Log.Internal;
+﻿using Stethoscope.Common;
+using Stethoscope.Log.Internal;
 
 using System;
 using System.Collections.Generic;
 
-namespace LogTracker.Log
+namespace Stethoscope.Log
 {
     public class LogRegistry : ILogRegistry
     {

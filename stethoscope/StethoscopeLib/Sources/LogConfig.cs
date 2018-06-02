@@ -1,4 +1,4 @@
-﻿using LogTracker.Common;
+﻿using Stethoscope.Common;
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -6,7 +6,7 @@ using Newtonsoft.Json.Converters;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-namespace LogTracker
+namespace Stethoscope
 {
     /// <summary>
     /// How failure to parse a log entry should be handled

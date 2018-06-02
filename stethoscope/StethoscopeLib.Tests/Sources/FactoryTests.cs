@@ -1,12 +1,12 @@
-﻿using LogTracker.Common;
-using LogTracker.Parsers;
-using LogTracker.Printers;
+﻿using Stethoscope.Common;
+using Stethoscope.Parsers;
+using Stethoscope.Printers;
 
 using NSubstitute;
 
 using NUnit.Framework;
 
-namespace LogTracker.Tests
+namespace Stethoscope.Tests
 {
     [TestFixture]
     public class FactoryTests

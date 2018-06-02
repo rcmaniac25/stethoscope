@@ -1,4 +1,4 @@
-﻿using LogTracker.Common;
+﻿using Stethoscope.Common;
 
 using System;
 using System.Collections.Generic;
@@ -8,7 +8,7 @@ using System.Text;
 using System.Xml;
 using System.Xml.Linq;
 
-namespace LogTracker.Parsers.Internal.XML
+namespace Stethoscope.Parsers.Internal.XML
 {
     public class XMLLogParser : ILogParser
     {

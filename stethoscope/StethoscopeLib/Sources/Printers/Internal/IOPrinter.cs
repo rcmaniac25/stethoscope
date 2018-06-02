@@ -1,9 +1,9 @@
-﻿using LogTracker.Common;
+﻿using Stethoscope.Common;
 
 using System.IO;
 using System.Linq;
 
-namespace LogTracker.Printers.Internal
+namespace Stethoscope.Printers.Internal
 {
     public abstract class IOPrinter : IPrinter
     {

@@ -1,7 +1,7 @@
-﻿using LogTracker.Common;
-using LogTracker.Log;
-using LogTracker.Parsers;
-using LogTracker.Printers;
+﻿using Stethoscope.Common;
+using Stethoscope.Log;
+using Stethoscope.Parsers;
+using Stethoscope.Printers;
 
 using Mono.Options;
 
@@ -11,7 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace LogTracker
+namespace Stethoscope
 {
     public class Program
     {

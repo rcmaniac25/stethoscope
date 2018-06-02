@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-using LogTracker.Common;
+using Stethoscope.Common;
 
-namespace LogTracker.Log.Internal
+namespace Stethoscope.Log.Internal
 {
     public class FailedLogEntry : IInternalLogEntry, IEquatable<FailedLogEntry>
     {

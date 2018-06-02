@@ -1,7 +1,7 @@
-﻿using LogTracker.Common;
-using LogTracker.Log;
-using LogTracker.Log.Internal;
-using LogTracker.Tests.Helpers;
+﻿using Stethoscope.Common;
+using Stethoscope.Log;
+using Stethoscope.Log.Internal;
+using Stethoscope.Tests.Helpers;
 
 using NSubstitute;
 
@@ -10,7 +10,7 @@ using NUnit.Framework;
 using System;
 using System.Linq;
 
-namespace LogTracker.Tests
+namespace Stethoscope.Tests
 {
     [TestFixture(TestOf = typeof(LogRegistry))]
     public class LogRegistryTests

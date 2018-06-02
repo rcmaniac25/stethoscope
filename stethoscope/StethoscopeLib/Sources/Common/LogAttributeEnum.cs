@@ -1,4 +1,4 @@
-﻿namespace LogTracker.Common
+﻿namespace Stethoscope.Common
 {
     /// <summary>
     /// Available attributes for a log

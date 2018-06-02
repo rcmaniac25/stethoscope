@@ -1,7 +1,7 @@
-﻿using LogTracker.Common;
-using LogTracker.Parsers.Internal.XML;
+﻿using Stethoscope.Common;
+using Stethoscope.Parsers.Internal.XML;
 
-namespace LogTracker.Parsers
+namespace Stethoscope.Parsers
 {
     public class LogParserFactory
     {

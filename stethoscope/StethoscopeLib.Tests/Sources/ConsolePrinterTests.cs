@@ -1,11 +1,11 @@
 ﻿using System;
 using System.IO;
 
-using LogTracker.Printers.Internal;
+using Stethoscope.Printers.Internal;
 
 using NUnit.Framework;
 
-namespace LogTracker.Tests
+namespace Stethoscope.Tests
 {
     // Since we're replacing standard out, we can't run this is parallel
     [TestFixture(TestOf = typeof(ConsolePrinter)), NonParallelizable]

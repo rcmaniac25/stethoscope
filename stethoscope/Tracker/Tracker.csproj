@@ -12,7 +12,7 @@
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-    <RootNamespace>LogTracker</RootNamespace>
+    <RootNamespace>Stethoscope</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

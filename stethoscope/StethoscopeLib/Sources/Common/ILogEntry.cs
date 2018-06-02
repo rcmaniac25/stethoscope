@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace LogTracker.Common
+namespace Stethoscope.Common
 {
     /// <summary>
     /// An individual log entry within a log.

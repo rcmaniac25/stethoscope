@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace LogTracker.Parsers
+namespace Stethoscope.Parsers
 {
     enum LogParserErrors
     {

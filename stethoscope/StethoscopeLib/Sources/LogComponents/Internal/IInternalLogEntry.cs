@@ -1,8 +1,8 @@
-﻿using LogTracker.Common;
+﻿using Stethoscope.Common;
 
 using System;
 
-namespace LogTracker.Log.Internal
+namespace Stethoscope.Log.Internal
 {
     interface IInternalLogEntry : ILogEntry
     {

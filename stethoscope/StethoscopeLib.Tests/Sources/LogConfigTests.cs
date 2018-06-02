@@ -1,10 +1,10 @@
-using LogTracker.Common;
+using Stethoscope.Common;
 
 using NUnit.Framework;
 
 using System;
 
-namespace LogTracker.Tests
+namespace Stethoscope.Tests
 {
     [TestFixture(TestOf = typeof(LogConfig))]
     public class LogConfigTest

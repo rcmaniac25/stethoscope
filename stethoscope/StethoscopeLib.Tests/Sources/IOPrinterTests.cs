@@ -1,11 +1,11 @@
-﻿using LogTracker.Log;
-using LogTracker.Printers.Internal;
+﻿using Stethoscope.Log;
+using Stethoscope.Printers.Internal;
 
 using NUnit.Framework;
 
 using System;
 
-namespace LogTracker.Tests
+namespace Stethoscope.Tests
 {
     public abstract class IOPrinterTests
     {

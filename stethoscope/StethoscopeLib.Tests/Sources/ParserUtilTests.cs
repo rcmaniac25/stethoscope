@@ -1,12 +1,12 @@
-﻿using LogTracker.Parsers;
-using LogTracker.Tests.Helpers;
+﻿using Stethoscope.Parsers;
+using Stethoscope.Tests.Helpers;
 
 using NUnit.Framework;
 
 using System;
 using System.Text;
 
-namespace LogTracker.Tests
+namespace Stethoscope.Tests
 {
     [TestFixture(TestOf = typeof(ParserUtil))]
     public class ParserUtilTests

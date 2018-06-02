@@ -625,3 +625,9 @@ void doSomethingCool(std::ifstream& input)
 - That simple bit of info meant that I was able to find out... I forgot to parse "Text" types. So I handled elements and cdata... but not text. 3 lines later, my failing tests went from 14 to 4.
 - Couple more small fixes and fixing a typo in a unit test: everything is passing!
 - Next up is... the stuff on the Tasks.md list... for tomorrow
+
+#51.2. 6/01/2018:
+- So, I didn't have a lot of time tonight, and I procastinated on doing this last night... but the refactor tool made it very easy: changed from LogTracker to Stethoscope for the namespace.
+- I'm still not entirely thrilled with namespace, but LogTracker cornered the dev into one use of the library (to track logs) when the library itself can do more then that.
+- Also, having the name of the library in the namespace probably makes it less likely to confuse with something else.
+- That's all for tonight...

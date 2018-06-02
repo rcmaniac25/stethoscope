@@ -1,13 +1,13 @@
-﻿using LogTracker.Common;
-using LogTracker.Log.Internal;
-using LogTracker.Tests.Helpers;
+﻿using Stethoscope.Common;
+using Stethoscope.Log.Internal;
+using Stethoscope.Tests.Helpers;
 
 using NUnit.Framework;
 
 using System;
 using System.Collections.Generic;
 
-namespace LogTracker.Tests
+namespace Stethoscope.Tests
 {
     [TestFixture(TestOf = typeof(LogEntry))]
     public class LogEntryTests
