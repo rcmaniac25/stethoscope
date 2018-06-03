@@ -631,3 +631,11 @@ void doSomethingCool(std::ifstream& input)
 - I'm still not entirely thrilled with namespace, but LogTracker cornered the dev into one use of the library (to track logs) when the library itself can do more then that.
 - Also, having the name of the library in the namespace probably makes it less likely to confuse with something else.
 - That's all for tonight...
+
+#52.2. 6/02/2018:
+- Original plan: read through all the prior logs written here and determine if I have new tasks to add to the Tasks.md page.
+- I'm very tired, what's less likely to put me to sleep?
+- Making LogRegistry and XMLLogParser thread safe
+- LogRegistry: not too hard... until I realize that the get functions just operate on the array... not something you just want to lock up
+- XMLLogParser? Doesn't really need to be threadsafe since each operation is unique and it doesn't operate upon itself, but config and registry changes could require some locks.
+- On that note, the printers also should have locks on the setting the config and registry
