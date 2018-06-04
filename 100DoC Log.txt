@@ -639,3 +639,22 @@ void doSomethingCool(std::ifstream& input)
 - LogRegistry: not too hard... until I realize that the get functions just operate on the array... not something you just want to lock up
 - XMLLogParser? Doesn't really need to be threadsafe since each operation is unique and it doesn't operate upon itself, but config and registry changes could require some locks.
 - On that note, the printers also should have locks on the setting the config and registry
+
+#53.2. 6/03/2018:
+- Yesterday I started working on thread safety, today I got stuck on thread safety
+- Note 1: I learned long ago that mutexes, at the speed a computer operates at, are not fast. Something like a monitor is better even if it takes a few more lines of code to build. There will always be a place for mutex, you just need to know where.
+- Note 2: Faster then a monitor: just not having locking contexts... use atomics. It happens at the processor level and is much faster then anything else you can work with.
+- Two issues:
+-- 1. Registry iteration won't work if a log is added mid-stream while iterating, regardless of iteration location. For one, the current List implementation will throw an exception during iteration as it's been modifed.
+-- 2. Log parsing relies on config attributes... that could change if the config is changed. Luckily, the values are copied for the most part.
+- For #2, I planned to count how many parse operations are occuring at one time and, if config was active, not allow/delay the parsing. If parsing was active, throw an exception from the config functions.
+- But while typing this I realized "the config functions aren't exposed". ILogParser doesn't expose the config functions (and neither does IPrinter), this means that the "proper" way to call those functions is to have the factory invoke them, and it invokes them before returning the implementations.
+- So if anyone/anything uses them later, they're on their own. I won't try to control "advanced" or naive usage of those classes.
+- That solves #2, but what about #1?
+- Turns out... it's not easy, but it gives me a way to do something I have wanted to put in: Rx (observables).
+- By using Rx "nearly" remove all worries of "what happens when we have millions of logs?" because Observables don't store the data and are a programatic method of doing iteration without "you removed/added an item mid-rexecution".
+- In some apps, that might still be a problem, but for our usage, if the processing is past the point processing, then we don't care. If it's before, then we get that value (or for replays, we get a new value in the replay).
+- This will require a custom Subject (look up "Subjects" in Rx/Observables) so we can insert values mid-stream. If/when we switch to a DB or similar to store logs, then it becomes "can a DB query get values mid-query?" if yes, then great. If not, then so long as it simply skips over it, it doesn't have any effect. So it's a win-win.
+- The end goal is to allow multi-thread add/read of logs without exception. Since constant adding of logs could make it so that iteration never ends, we can't put a mutex or lock into the iteration code. Also, async-iterators are... not that great: https://codeblog.jonskeet.uk/2009/10/23/iterating-atomically/
+- Past experience with Rx tells me that replacing with lists with iterators will make changing to Rx really easy... and we already switched to iterators, so this will be easy.
+- Minor benefit: Rx exists for numerous languages, which means that we can move it to a different language later.

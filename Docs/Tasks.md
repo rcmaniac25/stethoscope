@@ -4,8 +4,11 @@
 
 What needs to get done. Should make some of them tickets... (some of these may be trains of thought)
 
+- Make library threadsafe
+    - Switch from iterators to Rx
+	- Update/extend Nunit to support Rx
 - Reread logs to see if there are any notes that were missed and should be added as tasks
-- Make parser and registry threadsafe
+- Stat gathering and benchmarks (either with an API or just rigging it to get me stats remove the code after)
 - Acquire bigger logs (I'm testing on like a 6 line file... I have files in the GB range, but that might be too big for now, so I need something smaller. Note: can't post these...)
     - See how long these take to parse, and see where we can speed up processing (background threads? Queues?)
 - Determine program arguments and the config file usage (are they redundent? Complementary? Can I setup everything with program arguments?)

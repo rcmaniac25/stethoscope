@@ -366,6 +366,10 @@ namespace Stethoscope.Parsers.Internal.XML
 
         public void SetRegistry(ILogRegistry registry)
         {
+            if (this.registry != null)
+            {
+                throw new InvalidOperationException("Can only set registry once");
+            }
             this.registry = registry;
         }
 
@@ -383,9 +387,9 @@ namespace Stethoscope.Parsers.Internal.XML
 
         public void SetConfig(LogConfig config)
         {
-            if (attributePaths != null)
+            if (validConfigs && attributePaths != null)
             {
-                throw new InvalidOperationException("Can onlys set config once");
+                throw new InvalidOperationException("Can only set config once");
             }
 
             validConfigs = config.IsValid;
