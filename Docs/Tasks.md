@@ -2,10 +2,13 @@
 
 ## Tasks
 
-What needs to get done. Should make some of them tickets... (some of these may be trains of thought)
+What needs to get done. Should make some of them tickets... (some of these may be trains-of-thought)
 
 - Make library threadsafe
+	- Fix IOPrinter so tests pass
     - Switch from iterators to Rx
+		- GetLogBy
+		- Actual log storage
 	- Update/extend Nunit to support Rx
 - Reread logs to see if there are any notes that were missed and should be added as tasks
 - Stat gathering and benchmarks (either with an API or just rigging it to get me stats remove the code after)

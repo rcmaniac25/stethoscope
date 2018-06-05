@@ -9,17 +9,41 @@ using NUnit.Framework;
 
 using System;
 using System.Linq;
+using System.Reactive.Linq;
+using System.Collections.Generic;
 
 namespace Stethoscope.Tests
 {
     [TestFixture(TestOf = typeof(LogRegistry))]
     public class LogRegistryTests
     {
+        private static IEnumerable<T> TempEnumerableConvert<T>(IObservable<T> obs)
+        {
+            //XXX This is purely so later when this is replaced, it's easy to spot the broken elements.
+            //TODO: need to update tests to use observables and NUnit constraints
+            if (obs == null)
+            {
+                return null;
+            }
+            return obs.ToEnumerable();
+        }
+
+        private static IDictionary<K, IEnumerable<T>> TempDictConvertGrouped<K, T>(IObservable<IGroupedObservable<K, T>> obs)
+        {
+            //XXX This is purely so later when this is replaced, it's easy to spot the broken elements.
+            //TODO: need to update tests to use observables and NUnit constraints
+            if (obs == null)
+            {
+                return null;
+            }
+            return obs.ToDictionary(group => group.Key, group => group.ToEnumerable()).Wait();
+        }
+        
         [Test]
         public void GetLogsEmpty()
         {
             var registry = new LogRegistry();
-            var logs = registry.GetBy(LogAttribute.Level);
+            var logs = TempDictConvertGrouped(registry.GetBy(LogAttribute.Level));
             Assert.That(logs, Is.Empty);
         }
 
@@ -29,8 +53,8 @@ namespace Stethoscope.Tests
             var registry = new LogRegistry();
             var entry = registry.AddLog(DateTime.Now.ToString(), "testmsg");
             Assert.That(entry, Is.Not.Null);
-            
-            var logs = registry.GetBy(LogAttribute.Message);
+
+            var logs = TempDictConvertGrouped(registry.GetBy(LogAttribute.Message));
             Assert.That(logs, Is.Not.Empty);
         }
 
@@ -250,7 +274,7 @@ namespace Stethoscope.Tests
             var entry = registry.AddLog(DateTime.Now.ToString(), "testmsg");
             Assert.That(entry, Is.Not.Null);
 
-            var logs = registry.GetBy(LogAttribute.Level);
+            var logs = TempDictConvertGrouped(registry.GetBy(LogAttribute.Level));
             Assert.That(logs, Is.Empty);
         }
 
@@ -271,7 +295,7 @@ namespace Stethoscope.Tests
             entry = registry.AddLog(DateTime.Now.ToString(), "testmsg3");
             Assert.That(entry, Is.Not.Null);
 
-            var logs = registry.GetBy(LogAttribute.Level);
+            var logs = TempDictConvertGrouped(registry.GetBy(LogAttribute.Level));
             Assert.That(logs, Is.Not.Empty);
 
             Assert.That(logs.Keys, Is.SubsetOf(new string[] { "cookie", "brownie" }).And.Exactly(2).Items);
@@ -295,7 +319,7 @@ namespace Stethoscope.Tests
             entry = registry.AddLog(DateTime.Now.ToString(), "testmsg3");
             Assert.That(entry, Is.Not.Null);
 
-            var logs = registry.GetBy(LogAttribute.Level);
+            var logs = TempDictConvertGrouped(registry.GetBy(LogAttribute.Level));
             Assert.That(logs, Is.Not.Empty);
 
             Assert.That(logs.Keys, Has.Member("cookie").And.Exactly(1).Items);
@@ -321,7 +345,7 @@ namespace Stethoscope.Tests
 
             registry.AddValueToLog(entry, LogAttribute.Level, "ice cream");
 
-            var logs = registry.GetBy(LogAttribute.Level);
+            var logs = TempDictConvertGrouped(registry.GetBy(LogAttribute.Level));
             Assert.That(logs, Is.Not.Empty);
 
             Assert.That(logs.Keys, Is.SubsetOf(new string[] { "cookie", "brownie", "ice cream" }).And.Exactly(3).Items);
@@ -335,10 +359,10 @@ namespace Stethoscope.Tests
             var entry = registry.AddLog(DateTime.Now.ToString(), "testmsg1");
             Assert.That(entry, Is.Not.Null);
 
-            var logs = registry.GetBy(LogAttribute.Message);
+            var logs = TempDictConvertGrouped(registry.GetBy(LogAttribute.Message));
             Assert.That(logs, Is.Not.Empty);
 
-            logs = registry.GetBy(LogAttribute.Timestamp);
+            logs = TempDictConvertGrouped(registry.GetBy(LogAttribute.Timestamp));
             Assert.That(logs, Is.Null);
         }
 
@@ -356,7 +380,7 @@ namespace Stethoscope.Tests
 
             registry.NotifyFailedLogParsed(entry);
 
-            var logs = registry.GetBy(LogAttribute.Message);
+            var logs = TempDictConvertGrouped(registry.GetBy(LogAttribute.Message));
             Assert.That(logs, Is.Not.Empty);
 
             Assert.That(logs.Keys, Is.SubsetOf(new string[] { "msg1", "msg2" }).And.Exactly(2).Items);
@@ -374,7 +398,7 @@ namespace Stethoscope.Tests
 
             registry.AddValueToLog(entry, LogAttribute.Message, "msg2");
 
-            var logs = registry.GetBy(LogAttribute.Message);
+            var logs = TempDictConvertGrouped(registry.GetBy(LogAttribute.Message));
             Assert.That(logs, Is.Not.Empty);
 
             Assert.That(logs.Keys, Is.SubsetOf(new string[] { "msg1", "msg2" }).And.Exactly(2).Items);
@@ -392,7 +416,7 @@ namespace Stethoscope.Tests
 
             registry.AddValueToLog(entry, LogAttribute.Level, "something");
 
-            var logs = registry.GetBy(LogAttribute.Message);
+            var logs = TempDictConvertGrouped(registry.GetBy(LogAttribute.Message));
             Assert.That(logs, Is.Not.Empty);
 
             Assert.That(logs.Keys, Is.SubsetOf(new string[] { "msg1" }).And.Exactly(1).Items);
@@ -402,7 +426,7 @@ namespace Stethoscope.Tests
         public void GetByTimetstampEmpty()
         {
             var registry = new LogRegistry();
-            Assert.That(registry.GetByTimetstamp(), Is.Empty);
+            Assert.That(TempEnumerableConvert(registry.GetByTimetstamp()), Is.Empty);
         }
 
         [Test]
@@ -412,9 +436,9 @@ namespace Stethoscope.Tests
             var entry = registry.AddLog(DateTime.Now.ToString(), "testmsg");
             Assert.That(entry, Is.Not.Null);
 
-            var logs = registry.GetByTimetstamp();
+            var logs = TempEnumerableConvert(registry.GetByTimetstamp());
             Assert.That(logs, Is.Not.Empty);
-
+            
             var entryFromEnumeration = logs.Last();
             Assert.That(entryFromEnumeration, Is.EqualTo(entry));
         }
@@ -431,7 +455,7 @@ namespace Stethoscope.Tests
             entry = registry.AddLog(time.AddSeconds(1).ToString(), "testmsg2");
             Assert.That(registry.AddValueToLog(entry, LogAttribute.Level, 2), Is.True);
 
-            var logs = registry.GetByTimetstamp();
+            var logs = TempEnumerableConvert(registry.GetByTimetstamp());
             Assert.That(logs, Is.Not.Empty);
             
             Assert.That(logs.First().GetAttribute<int>(LogAttribute.Level), Is.EqualTo(1));
@@ -450,7 +474,7 @@ namespace Stethoscope.Tests
             entry = registry.AddLog(time.ToString(), "testmsg1");
             Assert.That(registry.AddValueToLog(entry, LogAttribute.Level, 1), Is.True);
 
-            var logs = registry.GetByTimetstamp();
+            var logs = TempEnumerableConvert(registry.GetByTimetstamp());
             Assert.That(logs, Is.Not.Empty);
 
             Assert.That(logs.First().GetAttribute<int>(LogAttribute.Level), Is.EqualTo(1));
@@ -470,7 +494,7 @@ namespace Stethoscope.Tests
             registry.AddValueToLog(entry, LogAttribute.Message, "msg2");
             registry.NotifyFailedLogParsed(entry);
 
-            var logs = registry.GetByTimetstamp();
+            var logs = TempEnumerableConvert(registry.GetByTimetstamp());
             Assert.That(logs, Is.Not.Empty);
 
             Assert.That(logs.Select(log => log.Message), Is.SubsetOf(new string[] { "msg2", "msg1" }).And.Exactly(2).Items);
@@ -488,7 +512,7 @@ namespace Stethoscope.Tests
             registry.AddValueToLog(entry, LogAttribute.Timestamp, time);
             registry.AddValueToLog(entry, LogAttribute.Message, "msg2");
 
-            var logs = registry.GetByTimetstamp();
+            var logs = TempEnumerableConvert(registry.GetByTimetstamp());
             Assert.That(logs, Is.Not.Empty);
 
             Assert.That(logs.Select(log => log.Message), Is.SubsetOf(new string[] { "msg1" }).And.Exactly(1).Items);
@@ -505,7 +529,7 @@ namespace Stethoscope.Tests
             entry = registry.AddFailedLog();
             registry.AddValueToLog(entry, LogAttribute.Message, "msg2");
 
-            var logs = registry.GetByTimetstamp();
+            var logs = TempEnumerableConvert(registry.GetByTimetstamp());
             Assert.That(logs, Is.Not.Empty);
 
             Assert.That(logs, Has.Exactly(1).Items);
@@ -522,7 +546,7 @@ namespace Stethoscope.Tests
             entry = registry.AddFailedLog();
             registry.AddValueToLog(entry, LogAttribute.Timestamp, "not-timestamp");
 
-            var logs = registry.GetByTimetstamp();
+            var logs = TempEnumerableConvert(registry.GetByTimetstamp());
             Assert.That(logs, Is.Not.Empty);
 
             Assert.That(logs, Has.Exactly(1).Items);
@@ -535,12 +559,12 @@ namespace Stethoscope.Tests
             var entry = registry.AddLog(DateTime.Now.ToString(), "testmsg");
             Assert.That(entry, Is.Not.Null);
 
-            var logs = registry.GetByTimetstamp();
+            var logs = TempEnumerableConvert(registry.GetByTimetstamp());
             Assert.That(logs, Is.Not.Empty);
 
             registry.Clear();
 
-            logs = registry.GetByTimetstamp();
+            logs = TempEnumerableConvert(registry.GetByTimetstamp());
             Assert.That(logs, Is.Empty);
         }
 

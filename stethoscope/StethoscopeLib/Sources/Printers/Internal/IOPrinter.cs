@@ -1,7 +1,8 @@
 ﻿using Stethoscope.Common;
 
+using System;
 using System.IO;
-using System.Linq;
+using System.Reactive.Linq;
 
 namespace Stethoscope.Printers.Internal
 {
@@ -19,20 +20,27 @@ namespace Stethoscope.Printers.Internal
         protected void PrintThreadTraces()
         {
             var threads = logRegistry.GetBy(LogAttribute.ThreadID);
-            foreach (var thread in threads)
+            threads.Subscribe(thread =>
             {
                 int indent = 0;
                 TextWriter.WriteLine($"Thread {thread.Key}");
+                
+                string initSrc = "";
+                string lastFunc = "";
+                string lastFuncSrc = "";
 
-                var firstAttribute = thread.Value.First();
-                var initSrc = firstAttribute.GetAttribute<string>(LogAttribute.SourceFile);
-                var lastFunc = firstAttribute.GetAttribute<string>(LogAttribute.Function);
-
-                var lastFuncSrc = $"{initSrc}.{lastFunc}";
-
-                TextWriter.WriteLine($"Start {lastFunc} // {initSrc}");
-                foreach (var log in thread.Value)
+                thread.Subscribe(log =>
                 {
+                    if (initSrc == "")
+                    {
+                        initSrc = log.GetAttribute<string>(LogAttribute.SourceFile);
+                        lastFunc = log.GetAttribute<string>(LogAttribute.Function);
+
+                        lastFuncSrc = $"{initSrc}.{lastFunc}";
+
+                        TextWriter.WriteLine($"Start {lastFunc} // {initSrc}");
+                    }
+
                     var src = log.GetAttribute<string>(LogAttribute.SourceFile);
                     var function = log.GetAttribute<string>(LogAttribute.Function);
                     var funcSrc = $"{src}.{function}";
@@ -47,11 +55,12 @@ namespace Stethoscope.Printers.Internal
                     }
 
                     TextWriter.WriteLine($"{GenerateIndentLog(indent + 1)}{log.Message}");
-                }
-
-                TextWriter.WriteLine($"End {lastFunc}");
-                TextWriter.WriteLine();
-            }
+                }, () =>
+                {
+                    TextWriter.WriteLine($"End {lastFunc}");
+                    TextWriter.WriteLine();
+                });
+            });
         }
 
         public virtual void Print() => PrintThreadTraces();

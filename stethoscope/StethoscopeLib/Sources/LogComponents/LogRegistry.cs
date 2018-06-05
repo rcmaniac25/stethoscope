@@ -3,6 +3,8 @@ using Stethoscope.Log.Internal;
 
 using System;
 using System.Collections.Generic;
+using System.Reactive.Linq;
+using System.Reactive.Subjects;
 
 namespace Stethoscope.Log
 {
@@ -63,6 +65,7 @@ namespace Stethoscope.Log
             }
         }
 
+        //TODO: replace logs with an observable
         private List<ILogEntry> logs = new List<ILogEntry>();
         private readonly IlogEntryComparer logEntryComparer = new IlogEntryComparer();
 
@@ -224,25 +227,40 @@ namespace Stethoscope.Log
             }
             return result;
         }
-
-        //TODO: make threadsafe
-        public IDictionary<object, IEnumerable<ILogEntry>> GetBy(LogAttribute attribute) => GetLogBy(attribute, logs);
-
-        public IEnumerable<ILogEntry> GetByTimetstamp()
+        
+        public IObservable<IGroupedObservable<object, ILogEntry>> GetBy(LogAttribute attribute)
         {
-            //TODO: make threadsafe
-            foreach (var log in logs)
+            if (attribute == LogAttribute.Timestamp)
             {
-                if (!log.IsValid &&
-                    ((log is IInternalLogEntry && ((IInternalLogEntry)log).HasTimestampChanged) || 
-                    !log.HasAttribute(LogAttribute.Timestamp) || !(log.GetAttribute<object>(LogAttribute.Timestamp) is DateTime)))
-                {
-                    // Special case to ensure that message (which doesn't apply here anyway) and timestamp match the expected types
-                    // For failed logs, timestamps that haven't been sorted are ignored.
-                    continue;
-                }
-                yield return log;
+                return null;
             }
+            return logs.ToObservable().Where(log =>
+            {
+                if (log.HasAttribute(attribute))
+                {
+                    if (!log.IsValid && attribute == LogAttribute.Message && !(log.GetAttribute<object>(attribute) is string))
+                    {
+                        // Special case to ensure that message and timestamp (which doesn't work here anyway) match the expected types
+                        return false;
+                    }
+                    return true;
+                }
+                return false;
+            }).GroupBy(log => log.GetAttribute<object>(attribute));
+        }
+
+        public IObservable<ILogEntry> GetByTimetstamp()
+        {
+            return logs.ToObservable().Where(log =>
+            {
+                // Special case to ensure that message (which doesn't apply here anyway) and timestamp match the expected types
+                // For failed logs, timestamps that haven't been sorted are ignored.
+                var isInvalid = !log.IsValid &&
+                    ((log is IInternalLogEntry && ((IInternalLogEntry)log).HasTimestampChanged) ||
+                    !log.HasAttribute(LogAttribute.Timestamp) || !(log.GetAttribute<object>(LogAttribute.Timestamp) is DateTime));
+
+                return !isInvalid;
+            });
         }
 
         //TODO: special get functions - get by function, get by thread ID, get by <key>, etc.

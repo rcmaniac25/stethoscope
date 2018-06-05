@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Reactive.Linq;
 
 namespace Stethoscope.Common
 {
@@ -43,11 +44,11 @@ namespace Stethoscope.Common
         /// </summary>
         /// <param name="attribute">The attribute to get entries by.</param>
         /// <returns>Logs grouped by the specified attribute.</returns>
-        IDictionary<object, IEnumerable<ILogEntry>> GetBy(LogAttribute attribute);
+        IObservable<IGroupedObservable<object, ILogEntry>> GetBy(LogAttribute attribute);
         /// <summary>
         /// Get logs, ordered by timestamp.
         /// </summary>
-        /// <returns>Enumeration of all log entries by time. Entries missing timestamps are not included.</returns>
-        IEnumerable<ILogEntry> GetByTimetstamp();
+        /// <returns>Observable of all log entries by time. Entries missing timestamps are not included.</returns>
+        IObservable<ILogEntry> GetByTimetstamp();
     }
 }

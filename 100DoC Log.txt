@@ -658,3 +658,10 @@ void doSomethingCool(std::ifstream& input)
 - The end goal is to allow multi-thread add/read of logs without exception. Since constant adding of logs could make it so that iteration never ends, we can't put a mutex or lock into the iteration code. Also, async-iterators are... not that great: https://codeblog.jonskeet.uk/2009/10/23/iterating-atomically/
 - Past experience with Rx tells me that replacing with lists with iterators will make changing to Rx really easy... and we already switched to iterators, so this will be easy.
 - Minor benefit: Rx exists for numerous languages, which means that we can move it to a different language later.
+
+#54.2. 6/04/2018:
+- Goal was to start working on switching from iterators with exposed classes, to observables
+- Mostly succeeded. I didn't update GetLogBy or the storage within LogRegistry, but nearly everything else is done
+- Only problem that was encountered was one of the logging tests failed because the outer subscription (threads) runs before the inner subscription (logs) finishes
+- I also had to place some weird methods for converting from observable to enumeration in registry tests, first so later removal makes it apparent what needs to be replaced, second because NUnit doesn't support checking Observables and I wanted to switch to observables before doing any work for nunit so they'd be understood.
+- Tomorrow's goal is to get the test to pass, finish work on LogRegistry, and then maybe move to the NUnit Observable support
