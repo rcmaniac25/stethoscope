@@ -58,9 +58,9 @@ namespace Stethoscope.Parsers.Internal.XML
                         buffer = new List<XNode>();
                         foreach (var node in currentNodes)
                         {
-                            if (node is XContainer)
+                            if (node is XContainer container)
                             {
-                                var newNode = (node as XContainer).Nodes().ElementAtOrDefault(section.IndexValue);
+                                var newNode = container.Nodes().ElementAtOrDefault(section.IndexValue);
                                 if (newNode != null)
                                 {
                                     buffer.Add(newNode);
@@ -88,7 +88,7 @@ namespace Stethoscope.Parsers.Internal.XML
                         buffer = new List<XNode>();
                         foreach (var node in currentNodes)
                         {
-                            var children = node is XContainer ? (node as XContainer).Nodes() : Enumerable.Empty<XNode>();
+                            var children = node is XContainer container ? container.Nodes() : Enumerable.Empty<XNode>();
                             var testSelf = !children.Any();
                             if (testSelf)
                             {
@@ -116,13 +116,13 @@ namespace Stethoscope.Parsers.Internal.XML
                         foreach (var node in currentNodes)
                         {
                             var bufferCount = buffer.Count;
-                            if (node is XContainer)
+                            if (node is XContainer container)
                             {
-                                buffer.AddRange((node as XContainer).Nodes().Where(child => child is XElement && (child as XElement).Name.LocalName == section.StringValue));
+                                buffer.AddRange(container.Nodes().Where(child => child is XElement e && e.Name.LocalName == section.StringValue));
                             }
-                            if (isLastNode && node is XElement && bufferCount == buffer.Count)
+                            if (isLastNode && node is XElement elem && bufferCount == buffer.Count)
                             {
-                                return (node as XElement).Attribute(section.StringValue)?.Value;
+                                return elem.Attribute(section.StringValue)?.Value;
                             }
                         }
                         currentNodes = buffer;
@@ -136,17 +136,17 @@ namespace Stethoscope.Parsers.Internal.XML
             if (currentNodes.Count > 0)
             {
                 var topNode = currentNodes[0];
-                if (topNode is XElement)
+                if (topNode is XElement elem)
                 {
-                    return (topNode as XElement).Value;
+                    return elem.Value;
                 }
-                else if (topNode is XCData)
+                else if (topNode is XCData data)
                 {
-                    return (topNode as XCData).Value;
+                    return data.Value;
                 }
-                else if (topNode is XText)
+                else if (topNode is XText text)
                 {
-                    return (topNode as XText).Value;
+                    return text.Value;
                 }
             }
             return null;
@@ -491,11 +491,14 @@ namespace Stethoscope.Parsers.Internal.XML
                 if (config.ContainsKey(ContextConfigs.FailureHandling))
                 {
                     var value = config[ContextConfigs.FailureHandling];
-                    if (!(value is LogParserFailureHandling))
+                    if (value is LogParserFailureHandling handling)
+                    {
+                        this.config.FailureHandling = handling;
+                    }
+                    else
                     {
                         throw new ArgumentException("FailureHandling must be a LogParserFailureHandling enum", "config");
                     }
-                    this.config.FailureHandling = (LogParserFailureHandling)value;
                 }
             }
 

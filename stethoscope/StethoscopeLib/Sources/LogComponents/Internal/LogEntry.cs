@@ -53,9 +53,9 @@ namespace Stethoscope.Log.Internal
 
         public override bool Equals(object obj)
         {
-            if (obj != null && obj is LogEntry)
+            if (obj is LogEntry entry)
             {
-                return Equals((LogEntry)obj);
+                return Equals(entry);
             }
             return false;
         }

@@ -665,3 +665,13 @@ void doSomethingCool(std::ifstream& input)
 - Only problem that was encountered was one of the logging tests failed because the outer subscription (threads) runs before the inner subscription (logs) finishes
 - I also had to place some weird methods for converting from observable to enumeration in registry tests, first so later removal makes it apparent what needs to be replaced, second because NUnit doesn't support checking Observables and I wanted to switch to observables before doing any work for nunit so they'd be understood.
 - Tomorrow's goal is to get the test to pass, finish work on LogRegistry, and then maybe move to the NUnit Observable support
+
+#55.2. 6/05/2018:
+- So the issue I encountered is that observables are pushed based. It's by design... but I had written a "nice printer type" that expected everything one-at-a-time.
+- Changing to observables made this apparent now, rather then at a later point when items would've been designed for a pull-based (enumerations) system.
+- Observables also force async, though it's somewhat transparent though some "ObserveOn" functions will probably be needed later.
+- To the point, I did a weird trick to get the observables to be provided in a one-at-a-time manner and, since the existing concat functions would've simplfied the grouping observables to just the values, took advantage of C# 7's pattern matching syntax.
+- If discriminated unions existed in C#, I'd use that since then I can just match on expected types instead of hoping for specific types.
+- Speaking of pattern matching, I implemented that everywhere else where it could be used.
+- I also do one more update to LogRegistry so the grouping function would use observables.
+- I planned on switching the backing storage of LogRegistry to use observables, but I knew that would take a while and it's late right now and I don't want a repeat of yesterday (that work took 3.5 hours because I was re-learning Observables while implementing them, trying to find the documentation that I wanted (it used to be good...), and I progressivly get slower as it gets later)

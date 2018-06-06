@@ -4,7 +4,6 @@ using Stethoscope.Log.Internal;
 using System;
 using System.Collections.Generic;
 using System.Reactive.Linq;
-using System.Reactive.Subjects;
 
 namespace Stethoscope.Log
 {
@@ -22,9 +21,9 @@ namespace Stethoscope.Log
                 if (entry.HasAttribute(LogAttribute.Timestamp))
                 {
                     var timestamp = entry.GetAttribute<object>(LogAttribute.Timestamp);
-                    if (timestamp is DateTime)
+                    if (timestamp is DateTime ts)
                     {
-                        return (DateTime)timestamp;
+                        return ts;
                     }
                 }
                 
@@ -157,7 +156,7 @@ namespace Stethoscope.Log
                 lock (logs)
                 {
                     //XXX depending on the size of the log list, this could be a really long search. Perhaps have a function that marks the start of some parsing, or a general checkpoint, since all failed parses will be added to the end of the list. This way we can offset the search.
-                    var index = logs.FindIndex(en => en is IInternalLogEntry && ((IInternalLogEntry)en).ID == failedLog.ID);
+                    var index = logs.FindIndex(en => en is IInternalLogEntry internalEntry && internalEntry.ID == failedLog.ID);
                     if (index < 0)
                     {
                         throw new ArgumentException("Failed log does not exist in this registry", "entry");
@@ -174,16 +173,16 @@ namespace Stethoscope.Log
 
         public bool AddValueToLog(ILogEntry entry, LogAttribute attribute, object value)
         {
-            if (!(entry is IInternalLogEntry))
+            if (value == null)
             {
                 return false;
             }
-            if (entry.HasAttribute(attribute) || entry == null || value == null)
+            if (entry is IInternalLogEntry internalEntry && !entry.HasAttribute(attribute))
             {
-                return false;
+                internalEntry.AddAttribute(attribute, value);
+                return true;
             }
-            (entry as IInternalLogEntry).AddAttribute(attribute, value);
-            return true;
+            return false;
         }
 
         public void Clear()
@@ -193,48 +192,14 @@ namespace Stethoscope.Log
                 logs.Clear();
             }
         }
-
-        public static IDictionary<object, IEnumerable<ILogEntry>> GetLogBy(LogAttribute attribute, IEnumerable<ILogEntry> entries)
-        {
-            //XXX Initial implementation... should stream instead of building a dictionary (like when doing a groupBy)
-            if (attribute == LogAttribute.Timestamp)
-            {
-                return null;
-            }
-            var tmpResult = new Dictionary<object, List<ILogEntry>>();
-            foreach (var log in entries)
-            {
-                if (log.HasAttribute(attribute))
-                {
-                    var key = log.GetAttribute<object>(attribute);
-                    if (!log.IsValid && attribute == LogAttribute.Message && !(key is string))
-                    {
-                        // Special case to ensure that message and timestamp (which doesn't work here anyway) match the expected types
-                        continue;
-                    }
-                    if (!tmpResult.ContainsKey(key))
-                    {
-                        tmpResult.Add(key, new List<ILogEntry>());
-                    }
-                    tmpResult[key].Add(log);
-                }
-            }
-
-            var result = new Dictionary<object, IEnumerable<ILogEntry>>();
-            foreach (var kv in tmpResult)
-            {
-                result.Add(kv.Key, kv.Value.AsReadOnly());
-            }
-            return result;
-        }
         
-        public IObservable<IGroupedObservable<object, ILogEntry>> GetBy(LogAttribute attribute)
+        public static IObservable<IGroupedObservable<object, ILogEntry>> GetLogBy(LogAttribute attribute, IObservable<ILogEntry> entries)
         {
             if (attribute == LogAttribute.Timestamp)
             {
                 return null;
             }
-            return logs.ToObservable().Where(log =>
+            return entries.Where(log =>
             {
                 if (log.HasAttribute(attribute))
                 {
@@ -248,6 +213,8 @@ namespace Stethoscope.Log
                 return false;
             }).GroupBy(log => log.GetAttribute<object>(attribute));
         }
+
+        public IObservable<IGroupedObservable<object, ILogEntry>> GetBy(LogAttribute attribute) => GetLogBy(attribute, logs.ToObservable());
 
         public IObservable<ILogEntry> GetByTimetstamp()
         {
