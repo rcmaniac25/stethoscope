@@ -498,7 +498,7 @@ void doSomethingCool(std::ifstream& input)
 #38.2. 5/19/2018:
 - Started working on FailedLogEntry. I say "started" because as I started working to integrate it into the registry and update tests, I had a bunch of questions...
 - Good questions, like can I compare LogEntry to FailedLogEntry? What about Equals?
-- It's a good start, and I like some of the ideas. Also, adding this functionality means the failure handling can work as a developer intents. Or maybe, how the log source can be used. A single log may want failure, multiple file logs may want to skip, while a log stream may want to attempt to parse.
+- It's a good start, and I like some of the ideas. Also, adding this functionality means the failure handling can work as a developer intends. Or maybe, how the log source can be used. A single log may want failure, multiple file logs may want to skip, while a log stream may want to attempt to parse.
 - ...and the handling questions will allow that to work without any "oh, BTW, the Equals function doesn't work if you set this one global value". It shouldn't care about your config.
 - I also learned that `Property { get => "hi"; }` can be simplified to `Property => "hi";`
 
@@ -675,3 +675,20 @@ void doSomethingCool(std::ifstream& input)
 - Speaking of pattern matching, I implemented that everywhere else where it could be used.
 - I also do one more update to LogRegistry so the grouping function would use observables.
 - I planned on switching the backing storage of LogRegistry to use observables, but I knew that would take a while and it's late right now and I don't want a repeat of yesterday (that work took 3.5 hours because I was re-learning Observables while implementing them, trying to find the documentation that I wanted (it used to be good...), and I progressivly get slower as it gets later)
+
+#56.2. 6/06/2018:
+- So I spent a bit reading through Rx and thinking: how do I replace the array of elements
+- I came to the following requirements for the storage: I need it to replay, sorted, and "lossy". I also wanted to be able to count the number of log elements, clear the logs, and it needed a better way of handling "buffered" content.
+- Why for each feature?
+-- Replay: kindof obvious; need to to be able to go through logs
+-- Sorted: This one will be needed when GetByTimetstamp is needed, and it's easier to sort on insert then at runtime.
+-- Lossy: This is just the name I gave this... basically, given the nature of observables, if a new subscription occurs, it should replay everything. But if an existing subscription is in use, and it's getting data, and a new log comes in (say, from a new source) and has a timestamp earlier then what we've iterated on, then ignore it. We don't need to revisit the past right now.
+- Clearing is easy, counting is mostly easy, and the buffered content is just to handle failed logs until the registry is notified of there completion.
+- Once I realized the work is gonna be a long time, I decided to deplay it to tomorrow. Instead I did the long running "let me read through old 100DoC logs and see if there's any todos I missed". There weren't any.
+- One realization is that I may have to implement Queriable, or for observables, IQbservable. I came to this because replay is easy (so long as the data is small), but sorting an observable is nearly impossible. I could stick to the array and just do AsObservable, but that's gonna get weird once we insert something mid-iteration. Maybe it's already "lossy". But I could also go to a database...
+- Then my mind wondered, and I realized maybe a sub-class for specifying the storage system. List (default), InMemoryDB, FileDB, Auto? (which would switch between them as time went on... it sounds cool but probably not)
+- So... if I have a DB, then I can simply request a sorted list. But wait, I've wanted to have Queriable... and IQbservable is a query-enabled observable... and queries work well with DBs.
+- It just kindof all fit together, I can make a storage type for the registry, make everything queriable, and it should all produce an efficant and functional system.
+- And once that's done, it should make handling large logs easier and faster... and that comes after this work. So it's just in time.
+- (ok, looking at the task list, I'm doing stats next... useful for determining if the work is really useful and possibly to gather some early stats for determining "should the default storage be a list, InMemoryDB, or FileDB?")
+- (ok... also missed making sure NUnit supported Observables...)

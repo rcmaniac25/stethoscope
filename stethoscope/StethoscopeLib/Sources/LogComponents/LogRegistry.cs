@@ -223,7 +223,7 @@ namespace Stethoscope.Log
                 // Special case to ensure that message (which doesn't apply here anyway) and timestamp match the expected types
                 // For failed logs, timestamps that haven't been sorted are ignored.
                 var isInvalid = !log.IsValid &&
-                    ((log is IInternalLogEntry && ((IInternalLogEntry)log).HasTimestampChanged) ||
+                    ((log is IInternalLogEntry internalLog && internalLog.HasTimestampChanged) ||
                     !log.HasAttribute(LogAttribute.Timestamp) || !(log.GetAttribute<object>(LogAttribute.Timestamp) is DateTime));
 
                 return !isInvalid;
