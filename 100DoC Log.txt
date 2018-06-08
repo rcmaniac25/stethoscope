@@ -692,3 +692,9 @@ void doSomethingCool(std::ifstream& input)
 - And once that's done, it should make handling large logs easier and faster... and that comes after this work. So it's just in time.
 - (ok, looking at the task list, I'm doing stats next... useful for determining if the work is really useful and possibly to gather some early stats for determining "should the default storage be a list, InMemoryDB, or FileDB?")
 - (ok... also missed making sure NUnit supported Observables...)
+
+#57.2. 6/07/2018:
+- I talked with a friend about the observable design for longed then expected...
+- I'm going to go with the plan I had yesterday, but hide it with a factory.
+- The factory will use a set of criteria (unused as of this commit) to pick which storage to use.
+- But... due to that conversation going for a bit, I'll have to do the storage implementation and work tomorrow.

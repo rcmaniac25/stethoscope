@@ -21,7 +21,7 @@ namespace Stethoscope
         private ILogParser logFileParser;
         private IPrinter printer;
 
-        private LogRegistry registry;
+        private ILogRegistry registry;
 
         #region Argument Parsing
 
@@ -77,10 +77,12 @@ namespace Stethoscope
         public void Setup()
         {
             //XXX use config to get this info
+            var registryFactory = LogRegistryFactory.Create();
+
             var parserFactory = LogParserFactory.GetParserForFileExtension("xml");
             var printerFactory = PrinterFactory.CrateConsoleFactory();
 
-            registry = new LogRegistry();
+            registry = registryFactory.Create();
 
             logFileParser = parserFactory.Create(registry, config);
             printer = printerFactory.Create(registry, config);

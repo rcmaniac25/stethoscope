@@ -1,4 +1,4 @@
-﻿using Stethoscope.Log;
+﻿using Stethoscope.Log.Internal;
 using Stethoscope.Printers.Internal;
 
 using NUnit.Framework;

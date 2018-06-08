@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Reactive.Linq;
 
-namespace Stethoscope.Log
+namespace Stethoscope.Log.Internal
 {
     public class LogRegistry : ILogRegistry
     {

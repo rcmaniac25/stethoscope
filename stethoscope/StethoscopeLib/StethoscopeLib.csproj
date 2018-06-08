@@ -27,4 +27,8 @@
     <PackageReference Include="System.Reactive" Version="4.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Sources\LogComponents\Internal\Storage\" />
+  </ItemGroup>
+
 </Project>

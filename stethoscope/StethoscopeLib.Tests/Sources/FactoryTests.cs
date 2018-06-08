@@ -1,4 +1,5 @@
 ﻿using Stethoscope.Common;
+using Stethoscope.Log;
 using Stethoscope.Parsers;
 using Stethoscope.Printers;
 
@@ -58,5 +59,20 @@ namespace Stethoscope.Tests
             Assert.That(parser, Is.Not.Null);
             Assert.That(parser, Is.TypeOf<Parsers.Internal.XML.XMLLogParser>());
         }
+
+        [Test(TestOf = typeof(LogRegistryFactory))]
+        public void LogRegistryFactoryProducesRegistry()
+        {
+            var factory = LogRegistryFactory.Create();
+
+            Assert.That(factory, Is.Not.Null);
+
+            var registry = factory.Create();
+
+            Assert.That(registry, Is.Not.Null);
+            Assert.That(registry, Is.TypeOf<Log.Internal.LogRegistry>());
+        }
+
+        //TODO: log registry factory tests for different storage
     }
 }

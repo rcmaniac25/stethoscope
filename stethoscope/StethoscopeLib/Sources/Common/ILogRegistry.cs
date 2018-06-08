@@ -37,8 +37,7 @@ namespace Stethoscope.Common
         /// </summary>
         /// <param name="entry">The failed log entry. Any other log entry will throw an exception.</param>
         void NotifyFailedLogParsed(ILogEntry entry);
-
-        //TODO: switch to an enumeration of IGrouping
+        
         /// <summary>
         /// Get logs by a specific attribute.
         /// </summary>
