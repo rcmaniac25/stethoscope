@@ -698,3 +698,12 @@ void doSomethingCool(std::ifstream& input)
 - I'm going to go with the plan I had yesterday, but hide it with a factory.
 - The factory will use a set of criteria (unused as of this commit) to pick which storage to use.
 - But... due to that conversation going for a bit, I'll have to do the storage implementation and work tomorrow.
+
+#58.2. 6/08/2018:
+- So much for doing the storage implementation "tomorrow". And as a heads up, I hope to do more _tommorrow_...
+- Basically, I took a look at IQbservable and went "this is cool... how do I utilize this?" and everyone else seems to have the same question.
+- I found a promissing project (https://github.com/RxDave/Qactive) though haven't looked it over enough yet to be able to determine if it's useful...
+- But besides that... it's again, many people going "it would be great to recieve values as they appear, with filters, and done server side instead of client side" and then nobody having a DB connection or something that can be utilized.
+- My initial plan is just to have a list anyway, so it's not going to be anything incredible. Heck, it could just be I take the expression from the Qbservable, execute it on the list, and as I get results back, return.
+- But for now, after glancing at a lot of discussions and some code, I just made an interface. I don't want it to just be a mini-ILogRegistry. it should be storage of ILogEntries and nothing more. Closer to ICollection<ILogEntry>.
+- I doubt this is the final design, but I can at least do something to get an idea out.
