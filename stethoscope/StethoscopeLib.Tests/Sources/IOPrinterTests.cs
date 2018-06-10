@@ -15,7 +15,8 @@ namespace Stethoscope.Tests
         [SetUp]
         public virtual void Setup()
         {
-            logRegistry = new LogRegistry();
+            //TODO
+            logRegistry = new LogRegistry(null);
             logConfig = new LogConfig()
             {
                 TimestampPath = "TimePath",

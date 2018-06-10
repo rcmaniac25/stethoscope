@@ -38,11 +38,17 @@ namespace Stethoscope.Tests
             }
             return obs.ToDictionary(group => group.Key, group => group.ToEnumerable()).Wait();
         }
+
+        private static LogRegistry CreateLogRegistry()
+        {
+            //TODO
+            return new LogRegistry(null);
+        }
         
         [Test]
         public void GetLogsEmpty()
         {
-            var registry = new LogRegistry();
+            var registry = CreateLogRegistry();
             var logs = TempDictConvertGrouped(registry.GetBy(LogAttribute.Level));
             Assert.That(logs, Is.Empty);
         }
@@ -50,7 +56,7 @@ namespace Stethoscope.Tests
         [Test]
         public void AddLog()
         {
-            var registry = new LogRegistry();
+            var registry = CreateLogRegistry();
             var entry = registry.AddLog(DateTime.Now.ToString(), "testmsg");
             Assert.That(entry, Is.Not.Null);
 
@@ -64,7 +70,7 @@ namespace Stethoscope.Tests
             var logmsg = "testmsg";
             var timestamp = DateTime.Now;
 
-            var registry = new LogRegistry();
+            var registry = CreateLogRegistry();
             var entry = registry.AddLog(timestamp.ToString(), logmsg);
             Assert.That(entry, Is.Not.Null);
 
@@ -77,7 +83,7 @@ namespace Stethoscope.Tests
         [Test]
         public void AddLogInvalidMessage()
         {
-            var registry = new LogRegistry();
+            var registry = CreateLogRegistry();
             Assert.Throws<ArgumentNullException>(() =>
             {
                 registry.AddLog(DateTime.Now.ToString(), null);
@@ -87,7 +93,7 @@ namespace Stethoscope.Tests
         [Test]
         public void AddLogInvalidTimestamp()
         {
-            var registry = new LogRegistry();
+            var registry = CreateLogRegistry();
             Assert.Throws<ArgumentException>(() =>
             {
                 registry.AddLog("cookie", "testmsg");
@@ -97,7 +103,7 @@ namespace Stethoscope.Tests
         [Test]
         public void AddFailedLog()
         {
-            var registry = new LogRegistry();
+            var registry = CreateLogRegistry();
             var entry = registry.AddFailedLog();
             Assert.That(entry, Is.Not.Null);
 
@@ -107,7 +113,7 @@ namespace Stethoscope.Tests
         [Test]
         public void NotifyFailedLogParsed()
         {
-            var registry = new LogRegistry();
+            var registry = CreateLogRegistry();
             var entry = registry.AddFailedLog();
             Assert.That(entry, Is.Not.Null);
 
@@ -117,7 +123,7 @@ namespace Stethoscope.Tests
         [Test]
         public void NotifyFailedLogParsedNull()
         {
-            var registry = new LogRegistry();
+            var registry = CreateLogRegistry();
             Assert.Throws<ArgumentNullException>(() =>
             {
                 registry.NotifyFailedLogParsed(null);
@@ -127,7 +133,7 @@ namespace Stethoscope.Tests
         [Test]
         public void NotifyFailedLogParsedWithGoodLog()
         {
-            var registry = new LogRegistry();
+            var registry = CreateLogRegistry();
             var entry = registry.AddLog(DateTime.Now.ToString(), "testmsg");
             Assert.That(entry, Is.Not.Null);
 
@@ -140,7 +146,7 @@ namespace Stethoscope.Tests
         [Test]
         public void AddValueToLog()
         {
-            var registry = new LogRegistry();
+            var registry = CreateLogRegistry();
             var entry = registry.AddLog(DateTime.Now.ToString(), "testmsg");
             Assert.That(entry, Is.Not.Null);
 
@@ -158,7 +164,7 @@ namespace Stethoscope.Tests
         [Test]
         public void AddValueToLogAgain()
         {
-            var registry = new LogRegistry();
+            var registry = CreateLogRegistry();
             var entry = registry.AddLog(DateTime.Now.ToString(), "testmsg");
             Assert.That(entry, Is.Not.Null);
 
@@ -176,7 +182,7 @@ namespace Stethoscope.Tests
         [Test]
         public void AddValueToLogNullValue()
         {
-            var registry = new LogRegistry();
+            var registry = CreateLogRegistry();
             var entry = registry.AddLog(DateTime.Now.ToString(), "testmsg");
             Assert.That(entry, Is.Not.Null);
 
@@ -190,7 +196,7 @@ namespace Stethoscope.Tests
         [Test]
         public void AddValueToLogNullEntry()
         {
-            var registry = new LogRegistry();
+            var registry = CreateLogRegistry();
             var added = registry.AddValueToLog(null, LogAttribute.ThreadID, 1234);
 
             Assert.That(added, Is.False);
@@ -199,7 +205,7 @@ namespace Stethoscope.Tests
         [Test]
         public void AddValueToLogMessage()
         {
-            var registry = new LogRegistry();
+            var registry = CreateLogRegistry();
             var entry = registry.AddLog(DateTime.Now.ToString(), "testmsg");
             Assert.That(entry, Is.Not.Null);
             
@@ -211,7 +217,7 @@ namespace Stethoscope.Tests
         [Test]
         public void AddValueToFailedLogMessage()
         {
-            var registry = new LogRegistry();
+            var registry = CreateLogRegistry();
             var entry = registry.AddFailedLog();
             Assert.That(entry, Is.Not.Null);
 
@@ -223,7 +229,7 @@ namespace Stethoscope.Tests
         [Test]
         public void AddValueToLogTimestamp()
         {
-            var registry = new LogRegistry();
+            var registry = CreateLogRegistry();
             var entry = registry.AddLog(DateTime.Now.ToString(), "testmsg");
             Assert.That(entry, Is.Not.Null);
             
@@ -235,7 +241,7 @@ namespace Stethoscope.Tests
         [Test]
         public void AddValueToFailedLogTimestamp()
         {
-            var registry = new LogRegistry();
+            var registry = CreateLogRegistry();
             var entry = registry.AddFailedLog();
             Assert.That(entry, Is.Not.Null);
 
@@ -247,7 +253,7 @@ namespace Stethoscope.Tests
         [Test]
         public void AddValueToLogInvalidLogEntry()
         {
-            var registry = new LogRegistry();
+            var registry = CreateLogRegistry();
             var entry = Substitute.For<ILogEntry>();
 
             var added = registry.AddValueToLog(entry, LogAttribute.ThreadID, 1234);
@@ -258,7 +264,7 @@ namespace Stethoscope.Tests
         [Test]
         public void AddValueToLogValidLogEntry()
         {
-            var registry = new LogRegistry();
+            var registry = CreateLogRegistry();
             var entry = Substitute.For<IInternalLogEntry>();
 
             var added = registry.AddValueToLog(entry, LogAttribute.ThreadID, 1234);
@@ -270,7 +276,7 @@ namespace Stethoscope.Tests
         [Test]
         public void GetByLogsWithoutAttributes()
         {
-            var registry = new LogRegistry();
+            var registry = CreateLogRegistry();
             var entry = registry.AddLog(DateTime.Now.ToString(), "testmsg");
             Assert.That(entry, Is.Not.Null);
 
@@ -281,7 +287,7 @@ namespace Stethoscope.Tests
         [Test]
         public void GetByLogsSomeAttributesWithUniqueValues()
         {
-            var registry = new LogRegistry();
+            var registry = CreateLogRegistry();
             var entry = registry.AddLog(DateTime.Now.ToString(), "testmsg1");
             Assert.That(entry, Is.Not.Null);
 
@@ -305,7 +311,7 @@ namespace Stethoscope.Tests
         [Test]
         public void GetByLogsSomeAttributesWithDuplicateValues()
         {
-            var registry = new LogRegistry();
+            var registry = CreateLogRegistry();
             var entry = registry.AddLog(DateTime.Now.ToString(), "testmsg1");
             Assert.That(entry, Is.Not.Null);
 
@@ -329,7 +335,7 @@ namespace Stethoscope.Tests
         [Test]
         public void GetByLogsAllAttributesWithUniqueValues()
         {
-            var registry = new LogRegistry();
+            var registry = CreateLogRegistry();
             var entry = registry.AddLog(DateTime.Now.ToString(), "testmsg1");
             Assert.That(entry, Is.Not.Null);
 
@@ -355,7 +361,7 @@ namespace Stethoscope.Tests
         [Test]
         public void GetByLogsInvalidAttribute()
         {
-            var registry = new LogRegistry();
+            var registry = CreateLogRegistry();
             var entry = registry.AddLog(DateTime.Now.ToString(), "testmsg1");
             Assert.That(entry, Is.Not.Null);
 
@@ -369,7 +375,7 @@ namespace Stethoscope.Tests
         [Test]
         public void GetByLogsWithFailedLogs()
         {
-            var registry = new LogRegistry();
+            var registry = CreateLogRegistry();
             var entry = registry.AddLog(DateTime.Now.ToString(), "msg1");
             Assert.That(entry, Is.Not.Null);
 
@@ -389,7 +395,7 @@ namespace Stethoscope.Tests
         [Test]
         public void GetByLogsWithFailedLogsMissingNotify()
         {
-            var registry = new LogRegistry();
+            var registry = CreateLogRegistry();
             var entry = registry.AddLog(DateTime.Now.ToString(), "msg1");
             Assert.That(entry, Is.Not.Null);
 
@@ -407,7 +413,7 @@ namespace Stethoscope.Tests
         [Test]
         public void GetByLogsWithFailedLogsWithoutAttribute()
         {
-            var registry = new LogRegistry();
+            var registry = CreateLogRegistry();
             var entry = registry.AddLog(DateTime.Now.ToString(), "msg1");
             Assert.That(entry, Is.Not.Null);
 
@@ -425,14 +431,14 @@ namespace Stethoscope.Tests
         [Test]
         public void GetByTimetstampEmpty()
         {
-            var registry = new LogRegistry();
+            var registry = CreateLogRegistry();
             Assert.That(TempEnumerableConvert(registry.GetByTimetstamp()), Is.Empty);
         }
 
         [Test]
         public void GetByTimetstamp()
         {
-            var registry = new LogRegistry();
+            var registry = CreateLogRegistry();
             var entry = registry.AddLog(DateTime.Now.ToString(), "testmsg");
             Assert.That(entry, Is.Not.Null);
 
@@ -448,7 +454,7 @@ namespace Stethoscope.Tests
         {
             var time = DateTime.Now;
 
-            var registry = new LogRegistry();
+            var registry = CreateLogRegistry();
             var entry = registry.AddLog(time.ToString(), "testmsg1");
             Assert.That(registry.AddValueToLog(entry, LogAttribute.Level, 1), Is.True);
 
@@ -467,7 +473,7 @@ namespace Stethoscope.Tests
         {
             var time = DateTime.Now;
 
-            var registry = new LogRegistry();
+            var registry = CreateLogRegistry();
             var entry = registry.AddLog(time.AddSeconds(1).ToString(), "testmsg2");
             Assert.That(registry.AddValueToLog(entry, LogAttribute.Level, 2), Is.True);
 
@@ -486,7 +492,7 @@ namespace Stethoscope.Tests
         {
             var time = DateTime.Now;
 
-            var registry = new LogRegistry();
+            var registry = CreateLogRegistry();
             var entry = registry.AddLog(time.AddSeconds(1).ToString(), "msg1");
 
             entry = registry.AddFailedLog();
@@ -505,7 +511,7 @@ namespace Stethoscope.Tests
         {
             var time = DateTime.Now;
 
-            var registry = new LogRegistry();
+            var registry = CreateLogRegistry();
             var entry = registry.AddLog(time.AddSeconds(1).ToString(), "msg1");
 
             entry = registry.AddFailedLog();
@@ -523,7 +529,7 @@ namespace Stethoscope.Tests
         {
             var time = DateTime.Now;
 
-            var registry = new LogRegistry();
+            var registry = CreateLogRegistry();
             var entry = registry.AddLog(time.AddSeconds(1).ToString(), "msg1");
 
             entry = registry.AddFailedLog();
@@ -540,7 +546,7 @@ namespace Stethoscope.Tests
         {
             var time = DateTime.Now;
 
-            var registry = new LogRegistry();
+            var registry = CreateLogRegistry();
             var entry = registry.AddLog(time.AddSeconds(1).ToString(), "msg1");
 
             entry = registry.AddFailedLog();
@@ -555,7 +561,7 @@ namespace Stethoscope.Tests
         [Test]
         public void Clear()
         {
-            var registry = new LogRegistry();
+            var registry = CreateLogRegistry();
             var entry = registry.AddLog(DateTime.Now.ToString(), "testmsg");
             Assert.That(entry, Is.Not.Null);
 
@@ -571,14 +577,14 @@ namespace Stethoscope.Tests
         [Test]
         public void LogCountEmpty()
         {
-            var registry = new LogRegistry();
+            var registry = CreateLogRegistry();
             Assert.That(registry.LogCount, Is.Zero);
         }
 
         [Test]
         public void LogCount()
         {
-            var registry = new LogRegistry();
+            var registry = CreateLogRegistry();
             var entry = registry.AddLog(DateTime.Now.ToString(), "testmsg");
             Assert.That(entry, Is.Not.Null);
 
@@ -590,7 +596,7 @@ namespace Stethoscope.Tests
         {
             var time = DateTime.Now;
 
-            var registry = new LogRegistry();
+            var registry = CreateLogRegistry();
             var entry = registry.AddLog(time.AddSeconds(1).ToString(), "msg1");
 
             entry = registry.AddFailedLog();
@@ -606,7 +612,7 @@ namespace Stethoscope.Tests
         {
             var time = DateTime.Now;
 
-            var registry = new LogRegistry();
+            var registry = CreateLogRegistry();
             var entry = registry.AddLog(time.AddSeconds(1).ToString(), "msg1");
 
             entry = registry.AddFailedLog();
@@ -621,7 +627,7 @@ namespace Stethoscope.Tests
         {
             var time = DateTime.Now;
 
-            var registry = new LogRegistry();
+            var registry = CreateLogRegistry();
             var entry = registry.AddLog(time.AddSeconds(1).ToString(), "msg1");
 
             entry = registry.AddFailedLog();

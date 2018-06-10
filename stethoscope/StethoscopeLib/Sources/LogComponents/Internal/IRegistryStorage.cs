@@ -8,11 +8,10 @@ namespace Stethoscope.Log.Internal
     public interface IRegistryStorage
     {
         IQbservable<ILogEntry> Entries { get; }
-
         int Count { get; }
+        LogAttribute SortAttribute { get; }
 
-        Guid AddLog(ILogEntry entry);
-        //XXX: update?
+        Guid AddLogSorted(ILogEntry entry);
         void Clear();
 
         //XXX: close/shutdown?

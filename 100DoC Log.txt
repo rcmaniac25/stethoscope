@@ -707,3 +707,8 @@ void doSomethingCool(std::ifstream& input)
 - My initial plan is just to have a list anyway, so it's not going to be anything incredible. Heck, it could just be I take the expression from the Qbservable, execute it on the list, and as I get results back, return.
 - But for now, after glancing at a lot of discussions and some code, I just made an interface. I don't want it to just be a mini-ILogRegistry. it should be storage of ILogEntries and nothing more. Closer to ICollection<ILogEntry>.
 - I doubt this is the final design, but I can at least do something to get an idea out.
+
+#59.2. 6/09/2018:
+- Again, not much work today.
+- All I did was substitute the old implementation of LogRegistry with the initial work on implementing IRegistryStorage usage.
+- Ah, a few tests didn't compile... refactored LogRegistry creation to a function for them so only one spot needs to be updated. Should probably switch to using the LogFactory anyway.
