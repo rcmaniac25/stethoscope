@@ -1,6 +1,7 @@
 ﻿using Stethoscope.Common;
 using Stethoscope.Log;
 using Stethoscope.Log.Internal;
+using Stethoscope.Log.Internal.Storage;
 using Stethoscope.Tests.Helpers;
 
 using NSubstitute;
@@ -41,8 +42,8 @@ namespace Stethoscope.Tests
 
         private static LogRegistry CreateLogRegistry()
         {
-            //TODO
-            return new LogRegistry(null);
+            //TODO ?
+            return new LogRegistry(new ListStorage());
         }
         
         [Test]
@@ -638,5 +639,7 @@ namespace Stethoscope.Tests
 
             Assert.That(registry.LogCount, Is.EqualTo(1));
         }
+
+        //XXX: is there a way to test registry.Logs, or just stick to the extension functions?
     }
 }

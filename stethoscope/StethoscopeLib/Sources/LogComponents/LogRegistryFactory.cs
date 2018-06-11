@@ -1,5 +1,6 @@
 ﻿using Stethoscope.Common;
 using Stethoscope.Log.Internal;
+using Stethoscope.Log.Internal.Storage;
 
 namespace Stethoscope.Log
 {
@@ -16,7 +17,7 @@ namespace Stethoscope.Log
             public ILogRegistry Create(RegistrySelectionCriteria criteria)
             {
                 //XXX we don't care about criteria for now, but it will be used to pick "storage"
-                return new LogRegistry(null);
+                return new LogRegistry(new ListStorage());
             }
         }
     }

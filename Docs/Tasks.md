@@ -8,7 +8,6 @@ What needs to get done. Should make some of them tickets... (some of these may b
     - Switch from iterators to Rx
 		- Actual log storage
 			- Storage types
-			- Switch to IQbservable
 			- Make it easy and flexible to use...
 	- Update/extend Nunit to support Rx
 - Stat gathering and benchmarks (either with an API or just rigging it to get me stats remove the code after)

@@ -37,17 +37,10 @@ namespace Stethoscope.Common
         /// </summary>
         /// <param name="entry">The failed log entry. Any other log entry will throw an exception.</param>
         void NotifyFailedLogParsed(ILogEntry entry);
-        
+
         /// <summary>
-        /// Get logs by a specific attribute.
+        /// Queriable log entries.
         /// </summary>
-        /// <param name="attribute">The attribute to get entries by.</param>
-        /// <returns>Logs grouped by the specified attribute.</returns>
-        IObservable<IGroupedObservable<object, ILogEntry>> GetBy(LogAttribute attribute);
-        /// <summary>
-        /// Get logs, ordered by timestamp.
-        /// </summary>
-        /// <returns>Observable of all log entries by time. Entries missing timestamps are not included.</returns>
-        IObservable<ILogEntry> GetByTimetstamp();
+        IQbservable<ILogEntry> Logs { get; }
     }
 }

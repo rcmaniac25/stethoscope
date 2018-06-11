@@ -5,6 +5,8 @@ using NUnit.Framework;
 
 using System;
 
+using Stethoscope.Log.Internal.Storage;
+
 namespace Stethoscope.Tests
 {
     public abstract class IOPrinterTests
@@ -16,7 +18,7 @@ namespace Stethoscope.Tests
         public virtual void Setup()
         {
             //TODO
-            logRegistry = new LogRegistry(null);
+            logRegistry = new LogRegistry(new ListStorage());
             logConfig = new LogConfig()
             {
                 TimestampPath = "TimePath",

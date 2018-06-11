@@ -712,3 +712,13 @@ void doSomethingCool(std::ifstream& input)
 - Again, not much work today.
 - All I did was substitute the old implementation of LogRegistry with the initial work on implementing IRegistryStorage usage.
 - Ah, a few tests didn't compile... refactored LogRegistry creation to a function for them so only one spot needs to be updated. Should probably switch to using the LogFactory anyway.
+
+#60.2. 6/10/2018:
+- We're back in business... not perfectly, but unit tests pass and test program work as expected.
+- Looking at IQbservable... I think I'm in over my head. As such, my implementations for this will not be ideal, but I don't want to spent the remaining days on a proper implementation (though I know this will take longer then 100 days total).
+- Basically, I don't know enough about implementing a QbservableProvider and system and how Expressions work. Ideally, all invocations that check attributes on the log should be turned into a DB query (or similar), while everything else should be lambdas and similar that run within .Net.
+- Providers (to my understanding) basically take the entire query (from log in logs where log.Timestamp > DateTime.Now && log.Timestamp.Minutes > 30 select log) which has been turned into an "Expression" and iterates through it so "where log.Timestamp > DateTime.Now" becomes RemoteSQL("WHERE logTimestamp > cast((now()) as date)").Where(log => log.Timestamp.Minutes > 30).
+- LINQ is extremly powerful, but after nearly 50 days of doing unit tests, I'd like to not spend the rest of it learning and implementing LINQ.
+- With that explained... I got a basic storage that uses List, and ensured LogRegistry was implemented.
+- I will do a bit more research tomorrow to try and determine if there are any SQL IQObservables and/or how to ensure Insert doesn't screw up log iteration (I need it to be that if a subscription hasn't gotten to the inserted member, it's returned. But if it has passed that timestamp/iteration, it doesn't return it).
+- For now, everything's working again.
