@@ -66,7 +66,7 @@ namespace Stethoscope.Log.Internal.Storage
         private List<ILogEntry> logs = new List<ILogEntry>();
         private readonly IlogEntryComparer logEntryComparer = new IlogEntryComparer();
 
-        public IQbservable<ILogEntry> Entries => logs.ToObservable().AsQbservable(); //XXX Is this the most I can do?
+        public IQbservable<ILogEntry> Entries => logs.ToObservable().AsQbservable(); //XXX This won't work with "Insert" (or "Add" for that instance). This is basically saying "foreach(var log in logs) { OnNext(log); }" and enumerations don't like iteration + changes
 
         public int Count
         {
@@ -91,12 +91,13 @@ namespace Stethoscope.Log.Internal.Storage
             }
             lock (logs)
             {
+                //XXX need to make sure this will continue to work
+
                 // From https://stackoverflow.com/a/22801345/492347
                 if (logs.Count == 0 || logEntryComparer.Compare(logs[logs.Count - 1], entry) <= 0)
                 {
                     logs.Add(entry);
                 }
-                //XXX All insert operations may not work well with observables
                 else if (logEntryComparer.Compare(logs[0], entry) >= 0)
                 {
                     logs.Insert(0, entry);
@@ -118,6 +119,7 @@ namespace Stethoscope.Log.Internal.Storage
         {
             lock (logs)
             {
+                //XXX
                 logs.Clear();
             }
         }

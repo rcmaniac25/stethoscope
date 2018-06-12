@@ -5,10 +5,6 @@
 What needs to get done. Should make some of them tickets... (some of these may be trains-of-thought)
 
 - Make library threadsafe
-    - Switch from iterators to Rx
-		- Actual log storage
-			- Storage types
-			- Make it easy and flexible to use...
 	- Update/extend Nunit to support Rx
 - Stat gathering and benchmarks (either with an API or just rigging it to get me stats remove the code after)
 - Acquire bigger logs (I'm testing on like a 6 line file... I have files in the GB range, but that might be too big for now, so I need something smaller. Note: can't post these...)
@@ -16,11 +12,10 @@ What needs to get done. Should make some of them tickets... (some of these may b
 	- May have to rewrite IPrinter or change names of PrinterFactory so IOPrinter doesn't "wait" for a specific thread's stream to finish before (starting to) printing the next thread
 - Determine program arguments and the config file usage (are they redundent? Complementary? Can I setup everything with program arguments?)
 - Add logging (ironic... a log handling system, writing it's own logs). Will be useful when trying to figure out what went wrong with accesing remote logs and doing more advanced work.
+- Proper IQbservable support in RegistryStorage (and maybe additional storage options)
 - Support remote logs
 - (large) With larger logs, start to flesh out LogRegistry... maybe allow LINQ usage so components of logs can be searched through.
-    - Also try to figure out a good way to represent all this, as the idea seems like a DB. But it would be a DB with a dictionary... and that implies a NoSQL DB.
-    - If I abstract LogRegistry (which I already did), and make a factory (*sigh* too soon...), I can easily swap the internals from "keep list of log entries" to some specific DB
-    - Needs to support multiple sources (so there may be logs from same time but different log files), and how to query through that
+    - [Done?] Needs to support multiple sources (so there may be logs from same time but different log files), and how to query through that
     - How much metadata do we want? (log file names, sources, etc.)
     - Can we parse sub-logs? Like, running an inner process that makes it's own logs (different style, different functions, etc.)... but it outputs to the same log handler. End result: all the logs show up as "myLogHandler: {sublog}"
 	- How can we handle log-level structures? As in, some loggers can have a single log line and still write when a function started and when it ended. Knowing something like that would mean that instead of needing to guess at the start and end of a function, or requiring a templeted system, I can just look at a log and say "start and end" and move on.

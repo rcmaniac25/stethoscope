@@ -722,3 +722,14 @@ void doSomethingCool(std::ifstream& input)
 - With that explained... I got a basic storage that uses List, and ensured LogRegistry was implemented.
 - I will do a bit more research tomorrow to try and determine if there are any SQL IQObservables and/or how to ensure Insert doesn't screw up log iteration (I need it to be that if a subscription hasn't gotten to the inserted member, it's returned. But if it has passed that timestamp/iteration, it doesn't return it).
 - For now, everything's working again.
+
+#61.2. 6/11/2018:
+- So, today wasn't terribly productive.
+- I was mainly going through code, trying to understand how IQbservable would work... long story short, I'm not doing any more work on it in the short term.
+- It comes across as "the future" and "under-implemented" at the same time. And as I said else where: "I may have crossed an event horizon of code and I both want to continue and have no idea what todo"
+- I can basically ignore it by using AsQbservable on an Observable, but it's not a very useful tool when used that way.
+- Looking at the tasts I have, for the most part, I can ignore it for a bit. But the place where I see it being needed is when I support remote logs.
+- The reason is that, as of now, I'm reading files and streams. They'll be finite for the most part. But once I'm streaming logs in from remote servers, it will go from KB and MB of log data to GB of data, streaming from one or more server at a time.
+- That kind of data will require some updates to how they're inserted, possibly requireing queuing and proxies. Mutexes and Monitors may be too slow. To then read such volumes of data, having one giant stream will be like an infinite loop of log data. The ListStorage I have no will ballon in memory and probably become unusable. A DB will be needed (maybe sharding too?) and with a DB, IQbservable will actually have a real use.
+- But before the DB gets created, the ListStorage type should at least work properly.
+- So... lots of reading, but not a lot of code. Tomorrow I'll see if I can start and finish support for Observables within NUnit.
