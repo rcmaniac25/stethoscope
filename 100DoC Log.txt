@@ -733,3 +733,19 @@ void doSomethingCool(std::ifstream& input)
 - That kind of data will require some updates to how they're inserted, possibly requireing queuing and proxies. Mutexes and Monitors may be too slow. To then read such volumes of data, having one giant stream will be like an infinite loop of log data. The ListStorage I have no will ballon in memory and probably become unusable. A DB will be needed (maybe sharding too?) and with a DB, IQbservable will actually have a real use.
 - But before the DB gets created, the ListStorage type should at least work properly.
 - So... lots of reading, but not a lot of code. Tomorrow I'll see if I can start and finish support for Observables within NUnit.
+
+#62.2. 6/12/2018:
+- I know this feeling... this is the feeling of "I'm going to crash, hard, because of lack of sleep". I can barely keep my head up.
+- This feeling started earlier in the day, and now at this point, I'm going to have to call it quits.
+- But before that, I did research on how to support Observables with unit testing/NUnit. Ideally, I'd like to support Observables directly (Assert.That(obs, Is.Empty)) rather then converting to an enumeration or processing the Observable outside of that.
+- Luckily, NUnit has a page on extendable constraints: https://github.com/nunit/docs/wiki/Custom-Constraints
+- Looking at the area where I expose Observables, I came up with the following items I need to support:
+-- IObservable
+--- Is(.Not).Empty
+--- Is.SubsetOf
+--- <expression>.Exactly
+--- Has.Member(x)
+-- IObservable<IGroupedObservable<K, T>>
+--- <something to get all keys, and Concat? (to combine all values)> (though this could possibly be done with simple LINQ)
+- I wanted to work on this, but you don't realize how many typos I made and words I accidently when I typed just this log because of how tired I am.
+- I will work on the above tomorrow
