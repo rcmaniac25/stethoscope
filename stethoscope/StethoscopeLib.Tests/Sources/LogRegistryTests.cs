@@ -50,8 +50,8 @@ namespace Stethoscope.Tests
         public void GetLogsEmpty()
         {
             var registry = CreateLogRegistry();
-            var logs = TempDictConvertGrouped(registry.GetBy(LogAttribute.Level));
-            Assert.That(logs, Is.Empty);
+            var logs = registry.GetBy(LogAttribute.Level);
+            Assert.That(logs, IsEx.ExEmpty);
         }
 
         [Test]
@@ -61,8 +61,8 @@ namespace Stethoscope.Tests
             var entry = registry.AddLog(DateTime.Now.ToString(), "testmsg");
             Assert.That(entry, Is.Not.Null);
 
-            var logs = TempDictConvertGrouped(registry.GetBy(LogAttribute.Message));
-            Assert.That(logs, Is.Not.Empty);
+            var logs = registry.GetBy(LogAttribute.Message);
+            Assert.That(logs, Is.Not.ExEmpty());
         }
 
         [Test]
@@ -281,8 +281,8 @@ namespace Stethoscope.Tests
             var entry = registry.AddLog(DateTime.Now.ToString(), "testmsg");
             Assert.That(entry, Is.Not.Null);
 
-            var logs = TempDictConvertGrouped(registry.GetBy(LogAttribute.Level));
-            Assert.That(logs, Is.Empty);
+            var logs = registry.GetBy(LogAttribute.Level);
+            Assert.That(logs, IsEx.ExEmpty);
         }
 
         [Test]
@@ -366,10 +366,10 @@ namespace Stethoscope.Tests
             var entry = registry.AddLog(DateTime.Now.ToString(), "testmsg1");
             Assert.That(entry, Is.Not.Null);
 
-            var logs = TempDictConvertGrouped(registry.GetBy(LogAttribute.Message));
-            Assert.That(logs, Is.Not.Empty);
+            var logs = registry.GetBy(LogAttribute.Message);
+            Assert.That(logs, Is.Not.ExEmpty());
 
-            logs = TempDictConvertGrouped(registry.GetBy(LogAttribute.Timestamp));
+            logs = registry.GetBy(LogAttribute.Timestamp);
             Assert.That(logs, Is.Null);
         }
 
@@ -433,7 +433,7 @@ namespace Stethoscope.Tests
         public void GetByTimetstampEmpty()
         {
             var registry = CreateLogRegistry();
-            Assert.That(TempEnumerableConvert(registry.GetByTimetstamp()), Is.Empty);
+            Assert.That(registry.GetByTimetstamp(), IsEx.ExEmpty);
         }
 
         [Test]
@@ -443,11 +443,11 @@ namespace Stethoscope.Tests
             var entry = registry.AddLog(DateTime.Now.ToString(), "testmsg");
             Assert.That(entry, Is.Not.Null);
 
-            var logs = TempEnumerableConvert(registry.GetByTimetstamp());
-            Assert.That(logs, Is.Not.Empty);
+            var logs = registry.GetByTimetstamp();
+            Assert.That(logs, Is.Not.ExEmpty());
             
-            var entryFromEnumeration = logs.Last();
-            Assert.That(entryFromEnumeration, Is.EqualTo(entry));
+            var entryFromLogs = logs.LastAsync().Wait();
+            Assert.That(entryFromLogs, Is.EqualTo(entry));
         }
 
         [Test]
@@ -462,11 +462,11 @@ namespace Stethoscope.Tests
             entry = registry.AddLog(time.AddSeconds(1).ToString(), "testmsg2");
             Assert.That(registry.AddValueToLog(entry, LogAttribute.Level, 2), Is.True);
 
-            var logs = TempEnumerableConvert(registry.GetByTimetstamp());
-            Assert.That(logs, Is.Not.Empty);
+            var logs = registry.GetByTimetstamp();
+            Assert.That(logs, Is.Not.ExEmpty());
             
-            Assert.That(logs.First().GetAttribute<int>(LogAttribute.Level), Is.EqualTo(1));
-            Assert.That(logs.Last().GetAttribute<int>(LogAttribute.Level), Is.EqualTo(2));
+            Assert.That(logs.FirstAsync().Wait().GetAttribute<int>(LogAttribute.Level), Is.EqualTo(1));
+            Assert.That(logs.LastAsync().Wait().GetAttribute<int>(LogAttribute.Level), Is.EqualTo(2));
         }
 
         [Test]
@@ -481,11 +481,11 @@ namespace Stethoscope.Tests
             entry = registry.AddLog(time.ToString(), "testmsg1");
             Assert.That(registry.AddValueToLog(entry, LogAttribute.Level, 1), Is.True);
 
-            var logs = TempEnumerableConvert(registry.GetByTimetstamp());
-            Assert.That(logs, Is.Not.Empty);
+            var logs = registry.GetByTimetstamp();
+            Assert.That(logs, Is.Not.ExEmpty());
 
-            Assert.That(logs.First().GetAttribute<int>(LogAttribute.Level), Is.EqualTo(1));
-            Assert.That(logs.Last().GetAttribute<int>(LogAttribute.Level), Is.EqualTo(2));
+            Assert.That(logs.FirstAsync().Wait().GetAttribute<int>(LogAttribute.Level), Is.EqualTo(1));
+            Assert.That(logs.LastAsync().Wait().GetAttribute<int>(LogAttribute.Level), Is.EqualTo(2));
         }
 
         [Test]
@@ -566,13 +566,13 @@ namespace Stethoscope.Tests
             var entry = registry.AddLog(DateTime.Now.ToString(), "testmsg");
             Assert.That(entry, Is.Not.Null);
 
-            var logs = TempEnumerableConvert(registry.GetByTimetstamp());
-            Assert.That(logs, Is.Not.Empty);
+            var logs = registry.GetByTimetstamp();
+            Assert.That(logs, Is.Not.ExEmpty());
 
             registry.Clear();
 
-            logs = TempEnumerableConvert(registry.GetByTimetstamp());
-            Assert.That(logs, Is.Empty);
+            logs = registry.GetByTimetstamp();
+            Assert.That(logs, IsEx.ExEmpty);
         }
 
         [Test]

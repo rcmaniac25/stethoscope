@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Stethoscope.Tests.Helpers
 {
@@ -14,6 +15,30 @@ namespace Stethoscope.Tests.Helpers
                     yield return value;
                 }
             }
+        }
+
+        public static IObservable<object> CastGenericObservable<TActual>(TActual obs)
+        {
+            return CastGenericObservable(obs, typeof(TActual));
+        }
+
+        public static IObservable<object> CastGenericObservable(object expectedObservable, Type expectedObservableType)
+        {
+            if (expectedObservableType == null)
+            {
+                throw new ArgumentNullException(nameof(expectedObservableType));
+            }
+            if (expectedObservable == null)
+            {
+                return null;
+            }
+            if (expectedObservableType.IsGenericType && expectedObservableType.GetGenericTypeDefinition() == typeof(IObservable<>))
+            {
+                var castGeneric = typeof(System.Reactive.Linq.Observable).GetMethod("Cast");
+                var cast = castGeneric.MakeGenericMethod(expectedObservableType.GetGenericArguments());
+                return (IObservable<object>)cast.Invoke(null, new object[] { expectedObservable });
+            }
+            throw new ArgumentException("Argument is not of type IObservable", nameof(expectedObservableType));
         }
     }
 }

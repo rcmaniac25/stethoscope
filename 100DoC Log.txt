@@ -749,3 +749,16 @@ void doSomethingCool(std::ifstream& input)
 --- <something to get all keys, and Concat? (to combine all values)> (though this could possibly be done with simple LINQ)
 - I wanted to work on this, but you don't realize how many typos I made and words I accidently when I typed just this log because of how tired I am.
 - I will work on the above tomorrow
+
+#63.2. 6/13/2018:
+- I started working on the Observable support for NUnit and hit into a number of issues. Nothing blocking, but they make what I expected to be a simplistic and elegant addition, and tarnish it a bit.
+- I managed to get the Empty constraint (known as ExEmpty) implemented and will do more work tomorrow.
+- Issues encountered:
+-- The Custom Constraints page has an example of "public class Is : NUnit.Framework.Is". When first read, I assumed the types would clash but thought "just don't include the namespace that has Is in it"... but all the types you interact with in NUnit are in that namespace, so I had to change the name of my "Is" to "IsEx"
+-- C# doesn't support extension properties (just do a Google search for why...), so what could've been "Is.Not.ExEmpty" now has to be "Is.Not.ExEmpty()"
+-- It would be cool to do "Is.Not.Empty()" but for consistancy to prevent name clashes, had to rename them to ExEmpty and will do the same for other types. Also, since it's near impossible to tell 
+-- NUnit doesn't let you add sub-constraints... so I had to make entierly new constraints. Ex: EmptyConstraint really just checks a few types, picks a "real constraint", then uses that for testing. I'd be great to add additional types, but I can't. Instead, for ExEmpty, I do my own type checks and if none match, I run EmptyConstraint internally.
+-- For collections, there is IEnumerable and IEnumerable<T>. For Observables, there is only IObservable<T>. This meant that I needed to figure out how to interact with a type that I didn't know the type of until runtime. I made a helper function to convert to a known, generic, IObservable<object> but it took all the time I had allocated, and more, to working on this. C#'s generics are very good, but if you don't know the types ahead of time, they become near impossible without Reflection.
+-- One holdup in working on other functions was, after all the work needed for just doing ExEmpty, I didn't want to spend another hour or two just doing a couple more functions.
+- This has not gone as fast as I hoped. We'll see if I can finish it tomorrow.
+- I'm glad I worked on it, but it's just slow going. Also, was not expecting the Observable thing to be as much work as it was. A bunch of trial-error, some research, and a couple curses.
