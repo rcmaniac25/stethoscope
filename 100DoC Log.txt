@@ -762,3 +762,8 @@ void doSomethingCool(std::ifstream& input)
 -- One holdup in working on other functions was, after all the work needed for just doing ExEmpty, I didn't want to spend another hour or two just doing a couple more functions.
 - This has not gone as fast as I hoped. We'll see if I can finish it tomorrow.
 - I'm glad I worked on it, but it's just slow going. Also, was not expecting the Observable thing to be as much work as it was. A bunch of trial-error, some research, and a couple curses.
+
+#64.2. 6/14/2018:
+- It lives!!! Ok, at least for the extensions.
+- To add to the "issues" list: there are many existing constrains that could simply be extended... but even though the classes aren't sealed, the member variables are private, so I can't access them to use in an overriden ApplyTo function.
+- Next up: state gathering. I expect this will appear to be easy, and will end up taking me a couple days. The weekend will also be a bit slow again.

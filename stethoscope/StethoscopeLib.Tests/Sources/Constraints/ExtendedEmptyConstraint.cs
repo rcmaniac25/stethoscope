@@ -4,7 +4,6 @@ using System;
 
 namespace Stethoscope.Tests.Constraints
 {
-    // Extended version of EmptyConstraint
     public class ExtendedEmptyConstraint : Constraint
     {
         private Constraint realConstraint;
