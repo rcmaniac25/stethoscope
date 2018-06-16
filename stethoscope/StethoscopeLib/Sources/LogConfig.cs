@@ -69,6 +69,7 @@ namespace Stethoscope
         /// <returns>IDictionary of all attributes and their associated variable name.</returns>
         public static IDictionary<LogAttribute, string> GetAttributePaths()
         {
+            //TODO: record stat about function used
             return new Dictionary<LogAttribute, string>
             {
                 { LogAttribute.ThreadID, "ThreadIDPath" },

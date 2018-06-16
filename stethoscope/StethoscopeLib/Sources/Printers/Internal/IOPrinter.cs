@@ -72,53 +72,9 @@ namespace Stethoscope.Printers.Internal
                 TextWriter.WriteLine($"End {lastThread.Item3}");
                 TextWriter.WriteLine();
             }
-
-            /*
-            threads.Subscribe(thread =>
-            {
-                int indent = 0;
-                TextWriter.WriteLine($"Thread {thread.Key}");
-                
-                string initSrc = "";
-                string lastFunc = "";
-                string lastFuncSrc = "";
-
-                thread.Subscribe(log =>
-                {
-                    if (initSrc == "")
-                    {
-                        initSrc = log.GetAttribute<string>(LogAttribute.SourceFile);
-                        lastFunc = log.GetAttribute<string>(LogAttribute.Function);
-
-                        lastFuncSrc = $"{initSrc}.{lastFunc}";
-
-                        TextWriter.WriteLine($"Start {lastFunc} // {initSrc}");
-                    }
-
-                    var src = log.GetAttribute<string>(LogAttribute.SourceFile);
-                    var function = log.GetAttribute<string>(LogAttribute.Function);
-                    var funcSrc = $"{src}.{function}";
-
-                    if (funcSrc != lastFuncSrc)
-                    {
-                        TextWriter.WriteLine($"End {lastFunc}");
-                        TextWriter.WriteLine($"Start {function} // {src}");
-
-                        lastFuncSrc = funcSrc;
-                        lastFunc = function;
-                    }
-
-                    TextWriter.WriteLine($"{GenerateIndentLog(indent + 1)}{log.Message}");
-                }, () =>
-                {
-                    TextWriter.WriteLine($"End {lastFunc}");
-                    TextWriter.WriteLine();
-                });
-            });
-            */
         }
 
-        public virtual void Print() => PrintThreadTraces();
+        public virtual void Print() => PrintThreadTraces(); //TODO: record stat about function used
 
         public void SetConfig(LogConfig config)
         {

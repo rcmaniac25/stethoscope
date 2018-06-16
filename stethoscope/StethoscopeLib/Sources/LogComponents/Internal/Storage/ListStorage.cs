@@ -86,9 +86,11 @@ namespace Stethoscope.Log.Internal.Storage
         {
             if (!(entry is IInternalLogEntry))
             {
+                //TODO: record stat about failure
                 //XXX
                 throw new ArgumentException("Log type is not supported (right now)", "entry");
             }
+            //TODO: record stat about function used
             lock (logs)
             {
                 //XXX need to make sure this will continue to work
@@ -111,12 +113,14 @@ namespace Stethoscope.Log.Internal.Storage
                     }
                     logs.Insert(index, entry);
                 }
+                //TODO: record stat about total count
             }
             return ((IInternalLogEntry)entry).ID;
         }
 
         public void Clear()
         {
+            //TODO: record stat about function used
             lock (logs)
             {
                 //XXX

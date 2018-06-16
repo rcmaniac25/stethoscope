@@ -3,9 +3,6 @@
 ## Tasks
 
 What needs to get done. Should make some of them tickets... (some of these may be trains-of-thought)
-
-- Make library threadsafe
-	- Update/extend Nunit to support Rx
 - Stat gathering and benchmarks (either with an API or just rigging it to get me stats remove the code after)
 - Acquire bigger logs (I'm testing on like a 6 line file... I have files in the GB range, but that might be too big for now, so I need something smaller. Note: can't post these...)
     - See how long these take to parse, and see where we can speed up processing (background threads? Queues?)

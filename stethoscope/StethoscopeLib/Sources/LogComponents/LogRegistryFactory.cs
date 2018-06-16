@@ -10,12 +10,13 @@ namespace Stethoscope.Log
         {
         }
 
-        public static ILogRegistryFactory Create() => new LogRegistryFactoryFinder();
+        public static ILogRegistryFactory Create() => new LogRegistryFactoryFinder(); //TODO: record stat about function used
 
         private class LogRegistryFactoryFinder : ILogRegistryFactory
         {
             public ILogRegistry Create(RegistrySelectionCriteria criteria)
             {
+                //TODO: record stat about function and criteria used
                 //XXX we don't care about criteria for now, but it will be used to pick "storage"
                 return new LogRegistry(new ListStorage());
             }

@@ -767,3 +767,9 @@ void doSomethingCool(std::ifstream& input)
 - It lives!!! Ok, at least for the extensions.
 - To add to the "issues" list: there are many existing constrains that could simply be extended... but even though the classes aren't sealed, the member variables are private, so I can't access them to use in an overriden ApplyTo function.
 - Next up: state gathering. I expect this will appear to be easy, and will end up taking me a couple days. The weekend will also be a bit slow again.
+
+#65.2. 6/15/2018:
+- I didn't have a lot of time tonight, and I need to think about how to do the next task: stat gathering
+- Something easy but also useful, I went around to everything (except parsers) and put in comments for where stat gathering should be specified
+- Doing this is useful because, while I can't do it now, tomorrow I should be able to just look through everything that stats should be gathered and try to determine how the gathering should be done (static class that has some function call? instance type that can be instantiated? mix? other?)
+- But that's all for now.

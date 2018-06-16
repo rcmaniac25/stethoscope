@@ -15,6 +15,7 @@ namespace Stethoscope.Common
         /// <returns>Logs grouped by the specified attribute.</returns>
         public static IObservable<IGroupedObservable<object, ILogEntry>> GetBy(this ILogRegistry registry, LogAttribute attribute)
         {
+            //TODO: record stat about function and attribute used
             if (attribute == LogAttribute.Timestamp)
             {
                 return null;
@@ -45,6 +46,7 @@ namespace Stethoscope.Common
         /// <returns>Observable of all log entries by time. Entries missing timestamps are not included.</returns>
         public static IObservable<ILogEntry> GetByTimetstamp(this ILogRegistry registry)
         {
+            //TODO: record stat about function used
             return from log in registry.Logs
                    where log.IsValidForTimestamp()
                    select log;

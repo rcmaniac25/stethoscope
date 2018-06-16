@@ -48,8 +48,10 @@ namespace Stethoscope.Log.Internal
             
             if (!DateTime.TryParse(timestamp, out DateTime time))
             {
+                //TODO: record stat about failure
                 throw new ArgumentException("Could not parse timestamp", "timestamp");
             }
+            //TODO: record stat about function used
             var entry = new LogEntry(time, message);
             storage.AddLogSorted(entry);
             return entry;
@@ -57,6 +59,7 @@ namespace Stethoscope.Log.Internal
 
         public ILogEntry AddFailedLog()
         {
+            //TODO: record stat about function used
             var entry = new FailedLogEntry();
             lock (logsBeingProcessed)
             {
@@ -90,12 +93,15 @@ namespace Stethoscope.Log.Internal
             }
             if (!(entry is FailedLogEntry))
             {
+                //TODO: record stat about failure
                 throw new ArgumentException("Entry is not a failed log", "entry");
             }
 
+            //TODO: record stat about function used
             var failedLog = (FailedLogEntry)entry;
             if (failedLog.HasTimestampChanged || failedLog.IsEmpty)
             {
+                //TODO: record stat about timestamp/empty
                 ProcessingComplete(failedLog);
             }
             failedLog.ResetTimestampChanged();
@@ -107,8 +113,10 @@ namespace Stethoscope.Log.Internal
             {
                 return false;
             }
+            //TODO: record stat about function and attribute used
             if (entry is IInternalLogEntry internalEntry && !entry.HasAttribute(attribute))
             {
+                //TODO: record stat about adding to entry
                 internalEntry.AddAttribute(attribute, value);
                 return true;
             }
@@ -117,6 +125,7 @@ namespace Stethoscope.Log.Internal
 
         public void Clear()
         {
+            //TODO: record stat about function used
             lock (logsBeingProcessed)
             {
                 storage.Clear();
@@ -128,6 +137,7 @@ namespace Stethoscope.Log.Internal
         {
             get
             {
+                //TODO: record stat about function used and how many "being processed" logs exist
                 lock (logsBeingProcessed)
                 {
                     return storage.Entries.Concat(logsBeingProcessed.ToObservable());
