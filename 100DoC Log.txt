@@ -773,3 +773,8 @@ void doSomethingCool(std::ifstream& input)
 - Something easy but also useful, I went around to everything (except parsers) and put in comments for where stat gathering should be specified
 - Doing this is useful because, while I can't do it now, tomorrow I should be able to just look through everything that stats should be gathered and try to determine how the gathering should be done (static class that has some function call? instance type that can be instantiated? mix? other?)
 - But that's all for now.
+
+#66.2. 6/16/2018:
+- Ok, as stated already, didn't get very far.
+- Most I did was finish marking in the parser.
+- I will plan out how the state system should be implemented tomorrow. I may also mark more areas depending on what I think the stat system should be.

@@ -43,6 +43,7 @@ namespace Stethoscope.Parsers.Internal.XML
             else if (path[0].Type == ParserPathElementType.DirectNamedField)
             {
                 // Use an attribute
+                //TODO: record stat about path type
                 return element.Attribute(path[0].StringValue)?.Value;
             }
             var currentNodes = new List<XNode>
@@ -55,6 +56,7 @@ namespace Stethoscope.Parsers.Internal.XML
                 switch (section.Type)
                 {
                     case ParserPathElementType.IndexField:
+                        //TODO: record stat about path type
                         buffer = new List<XNode>();
                         foreach (var node in currentNodes)
                         {
@@ -70,6 +72,7 @@ namespace Stethoscope.Parsers.Internal.XML
                         currentNodes = buffer;
                         break;
                     case ParserPathElementType.FilterField:
+                        //TODO: record stat about path type
                         var nodeType = XmlNodeType.None;
                         switch (section.StringValue)
                         {
@@ -82,6 +85,9 @@ namespace Stethoscope.Parsers.Internal.XML
                             case "element":
                             case "elem":
                                 nodeType = XmlNodeType.Element;
+                                break;
+                            default:
+                                //TODO: record stat about unknown filter types
                                 break;
                         }
 
@@ -111,6 +117,7 @@ namespace Stethoscope.Parsers.Internal.XML
                         currentNodes = buffer;
                         break;
                     case ParserPathElementType.NamedField:
+                        //TODO: record stat about path type
                         buffer = new List<XNode>();
                         var isLastNode = section.FieldType != ParserPathElementFieldType.NotAValue && section.FieldType != ParserPathElementFieldType.Unknown;
                         foreach (var node in currentNodes)
@@ -148,6 +155,10 @@ namespace Stethoscope.Parsers.Internal.XML
                 {
                     return text.Value;
                 }
+                else
+                {
+                    //TODO: record stat about unknown top nodes
+                }
             }
             return null;
         }
@@ -171,6 +182,7 @@ namespace Stethoscope.Parsers.Internal.XML
                 {
                     //XXX should probably have some test for checking if the value couldn't be added
                     parser.registry.AddValueToLog(entry, kv.Key, value);
+                    //TODO: record stat about failures to add
                 }
             }
             if (config.AdditionalAttributes != null)
@@ -180,6 +192,7 @@ namespace Stethoscope.Parsers.Internal.XML
                     parser.registry.AddValueToLog(entry, kv.Key, kv.Value);
                 }
             }
+            //TODO: record stat about number of attributes set
             return LogParserErrors.OK;
         }
 
@@ -239,6 +252,7 @@ namespace Stethoscope.Parsers.Internal.XML
 
         private static LogParserErrors ProcessElement(XMLLogParser parser, ref TransientParserConfigs config, XElement element)
         {
+            //TODO: record stat about function used
             var result = ProcessValidElement(parser, ref config, element);
             if (result != LogParserErrors.OK && !ParserUtil.IsFatal(result))
             {
@@ -293,6 +307,7 @@ namespace Stethoscope.Parsers.Internal.XML
                             }
                             break;
                         case XmlNodeType.EndElement:
+                            //TODO: record stat about xml element type
                             if (xmlReader.Name == element.Name)
                             {
                                 var finishedElement = element;
@@ -312,14 +327,17 @@ namespace Stethoscope.Parsers.Internal.XML
                             }
                             break;
                         case XmlNodeType.CDATA:
+                            //TODO: record stat about xml element type
                             element.Add(new XCData(xmlReader.Value));
                             break;
                         case XmlNodeType.Text:
+                            //TODO: record stat about xml element type
                             element.Add(new XText(xmlReader.Value));
                             break;
                         case XmlNodeType.Whitespace:
                             break;
                         default:
+                            //TODO: record stat about unknown xml element type
                             break;
                     }
                 }
@@ -359,6 +377,7 @@ namespace Stethoscope.Parsers.Internal.XML
 
         public void Parse(Stream logStream)
         {
+            //TODO: record stat about function used
             XMLLogParser.InternalParse(this, ref defaultTransientConfig, logStream);
         }
 
@@ -397,6 +416,7 @@ namespace Stethoscope.Parsers.Internal.XML
             timestampPath = ParserUtil.ParsePath(config.TimestampPath);
             messagePath = ParserUtil.ParsePath(config.LogMessagePath);
 
+            //TODO: record stat about parser failure handling flag
             defaultTransientConfig = new TransientParserConfigs()
             {
                 FailureHandling = config.ParsingFailureHandling
@@ -405,6 +425,7 @@ namespace Stethoscope.Parsers.Internal.XML
             attributePaths = new Dictionary<LogAttribute, ParserPathElement[]>();
 
 #if NETSTANDARD2_0
+            //TODO: record stat noting .Net Standard 2.0
             var logConfigType = typeof(LogConfig);
             foreach (var attribute in LogConfig.GetAttributePaths())
             {
@@ -415,6 +436,7 @@ namespace Stethoscope.Parsers.Internal.XML
                 AddAttributePath(attribute.Key, logConfigType.GetProperty(attribute.Value).GetValue(config) as string);
             }
 #else
+            //TODO: record stat noting not-.Net Standard 2.0
             AddAttributePath(LogAttribute.ThreadID, config.ThreadIDPath);
             AddAttributePath(LogAttribute.SourceFile, config.SourceFilePath);
             AddAttributePath(LogAttribute.Function, config.FunctionPath);
@@ -442,10 +464,9 @@ namespace Stethoscope.Parsers.Internal.XML
             {
                 this.parser = parser;
                 this.config = priorConfig;
-                this.IsUsable = true;
             }
 
-            public bool IsUsable { get; set; }
+            public bool IsUsable { get; set; } = true;
 
             private void CheckUsability()
             {
@@ -463,12 +484,13 @@ namespace Stethoscope.Parsers.Internal.XML
                     return;
                 }
 
+                //TODO: record stat about function used and config size (and maybe values?)
                 if (config.ContainsKey(ContextConfigs.LogSource))
                 {
                     var value = config[ContextConfigs.LogSource];
                     if (!(value is string))
                     {
-                        throw new ArgumentException("LogSource must be a string", "config");
+                        throw new ArgumentException("LogSource must be a string", nameof(config));
                     }
                     if (this.config.AdditionalAttributes == null)
                     {
@@ -497,7 +519,7 @@ namespace Stethoscope.Parsers.Internal.XML
                     }
                     else
                     {
-                        throw new ArgumentException("FailureHandling must be a LogParserFailureHandling enum", "config");
+                        throw new ArgumentException("FailureHandling must be a LogParserFailureHandling enum", nameof(config));
                     }
                 }
             }
@@ -505,12 +527,14 @@ namespace Stethoscope.Parsers.Internal.XML
             public void ApplyContextConfig(IDictionary<ContextConfigs, object> config, Action<ILogParser> context)
             {
                 CheckUsability();
+                //TODO: record stat about function used
                 XMLLogParser.InternalApplyContextConfig(parser, this.config, config, context);
             }
 
             public void Parse(Stream logStream)
             {
                 CheckUsability();
+                //TODO: record stat about function used
                 XMLLogParser.InternalParse(parser, ref config, logStream);
             }
         }
@@ -521,7 +545,7 @@ namespace Stethoscope.Parsers.Internal.XML
         {
             if (context == null)
             {
-                throw new ArgumentNullException("context");
+                throw new ArgumentNullException(nameof(context));
             }
 
             var contextParser = new XMLContextParser(parser, priorConfig);
@@ -539,6 +563,7 @@ namespace Stethoscope.Parsers.Internal.XML
 
         public void ApplyContextConfig(IDictionary<ContextConfigs, object> config, Action<ILogParser> context)
         {
+            //TODO: record stat about function used
             InternalApplyContextConfig(this, defaultTransientConfig, config, context);
         }
 
