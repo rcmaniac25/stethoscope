@@ -15,11 +15,11 @@ namespace Stethoscope.Log.Internal
         {
             if (storage == null)
             {
-                throw new ArgumentNullException("storage");
+                throw new ArgumentNullException(nameof(storage));
             }
             if (storage.SortAttribute != LogAttribute.Timestamp)
             {
-                throw new ArgumentException("Storage must sort logs by Timestamp", "storage");
+                throw new ArgumentException("Storage must sort logs by Timestamp", nameof(storage));
             }
             this.storage = storage;
         }
@@ -39,11 +39,11 @@ namespace Stethoscope.Log.Internal
         {
             if (timestamp == null)
             {
-                throw new ArgumentNullException("timestamp");
+                throw new ArgumentNullException(nameof(timestamp));
             }
             if (message == null)
             {
-                throw new ArgumentNullException("message");
+                throw new ArgumentNullException(nameof(message));
             }
             
             if (!DateTime.TryParse(timestamp, out DateTime time))
@@ -75,7 +75,7 @@ namespace Stethoscope.Log.Internal
                 var index = logsBeingProcessed.FindIndex(en => en.ID == failedLog.ID);
                 if (index < 0)
                 {
-                    throw new ArgumentException("Failed log does not exist in this registry", "entry");
+                    throw new ArgumentException("Failed log does not exist in this registry", "entry"); // Argument name comes from NotifyFailedLogParsed
                 }
                 logsBeingProcessed.RemoveAt(index);
                 if (!failedLog.IsEmpty)
@@ -89,7 +89,7 @@ namespace Stethoscope.Log.Internal
         {
             if (entry == null)
             {
-                throw new ArgumentNullException("entry");
+                throw new ArgumentNullException(nameof(entry));
             }
             if (!(entry is FailedLogEntry))
             {

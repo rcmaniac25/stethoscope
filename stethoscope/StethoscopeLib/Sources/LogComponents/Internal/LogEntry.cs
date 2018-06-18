@@ -23,7 +23,7 @@ namespace Stethoscope.Log.Internal
         {
             if (logMessage == null)
             {
-                throw new ArgumentNullException("logMessage");
+                throw new ArgumentNullException(nameof(logMessage));
             }
 
             AddAttribute(LogAttribute.Timestamp, timestamp);

@@ -786,3 +786,4 @@ void doSomethingCool(std::ifstream& input)
 - ...then the actual statistic types will be handled in the background. Statistics like min, max, average, the previously mentioned histogram, etc.
 - I'd also like self-feedback to exist as an option, so stats can be polled, written to a file, callbacks invoked or gather during runtime, etc.
 - Though, I need to look to see if existing libraries/systems exist. No need to reinvent the wheel if something good enough exists already.
+- Bonus: as I've been doing it as I come across them, I now use "nameof" for all argument exceptions* where I specify the argument name.
