@@ -88,7 +88,7 @@ namespace Stethoscope.Log.Internal.Storage
             {
                 //TODO: record stat about failure
                 //XXX
-                throw new ArgumentException("Log type is not supported (right now)", "entry");
+                throw new ArgumentException("Log type is not supported (right now)", nameof(entry));
             }
             //TODO: record stat about function used
             lock (logs)

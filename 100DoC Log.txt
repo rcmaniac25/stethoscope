@@ -778,3 +778,11 @@ void doSomethingCool(std::ifstream& input)
 - Ok, as stated already, didn't get very far.
 - Most I did was finish marking in the parser.
 - I will plan out how the state system should be implemented tomorrow. I may also mark more areas depending on what I think the stat system should be.
+
+#67.2. 6/17/2018:
+- So... still not a whole lot, but the main thing was I tried to summerize some of the operations.
+- I know a histogram will be something that will be created by the stat system.
+- I want to be minimal and only provide stat recording thatr is as minimal as possible (think "collection.Record(value)" instead of "StatCollector.Record(Name, value, RecordStatScope.Public | RecordStatScope.GlobalStore)").
+- ...then the actual statistic types will be handled in the background. Statistics like min, max, average, the previously mentioned histogram, etc.
+- I'd also like self-feedback to exist as an option, so stats can be polled, written to a file, callbacks invoked or gather during runtime, etc.
+- Though, I need to look to see if existing libraries/systems exist. No need to reinvent the wheel if something good enough exists already.

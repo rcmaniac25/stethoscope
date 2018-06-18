@@ -49,7 +49,7 @@ namespace Stethoscope.Log.Internal
             if (!DateTime.TryParse(timestamp, out DateTime time))
             {
                 //TODO: record stat about failure
-                throw new ArgumentException("Could not parse timestamp", "timestamp");
+                throw new ArgumentException("Could not parse timestamp", nameof(timestamp));
             }
             //TODO: record stat about function used
             var entry = new LogEntry(time, message);
@@ -94,7 +94,7 @@ namespace Stethoscope.Log.Internal
             if (!(entry is FailedLogEntry))
             {
                 //TODO: record stat about failure
-                throw new ArgumentException("Entry is not a failed log", "entry");
+                throw new ArgumentException("Entry is not a failed log", nameof(entry));
             }
 
             //TODO: record stat about function used

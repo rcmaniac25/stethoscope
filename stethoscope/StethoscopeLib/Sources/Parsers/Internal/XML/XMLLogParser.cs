@@ -72,7 +72,7 @@ namespace Stethoscope.Parsers.Internal.XML
                         currentNodes = buffer;
                         break;
                     case ParserPathElementType.FilterField:
-                        //TODO: record stat about path type
+                        //TODO: record stat about path type and filter types
                         var nodeType = XmlNodeType.None;
                         switch (section.StringValue)
                         {
@@ -85,9 +85,6 @@ namespace Stethoscope.Parsers.Internal.XML
                             case "element":
                             case "elem":
                                 nodeType = XmlNodeType.Element;
-                                break;
-                            default:
-                                //TODO: record stat about unknown filter types
                                 break;
                         }
 
