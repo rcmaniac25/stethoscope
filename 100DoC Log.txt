@@ -787,3 +787,9 @@ void doSomethingCool(std::ifstream& input)
 - I'd also like self-feedback to exist as an option, so stats can be polled, written to a file, callbacks invoked or gather during runtime, etc.
 - Though, I need to look to see if existing libraries/systems exist. No need to reinvent the wheel if something good enough exists already.
 - Bonus: as I've been doing it as I come across them, I now use "nameof" for all argument exceptions* where I specify the argument name.
+
+#68.2. 6/18/2018:
+- So doing some searches, I came across Metrics.NET and spent today reading through docs.
+- If it reminded me of anything, it's that I want to grab performance stats too. "Timers" in Metrics's API.
+- The challenge I have is that I don't want the library to do configuration...
+- ...but I'm also not sure if I want to abstract the logging to hide away the global Metric class or similar. And if I _do_ abstract it, then I will have to take some control of configuration.
