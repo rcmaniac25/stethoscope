@@ -38,8 +38,7 @@ namespace Stethoscope.Parsers
             public ILogParser Create(ILogRegistry registry, LogConfig config)
             {
                 logParserCreationCounter.Increment();
-
-                //TODO: record stat about function used (maybe config values?)
+                
                 var parser = new XMLLogParser();
                 parser.SetRegistry(registry);
                 parser.SetConfig(config);

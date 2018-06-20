@@ -33,9 +33,8 @@ namespace Stethoscope.Log
         {
             public ILogRegistry Create(RegistrySelectionCriteria criteria)
             {
-                logRegistryCreationCounter.Increment();
-
-                //TODO: record stat about criteria used
+                logRegistryCreationCounter.Increment(criteria.ToString());
+                
                 //XXX we don't care about criteria for now, but it will be used to pick "storage"
                 return new LogRegistry(new ListStorage());
             }
