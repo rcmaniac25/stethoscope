@@ -1,17 +1,30 @@
-﻿using Stethoscope.Common;
+﻿using Metrics;
+
+using Stethoscope.Common;
 using Stethoscope.Parsers.Internal.XML;
 
 namespace Stethoscope.Parsers
 {
     public class LogParserFactory
     {
+        private static readonly Counter logParserFactoryCreationCounter;
+        private static readonly Counter logParserCreationCounter;
+
+        static LogParserFactory()
+        {
+            var printerContext = Metric.Context("LogParser Factory");
+            logParserFactoryCreationCounter = printerContext.Counter("Creation", Unit.Calls, "log, parser, factory");
+            logParserCreationCounter = printerContext.Counter("Usage", Unit.Calls, "log, parser");
+        }
+
         private LogParserFactory()
         {
         }
 
         public static ILogParserFactory GetParserForFileExtension(string ext)
         {
-            //TODO: record stat about function used and ext
+            logParserFactoryCreationCounter.Increment(ext);
+
             switch (ext.ToLower())
             {
                 case "xml":
@@ -24,6 +37,8 @@ namespace Stethoscope.Parsers
         {
             public ILogParser Create(ILogRegistry registry, LogConfig config)
             {
+                logParserCreationCounter.Increment();
+
                 //TODO: record stat about function used (maybe config values?)
                 var parser = new XMLLogParser();
                 parser.SetRegistry(registry);

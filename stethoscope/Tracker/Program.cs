@@ -3,6 +3,8 @@ using Stethoscope.Log;
 using Stethoscope.Parsers;
 using Stethoscope.Printers;
 
+using Metrics;
+
 using Mono.Options;
 
 using Newtonsoft.Json;
@@ -76,6 +78,8 @@ namespace Stethoscope
 
         public void Setup()
         {
+            Metric.Config.WithHttpEndpoint("http://localhost:2581/").WithAllCounters();
+
             //XXX use config to get this info
             var registryFactory = LogRegistryFactory.Create();
 

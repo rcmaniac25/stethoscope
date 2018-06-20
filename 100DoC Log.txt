@@ -793,3 +793,9 @@ void doSomethingCool(std::ifstream& input)
 - If it reminded me of anything, it's that I want to grab performance stats too. "Timers" in Metrics's API.
 - The challenge I have is that I don't want the library to do configuration...
 - ...but I'm also not sure if I want to abstract the logging to hide away the global Metric class or similar. And if I _do_ abstract it, then I will have to take some control of configuration.
+
+#69.2. 6/19/2018:
+- So, I'm going to directly invoke the Metrics library for now. I'd like a little more isolation instead of using globals, but it's the best library available from what I can tell.
+- To start, I implemented metrics for the factory types.
+- I also spent a bit of time trying to debug why things weren't working... turns out an additional dependency of System.Configuration.ConfigurationManager was needed.
+- Lastly, I needed to ensure that the application and tests would be configured correctly.
