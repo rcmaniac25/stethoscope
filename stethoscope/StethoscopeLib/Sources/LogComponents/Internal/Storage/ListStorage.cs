@@ -1,4 +1,6 @@
-﻿using Stethoscope.Common;
+﻿using Metrics;
+
+using Stethoscope.Common;
 
 using System;
 using System.Collections.Generic;
@@ -8,7 +10,9 @@ namespace Stethoscope.Log.Internal.Storage
 {
     public class ListStorage : IRegistryStorage
     {
-        private class IlogEntryComparer : IComparer<ILogEntry>
+        #region LogEntryComparer
+
+        private class LogEntryComparer : IComparer<ILogEntry>
         {
             private DateTime? GetTimestamp(ILogEntry entry)
             {
@@ -63,8 +67,26 @@ namespace Stethoscope.Log.Internal.Storage
             }
         }
 
+        #endregion
+
+        private static readonly Counter unsupportedLogEntryCounter;
+        private static readonly Counter logCounter;
+        private static readonly Timer addLogWithLockTimer;
+        private static readonly Timer addLogWithoutLockTimer;
+        private static readonly Counter clearCounter;
+
+        static ListStorage()
+        {
+            var listStorageContext = Metric.Context("ListStorage");
+            unsupportedLogEntryCounter = listStorageContext.Counter("Unsupported Log Entry", Unit.Errors, "registry, storage, error, log, entry, unsupported");
+            logCounter = listStorageContext.Counter("Log Count", Unit.Items, "registry, storage, log, entry");
+            addLogWithLockTimer = listStorageContext.Timer("AddLogSorted with Lock", Unit.Calls, tags: "registry, storage, log, entry, lock, add");
+            addLogWithoutLockTimer = listStorageContext.Timer("AddLogSorted", Unit.Calls, tags: "registry, storage, log, entry, add");
+            clearCounter = listStorageContext.Counter("Clear", Unit.Calls, "registry, storage");
+        }
+
         private List<ILogEntry> logs = new List<ILogEntry>();
-        private readonly IlogEntryComparer logEntryComparer = new IlogEntryComparer();
+        private readonly LogEntryComparer logEntryComparer = new LogEntryComparer();
 
         public IQbservable<ILogEntry> Entries => logs.ToObservable().AsQbservable(); //XXX This won't work with "Insert" (or "Add" for that instance). This is basically saying "foreach(var log in logs) { OnNext(log); }" and enumerations don't like iteration + changes
 
@@ -86,41 +108,48 @@ namespace Stethoscope.Log.Internal.Storage
         {
             if (!(entry is IInternalLogEntry))
             {
-                //TODO: record stat about failure
+                unsupportedLogEntryCounter.Increment();
+
                 //XXX
                 throw new ArgumentException("Log type is not supported (right now)", nameof(entry));
             }
-            //TODO: record stat about function used
-            lock (logs)
+            using (addLogWithLockTimer.NewContext())
             {
-                //XXX need to make sure this will continue to work
-
-                // From https://stackoverflow.com/a/22801345/492347
-                if (logs.Count == 0 || logEntryComparer.Compare(logs[logs.Count - 1], entry) <= 0)
+                lock (logs)
                 {
-                    logs.Add(entry);
-                }
-                else if (logEntryComparer.Compare(logs[0], entry) >= 0)
-                {
-                    logs.Insert(0, entry);
-                }
-                else
-                {
-                    var index = logs.BinarySearch(entry, logEntryComparer);
-                    if (index < 0)
+                    using (addLogWithoutLockTimer.NewContext())
                     {
-                        index = ~index;
+                        //XXX need to make sure this will continue to work
+
+                        // From https://stackoverflow.com/a/22801345/492347
+                        if (logs.Count == 0 || logEntryComparer.Compare(logs[logs.Count - 1], entry) <= 0)
+                        {
+                            logs.Add(entry);
+                        }
+                        else if (logEntryComparer.Compare(logs[0], entry) >= 0)
+                        {
+                            logs.Insert(0, entry);
+                        }
+                        else
+                        {
+                            var index = logs.BinarySearch(entry, logEntryComparer);
+                            if (index < 0)
+                            {
+                                index = ~index;
+                            }
+                            logs.Insert(index, entry);
+                        }
+                        logCounter.Increment();
                     }
-                    logs.Insert(index, entry);
                 }
-                //TODO: record stat about total count
             }
             return ((IInternalLogEntry)entry).ID;
         }
 
         public void Clear()
         {
-            //TODO: record stat about function used
+            clearCounter.Increment();
+
             lock (logs)
             {
                 //XXX

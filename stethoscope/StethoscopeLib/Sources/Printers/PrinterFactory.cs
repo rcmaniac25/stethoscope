@@ -7,14 +7,14 @@ namespace Stethoscope.Printers
 {
     public class PrinterFactory
     {
-        private static readonly Counter printerFactoryCreationCounter;
-        private static readonly Counter printerCreationCounter;
+        private static readonly Counter factoryCreationCounter;
+        private static readonly Counter creationCounter;
 
         static PrinterFactory()
         {
             var printerContext = Metric.Context("Printer Factory");
-            printerFactoryCreationCounter = printerContext.Counter("Creation", Unit.Calls, "printer, factory");
-            printerCreationCounter = printerContext.Counter("Usage", Unit.Calls, "printer");
+            factoryCreationCounter = printerContext.Counter("Creation", Unit.Calls, "printer, factory");
+            creationCounter = printerContext.Counter("Usage", Unit.Calls, "printer");
         }
 
         private PrinterFactory()
@@ -23,7 +23,7 @@ namespace Stethoscope.Printers
 
         public static IPrinterFactory CrateConsoleFactory()
         {
-            printerFactoryCreationCounter.Increment();
+            factoryCreationCounter.Increment();
 
             return new ConsolePrinterFactory();
         }
@@ -32,7 +32,7 @@ namespace Stethoscope.Printers
         {
             public IPrinter Create(ILogRegistry registry, LogConfig config)
             {
-                printerCreationCounter.Increment();
+                creationCounter.Increment();
 
                 var printer = new ConsolePrinter();
                 printer.SetRegistry(registry);

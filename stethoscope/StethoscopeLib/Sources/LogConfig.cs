@@ -1,7 +1,9 @@
-﻿using Stethoscope.Common;
+﻿using Metrics;
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+
+using Stethoscope.Common;
 
 using System.Collections.Generic;
 using System.Runtime.Serialization;
@@ -33,6 +35,8 @@ namespace Stethoscope
 
     public struct LogConfig
     {
+        private static readonly Counter getAttributeCounter = Metric.Counter("Config Attribute Invocation", Unit.Calls, "config, reflection");
+
         // Opt
         public string ThreadIDPath { get; set; }
         public string SourceFilePath { get; set; }
@@ -69,7 +73,8 @@ namespace Stethoscope
         /// <returns>IDictionary of all attributes and their associated variable name.</returns>
         public static IDictionary<LogAttribute, string> GetAttributePaths()
         {
-            //TODO: record stat about function used
+            getAttributeCounter.Increment();
+
             return new Dictionary<LogAttribute, string>
             {
                 { LogAttribute.ThreadID, "ThreadIDPath" },

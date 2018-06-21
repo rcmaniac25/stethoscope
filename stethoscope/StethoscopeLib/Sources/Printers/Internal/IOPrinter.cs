@@ -1,4 +1,6 @@
-﻿using Stethoscope.Common;
+﻿using Metrics;
+
+using Stethoscope.Common;
 
 using System;
 using System.IO;
@@ -8,6 +10,8 @@ namespace Stethoscope.Printers.Internal
 {
     public abstract class IOPrinter : IPrinter
     {
+        protected static readonly Counter printCounter = Metric.Counter("IO Printer Print", Unit.Calls, "IO, printer");
+
         protected ILogRegistry logRegistry;
 
         protected TextWriter TextWriter { get; set; }
@@ -74,7 +78,12 @@ namespace Stethoscope.Printers.Internal
             }
         }
 
-        public virtual void Print() => PrintThreadTraces(); //TODO: record stat about function used
+        public virtual void Print()
+        {
+            printCounter.Increment();
+
+            PrintThreadTraces();
+        }
 
         public void SetConfig(LogConfig config)
         {

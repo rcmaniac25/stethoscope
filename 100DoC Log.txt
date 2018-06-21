@@ -799,3 +799,8 @@ void doSomethingCool(std::ifstream& input)
 - To start, I implemented metrics for the factory types.
 - I also spent a bit of time trying to debug why things weren't working... turns out an additional dependency of System.Configuration.ConfigurationManager was needed.
 - Lastly, I needed to ensure that the application and tests would be configured correctly.
+
+#70.2. 6/20/2018:
+- Implemented trival metrics.
+- Was debating on the ListStorage.AddLogSorted, if I wanted to manually measure the lock time AND the actual execution, or just do (what I ended up doing) of just combining the two timers.
+- It was easier to combine then to try to do StartTimer, StopTimer, Record(stop - start, ...) and then doing that only around locks and then the execution itself.

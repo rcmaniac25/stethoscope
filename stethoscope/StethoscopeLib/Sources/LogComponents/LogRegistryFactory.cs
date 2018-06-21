@@ -8,14 +8,14 @@ namespace Stethoscope.Log
 {
     public class LogRegistryFactory
     {
-        private static readonly Counter logRegistryFactoryCreationCounter;
-        private static readonly Counter logRegistryCreationCounter;
+        private static readonly Counter factoryCreationCounter;
+        private static readonly Counter creationCounter;
 
         static LogRegistryFactory()
         {
             var printerContext = Metric.Context("LogRegistry Factory");
-            logRegistryFactoryCreationCounter = printerContext.Counter("Creation", Unit.Calls, "log, registry, factory");
-            logRegistryCreationCounter = printerContext.Counter("Usage", Unit.Calls, "log, registry");
+            factoryCreationCounter = printerContext.Counter("Creation", Unit.Calls, "log, registry, factory");
+            creationCounter = printerContext.Counter("Usage", Unit.Calls, "log, registry");
         }
 
         private LogRegistryFactory()
@@ -24,7 +24,7 @@ namespace Stethoscope.Log
 
         public static ILogRegistryFactory Create()
         {
-            logRegistryFactoryCreationCounter.Increment();
+            factoryCreationCounter.Increment();
 
             return new LogRegistryFactoryFinder();
         }
@@ -33,7 +33,7 @@ namespace Stethoscope.Log
         {
             public ILogRegistry Create(RegistrySelectionCriteria criteria)
             {
-                logRegistryCreationCounter.Increment(criteria.ToString());
+                creationCounter.Increment(criteria.ToString());
                 
                 //XXX we don't care about criteria for now, but it will be used to pick "storage"
                 return new LogRegistry(new ListStorage());
