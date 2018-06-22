@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Metrics;
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -25,6 +27,28 @@ namespace Stethoscope.Parsers
         private const char INDEX_MARKER = '#';
         private const char FILTER_MARKER = '$';
         private const char TYPE_MARKER = '&';
+
+        private static readonly Counter castUnquotedKeyValueCounter;
+        private static readonly Counter castQuotedKeyValueCounter;
+        private static readonly Counter castFieldKeyValueCounter;
+        private static readonly Histogram keyValueCastCountHistogram;
+        private static readonly Counter parsePathCounter;
+        private static readonly Counter parsePathTypeCounter;
+        private static readonly Counter parsePathFieldTypeCounter;
+        private static readonly Histogram parsePathLengthHistogram;
+
+        static ParserUtil()
+        {
+            var parserUtilContext = Metric.Context("Parser Utility");
+            castUnquotedKeyValueCounter = parserUtilContext.Counter("Cast Unquoted Key-Value", Unit.Calls, "parser, cast, keyvalue");
+            castQuotedKeyValueCounter = parserUtilContext.Counter("Cast Quoted Key-Value", Unit.Calls, "parser, cast, keyvalue");
+            castFieldKeyValueCounter = parserUtilContext.Counter("Cast Field Key-Value", Unit.Calls, "parser, cast, keyvalue, field");
+            keyValueCastCountHistogram = parserUtilContext.Histogram("Cast Field Key-Value Count", Unit.Items, tags: "parser, cast, keyvalue, field, items");
+            parsePathCounter = parserUtilContext.Counter("ParsePath", Unit.Calls, "parser, path");
+            parsePathTypeCounter = parserUtilContext.Counter("ParsePath Path Type", Unit.Items, "parser, path, type");
+            parsePathFieldTypeCounter = parserUtilContext.Counter("ParsePath Field Type", Unit.Items, "parser, path, field, type");
+            parsePathLengthHistogram = parserUtilContext.Histogram("ParsePath Length", Unit.Items, tags: "parser, path, length");
+        }
 
         #region Cast (Key-Value)
 
@@ -175,12 +199,13 @@ namespace Stethoscope.Parsers
 
         private static IEnumerable<KeyValuePair<string, string>> CastKeyValueSplit(string rawValue)
         {
-            //TODO: record stat about function used
+            castUnquotedKeyValueCounter.Increment();
+
             if (rawValue.IndexOf('"') < 0)
             {
                 return FastCastKeyValueSplit(rawValue);
             }
-            //TODO: record stat about quoted function used
+            castQuotedKeyValueCounter.Increment();
             return QuotedCastKeyValueSplit(rawValue);
         }
 
@@ -191,8 +216,7 @@ namespace Stethoscope.Parsers
             switch (fieldType)
             {
                 case ParserPathElementFieldType.Bool:
-                    bool bValue;
-                    if (bool.TryParse(rawValue, out bValue))
+                    if (bool.TryParse(rawValue, out bool bValue))
                     {
                         return bValue;
                     }
@@ -200,14 +224,14 @@ namespace Stethoscope.Parsers
                 case ParserPathElementFieldType.String:
                     return rawValue;
                 case ParserPathElementFieldType.Int:
-                    int iValue;
-                    if (int.TryParse(rawValue, out iValue))
+                    if (int.TryParse(rawValue, out int iValue))
                     {
                         return iValue;
                     }
                     break;
                 case ParserPathElementFieldType.KeyValue:
-                    //TODO: record stat about key-value being cast
+                    castFieldKeyValueCounter.Increment();
+
                     if (rawValue == null)
                     {
                         return null;
@@ -217,7 +241,7 @@ namespace Stethoscope.Parsers
                     {
                         kv.Add(pair);
                     }
-                    //TODO: record stat about key-value element count
+                    keyValueCastCountHistogram.Update(kv.Count);
                     if (kv.Count > 0)
                     {
                         return kv;
@@ -267,7 +291,8 @@ namespace Stethoscope.Parsers
 
         public static ParserPathElement[] ParsePath(string path)
         {
-            //TODO: record stat about function used
+            parsePathCounter.Increment();
+
             if (string.IsNullOrWhiteSpace(path))
             {
                 return null;
@@ -282,7 +307,7 @@ namespace Stethoscope.Parsers
                     // Only has the '!' marker
                     return null;
                 }
-                //TODO: record stat about path type, length, and field type
+                parsePathTypeCounter.Increment(ParserPathElementType.DirectNamedField.ToString());
                 elements.Add(new ParserPathElement()
                 {
                     Type = ParserPathElementType.DirectNamedField,
@@ -316,7 +341,7 @@ namespace Stethoscope.Parsers
                             // Is not an int or is a negative value
                             return null;
                         }
-                        //TODO: record stat about path type
+                        parsePathTypeCounter.Increment(ParserPathElementType.IndexField.ToString());
                         elements.Add(new ParserPathElement()
                         {
                             Type = ParserPathElementType.IndexField,
@@ -327,7 +352,7 @@ namespace Stethoscope.Parsers
                     }
                     else if (section[0] == FILTER_MARKER)
                     {
-                        //TODO: record stat about path type
+                        parsePathTypeCounter.Increment(ParserPathElementType.FilterField.ToString());
                         elements.Add(new ParserPathElement()
                         {
                             Type = ParserPathElementType.FilterField,
@@ -338,7 +363,7 @@ namespace Stethoscope.Parsers
                     }
                     else if (section[0] == NAMED_MARKER)
                     {
-                        //TODO: record stat about path type
+                        parsePathTypeCounter.Increment(ParserPathElementType.NamedField.ToString());
                         elements.Add(new ParserPathElement()
                         {
                             Type = ParserPathElementType.NamedField,
@@ -359,7 +384,11 @@ namespace Stethoscope.Parsers
                 }
             }
 
-            //TODO: record stat about path length and field type
+            if (elements.Count > 0)
+            {
+                parsePathFieldTypeCounter.Increment(elements.Last().FieldType.ToString());
+            }
+            parsePathLengthHistogram.Update(elements.Count, path);
             return elements.ToArray();
         }
 

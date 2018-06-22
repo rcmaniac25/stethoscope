@@ -804,3 +804,7 @@ void doSomethingCool(std::ifstream& input)
 - Implemented trival metrics.
 - Was debating on the ListStorage.AddLogSorted, if I wanted to manually measure the lock time AND the actual execution, or just do (what I ended up doing) of just combining the two timers.
 - It was easier to combine then to try to do StartTimer, StopTimer, Record(stop - start, ...) and then doing that only around locks and then the execution itself.
+
+#71.2. 6/21/2018:
+- Implemented non-trival metrics.
+- There are probably a few more I can add, but they'd only be added because I thought of them... not because I saw a need for them. Like timing how long GetElementDataFromPath takes... realty is, it doesn't matter. ProcessElement does matter, since it limits how many logs we can go through. While GetElementDataFromPath would just be "this type of operation/length is slow"

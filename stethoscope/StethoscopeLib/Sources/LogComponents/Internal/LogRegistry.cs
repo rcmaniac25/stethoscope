@@ -1,4 +1,6 @@
-﻿using Stethoscope.Common;
+﻿using Metrics;
+
+using Stethoscope.Common;
 
 using System;
 using System.Collections.Generic;
@@ -8,6 +10,34 @@ namespace Stethoscope.Log.Internal
 {
     public class LogRegistry : ILogRegistry
     {
+        private static readonly Counter dateTimeParseFailureCounter;
+        private static readonly Meter addLogMeter;
+        private static readonly Meter addFailedLogMeter;
+        private static readonly Counter logsBeingProcessedCounter;
+        private static readonly Counter notifyParsedInvalidLogTypeCounter;
+        private static readonly Counter notifyParsedCounter;
+        private static readonly Counter notifyParsedProcessingCounter;
+        private static readonly Counter addValueToLogCounter;
+        private static readonly Counter addValueToLogAddingCounter;
+        private static readonly Counter clearCounter;
+        private static readonly Counter logObservableRequestedCounter;
+
+        static LogRegistry()
+        {
+            var logRegistryContext = Metric.Context("LogRegistry");
+            dateTimeParseFailureCounter = logRegistryContext.Counter("AddLog DateTime Parse Failures", Unit.Errors, "log, registry, add, parse, failure");
+            addLogMeter = logRegistryContext.Meter("AddLog", Unit.Calls, tags: "log, registry, add, log");
+            addFailedLogMeter = logRegistryContext.Meter("AddFailedLog", Unit.Calls, tags: "log, registry, add, log, failed");
+            logsBeingProcessedCounter = logRegistryContext.Counter("Logs being Processed", Unit.Items, "log, registry, process, failed, items");
+            notifyParsedInvalidLogTypeCounter = logRegistryContext.Counter("NotifyFailedLogParsed Invalid Log Type", Unit.Errors, "log, registry, notify, failed, invalid, type");
+            notifyParsedCounter = logRegistryContext.Counter("NotifyFailedLogParsed", Unit.Calls, "log, registry, notify, failed");
+            notifyParsedProcessingCounter = logRegistryContext.Counter("NotifyFailedLogParsed Processing", Unit.Events, "log, registry, notify, failed");
+            addValueToLogCounter = logRegistryContext.Counter("AddValueToLog", Unit.Calls, "log, registry, add, value, log");
+            addValueToLogAddingCounter = logRegistryContext.Counter("AddValueToLog (actually add to log)", Unit.Events, "log, registry, add, value, log");
+            clearCounter = logRegistryContext.Counter("Clear", Unit.Calls, "log, registry, clear");
+            logObservableRequestedCounter = logRegistryContext.Counter("Logs", Unit.Calls, "log, registry, logs");
+        }
+
         private readonly IRegistryStorage storage;
         private readonly List<IInternalLogEntry> logsBeingProcessed = new List<IInternalLogEntry>();
 
@@ -45,13 +75,14 @@ namespace Stethoscope.Log.Internal
             {
                 throw new ArgumentNullException(nameof(message));
             }
-            
+
+            addLogMeter.Mark();
+
             if (!DateTime.TryParse(timestamp, out DateTime time))
             {
-                //TODO: record stat about failure
+                dateTimeParseFailureCounter.Increment();
                 throw new ArgumentException("Could not parse timestamp", nameof(timestamp));
             }
-            //TODO: record stat about function used
             var entry = new LogEntry(time, message);
             storage.AddLogSorted(entry);
             return entry;
@@ -59,11 +90,13 @@ namespace Stethoscope.Log.Internal
 
         public ILogEntry AddFailedLog()
         {
-            //TODO: record stat about function used
+            addFailedLogMeter.Mark();
+
             var entry = new FailedLogEntry();
             lock (logsBeingProcessed)
             {
                 logsBeingProcessed.Add(entry);
+                logsBeingProcessedCounter.Increment();
             }
             return entry;
         }
@@ -78,6 +111,7 @@ namespace Stethoscope.Log.Internal
                     throw new ArgumentException("Failed log does not exist in this registry", "entry"); // Argument name comes from NotifyFailedLogParsed
                 }
                 logsBeingProcessed.RemoveAt(index);
+                logsBeingProcessedCounter.Decrement();
                 if (!failedLog.IsEmpty)
                 {
                     storage.AddLogSorted(failedLog);
@@ -93,15 +127,16 @@ namespace Stethoscope.Log.Internal
             }
             if (!(entry is FailedLogEntry))
             {
-                //TODO: record stat about failure
+                notifyParsedInvalidLogTypeCounter.Increment();
                 throw new ArgumentException("Entry is not a failed log", nameof(entry));
             }
 
-            //TODO: record stat about function used
+            notifyParsedCounter.Increment();
+
             var failedLog = (FailedLogEntry)entry;
             if (failedLog.HasTimestampChanged || failedLog.IsEmpty)
             {
-                //TODO: record stat about timestamp/empty
+                notifyParsedProcessingCounter.Increment();
                 ProcessingComplete(failedLog);
             }
             failedLog.ResetTimestampChanged();
@@ -113,10 +148,11 @@ namespace Stethoscope.Log.Internal
             {
                 return false;
             }
-            //TODO: record stat about function and attribute used
+            addValueToLogCounter.Increment(attribute.ToString());
+
             if (entry is IInternalLogEntry internalEntry && !entry.HasAttribute(attribute))
             {
-                //TODO: record stat about adding to entry
+                addValueToLogAddingCounter.Increment();
                 internalEntry.AddAttribute(attribute, value);
                 return true;
             }
@@ -125,7 +161,7 @@ namespace Stethoscope.Log.Internal
 
         public void Clear()
         {
-            //TODO: record stat about function used
+            clearCounter.Increment();
             lock (logsBeingProcessed)
             {
                 storage.Clear();
@@ -137,7 +173,7 @@ namespace Stethoscope.Log.Internal
         {
             get
             {
-                //TODO: record stat about function used and how many "being processed" logs exist
+                logObservableRequestedCounter.Increment();
                 lock (logsBeingProcessed)
                 {
                     return storage.Entries.Concat(logsBeingProcessed.ToObservable());
