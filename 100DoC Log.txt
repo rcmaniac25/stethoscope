@@ -808,3 +808,13 @@ void doSomethingCool(std::ifstream& input)
 #71.2. 6/21/2018:
 - Implemented non-trival metrics.
 - There are probably a few more I can add, but they'd only be added because I thought of them... not because I saw a need for them. Like timing how long GetElementDataFromPath takes... realty is, it doesn't matter. ProcessElement does matter, since it limits how many logs we can go through. While GetElementDataFromPath would just be "this type of operation/length is slow"
+
+#72.2. 6/22/2018:
+- So this is a weird one... I wrote code, but thank God for unit tests... because I found out it didn't work.
+- What's weird is that it should...
+- Ex. Instead of "var result = x + y" I wrote "var result = Math.Add(x, y)". The first passes unit tests, the second doesn't.
+- So I went off and did this: "var result = x + y; var result2 = Math.Add(x, y);" and... it too doesn't pass.
+- What the heck? How does addiitonal code, that has purposly been written to not interact with the original fail?
+- ...and I spoke too soon, I realized while typing this that the reader probably already read the value for the original format... but running both means that it's not getting the same values/children.
+- It's late, so I'm going to stop here and try to figure out what to do tomorrow.
+- The end goal was to eliminate the "root" node, since streaming and massive logs don't need millions of child nodes.
