@@ -342,7 +342,8 @@ namespace Stethoscope.Parsers.Internal.XML
         {
             using (var xmlReader = XmlReader.Create(input))
             {
-                XElement element = null;
+                // Don't just use XML's natual tree-creation setup... because we don't want the root element to have children. For large or streaming logs, it will become a resource hog
+                var elements = new Stack<XElement>();
                 bool exitLoop = false;
 
                 while (!exitLoop && xmlReader.Read())
@@ -351,34 +352,29 @@ namespace Stethoscope.Parsers.Internal.XML
                     {
                         case XmlNodeType.Element:
                             var name = XName.Get(xmlReader.Name, xmlReader.NamespaceURI);
-                            if (element == null)
+                            var element = new XElement(name);
+                            if (elements.Count > 1) // Don't add children to root to ensure it doesn't become massive
                             {
-                                element = new XElement(name);
+                                elements.Peek().Add(element);
                             }
-                            else
-                            {
-                                var ele = new XElement(name);
-                                element.Add(ele);
-                                element = ele;
-                            }
+                            elements.Push(element);
                             if (xmlReader.HasAttributes)
                             {
                                 while (xmlReader.MoveToNextAttribute())
                                 {
                                     var attName = XName.Get(xmlReader.Name, xmlReader.NamespaceURI);
                                     var att = new XAttribute(attName, xmlReader.Value);
-                                    element.Add(att);
+                                    elements.Peek().Add(att);
                                 }
                                 xmlReader.MoveToElement();
                             }
                             break;
                         case XmlNodeType.EndElement:
                             xmlElementCounter.Increment();
-                            if (xmlReader.Name == element.Name)
+                            if (xmlReader.Name == elements.Peek().Name)
                             {
-                                var finishedElement = element;
-                                element = element.Parent;
-                                if (element != null && element.Name == "root")
+                                var finishedElement = elements.Pop();
+                                if (elements.Count == 1) // Don't process the elements unless they're children of root. Anything else is a child element of a log element
                                 {
                                     using (processElementTimer.NewContext())
                                     {
@@ -392,16 +388,16 @@ namespace Stethoscope.Parsers.Internal.XML
                             }
                             else
                             {
-                                Console.Error.WriteLine($"Element {element.Name} ended, but the name of the ending element {xmlReader.Name} doesn't match. Possibly out of sync...");
+                                Console.Error.WriteLine($"Element {elements.Peek().Name} ended, but the name of the ending element {xmlReader.Name} doesn't match. Possibly out of sync...");
                             }
                             break;
                         case XmlNodeType.CDATA:
                             xmlCDATACounter.Increment();
-                            element.Add(new XCData(xmlReader.Value));
+                            elements.Peek().Add(new XCData(xmlReader.Value));
                             break;
                         case XmlNodeType.Text:
                             xmlTextCounter.Increment();
-                            element.Add(new XText(xmlReader.Value));
+                            elements.Peek().Add(new XText(xmlReader.Value));
                             break;
                         case XmlNodeType.Whitespace:
                             break;
@@ -411,7 +407,7 @@ namespace Stethoscope.Parsers.Internal.XML
                     }
                 }
 
-                if (element?.Parent != null)
+                if (elements.Count != 0)
                 {
                     xmlRootUnfinishedCounter.Increment();
                     Console.Error.WriteLine("Root element didn't end");
@@ -423,6 +419,8 @@ namespace Stethoscope.Parsers.Internal.XML
         {
             using (var ms = new MemoryStream())
             {
+                //TODO: need to support logs that already have a root element
+
                 var rootElementStringBytes = Encoding.UTF8.GetBytes("<root>");
                 ms.Write(rootElementStringBytes, 0, rootElementStringBytes.Length);
 

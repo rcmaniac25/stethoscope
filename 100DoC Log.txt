@@ -818,3 +818,15 @@ void doSomethingCool(std::ifstream& input)
 - ...and I spoke too soon, I realized while typing this that the reader probably already read the value for the original format... but running both means that it's not getting the same values/children.
 - It's late, so I'm going to stop here and try to figure out what to do tomorrow.
 - The end goal was to eliminate the "root" node, since streaming and massive logs don't need millions of child nodes.
+
+#73.2. 6/23/2018:
+- So in a slight comedy of errors yesterday, I tried to replace the tree-model of XML nodes (element.Parent.Children.Contains(element)) with... a Queue.
+- Take a moment to think about that... how do I take that same example and do it with a queue? Hint: you have to create a new queue.
+- This is what happens when I work with little sleep. What was I actually looking for? Stack, not Queue.
+- So I switched to a Stack and... everything still failed.
+- Turns out, I condensed some of the logic down originally and didn't make it obvious what was happening... so I past self confused current self with what I did.
+- Key: adding new elements to a parent. I went "nah, don't need this" but didn't think "um, I don't want to add elements to <root> but everything else is fine"
+- With the proper container in place, a couple comments on what is being done, and ensuring that I add children at the correct moment, I was able to get everything working and passing tests.
+- I repeat: unit tests are very useful... I had many of the XMLLogParser tests turn red.
+- I also repeat: sleep. Don't kill yourself over code. I possibly would've had this done yesterday if I wasn't tired and realized I was using a Queue instead of a Stack. I distinctly remember going "why is there no Push function? Well, Enqueue is close enough".
+- Bonus: I realized "what if a log shows up that already has a root?" and made a note that I need to support XML logs that already have roots.
