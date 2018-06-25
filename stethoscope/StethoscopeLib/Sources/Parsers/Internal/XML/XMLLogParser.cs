@@ -17,6 +17,7 @@ namespace Stethoscope.Parsers.Internal.XML
         private struct TransientParserConfigs
         {
             public LogParserFailureHandling FailureHandling { get; set; }
+            public bool LogHasRoot { get; set; }
             public Dictionary<LogAttribute, object> AdditionalAttributes;
         }
         
@@ -419,17 +420,21 @@ namespace Stethoscope.Parsers.Internal.XML
         {
             using (var ms = new MemoryStream())
             {
-                //TODO: need to support logs that already have a root element
-
-                var rootElementStringBytes = Encoding.UTF8.GetBytes("<root>");
-                ms.Write(rootElementStringBytes, 0, rootElementStringBytes.Length);
+                if (!config.LogHasRoot)
+                {
+                    var rootElementStringBytes = Encoding.UTF8.GetBytes("<root>");
+                    ms.Write(rootElementStringBytes, 0, rootElementStringBytes.Length);
+                }
 
                 //TODO: this doesn't work for streaming, but read/write streams don't really work/exist right now
                 logStream.CopyTo(ms);
 
-                //XXX: not going to show up in streaming log
-                var rootEndElementStringBytes = Encoding.UTF8.GetBytes("</root>");
-                ms.Write(rootEndElementStringBytes, 0, rootEndElementStringBytes.Length);
+                if (!config.LogHasRoot)
+                {
+                    //XXX: not going to show up in streaming log
+                    var rootEndElementStringBytes = Encoding.UTF8.GetBytes("</root>");
+                    ms.Write(rootEndElementStringBytes, 0, rootEndElementStringBytes.Length);
+                }
 
                 ms.Position = 0L;
                 try
@@ -487,7 +492,8 @@ namespace Stethoscope.Parsers.Internal.XML
             setConfigFailureHandlingCounter.Increment(config.ParsingFailureHandling.ToString());
             defaultTransientConfig = new TransientParserConfigs()
             {
-                FailureHandling = config.ParsingFailureHandling
+                FailureHandling = config.ParsingFailureHandling,
+                LogHasRoot = config.LogHasRoot
             };
 
             attributePaths = new Dictionary<LogAttribute, ParserPathElement[]>();

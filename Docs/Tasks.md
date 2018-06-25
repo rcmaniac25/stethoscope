@@ -8,6 +8,7 @@ What needs to get done. Should make some of them tickets... (some of these may b
 	- May have to rewrite IPrinter or change names of PrinterFactory so IOPrinter doesn't "wait" for a specific thread's stream to finish before (starting to) printing the next thread
 - Determine program arguments and the config file usage (are they redundent? Complementary? Can I setup everything with program arguments?)
 - Add logging (ironic... a log handling system, writing it's own logs). Will be useful when trying to figure out what went wrong with accesing remote logs and doing more advanced work.
+- Ensure this works under Mono (as the port to C++ is still a while away, and "this WILL be ported" opinion is always subject to change, though it's currently "it WILL happen")
 - Proper IQbservable support in RegistryStorage (and maybe additional storage options)
 - Support remote logs
 - (large) With larger logs, start to flesh out LogRegistry... maybe allow LINQ usage so components of logs can be searched through.

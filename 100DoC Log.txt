@@ -830,3 +830,13 @@ void doSomethingCool(std::ifstream& input)
 - I repeat: unit tests are very useful... I had many of the XMLLogParser tests turn red.
 - I also repeat: sleep. Don't kill yourself over code. I possibly would've had this done yesterday if I wasn't tired and realized I was using a Queue instead of a Stack. I distinctly remember going "why is there no Push function? Well, Enqueue is close enough".
 - Bonus: I realized "what if a log shows up that already has a root?" and made a note that I need to support XML logs that already have roots.
+
+#74.2. 6/24/2018:
+- I didn't have a lot of time today, so I quickly added one element I mentioned yesterday: supporting logs with an existing root.
+- While the flag is there, the tasks I need to do with it:
+-- Support flag with ContextConfigs
+-- Unit tests
+-- Think about if this is applicable for other log formats... and if not, how should I handle this?
+--- While I keep flip-flopping mentally if I should or shouldn't, I'd like LogConfig to be per-parser/per-log to ensure the program can support multiple log sources at the same time AND not have sub-configs or something.
+--- For all I know, the sub-configs might be a better idea... but do it per-log type?
+--- Other log type ideas... would they have there own variables that don't work elsewhere?

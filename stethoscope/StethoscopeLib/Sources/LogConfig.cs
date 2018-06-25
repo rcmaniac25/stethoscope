@@ -50,8 +50,15 @@ namespace Stethoscope
         public string TraceIdPath { get; set; }
         public string ContextPath { get; set; }
 
+        /// <summary>
+        /// How to handle failures during parsing.
+        /// </summary>
         [JsonConverter(typeof(StringEnumConverter))]
         public LogParserFailureHandling ParsingFailureHandling { get; set; }
+        /// <summary>
+        /// If the log data has a root element or not. Ex. <root><logdata/></root> vs. <logdata/>
+        /// </summary>
+        public bool LogHasRoot { get; set; }
 
         // Req
         public string TimestampPath { get; set; }
