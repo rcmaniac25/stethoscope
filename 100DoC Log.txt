@@ -840,3 +840,12 @@ void doSomethingCool(std::ifstream& input)
 --- While I keep flip-flopping mentally if I should or shouldn't, I'd like LogConfig to be per-parser/per-log to ensure the program can support multiple log sources at the same time AND not have sub-configs or something.
 --- For all I know, the sub-configs might be a better idea... but do it per-log type?
 --- Other log type ideas... would they have there own variables that don't work elsewhere?
+
+#75.2. 6/25/2018:
+- Finished support for ContextConfigs and unit tests for LogHasRoot
+- As I like the idea of per-log/format configs, the LogHasRoot config can be ignored by parsers that don't support it.
+- I also aquired bigger logs... going up to 7GB.
+- The smaller of the large logs parse just fine, though RAM usage goes to ~2.5-3GB.
+- The 7GB log... didn't parse because Stream.CopyTo couldn't copy the data. Understandable, it's 7GB trying to be copied to a MemoryStream.
+- I'll need to do streaming to test that one.
+- One interesting one: I support XML right now, will add support for JSON later... but I forgot, there was a period of time (and many logging systems output) unstructured plaintext. I'm curious if I can support it... I don't know how at this point, but we'll think about that when the time comes.

@@ -558,7 +558,9 @@ namespace Stethoscope.Parsers.Internal.XML
 
                 contextApplyConfigCounter.Increment();
                 contextApplyConfigSizeHistogram.Update(config.Count);
-                
+
+                #region Parse config
+
                 if (config.ContainsKey(ContextConfigs.LogSource))
                 {
                     var value = config[ContextConfigs.LogSource];
@@ -596,6 +598,20 @@ namespace Stethoscope.Parsers.Internal.XML
                         throw new ArgumentException("FailureHandling must be a LogParserFailureHandling enum", nameof(config));
                     }
                 }
+                if (config.ContainsKey(ContextConfigs.LogHasRoot))
+                {
+                    var value = config[ContextConfigs.LogHasRoot];
+                    if (value is bool hasRoot)
+                    {
+                        this.config.LogHasRoot = hasRoot;
+                    }
+                    else
+                    {
+                        throw new ArgumentException("LogHasRoot must be a boolean", nameof(config));
+                    }
+                }
+
+                #endregion
             }
             
             public void ApplyContextConfig(IDictionary<ContextConfigs, object> config, Action<ILogParser> context)

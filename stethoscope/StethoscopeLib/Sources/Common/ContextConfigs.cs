@@ -9,7 +9,11 @@
         /// <summary>
         /// How to handle errors while parsing a log. Must be a <see cref="LogParserFailureHandling"/>.
         /// </summary>
-        FailureHandling
+        FailureHandling,
+        /// <summary>
+        /// Parsing a log should use the root that already exists. Must be a boolean.
+        /// </summary>
+        LogHasRoot
 
         //TODO: log source attribue. Ex. log file, stream URL, server name, etc.
         //      One idea to apply this without exposing some global: ILogParser.UseLogSourceContext(object source, Action<ILogParser> sourceContext). The log parser is valid only for the lifetime of the action delegate's context. All logs parsed within the context will have the log source applied to it.

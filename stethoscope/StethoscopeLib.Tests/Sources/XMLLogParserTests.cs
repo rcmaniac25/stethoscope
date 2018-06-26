@@ -121,6 +121,48 @@ namespace Stethoscope.Tests
         }
 
         [Test]
+        public void BasicTestWithRoot()
+        {
+            logConfig.LogHasRoot = true;
+
+            var parser = new XMLLogParser();
+            parser.SetConfig(logConfig);
+            parser.SetRegistry(logRegistry);
+
+            logRegistry.AddLog("goodtime", "my log").Returns(logEntry);
+
+            var log = "<someroot><fakelog time=\"goodtime\" log=\"my log\"></fakelog></someroot>";
+            using (var ms = CreateStream(log))
+            {
+                parser.Parse(ms);
+            }
+
+            logRegistry.Received().AddLog("goodtime", "my log");
+            logRegistry.DidNotReceive().AddValueToLog(logEntry, Arg.Any<LogAttribute>(), Arg.Any<object>());
+        }
+
+        [Test]
+        public void BasicTestWithRootMissing()
+        {
+            logConfig.LogHasRoot = true;
+
+            var parser = new XMLLogParser();
+            parser.SetConfig(logConfig);
+            parser.SetRegistry(logRegistry);
+
+            logRegistry.AddLog("goodtime", "my log").Returns(logEntry);
+
+            var log = "<fakelog time=\"goodtime\" log=\"my log\"></fakelog>";
+            using (var ms = CreateStream(log))
+            {
+                parser.Parse(ms);
+            }
+
+            logRegistry.DidNotReceive().AddLog(Arg.Any<string>(), Arg.Any<string>());
+            logRegistry.DidNotReceive().AddValueToLog(logEntry, Arg.Any<LogAttribute>(), Arg.Any<object>());
+        }
+
+        [Test]
         public void NoConfig()
         {
             var parser = new XMLLogParser();
@@ -710,6 +752,45 @@ namespace Stethoscope.Tests
             Assert.Throws<ArgumentException>(() =>
             {
                 parser.ApplyContextConfig(ContextConfigs.FailureHandling, false, contextParser =>
+                {
+                });
+            });
+        }
+
+        [Test]
+        public void ApplyContextConfigLogHasRoot()
+        {
+            var parser = new XMLLogParser();
+            parser.SetConfig(logConfig);
+            parser.SetRegistry(logRegistry);
+
+            logRegistry.AddLog(Arg.Any<string>(), Arg.Any<string>()).Returns(logEntry);
+
+            parser.ApplyContextConfig(ContextConfigs.LogHasRoot, true, contextParser =>
+            {
+                Assert.That(Object.ReferenceEquals(contextParser, parser), Is.False);
+
+                var log = "<myroot><fakelog time=\"goodtime\" log=\"my log\"></fakelog></myroot>";
+                using (var ms = CreateStream(log))
+                {
+                    contextParser.Parse(ms);
+                }
+            });
+
+            logRegistry.Received(1).AddLog("goodtime", "my log");
+            logRegistry.DidNotReceive().AddValueToLog(logEntry, Arg.Any<LogAttribute>(), Arg.Any<object>());
+        }
+
+        [Test]
+        public void ApplyContextConfigLogHasRootInvalid()
+        {
+            var parser = new XMLLogParser();
+            parser.SetConfig(logConfig);
+            parser.SetRegistry(logRegistry);
+
+            Assert.Throws<ArgumentException>(() =>
+            {
+                parser.ApplyContextConfig(ContextConfigs.LogHasRoot, "false", contextParser =>
                 {
                 });
             });
