@@ -849,3 +849,18 @@ void doSomethingCool(std::ifstream& input)
 - The 7GB log... didn't parse because Stream.CopyTo couldn't copy the data. Understandable, it's 7GB trying to be copied to a MemoryStream.
 - I'll need to do streaming to test that one.
 - One interesting one: I support XML right now, will add support for JSON later... but I forgot, there was a period of time (and many logging systems output) unstructured plaintext. I'm curious if I can support it... I don't know how at this point, but we'll think about that when the time comes.
+
+#76.2. 6/26/2018:
+- So, I wasn't sure where I should go... and decided to jsut get benchmarks.
+- So no code today, just numbers.
+- Rough numbers... because the metrics continue to get gathered even when we're done processing. Grabbing them right as parsing finishes would probably be good. But I'm still namely trying to gather how to read some of these metrics.
+- Numbers:
+-- Setup without parsing: ~20.4 MB of RAM
+-- Setup with parsing: ~2636 MB of RAM
+-- Logs parsed: 687,674 logs
+-- Parsing rate: ~22,500 logs per sec, or ~22.5 logs per ms
+-- Parsing time:
+--- Min: ~0.01 ms per log
+--- Max: ~2.4 ms per log
+--- 99% precentile of parsing: ~0.07 ms per log
+-- Locks when adding to storage adds ~0.1 ms per log, at worse
