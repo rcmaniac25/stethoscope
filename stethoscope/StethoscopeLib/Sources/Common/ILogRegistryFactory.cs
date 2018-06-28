@@ -6,6 +6,11 @@ namespace Stethoscope.Common
     public enum RegistrySelectionCriteria
     {
         /// <summary>
+        /// A No-Op log storage option. Any implemented functionality is a convenience. No data is stored.
+        /// </summary>
+        Null = 0,
+
+        /// <summary>
         /// Default log for many uses
         /// </summary>
         Default = ExpectSmallDataset | MemoryStorage,

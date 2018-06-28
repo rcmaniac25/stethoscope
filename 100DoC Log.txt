@@ -858,9 +858,21 @@ void doSomethingCool(std::ifstream& input)
 -- Setup without parsing: ~20.4 MB of RAM
 -- Setup with parsing: ~2636 MB of RAM
 -- Logs parsed: 687,674 logs
+-- Log file size: 554,220 KB
 -- Parsing rate: ~22,500 logs per sec, or ~22.5 logs per ms
 -- Parsing time:
 --- Min: ~0.01 ms per log
 --- Max: ~2.4 ms per log
---- 99% precentile of parsing: ~0.07 ms per log
+--- 99% percentile of parsing: ~0.07 ms per log
 -- Locks when adding to storage adds ~0.1 ms per log, at worse
+
+#77.2. 6/27/2018:
+- I'm late, but wanted to see what I could do... which wasn't much.
+- I was planning on trying to implement streaming/concat Streams (https://stackoverflow.com/questions/3879152/how-do-i-concatenate-two-system-io-stream-instances-into-one) but realized "I need a different registry storage for this... it'd be too big"
+- See, by the numbers yesterday, a ~500MB log file produced ~700k logs. This took up ~2.5 GB of RAM.
+- The largest log I have on me right now is 7.1 GB. Using a nice ratio, that comes out to ~1.4 logs per MB, or in this case, a little over 10 million logs. Do the same for RAM, and it comes to ~36.5 GB.
+- Yes, ~36.5 GB. My computer has 64 GB of RAM ("they told me I was crazy... what are they to say now?"), and while technically I'd be fine, the reality is I'd be pushing it on RAM alone. I might be fine, I might not.
+- The other aspect is that LogEntry is a class right now. Which means every single one of them will be GCed and have additional data associated with them. That's a stretch to go. I'm not even sure if a List would be able to allocate a 36 GB array of memory.
+- My last goal for the night was to do some unit tests, but I'm going to push that to tomorrow as it occured to me, "what if LogEntries were structs instead of classes?"
+- Before I code that, my solution was to add NullStorage (think /dev/null) where every new log would just be ignored. Counted, but ignored. Nothing is stored. It's actually probably a useful type to have.
+- <coding>

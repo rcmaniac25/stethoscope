@@ -35,8 +35,18 @@ namespace Stethoscope.Log
             {
                 creationCounter.Increment(criteria.ToString());
                 
-                //XXX we don't care about criteria for now, but it will be used to pick "storage"
-                return new LogRegistry(new ListStorage());
+                IRegistryStorage storage;
+                if (criteria == RegistrySelectionCriteria.Null)
+                {
+                    storage = new NullStorage(LogAttribute.Timestamp);
+                }
+                else
+                {
+                    //XXX we don't care about criteria for now, but it will be used to pick "storage"
+                    storage = new ListStorage();
+                }
+                
+                return new LogRegistry(storage);
             }
         }
     }
