@@ -875,4 +875,4 @@ void doSomethingCool(std::ifstream& input)
 - The other aspect is that LogEntry is a class right now. Which means every single one of them will be GCed and have additional data associated with them. That's a stretch to go. I'm not even sure if a List would be able to allocate a 36 GB array of memory.
 - My last goal for the night was to do some unit tests, but I'm going to push that to tomorrow as it occured to me, "what if LogEntries were structs instead of classes?"
 - Before I code that, my solution was to add NullStorage (think /dev/null) where every new log would just be ignored. Counted, but ignored. Nothing is stored. It's actually probably a useful type to have.
-- <coding>
+- Ok, it took longer then expected to convert FailedLogEntry to a struct (let alone LogEntry) and unit tests broke. So I need to see what happened... tomorrow.
