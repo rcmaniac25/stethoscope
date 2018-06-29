@@ -31,21 +31,24 @@ namespace Stethoscope.Log
 
         private class LogRegistryFactoryFinder : ILogRegistryFactory
         {
-            public ILogRegistry Create(RegistrySelectionCriteria criteria)
+            private IRegistryStorage PickStorage(RegistrySelectionCriteria criteria)
             {
-                creationCounter.Increment(criteria.ToString());
-                
-                IRegistryStorage storage;
                 if (criteria == RegistrySelectionCriteria.Null)
                 {
-                    storage = new NullStorage(LogAttribute.Timestamp);
+                    return new NullStorage(LogAttribute.Timestamp);
                 }
                 else
                 {
                     //XXX we don't care about criteria for now, but it will be used to pick "storage"
-                    storage = new ListStorage();
+                    return new ListStorage();
                 }
-                
+            }
+
+            public ILogRegistry Create(RegistrySelectionCriteria criteria)
+            {
+                creationCounter.Increment(criteria.ToString());
+
+                IRegistryStorage storage = PickStorage(criteria);
                 return new LogRegistry(storage);
             }
         }

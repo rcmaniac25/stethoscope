@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reactive.Linq;
 
 namespace Stethoscope.Tests.Helpers
 {
@@ -32,9 +33,10 @@ namespace Stethoscope.Tests.Helpers
             {
                 return null;
             }
-            if (expectedObservableType.IsGenericType && expectedObservableType.GetGenericTypeDefinition() == typeof(IObservable<>))
+            if (expectedObservableType.IsGenericType &&
+                (expectedObservableType.GetGenericTypeDefinition() == typeof(IObservable<>) || expectedObservableType.GetGenericTypeDefinition() == typeof(IQbservable<>)))
             {
-                var castGeneric = typeof(System.Reactive.Linq.Observable).GetMethod("Cast");
+                var castGeneric = typeof(Observable).GetMethod("Cast");
                 var cast = castGeneric.MakeGenericMethod(expectedObservableType.GetGenericArguments());
                 return (IObservable<object>)cast.Invoke(null, new object[] { expectedObservable });
             }

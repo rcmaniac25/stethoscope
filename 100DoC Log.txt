@@ -876,3 +876,10 @@ void doSomethingCool(std::ifstream& input)
 - My last goal for the night was to do some unit tests, but I'm going to push that to tomorrow as it occured to me, "what if LogEntries were structs instead of classes?"
 - Before I code that, my solution was to add NullStorage (think /dev/null) where every new log would just be ignored. Counted, but ignored. Nothing is stored. It's actually probably a useful type to have.
 - Ok, it took longer then expected to convert FailedLogEntry to a struct (let alone LogEntry) and unit tests broke. So I need to see what happened... tomorrow.
+
+#78.2. 6/28/2018:
+- I tested the different entries as structs. I didn't measure any improvements in any metric... but did notice that it caused multiple unit tests to fail.
+- So for the sake of knowing things work, and making the implementation less hacky, I'll leave them as classes.
+- A quick test with NullStorage showed the XML parsing can run at 30,000 logs per sec.
+- I wonder if hybrid approaches might be useful, like lockless queues. Everything goes into the queue extremely fast, but then a methodical dequeuing. This way parsing happens really fast, while storage takes as long as needed. This may be better for DBs, where it could be hitting disks instead of just RAM.
+- NullStorage unit tests are done... I want to ensure all registry storage tests are in the same place, and need to make unit tests for the storage selection function. Tomorrow.

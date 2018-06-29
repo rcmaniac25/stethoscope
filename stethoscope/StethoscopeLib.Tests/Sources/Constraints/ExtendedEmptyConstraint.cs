@@ -1,6 +1,7 @@
 ﻿using NUnit.Framework.Constraints;
 
 using System;
+using System.Reactive.Linq;
 
 namespace Stethoscope.Tests.Constraints
 {
@@ -15,7 +16,8 @@ namespace Stethoscope.Tests.Constraints
         {
             if (actual != null)
             {
-                if (typeof(TActual).IsGenericType && typeof(TActual).GetGenericTypeDefinition() == typeof(IObservable<>))
+                if (typeof(TActual).IsGenericType &&
+                    (typeof(TActual).GetGenericTypeDefinition() == typeof(IObservable<>) || typeof(TActual).GetGenericTypeDefinition() == typeof(IQbservable<>)))
                 {
                     realConstraint = new EmptyObservableConstraint();
                 }
