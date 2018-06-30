@@ -33,21 +33,35 @@ namespace Stethoscope
         MarkEntriesAsFailed
     }
 
+    /// <summary>
+    /// Per-log/per-log type configuration.
+    /// </summary>
     public struct LogConfig
     {
         private static readonly Counter getAttributeCounter = Metric.Counter("Config Attribute Invocation", Unit.Calls, "config, reflection");
 
         // Opt
+        /// <summary>Path to use for getting <see cref="LogAttribute.ThreadID"/></summary>
         public string ThreadIDPath { get; set; }
+        /// <summary>Path to use for getting <see cref="LogAttribute.SourceFile"/></summary>
         public string SourceFilePath { get; set; }
+        /// <summary>Path to use for getting <see cref="LogAttribute.Function"/></summary>
         public string FunctionPath { get; set; }
+        /// <summary>Path to use for getting <see cref="LogAttribute.SourceLine"/></summary>
         public string LogLinePath { get; set; }
+        /// <summary>Path to use for getting <see cref="LogAttribute.Level"/></summary>
         public string LogLevelPath { get; set; }
+        /// <summary>Path to use for getting <see cref="LogAttribute.SequenceNumber"/></summary>
         public string LogSequencePath { get; set; }
+        /// <summary>Path to use for getting <see cref="LogAttribute.Module"/></summary>
         public string ModulePath { get; set; }
+        /// <summary>Path to use for getting <see cref="LogAttribute.Type"/></summary>
         public string LogTypePath { get; set; }
+        /// <summary>Path to use for getting <see cref="LogAttribute.Section"/></summary>
         public string SectionPath { get; set; }
+        /// <summary>Path to use for getting <see cref="LogAttribute.TraceID"/></summary>
         public string TraceIdPath { get; set; }
+        /// <summary>Path to use for getting <see cref="LogAttribute.Context"/></summary>
         public string ContextPath { get; set; }
 
         /// <summary>
@@ -61,9 +75,14 @@ namespace Stethoscope
         public bool LogHasRoot { get; set; }
 
         // Req
+        /// <summary>Path to use for getting <see cref="LogAttribute.Timestamp"/>. Will always be a <see cref="System.DateTime"/>.</summary>
         public string TimestampPath { get; set; }
+        /// <summary>Path to use for getting <see cref="LogAttribute.Message"/>. Will always be a <see cref="System.String"/>.</summary>
         public string LogMessagePath { get; set; }
 
+        /// <summary>
+        /// If this config is valid for a <see cref="ILogParser"/> to use.
+        /// </summary>
         [JsonIgnore]
         public bool IsValid
         {

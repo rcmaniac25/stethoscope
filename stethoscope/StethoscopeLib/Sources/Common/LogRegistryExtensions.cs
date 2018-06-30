@@ -7,6 +7,9 @@ using System.Reactive.Linq;
 
 namespace Stethoscope.Common
 {
+    /// <summary>
+    /// Extensions for <see cref="LogRegistry"/>
+    /// </summary>
     public static class LogRegistryExtensions
     {
         private static readonly Counter getByCounter;

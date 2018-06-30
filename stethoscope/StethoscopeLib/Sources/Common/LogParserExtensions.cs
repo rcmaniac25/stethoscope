@@ -6,6 +6,9 @@ using System.IO;
 
 namespace Stethoscope.Common
 {
+    /// <summary>
+    /// Extensions for <see cref="ILogParser"/>
+    /// </summary>
     public static class LogParserExtensions
     {
         private static readonly Counter parseCounter;
@@ -20,6 +23,11 @@ namespace Stethoscope.Common
             applyContextCounter = logParserExtContext.Counter("ApplyContext", Unit.Calls, "log, parser, applycontext");
         }
 
+        /// <summary>
+        /// Parse a log file.
+        /// </summary>
+        /// <param name="parser">The parser to use.</param>
+        /// <param name="logFile">Path to a log file.</param>
         public static void Parse(this ILogParser parser, string logFile)
         {
             parseCounter.Increment();
@@ -32,6 +40,13 @@ namespace Stethoscope.Common
             }
         }
 
+        /// <summary>
+        /// Apply additional context to the parser, using a specific config to modify parsing.
+        /// </summary>
+        /// <param name="parser">The parser to apply context to.</param>
+        /// <param name="configName">The specific config to apply.</param>
+        /// <param name="configValue">The value associated with the specified config.</param>
+        /// <param name="context">The context that the modified parser will execute in. If the scope of this parser is exited, as in the Action delegate finishes execution, then the modified parser becomes invalid and won't run.</param>
         public static void ApplyContextConfig(this ILogParser parser, ContextConfigs configName, object configValue, Action<ILogParser> context)
         {
             applyContextCounter.Increment(configName.ToString());

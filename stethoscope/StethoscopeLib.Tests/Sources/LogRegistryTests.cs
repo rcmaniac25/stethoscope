@@ -18,7 +18,6 @@ namespace Stethoscope.Tests
     {
         private static LogRegistry CreateLogRegistry()
         {
-            //TODO ?
             return new LogRegistry(new ListStorage());
         }
         

@@ -1,5 +1,8 @@
 ﻿namespace Stethoscope.Common
 {
+    /// <summary>
+    /// Configurations for applying additional context to a log parser.
+    /// </summary>
     public enum ContextConfigs
     {
         /// <summary>

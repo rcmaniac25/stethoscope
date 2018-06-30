@@ -883,3 +883,7 @@ void doSomethingCool(std::ifstream& input)
 - A quick test with NullStorage showed the XML parsing can run at 30,000 logs per sec.
 - I wonder if hybrid approaches might be useful, like lockless queues. Everything goes into the queue extremely fast, but then a methodical dequeuing. This way parsing happens really fast, while storage takes as long as needed. This may be better for DBs, where it could be hitting disks instead of just RAM.
 - NullStorage unit tests are done... I want to ensure all registry storage tests are in the same place, and need to make unit tests for the storage selection function. Tomorrow.
+
+#79.2. 6/29/2018:
+- I was gonna do unit tests to finish them off, but I mentally "crashed" and am very tired.
+- Instead, I did some mindless work and wrote as many inline docs as I could.

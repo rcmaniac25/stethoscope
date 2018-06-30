@@ -2,6 +2,9 @@
 
 namespace Stethoscope.Common
 {
+    /// <summary>
+    /// Selection criteria for picking registry storage for a log registry.
+    /// </summary>
     [Flags]
     public enum RegistrySelectionCriteria
     {
@@ -34,8 +37,16 @@ namespace Stethoscope.Common
         FileStorage = 0x8
     }
 
+    /// <summary>
+    /// Factory interface to create a log registry.
+    /// </summary>
     public interface ILogRegistryFactory
     {
+        /// <summary>
+        /// Create a log registry.
+        /// </summary>
+        /// <param name="selectionCriteria">Criteria for picking the storage system for the registry.</param>
+        /// <returns>Created log registry.</returns>
         ILogRegistry Create(RegistrySelectionCriteria selectionCriteria = RegistrySelectionCriteria.Default);
     }
 }
