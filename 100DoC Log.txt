@@ -887,3 +887,6 @@ void doSomethingCool(std::ifstream& input)
 #79.2. 6/29/2018:
 - I was gonna do unit tests to finish them off, but I mentally "crashed" and am very tired.
 - Instead, I did some mindless work and wrote as many inline docs as I could.
+
+#80.2. 6/30/2018:
+- I decided to procrastinate the unit tests some more, and instead worked on more documentation. Not everything, but a few.

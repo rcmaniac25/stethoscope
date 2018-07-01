@@ -1,5 +1,4 @@
-﻿using System;
-using System.Reactive.Linq;
+﻿using System.Reactive.Linq;
 
 namespace Stethoscope.Common
 {
@@ -19,7 +18,7 @@ namespace Stethoscope.Common
         /// Add a "failed" log to the registry. This is often a log entry that could not be parsed fully by the log parser.
         /// </summary>
         /// <returns>A failed log entry. <see cref="ILogEntry.IsValid"/> will return <c>false</c> for these entries.</returns>
-        /// <remarks><see cref="GetBy(LogAttribute)"/> might not return these entries. <see cref="GetByTimetstamp"/> will only return these entries if the timestamp exists.</remarks>
+        /// <remarks><see cref="LogRegistryExtensions.GetBy(ILogRegistry, LogAttribute)"/> might not return these entries. <see cref="LogRegistryExtensions.GetByTimetstamp"/> will only return these entries if the timestamp exists.</remarks>
         /// <seealso cref="LogParserFailureHandling"/>
         ILogEntry AddFailedLog();
 

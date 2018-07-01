@@ -8,6 +8,9 @@ using System.Reactive.Linq;
 
 namespace Stethoscope.Log.Internal.Storage
 {
+    /// <summary>
+    /// Registry storage that internally stores data in a <see cref="System.Collections.Generic.List{T}"/>.
+    /// </summary>
     public class ListStorage : IRegistryStorage
     {
         #region LogEntryComparer
@@ -88,8 +91,14 @@ namespace Stethoscope.Log.Internal.Storage
         private List<ILogEntry> logs = new List<ILogEntry>();
         private readonly LogEntryComparer logEntryComparer = new LogEntryComparer();
 
+        /// <summary>
+        /// Access the log entries stored in this.
+        /// </summary>
         public IQbservable<ILogEntry> Entries => logs.ToObservable().AsQbservable(); //XXX This won't work with "Insert" (or "Add" for that instance). This is basically saying "foreach(var log in logs) { OnNext(log); }" and enumerations don't like iteration + changes
 
+        /// <summary>
+        /// The number of logs stored.
+        /// </summary>
         public int Count
         {
             get
@@ -101,9 +110,17 @@ namespace Stethoscope.Log.Internal.Storage
             }
         }
 
+        /// <summary>
+        /// Logs are sorted by timestamp right now.
+        /// </summary>
         //XXX this should probably be set-able, but not for now
         public LogAttribute SortAttribute => LogAttribute.Timestamp;
 
+        /// <summary>
+        /// Add a log to the storage.
+        /// </summary>
+        /// <param name="entry">The log to store.</param>
+        /// <returns>The GUID that internally references the log entry.</returns>
         public Guid AddLogSorted(ILogEntry entry)
         {
             if (!(entry is IInternalLogEntry))
@@ -146,6 +163,9 @@ namespace Stethoscope.Log.Internal.Storage
             return ((IInternalLogEntry)entry).ID;
         }
 
+        /// <summary>
+        /// Clear all logs from this storage.
+        /// </summary>
         public void Clear()
         {
             clearCounter.Increment();
