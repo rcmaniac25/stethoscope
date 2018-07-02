@@ -33,7 +33,66 @@ namespace Stethoscope.Tests
             entry.IsValid.Returns(isValid);
         }
 
-        //TODO: redo LogRegistry tests so any tests that are really testing ListStorage are moved here
+        [Test(TestOf = typeof(ListStorage))]
+        public void ListStorageConstructorSetsSortAttribute()
+        {
+            var storage = new ListStorage();
+            Assert.That(storage.SortAttribute, Is.EqualTo(LogAttribute.Timestamp));
+        }
+
+        [Test(TestOf = typeof(ListStorage))]
+        public void ListStorageEmptyEntriesDefault()
+        {
+            var storage = new ListStorage();
+
+            Assert.That(storage.Count, Is.Zero);
+            Assert.That(storage.Entries, IsEx.ExEmpty);
+        }
+
+        [Test(TestOf = typeof(ListStorage))]
+        public void ListStorageAddLogSorted()
+        {
+            var storage = new ListStorage();
+            Assert.That(storage.Count, Is.Zero);
+
+            // Technically, various values should be set... but unless we throw an error, it should still work
+            storage.AddLogSorted(logEntry);
+
+            Assert.That(storage.Count, Is.EqualTo(1));
+            Assert.That(storage.Entries, Is.Not.ExEmpty());
+        }
+
+        [Test(TestOf = typeof(ListStorage))]
+        public void ListStorageAddLogSortedUnsupported()
+        {
+            var storage = new ListStorage();
+            Assert.That(storage.Count, Is.Zero);
+
+            // May seem weird, but for now we don't support arbitary ILogEntry
+            var unsupportedLogEntry = Substitute.For<ILogEntry>();
+            Assert.Throws<ArgumentException>(() =>
+            {
+                storage.AddLogSorted(unsupportedLogEntry);
+            });
+        }
+
+        [Test(TestOf = typeof(ListStorage))]
+        public void ListStorageClear()
+        {
+            var storage = new ListStorage();
+            Assert.That(storage.Count, Is.Zero);
+
+            // Technically, various values should be set... but unless we throw an error, it should still work
+            storage.AddLogSorted(logEntry);
+
+            Assert.That(storage.Count, Is.EqualTo(1));
+            Assert.That(storage.Entries, Is.Not.ExEmpty());
+
+            storage.Clear();
+
+            Assert.That(storage.Count, Is.Zero);
+            Assert.That(storage.Entries, IsEx.ExEmpty);
+        }
 
         [Test(TestOf = typeof(NullStorage))]
         public void NullStorageConstructorSetsSortAttribute()
@@ -81,4 +140,6 @@ namespace Stethoscope.Tests
             Assert.That(storage.Count, Is.Zero);
         }
     }
+
+    //TODO: with the exception of NullStorage, all storage types should act the same. So maybe once other types are added, test that they all work the same.
 }

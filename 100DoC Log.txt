@@ -890,3 +890,9 @@ void doSomethingCool(std::ifstream& input)
 
 #80.2. 6/30/2018:
 - I decided to procrastinate the unit tests some more, and instead worked on more documentation. Not everything, but a few.
+
+#81.2. 7/1/2018:
+- I looked at the LogRegistry tests and decided that I wasn't going to remove any. Functionality could change if a null storage is used, but all other storage types should function the same.
+- I also added a test for checking the desired storage type is returned for a specific criteria.
+- Lastly, another bit of documentation.
+- I might be a bit busy tomorrow, but if I can get the time, I'd like to start working on streaming log data (and do a bit more documentation).

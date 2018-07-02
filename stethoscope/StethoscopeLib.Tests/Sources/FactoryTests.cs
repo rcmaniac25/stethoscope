@@ -1,11 +1,11 @@
-﻿using Stethoscope.Common;
+﻿using NSubstitute;
+
+using NUnit.Framework;
+
+using Stethoscope.Common;
 using Stethoscope.Log;
 using Stethoscope.Parsers;
 using Stethoscope.Printers;
-
-using NSubstitute;
-
-using NUnit.Framework;
 
 namespace Stethoscope.Tests
 {
@@ -73,6 +73,34 @@ namespace Stethoscope.Tests
             Assert.That(registry, Is.TypeOf<Log.Internal.LogRegistry>());
         }
 
-        //TODO: log registry factory tests for different storage
+        private static Log.Internal.IRegistryStorage LogRegistryFactoryStorageTest(RegistrySelectionCriteria criteria)
+        {
+            var factory = LogRegistryFactory.Create();
+
+            Assert.That(factory, Is.Not.Null);
+
+            var factoryType = typeof(LogRegistryFactory).GetNestedType("LogRegistryFactoryFinder", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            var selectionCriteria = factoryType.GetMethod("PickStorage", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+
+            return selectionCriteria.Invoke(factory, new object[] { criteria }) as Log.Internal.IRegistryStorage;
+        }
+
+        [Test(TestOf = typeof(LogRegistryFactory))]
+        public void LogRegistryFactoryStorageNull()
+        {
+            var storage = LogRegistryFactoryStorageTest(RegistrySelectionCriteria.Null);
+            Assert.That(storage, Is.Not.Null);
+            Assert.That(storage, Is.TypeOf<Log.Internal.Storage.NullStorage>());
+            Assert.That(storage.SortAttribute, Is.EqualTo(LogAttribute.Timestamp));
+        }
+
+        [Test(TestOf = typeof(LogRegistryFactory))]
+        public void LogRegistryFactoryStorageDefault()
+        {
+            var storage = LogRegistryFactoryStorageTest(RegistrySelectionCriteria.Default);
+            Assert.That(storage, Is.Not.Null);
+            Assert.That(storage, Is.TypeOf<Log.Internal.Storage.ListStorage>());
+            Assert.That(storage.SortAttribute, Is.EqualTo(LogAttribute.Timestamp));
+        }
     }
 }

@@ -529,7 +529,7 @@ namespace Stethoscope.Parsers.Internal.XML
 
         private sealed class XMLContextParser : ILogParser
         {
-            private XMLLogParser parser;
+            private readonly XMLLogParser parser;
             private TransientParserConfigs config;
 
             public XMLContextParser(XMLLogParser parser, TransientParserConfigs priorConfig)

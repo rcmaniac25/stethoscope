@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Stethoscope.Common;
+
+using System;
 using System.Collections.Generic;
 using System.Text;
-
-using Stethoscope.Common;
 
 namespace Stethoscope.Log.Internal
 {
