@@ -6,6 +6,9 @@ using Stethoscope.Log.Internal.Storage;
 
 namespace Stethoscope.Log
 {
+    /// <summary>
+    /// Meta Factory object to create a log registry.
+    /// </summary>
     public class LogRegistryFactory
     {
         private static readonly Counter factoryCreationCounter;
@@ -22,6 +25,10 @@ namespace Stethoscope.Log
         {
         }
 
+        /// <summary>
+        /// Create a log registry factory.
+        /// </summary>
+        /// <returns>Log registry factory.</returns>
         public static ILogRegistryFactory Create()
         {
             factoryCreationCounter.Increment();

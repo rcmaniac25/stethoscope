@@ -4,8 +4,6 @@
 
 What needs to get done. Should make some of them tickets... (some of these may be trains-of-thought)
 - Process bigger logs
-	- Convert log entry and failed log entry to structs to see if there are effects on RAM usage.
-    - See how long these take to parse, and see where we can speed up processing (background threads? Queues?)
 	- Need support for streaming logs for the largest logs...
 	- May have to rewrite IPrinter or change names of PrinterFactory so IOPrinter doesn't "wait" for a specific thread's stream to finish before (starting to) printing the next thread
 - Determine program arguments and the config file usage (are they redundent? Complementary? Can I setup everything with program arguments?)

@@ -5,6 +5,9 @@ using Stethoscope.Parsers.Internal.XML;
 
 namespace Stethoscope.Parsers
 {
+    /// <summary>
+    /// Meta Factory object to create a log parser.
+    /// </summary>
     public class LogParserFactory
     {
         private static readonly Counter factoryCreationCounter;
@@ -21,6 +24,11 @@ namespace Stethoscope.Parsers
         {
         }
 
+        /// <summary>
+        /// Create a log parser factory.
+        /// </summary>
+        /// <param name="ext">The extension the parsers created from this factory are expected to support.</param>
+        /// <returns>Log parser factory.</returns>
         public static ILogParserFactory GetParserForFileExtension(string ext)
         {
             factoryCreationCounter.Increment(ext);

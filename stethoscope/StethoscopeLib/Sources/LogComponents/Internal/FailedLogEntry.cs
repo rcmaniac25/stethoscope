@@ -6,24 +6,60 @@ using System.Text;
 
 namespace Stethoscope.Log.Internal
 {
+    /// <summary>
+    /// Failed log entry stored in a log registry. Failed logs are logs that were not able to be parsed. This log entry represents the parts of the log that were parsed.
+    /// </summary>
     public class FailedLogEntry : IInternalLogEntry, IEquatable<FailedLogEntry>
     {
         private Dictionary<LogAttribute, object> attributes = new Dictionary<LogAttribute, object>();
 
+        /// <summary>
+        /// Timestamp of the log entry.
+        /// </summary>
         public DateTime Timestamp => (DateTime)attributes[LogAttribute.Timestamp];
+        /// <summary>
+        /// The specific log message.
+        /// </summary>
         public string Message => (string)attributes[LogAttribute.Message];
+        /// <summary>
+        /// If this log entry is a valid log entry. Valid=was able to be parsed completely. Always returns <c>false</c>.
+        /// </summary>
         public bool IsValid => false;
+        /// <summary>
+        /// If the timestamp of the log entry changed.
+        /// </summary>
         public bool HasTimestampChanged { get; private set; }
+        /// <summary>
+        /// The unique ID of the log entry.
+        /// </summary>
         public Guid ID { get; } = Guid.NewGuid();
+        /// <summary>
+        /// If the log entry doesn't have any attributes.
+        /// </summary>
         public bool IsEmpty => attributes.Count == 0;
 
+        /// <summary>
+        /// Resets <see cref="HasTimestampChanged"/> to <c>false</c>.
+        /// </summary>
         public void ResetTimestampChanged()
         {
             HasTimestampChanged = false;
         }
 
+        /// <summary>
+        /// Get if a specific log attribute exists.
+        /// </summary>
+        /// <param name="attribute">The attribute to get if it exists.</param>
+        /// <returns><c>true</c> if the attribute exists. <c>false</c> if otherwise.</returns>
         public bool HasAttribute(LogAttribute attribute) => attributes.ContainsKey(attribute);
 
+        /// <summary>
+        /// Get the specific log attribute.
+        /// </summary>
+        /// <typeparam name="T">The type of the log entry. Exception thrown if type mismatch.</typeparam>
+        /// <param name="attribute">The attribute to get. Exception thrown if it doesn't exist.</param>
+        /// <returns>The attribute value.</returns>
+        /// <seealso cref="HasAttribute(LogAttribute)"/>
         public T GetAttribute<T>(LogAttribute attribute)
         {
             if (!attributes.ContainsKey(attribute))
@@ -34,6 +70,11 @@ namespace Stethoscope.Log.Internal
             return (T)attributes[attribute];
         }
 
+        /// <summary>
+        /// Add an attribute to the log entry. Shouldn't be used directly. Use <see cref="ILogRegistry.AddValueToLog(ILogEntry, LogAttribute, object)"/> instead.
+        /// </summary>
+        /// <param name="attribute">The attribute to add.</param>
+        /// <param name="value">The value of the attribute.</param>
         public void AddAttribute(LogAttribute attribute, object value)
         {
             attributes.Add(attribute, value);
@@ -42,7 +83,12 @@ namespace Stethoscope.Log.Internal
                 HasTimestampChanged = true;
             }
         }
-        
+
+        /// <summary>
+        /// If an object is equal to this log entry.
+        /// </summary>
+        /// <param name="obj">The object to compare to this log entry.</param>
+        /// <returns><c>true</c> if the object and this log entry are equal, <c>false</c> otherwise.</returns>
         public override bool Equals(object obj)
         {
             if (obj is FailedLogEntry failedEntry)
@@ -85,6 +131,11 @@ namespace Stethoscope.Log.Internal
             return true;
         }
 
+        /// <summary>
+        /// If a log entry is equal to this log entry.
+        /// </summary>
+        /// <param name="other">The log entry to compare to this log entry.</param>
+        /// <returns><c>true</c> if the log entry and this log entry are equal, <c>false</c> otherwise.</returns>
         public bool Equals(FailedLogEntry other)
         {
             if (other != null)
@@ -94,8 +145,16 @@ namespace Stethoscope.Log.Internal
             return false;
         }
 
+        /// <summary>
+        /// Get the hash code of this log entry.
+        /// </summary>
+        /// <returns>The hash code of this log entry.</returns>
         public override int GetHashCode() => 91450537 ^ attributes.GetHashCode();
 
+        /// <summary>
+        /// Get a string representation of this log entry.
+        /// </summary>
+        /// <returns>A string representation of this log entry.</returns>
         public override string ToString()
         {
             var sb = new StringBuilder("Failed: ");

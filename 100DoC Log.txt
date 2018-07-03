@@ -896,3 +896,7 @@ void doSomethingCool(std::ifstream& input)
 - I also added a test for checking the desired storage type is returned for a specific criteria.
 - Lastly, another bit of documentation.
 - I might be a bit busy tomorrow, but if I can get the time, I'd like to start working on streaming log data (and do a bit more documentation).
+
+#82.2. 7/2/2018:
+- Ok... didn't get the time. More docs!
+- Actually... I finished the docs. :D

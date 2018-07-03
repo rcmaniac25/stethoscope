@@ -5,6 +5,9 @@ using Stethoscope.Printers.Internal;
 
 namespace Stethoscope.Printers
 {
+    /// <summary>
+    /// Meta Factory object for picking a log printer.
+    /// </summary>
     public class PrinterFactory
     {
         private static readonly Counter factoryCreationCounter;
@@ -21,6 +24,10 @@ namespace Stethoscope.Printers
         {
         }
 
+        /// <summary>
+        /// Create a printer factory.
+        /// </summary>
+        /// <returns>Printer factory.</returns>
         public static IPrinterFactory CrateConsoleFactory()
         {
             factoryCreationCounter.Increment();

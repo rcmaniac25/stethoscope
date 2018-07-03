@@ -8,6 +8,9 @@ using System.Reactive.Linq;
 
 namespace Stethoscope.Log.Internal
 {
+    /// <summary>
+    /// Standard log registry for storing all log entries.
+    /// </summary>
     public class LogRegistry : ILogRegistry
     {
         private static readonly Counter dateTimeParseFailureCounter;
@@ -41,6 +44,10 @@ namespace Stethoscope.Log.Internal
         private readonly IRegistryStorage storage;
         private readonly List<IInternalLogEntry> logsBeingProcessed = new List<IInternalLogEntry>();
 
+        /// <summary>
+        /// Create a LogRegistry.
+        /// </summary>
+        /// <param name="storage">The actual storage object that will hold all log entries.</param>
         public LogRegistry(IRegistryStorage storage)
         {
             if (storage == null)
@@ -54,6 +61,9 @@ namespace Stethoscope.Log.Internal
             this.storage = storage;
         }
 
+        /// <summary>
+        /// Number of logs, both stored and in processing, contained by this registry.
+        /// </summary>
         public int LogCount
         {
             get
@@ -64,7 +74,13 @@ namespace Stethoscope.Log.Internal
                 }
             }
         }
-        
+
+        /// <summary>
+        /// Add a new log to the registry.
+        /// </summary>
+        /// <param name="timestamp">String representation of a timestamp.</param>
+        /// <param name="message">The message that was logged for this entry.</param>
+        /// <returns>The created log entry.</returns>
         public ILogEntry AddLog(string timestamp, string message)
         {
             if (timestamp == null)
@@ -88,6 +104,12 @@ namespace Stethoscope.Log.Internal
             return entry;
         }
 
+        /// <summary>
+        /// Add a "failed" log to the registry. This is often a log entry that could not be parsed fully by the log parser.
+        /// </summary>
+        /// <returns>A failed log entry. <see cref="ILogEntry.IsValid"/> will return <c>false</c> for these entries. Once a log is done being parsed, <see cref="NotifyFailedLogParsed(ILogEntry)"/> should be called.</returns>
+        /// <remarks><see cref="LogRegistryExtensions.GetBy(ILogRegistry, LogAttribute)"/> might not return these entries. <see cref="LogRegistryExtensions.GetByTimetstamp"/> will only return these entries if the timestamp exists.</remarks>
+        /// <seealso cref="LogParserFailureHandling"/>
         public ILogEntry AddFailedLog()
         {
             addFailedLogMeter.Mark();
@@ -118,7 +140,11 @@ namespace Stethoscope.Log.Internal
                 }
             }
         }
-        
+
+        /// <summary>
+        /// Notify the registry that the failed log has finished getting parsed. This does not indicate it has been successfully parsed, just that it is done parsing.
+        /// </summary>
+        /// <param name="entry">The failed log entry. Any other log entry will throw an exception.</param>
         public void NotifyFailedLogParsed(ILogEntry entry)
         {
             if (entry == null)
@@ -142,6 +168,13 @@ namespace Stethoscope.Log.Internal
             failedLog.ResetTimestampChanged();
         }
 
+        /// <summary>
+        /// Add an attribute value to the log entry.
+        /// </summary>
+        /// <param name="entry">The entry to add an attribute to.</param>
+        /// <param name="attribute">The attribute to add to.</param>
+        /// <param name="value">The attribute value to add.</param>
+        /// <returns><c>true</c> if the entry was added. <c>false</c> if otherwise.</returns>
         public bool AddValueToLog(ILogEntry entry, LogAttribute attribute, object value)
         {
             if (value == null)
@@ -159,6 +192,9 @@ namespace Stethoscope.Log.Internal
             return false;
         }
 
+        /// <summary>
+        /// Remove all logs from this registry.
+        /// </summary>
         public void Clear()
         {
             clearCounter.Increment();
@@ -169,6 +205,9 @@ namespace Stethoscope.Log.Internal
             }
         }
 
+        /// <summary>
+        /// Queriable log entries.
+        /// </summary>
         public IQbservable<ILogEntry> Logs
         {
             get

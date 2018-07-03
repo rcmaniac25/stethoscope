@@ -12,6 +12,9 @@ using System.Xml.Linq;
 
 namespace Stethoscope.Parsers.Internal.XML
 {
+    /// <summary>
+    /// Log parser for XML logs.
+    /// </summary>
     public class XMLLogParser : ILogParser
     {
         private struct TransientParserConfigs
@@ -448,6 +451,10 @@ namespace Stethoscope.Parsers.Internal.XML
             }
         }
 
+        /// <summary>
+        /// Parse a stream of data to get applicable logs.
+        /// </summary>
+        /// <param name="logStream">The stream of log data.</param>
         public void Parse(Stream logStream)
         {
             parseCounter.Increment();
@@ -456,6 +463,10 @@ namespace Stethoscope.Parsers.Internal.XML
 
         #endregion
 
+        /// <summary>
+        /// Set the registy that logs will be saved to once parsed.
+        /// </summary>
+        /// <param name="registry">The registy that logs will be saved to once parsed.</param>
         public void SetRegistry(ILogRegistry registry)
         {
             if (this.registry != null)
@@ -477,6 +488,10 @@ namespace Stethoscope.Parsers.Internal.XML
             }
         }
 
+        /// <summary>
+        /// Set the configurations to apply to the log parser.
+        /// </summary>
+        /// <param name="config">Configurations to apply to the log parser.</param>
         public void SetConfig(LogConfig config)
         {
             if (validConfigs && attributePaths != null)
@@ -651,6 +666,11 @@ namespace Stethoscope.Parsers.Internal.XML
             }
         }
 
+        /// <summary>
+        /// Apply additional context to the parser, using specific configs to modify parsing.
+        /// </summary>
+        /// <param name="config">A collection of configs to modify the parser with.</param>
+        /// <param name="context">The context that the modified parser will execute in. If the scope of this parser is exited, as in the Action delegate finishes execution, then the modified parser becomes invalid and won't run.</param>
         public void ApplyContextConfig(IDictionary<ContextConfigs, object> config, Action<ILogParser> context)
         {
             applyContextConfigCounter.Increment();
