@@ -900,3 +900,12 @@ void doSomethingCool(std::ifstream& input)
 #82.2. 7/2/2018:
 - Ok... didn't get the time. More docs!
 - Actually... I finished the docs. :D
+
+#83.2. 7/3/2018:
+- So, I was a bit late and planned to at least attempt to work on streaming and... unexpected injury(?)
+- I listen to music using over-ear headphones (as is proper...) and the ear pads/cups/etc. that sit between the eat and the speaker becomes torn up on my headset. I bought new ones.
+- I don't know about others, but these pads have a barely elastic band that is supposed to be stretched around the pads and then they contract and it holds the piece in place.
+- I had a bit of a hard time and then I finally succeeded, I went to type out a message and... realized I couldn't feel one hand. I could barely type. At this point, it's uncomfortable.
+- Instead of coding... I will read/research. A friend sent this to me: https://blog.marcgravell.com/2018/07/pipe-dreams-part-2.html
+- I will read part 1 (https://blog.marcgravell.com/2018/07/pipe-dreams-part-1.html) before I get to part 2 (^^), as it's interesting and I like the concepts described.
+- But that's all for now. Let's see if this doesn't sidetrack me into implementing...
