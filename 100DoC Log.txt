@@ -923,3 +923,11 @@ void doSomethingCool(std::ifstream& input)
 - Next annoyances: Knowing if I should write more data to IO, knowing the optimal amount of data to send, and otherwise building around the API (again, buffers for everything... as some put it, it's a code smell). I'm not sure if they have a nicer way to handle it with Pipe/Pipeline, but compressing/encrypting/etc. (and the reverse) are either a stage in the I/O that is like reading/writing inside of a read/write logic or it's encapsulation and you need to dig layers deep to get to the original stream if needed and the wrapping just repeats the logic at an intermediary layer, outside the read/write logic.
 - The last one, encapsulation, is how many of the current stream I/Os work: stream = new BinaryReader(new SevenZipReader(new AESDecrypter(new FileStream(path), iv)));
 - So... I'll continue reading and decide if I want to do something with it now, as I do still need to stream log data.
+
+#85.2. 7/5/2018:
+- So... I've been very slow at reading. Code articles/whitepapers are some of the dryest reading materials you can find. I'm not sure it could hold the attention of a rock.
+- This article is fine, but it's not holding my attention.
+- Looking up the code (which I now know is System.IO.Pipelines, which is never mentioned) and reading the articles (to the current point I'm at), I've decided...
+- ...to skip it for now. As great of a concept as it is, there is literally no backend implementation. As the article puts "It's current release is like the abstract Stream class with no implementation of NetworkStream or FileStream".
+- So while I want to use it, I must put function in front of cool-ness and move on.
+- ...as soon as I finish reading it.

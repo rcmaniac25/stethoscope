@@ -11,6 +11,7 @@ What needs to get done. Should make some of them tickets... (some of these may b
 - Ensure this works under Mono (as the port to C++ is still a while away, and "this WILL be ported" opinion is always subject to change, though it's currently "it WILL happen")
 - Proper IQbservable support in RegistryStorage (and maybe additional storage options)
 - Support remote logs
+- Look into the status of System.IO.Pipelines to see if more progress has been made (would also need to upgrade to at least .Net Core 2.1 and the .Net Framework equiv. Maybe https://github.com/mgravell/Pipelines.Sockets.Unofficial if nothing new)
 - (large) With larger logs, start to flesh out LogRegistry... maybe allow LINQ usage so components of logs can be searched through.
     - [Done?] Needs to support multiple sources (so there may be logs from same time but different log files), and how to query through that
     - How much metadata do we want? (log file names, sources, etc.)
