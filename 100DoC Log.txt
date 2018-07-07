@@ -931,3 +931,7 @@ void doSomethingCool(std::ifstream& input)
 - ...to skip it for now. As great of a concept as it is, there is literally no backend implementation. As the article puts "It's current release is like the abstract Stream class with no implementation of NetworkStream or FileStream".
 - So while I want to use it, I must put function in front of cool-ness and move on.
 - ...as soon as I finish reading it.
+
+#86.2. 7/6/2018:
+- So I noticed it's almost day 100... I'm going to do something weird... I'm going to branch and try to do a quick-and-dirty implementation to get something working (and will continue the log there) and then hopefully merge that back in (somehow).
+- Look at branch experimental/poc for branch
