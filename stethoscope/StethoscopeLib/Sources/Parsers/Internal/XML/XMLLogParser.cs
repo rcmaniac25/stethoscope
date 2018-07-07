@@ -421,33 +421,23 @@ namespace Stethoscope.Parsers.Internal.XML
 
         private static void InternalParse(XMLLogParser parser, ref TransientParserConfigs config, Stream logStream)
         {
-            using (var ms = new MemoryStream())
+            var parserStream = 
+                !config.LogHasRoot ? 
+                Encoding.UTF8.GetBytes("<root>").Append(logStream) : 
+                logStream;
+
+            if (!config.LogHasRoot)
             {
-                if (!config.LogHasRoot)
-                {
-                    var rootElementStringBytes = Encoding.UTF8.GetBytes("<root>");
-                    ms.Write(rootElementStringBytes, 0, rootElementStringBytes.Length);
-                }
+                parserStream = parserStream.Append(Encoding.UTF8.GetBytes("</root>"));
+            }
 
-                //TODO: this doesn't work for streaming, but read/write streams don't really work/exist right now
-                logStream.CopyTo(ms);
-
-                if (!config.LogHasRoot)
-                {
-                    //XXX: not going to show up in streaming log
-                    var rootEndElementStringBytes = Encoding.UTF8.GetBytes("</root>");
-                    ms.Write(rootEndElementStringBytes, 0, rootEndElementStringBytes.Length);
-                }
-
-                ms.Position = 0L;
-                try
-                {
-                    ParseLoop(parser, ref config, ms);
-                }
-                catch
-                {
-                    //XXX probably want to do something here...
-                }
+            try
+            {
+                ParseLoop(parser, ref config, parserStream);
+            }
+            catch
+            {
+                //XXX probably want to do something here...
             }
         }
 

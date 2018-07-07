@@ -935,3 +935,10 @@ void doSomethingCool(std::ifstream& input)
 #86.2. 7/6/2018:
 - So I noticed it's almost day 100... I'm going to do something weird... I'm going to branch and try to do a quick-and-dirty implementation to get something working (and will continue the log there) and then hopefully merge that back in (somehow).
 - Look at branch experimental/poc for branch
+- So I'm giving this a try: I want to see if I can get a simple system that I can actually use, even if not written "ideally".
+- A proof of concept. Today may just be me playing around so there may or may not be much code today.
+- ...and right after writing that, I realized a common logic piece I need anyway: streaming. Namely, some way to concat streams together.
+- I simply (cowboy) coded and got most of the way through making a Stream that a generic interface type appended to, so that they'll iterate one after another as if one large stream.
+- The biggest I have is that this needs to be support streaming logs, and NetworkStreams don't support Position (setting? Or getting too?), Seek, and Length. So I need to ensure that all my logic either has those as optional, or simply don't use them.
+- The other worry I have is the code is not the cleanest (so maybe it's good it's in the branch) which means if something goes wrong, it will be a struggle to find what happened.
+- I took inspiration from https://stackoverflow.com/a/3879208/492347 (https://github.com/lassevk/Streams/blob/master/Streams/CombinedStream.cs) but I allow runtime additions and don't rely on seeking and being able to use Length and Position.
