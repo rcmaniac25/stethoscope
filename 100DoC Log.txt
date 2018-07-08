@@ -942,3 +942,22 @@ void doSomethingCool(std::ifstream& input)
 - The biggest I have is that this needs to be support streaming logs, and NetworkStreams don't support Position (setting? Or getting too?), Seek, and Length. So I need to ensure that all my logic either has those as optional, or simply don't use them.
 - The other worry I have is the code is not the cleanest (so maybe it's good it's in the branch) which means if something goes wrong, it will be a struggle to find what happened.
 - I took inspiration from https://stackoverflow.com/a/3879208/492347 (https://github.com/lassevk/Streams/blob/master/Streams/CombinedStream.cs) but I allow runtime additions and don't rely on seeking and being able to use Length and Position.
+
+#87.2. 7/7/2018:
+- So my goal tonight was to get ConcatStream working in a way that would support streaming logs
+- I succeeded
+- There's still work to do... I could've done it, but I started watching food videos on YouTube. (I state this only for being honest, and because the videos looked really good)
+- I learned that Position and Length require CanSeek position. At least, Position is documented to need it. Length isn't, but I can't figure out you'd really use Position without knowing Length, and if Position requires CanSeek, then by my logic, Length requires CanSeek too.
+- Somewhat related: somehow seek lets you specify (final) positions less then 0 and greater then then length of the stream. It explicitly states it's allowed. Yet every implementation I see doesn't seem to allow it.
+- Onto some cool bits, I ran a few stats with the new system. Now, a key difference is that I'm using the new NullStorage type because... I tested with the largest log I have, which is around 8BG in size. MemoryStream supports 2GB buffers... so it would never support even copying this log file. This is why I needed the appendable/ConcatStream and NullStorage. One so I could open the Streams (which is the same case for streaming logs) and the other because I simply don't have a need for storing such massive amounts of data right now.
+- Numbers:
+-- Parsing (without storage): ~23 MB of RAM
+-- Logs parsed: ~9 millions logs
+-- Log file size: ~8 GB
+-- Parsing rate: ~33,500 logs per sec, or ~33.5 logs per ms
+- Now, I think the interesting thing is that the parsing rate went up. "But NullStorage", yes... I'm not sure I wrote it before, but I tested before hand with NullStorage. Take NullStorage parsing rate and subtract ~10k/s.
+- Statistics measured 50k/s parsing. I substracted my 10k/s and a little more to get what I think is a realistic rate once storage is used.
+- But it made me go "did change in Streams make things go faster?" and I want to say no, as using the file from the last test gave me the same results. Then why the heck was this so much faster?
+- I'm actually not sure. MemoryStream is very fast and skips disk I/O, FileStream hits disk (though I have an SSD... but that doesn't change getting the data for processing purposes). Nothing really changed from how the XML parser gets the data, and yet with the NullStorage, the larger log parsed 50k/s while the smaller log parsed 40k/s. There was a slight config change, but the per-log rate seemed the same.
+- It's a mystery that I'll accept, as I don't think I'll get anything of that rate coming over SSH.
+- Tomorrow, I'd like to finish of the stream and... figure out what I want to see as a working PoC and then start working towards that. Kinda hoping I don't have to do the DB-based storage right now, but we'll see.

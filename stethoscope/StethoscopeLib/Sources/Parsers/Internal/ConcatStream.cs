@@ -33,7 +33,6 @@ namespace Stethoscope.Parsers.Internal
 
         private List<IConcatStreamSource> sources = new List<IConcatStreamSource>();
         private long absPos = 0L;
-        private long posOffset = 0L;
         private int sourceIndex = 0;
 
         private DirtyProperties propertyDirty = DirtyProperties.All;
@@ -126,25 +125,10 @@ namespace Stethoscope.Parsers.Internal
             }
             lock (sources)
             {
-                if (sources.Count == 0)
+                if (sources.Count != 0)
                 {
-                    var pos = 0L;
-                    try
-                    {
-                        pos = source.Position;
-                    }
-                    catch
-                    {
-                        throw new InvalidOperationException("Cannot get source position of first source");
-                    }
-                    absPos = pos;
-                    posOffset = 0;
-                    if (pos != 0)
-                    {
-                        //TODO: need to take index into account
-                    }
+                    //TODO: optimzation - if the current soruces are seekable, but the new source is not seekable, then we can do some cleanup and dispose and remove the old sources since we will no longer be able to seek or change position once we add the new source
                 }
-                //XXX if sources count is not 0, and the new source would change if CanSeek can be used, then we can dispose of sources we're done with since we can't seek back
                 propertyDirty = DirtyProperties.All;
                 sources.Add(source);
             }
@@ -159,14 +143,75 @@ namespace Stethoscope.Parsers.Internal
 
         #region Read
 
-        public override int Read(byte[] buffer, int offset, int count)
+        private void TestReadArguments(byte[] buffer, int offset, int count)
         {
             if (disposed)
             {
                 throw new ObjectDisposedException(nameof(ConcatStream));
             }
-            //TODO: remember to avoid usage of Position and Length as streaming logs won't support those parameters
-            return 0;
+            if (buffer == null)
+            {
+                throw new ArgumentNullException(nameof(buffer));
+            }
+            if (offset < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(offset), "Must be a postive number");
+            }
+            if (count < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(count), "Must be a postive number");
+            }
+            if ((offset + count) > buffer.Length)
+            {
+                throw new ArgumentException($"{nameof(offset)} + {nameof(count)} must be equal to or less then the length of {nameof(buffer)}");
+            }
+        }
+
+        public override int Read(byte[] buffer, int offset, int count)
+        {
+            TestReadArguments(buffer, offset, count);
+
+            lock (sources)
+            {
+                if (sourceIndex >= sources.Count)
+                {
+                    return 0;
+                }
+            }
+            
+            var totalRead = 0;
+            var bufferOffset = offset;
+            while (count > 0)
+            {
+                var sourceRead = 0;
+                lock (sources)
+                {
+                    sourceRead = sources[sourceIndex].Read(buffer, bufferOffset, count);
+                }
+                if (sourceRead == 0)
+                {
+                    lock (sources)
+                    {
+                        if ((sourceIndex + 1) < sources.Count)
+                        {
+                            sourceIndex++;
+                            continue;
+                        }
+                        else
+                        {
+                            // So we early exit later on.
+                            sourceIndex = sources.Count;
+                        }
+                    }
+                    break;
+                }
+                totalRead += sourceRead;
+                bufferOffset += sourceRead;
+                count -= sourceRead;
+
+                absPos += sourceRead;
+            }
+            return totalRead;
         }
 
         #endregion
@@ -179,7 +224,7 @@ namespace Stethoscope.Parsers.Internal
             {
                 throw new ObjectDisposedException(nameof(ConcatStream));
             }
-            if (!CanSeek)
+            if (!CanSeek) // Required to use Length or Position
             {
                 throw new NotSupportedException($"Sources for {nameof(ConcatStream)} do not all support seeking");
             }
@@ -202,7 +247,7 @@ namespace Stethoscope.Parsers.Internal
                     {
                         throw new ArgumentException("Seek position is after the end of the stream", nameof(offset));
                     }
-                    //TODO: remember to avoid usage of Position and Length as streaming logs won't support those parameters
+                    //TODO
                     break;
                 case SeekOrigin.Current:
                     var newPos = absPos + offset;
@@ -214,7 +259,7 @@ namespace Stethoscope.Parsers.Internal
                     {
                         throw new ArgumentException("Seek position is after the end of the stream", nameof(offset));
                     }
-                    //TODO: remember to avoid usage of Position and Length as streaming logs won't support those parameters
+                    //TODO
                     break;
                 case SeekOrigin.End:
                     if (maxLength == -1)

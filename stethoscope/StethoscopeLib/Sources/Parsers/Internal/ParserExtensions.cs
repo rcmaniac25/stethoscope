@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.IO;
 
 namespace Stethoscope.Parsers.Internal
@@ -14,6 +12,7 @@ namespace Stethoscope.Parsers.Internal
         private class ByteArraySource : IConcatStreamSource
         {
             private byte[] data;
+            private long pos;
 
             public ByteArraySource(byte[] array)
             {
@@ -21,8 +20,22 @@ namespace Stethoscope.Parsers.Internal
             }
 
             public bool CanSeek => true;
-            public long Length => data.Length;
-            public long Position { get; set; } //XXX should we restrict position?
+            public long Length => data.LongLength;
+            public long Position
+            {
+                get
+                {
+                    return pos;
+                }
+                set
+                {
+                    if (value < 0 || value > data.LongLength)
+                    {
+                        throw new ArgumentOutOfRangeException(nameof(value));
+                    }
+                    pos = value;
+                }
+            }
 
             public void Dispose()
             {
@@ -30,20 +43,22 @@ namespace Stethoscope.Parsers.Internal
 
             public int Read(byte[] buffer, int offset, int count)
             {
-                var dataPos = Position;
-                var dataCountRemaining = data.Length - dataPos;
+                var dataCountRemaining = data.LongLength - pos;
+                if (dataCountRemaining <= 0)
+                {
+                    return 0;
+                }
                 if (dataCountRemaining >= count)
                 {
-                    Buffer.BlockCopy(data, (int)dataPos, buffer, offset, count);
-                    Position = dataPos + count;
+                    Buffer.BlockCopy(data, (int)pos, buffer, offset, count);
+                    pos += count;
                     return count;
                 }
                 else
                 {
-                    var dataCountToCopy = (int)dataCountRemaining;
-                    Buffer.BlockCopy(data, (int)dataPos, buffer, offset, dataCountToCopy);
-                    Position = data.Length;
-                    return dataCountToCopy;
+                    Buffer.BlockCopy(data, (int)pos, buffer, offset, (int)dataCountRemaining);
+                    pos = data.LongLength;
+                    return (int)dataCountRemaining;
                 }
             }
         }
@@ -59,6 +74,10 @@ namespace Stethoscope.Parsers.Internal
             public StreamSource(Stream stream)
             {
                 this.stream = stream ?? throw new ArgumentNullException("concatOn");
+                if (!stream.CanRead)
+                {
+                    throw new ArgumentException("Stream must be readable", "concatOn");
+                }
             }
 
             public bool CanSeek => stream.CanSeek;

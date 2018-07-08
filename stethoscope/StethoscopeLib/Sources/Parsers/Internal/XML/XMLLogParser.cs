@@ -439,6 +439,12 @@ namespace Stethoscope.Parsers.Internal.XML
             {
                 //XXX probably want to do something here...
             }
+
+            if (!config.LogHasRoot)
+            {
+                // If we didn't have the root, then we end up creating a Stream by appending streams together and need to dispose it
+                parserStream.Dispose();
+            }
         }
 
         /// <summary>
