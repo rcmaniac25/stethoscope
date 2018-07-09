@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 
 namespace Stethoscope.Parsers.Internal
 {
-    // Based off https://stackoverflow.com/a/3879208/492347 (https://github.com/lassevk/Streams/blob/master/Streams/CombinedStream.cs) though no code was directly used. It was used as a reference to see how they did something.
+    // Based off https://stackoverflow.com/a/3879208/492347 (https://github.com/lassevk/Streams/blob/master/Streams/CombinedStream.cs) though no code was directly used. It was used as a reference to see how they did something if I got stuck.
 
     public interface IConcatStreamSource : IDisposable
     {
@@ -113,7 +112,42 @@ namespace Stethoscope.Parsers.Internal
 
         #region AppendSource
 
-        public void AppendSource(IConcatStreamSource source)
+        private void OptimizeSources()
+        {
+            // optimzation - if the current sources are seekable, but the new source is not seekable, then we can do some cleanup and dispose and remove the old sources since we will no longer be able to seek or change position once we add the new source
+            if (sourceIndex >= sources.Count)
+            {
+                // We can remove all existing sources since we are at the end anyway. Essentially Dispose, without marking the stream as disposed
+                foreach (var source in sources)
+                {
+                    try
+                    {
+                        source.Dispose();
+                    }
+                    catch
+                    {
+                    }
+                }
+                sources.Clear();
+            }
+            else
+            {
+                for (int i = sourceIndex - 1; i >= 0; i--)
+                {
+                    try
+                    {
+                        sources[i].Dispose();
+                    }
+                    catch
+                    {
+                    }
+                    sources.RemoveAt(i);
+                }
+            }
+            sourceIndex = 0;
+        }
+
+        public void AppendSource(IConcatStreamSource source, bool optimizeIfPossible = true)
         {
             if (disposed)
             {
@@ -125,9 +159,9 @@ namespace Stethoscope.Parsers.Internal
             }
             lock (sources)
             {
-                if (sources.Count != 0)
+                if (optimizeIfPossible && sources.Count != 0 && CanSeek && !source.CanSeek)
                 {
-                    //TODO: optimzation - if the current soruces are seekable, but the new source is not seekable, then we can do some cleanup and dispose and remove the old sources since we will no longer be able to seek or change position once we add the new source
+                    OptimizeSources();
                 }
                 propertyDirty = DirtyProperties.All;
                 sources.Add(source);
@@ -236,6 +270,7 @@ namespace Stethoscope.Parsers.Internal
             catch
             {
             }
+            var newPos = absPos;
             switch (origin)
             {
                 case SeekOrigin.Begin:
@@ -247,10 +282,10 @@ namespace Stethoscope.Parsers.Internal
                     {
                         throw new ArgumentException("Seek position is after the end of the stream", nameof(offset));
                     }
-                    //TODO
+                    newPos = offset;
                     break;
                 case SeekOrigin.Current:
-                    var newPos = absPos + offset;
+                    newPos = absPos + offset;
                     if (newPos < 0)
                     {
                         throw new ArgumentException("Seek position is before start of stream", nameof(offset));
@@ -259,7 +294,6 @@ namespace Stethoscope.Parsers.Internal
                     {
                         throw new ArgumentException("Seek position is after the end of the stream", nameof(offset));
                     }
-                    //TODO
                     break;
                 case SeekOrigin.End:
                     if (maxLength == -1)
@@ -275,8 +309,87 @@ namespace Stethoscope.Parsers.Internal
                     {
                         throw new ArgumentException("Seek position is after the end of the stream", nameof(offset));
                     }
-                    //TODO
                     break;
+            }
+            if (newPos != absPos)
+            {
+                if (newPos < absPos)
+                {
+                    while (absPos != newPos)
+                    {
+                        var sourceRemaining = 0L;
+                        lock (sources)
+                        {
+                            if (sourceIndex >= sources.Count)
+                            {
+                                sourceIndex = sources.Count - 1;
+                            }
+                            sourceRemaining = sources[sourceIndex].Position;
+                        }
+                        var absRemaining = absPos - newPos;
+                        if (absRemaining > sourceRemaining)
+                        {
+                            // Need to change sources
+                            absPos -= sourceRemaining;
+                            lock (sources)
+                            {
+                                sources[sourceIndex].Position = 0;
+                                if (sourceIndex == 0)
+                                {
+                                    break;
+                                }
+                                else
+                                {
+                                    sourceIndex--;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            // Will remain in the same source
+                            lock (sources)
+                            {
+                                sources[sourceIndex].Position -= absRemaining;
+                            }
+                            absPos = newPos;
+                        }
+                    }
+                }
+                else
+                {
+                    while (absPos != newPos)
+                    {
+                        var sourceRemaining = 0L;
+                        lock (sources)
+                        {
+                            if (sourceIndex >= sources.Count)
+                            {
+                                break;
+                            }
+                            sourceRemaining = sources[sourceIndex].Length - sources[sourceIndex].Position;
+                        }
+                        var absRemaining = newPos - absPos;
+                        if (absRemaining > sourceRemaining)
+                        {
+                            // Need to change sources
+                            lock (sources)
+                            {
+                                sources[sourceIndex].Position = sources[sourceIndex].Length;
+                                sourceIndex++;
+                            }
+                            absPos += sourceRemaining;
+                        }
+                        else
+                        {
+                            // Will remain in the same source
+                            lock (sources)
+                            {
+                                sources[sourceIndex].Position += absRemaining;
+                            }
+                            absPos = newPos;
+                        }
+                    }
+                }
             }
             return absPos;
         }
@@ -309,4 +422,6 @@ namespace Stethoscope.Parsers.Internal
             sources.Clear();
         }
     }
+
+    //TODO: needs unit tests
 }

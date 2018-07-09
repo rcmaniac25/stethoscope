@@ -961,3 +961,9 @@ void doSomethingCool(std::ifstream& input)
 - I'm actually not sure. MemoryStream is very fast and skips disk I/O, FileStream hits disk (though I have an SSD... but that doesn't change getting the data for processing purposes). Nothing really changed from how the XML parser gets the data, and yet with the NullStorage, the larger log parsed 50k/s while the smaller log parsed 40k/s. There was a slight config change, but the per-log rate seemed the same.
 - It's a mystery that I'll accept, as I don't think I'll get anything of that rate coming over SSH.
 - Tomorrow, I'd like to finish of the stream and... figure out what I want to see as a working PoC and then start working towards that. Kinda hoping I don't have to do the DB-based storage right now, but we'll see.
+
+#88.2. 7/8/2018:
+- Finished Seek and wrote the source "optimization".
+- For Seek, unlike the implementation I found, I don't produce buckets to determine progress. It reduces an aspect of complexity IMHO.
+- I could probably cleanup the somewhat wacky Seek loop, but... have other things to do.
+- I will do the actual planning tomorrow. Wanted to do it tonight, but still have a bunch of things to finish today.
