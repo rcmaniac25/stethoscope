@@ -967,3 +967,6 @@ void doSomethingCool(std::ifstream& input)
 - For Seek, unlike the implementation I found, I don't produce buckets to determine progress. It reduces an aspect of complexity IMHO.
 - I could probably cleanup the somewhat wacky Seek loop, but... have other things to do.
 - I will do the actual planning tomorrow. Wanted to do it tonight, but still have a bunch of things to finish today.
+
+#89.2. 7/9/2018:
+- Little time crunch today, but I wrote up some things to try (Tasks.md) which is probably a stretch, but could be cool if I can pull it off.
