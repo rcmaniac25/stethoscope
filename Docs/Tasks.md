@@ -4,6 +4,7 @@
 
 Sub-100 Day Crunch:
 - ListStorage's Entries will get an exception or completed whenever an entry is added. Need this to work multi-threaded (might require a custom implementation of an Observable instead of ToObservable)
+-- Write own implementation (though I may copy what Rx does, so probably need to reference their license). Write as an extension for ICollection with the function being "ToObservable(UpdateState state)" so we can choose between default implementation, and the one that returns this custom version.
 - (on an independent thread) Analyze logs to try and figure out what some logs are (can I do word counting or whatever the term is to determine similar syntax). Time box, and if no good results are found, then work on log templates to gather contents of logs
 - Try to build additional attributes. Such as a common ID or count of some element
 - Start trying to correlate additional attributes together. Possibly try to make common processes (fun=a, fun=b, fun=c; 48 times. fun=a, fun=b, fun=d, fun=c; 10 times. fun=a, fun=b, {branch if "args" contains "alt=true"} to d, fun=c). <-- Hard... could be a fun attempt

@@ -970,3 +970,8 @@ void doSomethingCool(std::ifstream& input)
 
 #89.2. 7/9/2018:
 - Little time crunch today, but I wrote up some things to try (Tasks.md) which is probably a stretch, but could be cool if I can pull it off.
+
+#90.2. 7/10/2018:
+- Looking at the source code that exists, if something gets added while the Observabke is running, it will stop or indicate completed.
+- So... I'll have to write my own. Do it like an extension with an argument for choosing how new data/data changes are handled.
+- I ran out of time, so I'll work on this tomorrow.
