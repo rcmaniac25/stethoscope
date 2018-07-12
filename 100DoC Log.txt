@@ -975,3 +975,12 @@ void doSomethingCool(std::ifstream& input)
 - Looking at the source code that exists, if something gets added while the Observabke is running, it will stop or indicate completed.
 - So... I'll have to write my own. Do it like an extension with an argument for choosing how new data/data changes are handled.
 - I ran out of time, so I'll work on this tomorrow.
+
+#91.2. 7/11/2018:
+- Ran out of time again... but I wanted to get something. I made at least the boilerplate for the extension so that ICollection can be converted to an Observable.
+- ICollection is chosen because the idea is that instead of an enumeration (which errors when it's contents change) we use for (int i = 0; i < collection.Count; i++)
+- This will enable us to keep iterating, even if the contents change.
+- I realized "but some logs run forever, so how do I do that?" and the easiest idea I had was to just have the collection never complete when it reaches the end of the collection.
+- Then I went to implement it and went "maybe another time" and "what happens when I go to run unit tests?"
+- FYI: this is the benefit of unit tests, as they depict how I assume people will use it. Suddenly saying "it never ends" is probably a bad idea.
+- Unrelated: at the time I went "I want to work on stuff fast", I didn't assume "actually starting on work" would occur then... and still hasn't fully happened. I think I may miss a PoC on the 100 day deadline. Oh well... life of personal projects.

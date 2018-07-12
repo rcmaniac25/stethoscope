@@ -1,6 +1,7 @@
 ﻿using Metrics;
 
 using Stethoscope.Common;
+using Stethoscope.Reactive;
 
 using System;
 using System.Collections.Generic;
@@ -215,7 +216,7 @@ namespace Stethoscope.Log.Internal
                 logObservableRequestedCounter.Increment();
                 lock (logsBeingProcessed)
                 {
-                    return storage.Entries.Concat(logsBeingProcessed.ToObservable());
+                    return storage.Entries.Concat(logsBeingProcessed.ToObservable(ObservableType.LiveUpdatingInfinite));
                 }
             }
         }

@@ -1,6 +1,7 @@
 ﻿using Metrics;
 
 using Stethoscope.Common;
+using Stethoscope.Reactive;
 
 using System;
 using System.Collections.Generic;
@@ -94,7 +95,7 @@ namespace Stethoscope.Log.Internal.Storage
         /// <summary>
         /// Access the log entries stored in this.
         /// </summary>
-        public IQbservable<ILogEntry> Entries => logs.ToObservable().AsQbservable(); //XXX This won't work with "Insert" (or "Add" for that instance). This is basically saying "foreach(var log in logs) { OnNext(log); }" and enumerations don't like iteration + changes
+        public IQbservable<ILogEntry> Entries => logs.ToObservable(ObservableType.LiveUpdatingInfinite).AsQbservable();
 
         /// <summary>
         /// The number of logs stored.
