@@ -984,3 +984,12 @@ void doSomethingCool(std::ifstream& input)
 - Then I went to implement it and went "maybe another time" and "what happens when I go to run unit tests?"
 - FYI: this is the benefit of unit tests, as they depict how I assume people will use it. Suddenly saying "it never ends" is probably a bad idea.
 - Unrelated: at the time I went "I want to work on stuff fast", I didn't assume "actually starting on work" would occur then... and still hasn't fully happened. I think I may miss a PoC on the 100 day deadline. Oh well... life of personal projects.
+
+#92.2. 7/12/2018:
+- I'm a broken record... ran out of time again. It's been a busy week and other events put me working on this later then I wanted.
+- I tried to start working on an abstraction for the observable, so that I can simply write it without the IDisposable/scheduler/etc. complexity.
+- I didn't get anywhere with that besides a base class that returns it's "type". I'm not sure how much I really care about the type but we'll see. It makes the function unique so it can act as an overload.
+- Also, I decided the "infinite" model isn't needed. Since the LiveUpdating type will continue running even if the underlying sequence changes, a scheduler can be used to just slow things down... and then later speed them up, or something like that. No need for a special observable.
+- Now... one question that came to mind: Skip/SkipLast functions basically iterate and just don't return data. Since the current extension is for a collection, can't I just do one easy skip (different starting index of ending test)?
+- I'm not sure how I can pull that off without "you can't use System.Reactive.Linq", and that's not as easy as it might sound. Will look later...
+- I also need to determine if I can get the ListStorage to use specific schedulers...

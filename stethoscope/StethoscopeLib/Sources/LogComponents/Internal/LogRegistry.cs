@@ -216,7 +216,7 @@ namespace Stethoscope.Log.Internal
                 logObservableRequestedCounter.Increment();
                 lock (logsBeingProcessed)
                 {
-                    return storage.Entries.Concat(logsBeingProcessed.ToObservable(ObservableType.LiveUpdatingInfinite));
+                    return storage.Entries.Concat(logsBeingProcessed.ToObservable(ObservableType.LiveUpdating));
                 }
             }
         }

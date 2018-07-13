@@ -95,7 +95,7 @@ namespace Stethoscope.Log.Internal.Storage
         /// <summary>
         /// Access the log entries stored in this.
         /// </summary>
-        public IQbservable<ILogEntry> Entries => logs.ToObservable(ObservableType.LiveUpdatingInfinite).AsQbservable();
+        public IQbservable<ILogEntry> Entries => logs.ToObservable(ObservableType.LiveUpdating).AsQbservable();
 
         /// <summary>
         /// The number of logs stored.
