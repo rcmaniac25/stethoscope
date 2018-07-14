@@ -993,3 +993,13 @@ void doSomethingCool(std::ifstream& input)
 - Now... one question that came to mind: Skip/SkipLast functions basically iterate and just don't return data. Since the current extension is for a collection, can't I just do one easy skip (different starting index of ending test)?
 - I'm not sure how I can pull that off without "you can't use System.Reactive.Linq", and that's not as easy as it might sound. Will look later...
 - I also need to determine if I can get the ListStorage to use specific schedulers...
+
+#92.2. 7/12/2018:
+- Most of today was spent trying to figure out the best way to write an observable.
+- I'm currently under the assumption that in order to get the optomizations mentioned before to work, I need to actually have control of execution. Otherwise a simple "the observable has a Subject and simply subscribes with it, then writes the collection to it" could be done.
+- But there is an expected element to the creation, based on ToObservable: long running and short running schedulers.
+- So when a subscription happens, if we don't want it running on "this" thread, we use a scheduler (which could still be "this" but at least it's controllable).
+- But we can either process one element at a time (<process>, <potential delay/wait/thread overhead>, <process>, <potential delay/wait/thread overhead>, <process>, etc.) or all at the same time until told to stop (while(isRunning)).
+- Long running schedulers will do the loop, while regular ones will do the single-element processing.
+- So I need to ensure such a system is implemented, get the scheduler to ListStorage (Config?), and do one more check to determine if I overcomplicated this or not to note for later work. Bonus: get that Skip/SkipLast optimization working.
+- Also, I want to look into what the benefits (as the above is my own guess as to benefits) of the two different scheduling models. Maybe it's not worth it to implement long... will have to research to find out.

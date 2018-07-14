@@ -1,22 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Reactive;
-using System.Text;
+﻿using System.Reactive;
+using System.Reactive.Concurrency;
 
 namespace Stethoscope.Reactive
 {
-    internal class TypedObservable<T> : ObservableBase<T>
+    internal abstract class TypedObservable<T> : ObservableBase<T>
     {
-        protected TypedObservable(ObservableType type)
+        protected IScheduler scheduler;
+
+        protected TypedObservable(ObservableType type, IScheduler scheduler)
         {
-            Type = type;
+            this.Type = type;
+            this.scheduler = scheduler;
         }
 
         public ObservableType Type { get; private set; }
-
-        protected override IDisposable SubscribeCore(IObserver<T> observer)
-        {
-            throw new NotImplementedException();
-        }
     }
 }
