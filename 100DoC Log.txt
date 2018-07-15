@@ -994,7 +994,7 @@ void doSomethingCool(std::ifstream& input)
 - I'm not sure how I can pull that off without "you can't use System.Reactive.Linq", and that's not as easy as it might sound. Will look later...
 - I also need to determine if I can get the ListStorage to use specific schedulers...
 
-#92.2. 7/12/2018:
+#93.2. 7/13/2018:
 - Most of today was spent trying to figure out the best way to write an observable.
 - I'm currently under the assumption that in order to get the optomizations mentioned before to work, I need to actually have control of execution. Otherwise a simple "the observable has a Subject and simply subscribes with it, then writes the collection to it" could be done.
 - But there is an expected element to the creation, based on ToObservable: long running and short running schedulers.
@@ -1003,3 +1003,9 @@ void doSomethingCool(std::ifstream& input)
 - Long running schedulers will do the loop, while regular ones will do the single-element processing.
 - So I need to ensure such a system is implemented, get the scheduler to ListStorage (Config?), and do one more check to determine if I overcomplicated this or not to note for later work. Bonus: get that Skip/SkipLast optimization working.
 - Also, I want to look into what the benefits (as the above is my own guess as to benefits) of the two different scheduling models. Maybe it's not worth it to implement long... will have to research to find out.
+
+#94.2. 7/14/2018:
+- So the "long" running observable, needed or not, was able to be abstracted away.
+- Still need to figure out how to get schedular to list storage.
+- I really want to write some tests to prove this works... I'm going to hold off and try to get more stuff done first.
+- Abstractions are good for scheduling/threads/etc. as you can write without needing to know about any scheduling/threads and generally keep your code smaller.

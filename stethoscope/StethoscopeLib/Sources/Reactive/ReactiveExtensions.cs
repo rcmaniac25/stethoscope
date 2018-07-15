@@ -26,13 +26,13 @@ namespace Stethoscope.Reactive
     public static class ReactiveExtensions
     {
         /// <summary>
-        /// Convert a <see cref="ICollection{T}"/> into an <see cref="IObservable{T}"/> of a specific type.
+        /// Convert a <see cref="IList{T}"/> into an <see cref="IObservable{T}"/> of a specific type.
         /// </summary>
         /// <typeparam name="T">Type of data.</typeparam>
         /// <param name="source">Source data.</param>
         /// <param name="type">What type of observable should be created.</param>
         /// <returns>An <see cref="IObservable{T}"/> based off the <paramref name="source"/>.</returns>
-        public static IObservable<T> ToObservable<T>(this ICollection<T> source, ObservableType type)
+        public static IObservable<T> ToObservable<T>(this IList<T> source, ObservableType type)
         {
             if (source == null)
             {
@@ -49,14 +49,14 @@ namespace Stethoscope.Reactive
         }
 
         /// <summary>
-        /// Convert a <see cref="ICollection{T}"/> into an <see cref="IObservable{T}"/> of a specific type., using the specified scheduler to run the enumeration loop.
+        /// Convert a <see cref="IList{T}"/> into an <see cref="IObservable{T}"/> of a specific type., using the specified scheduler to run the enumeration loop.
         /// </summary>
         /// <typeparam name="T">Type of data.</typeparam>
         /// <param name="source">Source data.</param>
         /// <param name="type">What type of observable should be created.</param>
         /// <param name="scheduler">Scheduler to run the enumeration of the input sequence on.</param>
         /// <returns>An <see cref="IObservable{T}"/> based off the <paramref name="source"/>.</returns>
-        public static IObservable<T> ToObservable<T>(this ICollection<T> source, ObservableType type, IScheduler scheduler)
+        public static IObservable<T> ToObservable<T>(this IList<T> source, ObservableType type, IScheduler scheduler)
         {
             if (source == null)
             {
@@ -70,7 +70,7 @@ namespace Stethoscope.Reactive
             switch (type)
             {
                 case ObservableType.LiveUpdating:
-                //TODO
+                    return new LiveListObservable<T>(source, scheduler);
                 case ObservableType.Traditional:
                     return System.Reactive.Linq.Observable.ToObservable(source, scheduler);
             }
