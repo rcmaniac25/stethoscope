@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 
 using Stethoscope.Common;
@@ -22,6 +23,10 @@ namespace Stethoscope.Log.Internal
         /// The log attribute used to sort entries.
         /// </summary>
         LogAttribute SortAttribute { get; }
+        /// <summary>
+        /// Scheduler for retrieving logs from storage.
+        /// </summary>
+        IScheduler LogScheduler { get; set; }
 
         /// <summary>
         /// Add a new log entry, sorting by <see cref="SortAttribute"/>. If the attribute does not contain the attribute, the log might not be added to the storage container. If this is the case, an empty GUID will be returned.

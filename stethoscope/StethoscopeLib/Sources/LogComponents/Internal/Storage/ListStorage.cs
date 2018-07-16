@@ -5,6 +5,7 @@ using Stethoscope.Reactive;
 
 using System;
 using System.Collections.Generic;
+using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 
 namespace Stethoscope.Log.Internal.Storage
@@ -93,9 +94,17 @@ namespace Stethoscope.Log.Internal.Storage
         private readonly LogEntryComparer logEntryComparer = new LogEntryComparer();
 
         /// <summary>
+        /// Scheduler for retrieving logs from storage. Ignored for Null storage.
+        /// </summary>
+        public IScheduler LogScheduler { get; set; }
+
+        /// <summary>
         /// Access the log entries stored in this.
         /// </summary>
-        public IQbservable<ILogEntry> Entries => logs.ToObservable(ObservableType.LiveUpdating).AsQbservable();
+        public IQbservable<ILogEntry> Entries =>
+            LogScheduler != null ?
+            logs.ToObservable(ObservableType.LiveUpdating, LogScheduler).AsQbservable() :
+            logs.ToObservable(ObservableType.LiveUpdating).AsQbservable();
 
         /// <summary>
         /// The number of logs stored.

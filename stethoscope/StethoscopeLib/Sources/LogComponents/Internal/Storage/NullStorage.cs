@@ -3,6 +3,7 @@
 using Stethoscope.Common;
 
 using System;
+using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 
 namespace Stethoscope.Log.Internal.Storage
@@ -32,6 +33,11 @@ namespace Stethoscope.Log.Internal.Storage
         {
             SortAttribute = sortReturn;
         }
+
+        /// <summary>
+        /// Scheduler for retrieving logs from storage. Ignored for Null storage.
+        /// </summary>
+        public IScheduler LogScheduler { get; set; }
 
         /// <summary>
         /// An empty <see cref="IQbservable{T}"/>

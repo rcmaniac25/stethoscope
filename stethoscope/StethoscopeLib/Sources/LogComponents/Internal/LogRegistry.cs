@@ -5,6 +5,7 @@ using Stethoscope.Reactive;
 
 using System;
 using System.Collections.Generic;
+using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 
 namespace Stethoscope.Log.Internal
@@ -60,6 +61,22 @@ namespace Stethoscope.Log.Internal
                 throw new ArgumentException("Storage must sort logs by Timestamp", nameof(storage));
             }
             this.storage = storage;
+            this.LogScheduler = TaskPoolScheduler.Default;
+        }
+
+        /// <summary>
+        /// Scheduler for retrieving logs from the registry.
+        /// </summary>
+        public IScheduler LogScheduler
+        {
+            get
+            {
+                return storage.LogScheduler;
+            }
+            set
+            {
+                storage.LogScheduler = value;
+            }
         }
 
         /// <summary>
@@ -216,7 +233,17 @@ namespace Stethoscope.Log.Internal
                 logObservableRequestedCounter.Increment();
                 lock (logsBeingProcessed)
                 {
-                    return storage.Entries.Concat(logsBeingProcessed.ToObservable(ObservableType.LiveUpdating));
+                    IObservable<ILogEntry> logsBeingProcessObservable;
+                    if (LogScheduler != null)
+                    {
+                        logsBeingProcessObservable = logsBeingProcessed.ToObservable(ObservableType.LiveUpdating, LogScheduler);
+                    }
+                    else
+                    {
+                        logsBeingProcessObservable = logsBeingProcessed.ToObservable(ObservableType.LiveUpdating);
+                    }
+
+                    return storage.Entries.Concat(logsBeingProcessObservable);
                 }
             }
         }

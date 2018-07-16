@@ -1,4 +1,5 @@
-﻿using System.Reactive.Linq;
+﻿using System.Reactive.Concurrency;
+using System.Reactive.Linq;
 
 namespace Stethoscope.Common
 {
@@ -41,5 +42,10 @@ namespace Stethoscope.Common
         /// Queriable log entries.
         /// </summary>
         IQbservable<ILogEntry> Logs { get; }
+
+        /// <summary>
+        /// Scheduler for retrieving logs from the registry.
+        /// </summary>
+        IScheduler LogScheduler { get; set; }
     }
 }

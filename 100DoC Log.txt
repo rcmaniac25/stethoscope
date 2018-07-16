@@ -1009,3 +1009,21 @@ void doSomethingCool(std::ifstream& input)
 - Still need to figure out how to get schedular to list storage.
 - I really want to write some tests to prove this works... I'm going to hold off and try to get more stuff done first.
 - Abstractions are good for scheduling/threads/etc. as you can write without needing to know about any scheduling/threads and generally keep your code smaller.
+
+#95.2. 7/15/2018:
+- Shoot... just noticed that because I made a branch that wasn't the main branch on Github, it stopped showing my commit streak. Eh, it doesn't matter (or at least, it shouldn't), but I was hoping to see such updates.
+- Saw the time and needed to do something short: so all I did was add a value for get/set a scheduler for getting logs. (Scheduler = what does the "work" in an observable. The current thread handles going through a list? A thread pool handles ".Where(val => val != null)."? Etc.)
+- Originally I was thinking I'd stick this in LogConfig but... "the power of defaults".
+- See, LogConfig implies the data has a preference/specific scheduler for that data. Reality is, the application/consumer is the one that has to actually handle it. If a LogConfig suddenly says "run on the UI thread", the application is in trouble.
+- Additionally, there's no way to specify a scheduler via JSON. A enum/parser would be needed to serialize/deserialize a scheduler. That could be problem if someone wants a special scheduler or Rx changes (and someone descides to ignore deprecation warnings)
+- So since the scheduler is application specific instead of data/parser specific, I made it get/set property of the registry (which passes through to registry storage) and registry storage.
+- As for "the power of defaults", a good default is one that fits most if not all situations without being a burden.
+- So what is the best option for "here's 2 logs" and "here's 60 million logs" and "here's... the logs will never stop"? Tasks.
+- We don't want it running on the thread that requests the observable itself.
+- We don't want it running on it's own thread, as the current system will end up making at least 2 threads just for that (and if I can be smart, we want those threads for for figuring out information About the logs, not just reading them).
+- There are others, but for simplicity: if tasks are used... especially with long running support, a task could be turned into thread if needed... or it could be run on some other processing element. It just offers one of the best options for execution (and for modern .Net, it should be used over threads)
+- So... a good default that will probably never get changed unless it's someone who wants very specific execution.
+- Important piece done, as it should mean we can sit somewhere to do processing and just pull a never ending feed from the registry which, at the same time, is being populated by a different thread attached to the parser.
+- I'm behind, obviously, and my hope for a PoC by day 100 isn't going to happen. As such, I will do one "larger" side tasks before hand: Qservable/Linq. I want to see if I can get some optimizations with iteration.
+- As there's no DB storage (yet), how can I get "Logs.Where(log => log.Message.Length > 10)" to run normally but "Logs.Skip(20 * 1000000).Where(log => log.Message.Length > 10)" to optimize the starting index of the iteration so it doesn't even bother with the first N items of iteration.
+- Think: that can even be a start for other optmizations: "Logs.Where(log => log.Timestamp > timeOfInterest)" becomes "Logs.Skip(Logs.IndexOfFirst(log => log.Timestamp > timeOfInterest)" which, in turn, means that instead of checking every log for that timestamp, we now do a single check to find the first index (since the array is sorted) and use that as a skip point... which, per before, would already be optimized.
