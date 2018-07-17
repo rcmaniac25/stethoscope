@@ -41,7 +41,7 @@ namespace Stethoscope.Reactive
                 }
             }
             ICancelable disposable = new BooleanDisposable();
-            scheduler.Schedule((state, observer, disposable), RecursiveExecution);
+            scheduler.Schedule((state, observer, disposable, firstExecute: true), RecursiveExecution);
             return disposable;
         }
 
@@ -49,6 +49,7 @@ namespace Stethoscope.Reactive
         {
             try
             {
+                AboutToExecute(state.innerState);
                 LongExecution(state.innerState, state.observable, cancelable);
             }
             catch (Exception e)
@@ -58,7 +59,7 @@ namespace Stethoscope.Reactive
         }
 
         // Based on the general flow of System.Reactive.Linq.ObservableImpl.ToObservable's "sink" LoopRec function.
-        private void RecursiveExecution((S innerState, IObserver<T> observable, ICancelable cancelable) state, Action<(S innerState, IObserver<T> observable, ICancelable cancelable)> recurse)
+        private void RecursiveExecution((S innerState, IObserver<T> observable, ICancelable cancelable, bool firstExecute) state, Action<(S innerState, IObserver<T> observable, ICancelable cancelable, bool firstExecute)> recurse)
         {
             if (state.cancelable.IsDisposed)
             {
@@ -74,9 +75,13 @@ namespace Stethoscope.Reactive
             {
                 try
                 {
+                    if (state.firstExecute)
+                    {
+                        AboutToExecute(state.innerState);
+                    }
                     IndividualExecution(state.innerState, state.observable, (newState) =>
                     {
-                        recurse((newState, state.observable, state.cancelable));
+                        recurse((newState, state.observable, state.cancelable, firstExecute: false));
                     });
                 }
                 catch (Exception e)
@@ -84,6 +89,10 @@ namespace Stethoscope.Reactive
                     state.observable.OnError(e);
                 }
             }
+        }
+
+        protected virtual void AboutToExecute(S state)
+        {
         }
 
         protected virtual void LongExecution(S state, IObserver<T> observer, ICancelable cancelable)

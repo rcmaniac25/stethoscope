@@ -1027,3 +1027,25 @@ void doSomethingCool(std::ifstream& input)
 - I'm behind, obviously, and my hope for a PoC by day 100 isn't going to happen. As such, I will do one "larger" side tasks before hand: Qservable/Linq. I want to see if I can get some optimizations with iteration.
 - As there's no DB storage (yet), how can I get "Logs.Where(log => log.Message.Length > 10)" to run normally but "Logs.Skip(20 * 1000000).Where(log => log.Message.Length > 10)" to optimize the starting index of the iteration so it doesn't even bother with the first N items of iteration.
 - Think: that can even be a start for other optmizations: "Logs.Where(log => log.Timestamp > timeOfInterest)" becomes "Logs.Skip(Logs.IndexOfFirst(log => log.Timestamp > timeOfInterest)" which, in turn, means that instead of checking every log for that timestamp, we now do a single check to find the first index (since the array is sorted) and use that as a skip point... which, per before, would already be optimized.
+
+#96.2. 7/16/2018:
+- Err... so my plan was to start working on Linq work, but I realized there was a problem with my live observable.
+- A chain of challenges:
+-- I need log items that I can iterate through and process (Enumerable?)
+--- I would like them ASAP (Observable)
+---- I want to minimize processing needed to get the data (Qbservable)
+----- I want to try and get stuff done... and a DB implementation is going to be a pain as Qbservable doesn't seem to have existing DB support that's obvious to find. (Stick to list storage for now)
+------ I need an observable of a list... but if the list gets insert/add, the underlying enumerable will throw an exception... (make own observable around list)
+------- I need to be able to add data at the same time as reading... if I add data after the current index, it's fine as I'll read it later. I don't care if data get's added before since I'm not reading it... or do I? (today's commit and challenge)
+- See, imagine you're iterating through a list (0, 1, 2, 3) and you're on index 1. Now a new item is inserted into the list at the same index. What happens? (0, 1n, 1o, 2o, 3o)
+- And... you're index is still at 1. So you return item 1 at index 1 and increment indice, the insertion happens, you return item 1... from index 2.
+- This is one of the reasons that Enumerables balk when changes happen during iteration, because it's a pain in the butt to handle.
+- So now we need notifying lists. Note: there is a Subject called a ReplaySubject, but it doesn't do inserts and Observables don't sort... so I can't use it. There is also at least one Observable that will notify you of changes to an internal list (or something like that). I'm going off memory... not ObservableCollection... or was it?
+- Regardless (we can always refactor to a better implementation later), I need to be able to track my index. So when the previous example happens, it's return item 1 at index 1 and increment indice, the insertion happens, you return item 2 from index 3.
+- "Huh? How did that index change by 2? You only did 1 increment." Yes... that's the point of today's work. End goal: something that tracks any indice change that happens at or before the current index we're on.
+- To get there, we first need to to get any changes to a list to be sent to whatever is tracking an index. Bonus: we could have multiple threads/tasks/etc. all tracking indexes at the same time so the list wrapper/abstraction can't store the changes.
+- Once we have an abstraction (that works with ListStorage), we can send events for Add, Insert, Clear, etc.
+- Once we have an abstraction with events, we can make a tracker that is independent of the list and can track indices using just the events.
+- I did all this, which is lots of boilerplate I wish I didn't have to write, and updated ListStorage. The registry storage tests passed. This is not the first time I've encountered this, but it's the first time where I didn't have already written boilerplate. Fun.
+- I can only commit the list abstraction because when I ran all tests, the LogRegistry tests failed. Not working on that now.
+- Also, we need some atomics/locks/something in the index watcher.
