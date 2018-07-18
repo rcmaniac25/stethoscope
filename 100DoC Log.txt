@@ -1049,3 +1049,12 @@ void doSomethingCool(std::ifstream& input)
 - I did all this, which is lots of boilerplate I wish I didn't have to write, and updated ListStorage. The registry storage tests passed. This is not the first time I've encountered this, but it's the first time where I didn't have already written boilerplate. Fun.
 - I can only commit the list abstraction because when I ran all tests, the LogRegistry tests failed. Not working on that now.
 - Also, we need some atomics/locks/something in the index watcher.
+
+#97.2. 7/17/2018:
+- I put some locks around the index watcher, though I'd prefer atomics. There's not really a good way to say "atomically update these multiple values", partially because there's never been a CPU opcode for something like that.
+- I half think "someone didn't think how code would be written" and half think "everyone else has figured out a way around this... yet they all use locks. Did nobody ask if that was really the best solution? Maybe it is... everyone else is doing it that way"
+- For the time being, I'm using locks around that code.
+- Next challenge: why aren't these tests passing?
+- That's actually harder... because I didn't have the time to debug it. The closest I got to was "I concat 2 observables. One is the registry storage entries and the other is the logs being processed. Because of the threadpool scheduler that operates on the 2 observables, but not the concat, it ends up running only part of the observable when doing tests. The result is that the first assert passes, but the second doesn't."
+- That's not good... as it should be "just working". I'll try having concat run on the same scheduler.
+- Also not good: my expectation was that each Subscribe happens once-per-use. If all the sudden one subscribe "uses" the first observable in a concat, and then the next subscribe "uses" the second observable, then I may need to write my own concat or figure out what's going wrong with my expectaion (latter, not former...).

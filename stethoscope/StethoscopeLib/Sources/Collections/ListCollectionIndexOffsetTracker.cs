@@ -6,7 +6,9 @@
     /// <typeparam name="T">The type of element in the collection.</typeparam>
     public class ListCollectionIndexOffsetTracker<T>
     {
-        //TODO: locks, atomics, something to handle concurrency
+        // Would prefer to use atomics instead of locks...
+
+        private readonly object locker = new object();
 
         /// <summary>
         /// Get or set the original index to track.
@@ -25,7 +27,10 @@
         {
             get
             {
-                return CurrentIndex - OriginalIndex;
+                lock (locker)
+                {
+                    return CurrentIndex - OriginalIndex;
+                }
             }
         }
 
@@ -34,7 +39,10 @@
         /// </summary>
         public void ResetCurrentIndex()
         {
-            CurrentIndex = OriginalIndex;
+            lock (locker)
+            {
+                CurrentIndex = OriginalIndex;
+            }
         }
 
         /// <summary>
@@ -43,7 +51,10 @@
         /// <param name="index">The new original index.</param>
         public void SetOriginalIndexAndResetCurrent(int index)
         {
-            CurrentIndex = OriginalIndex = index;
+            lock (locker)
+            {
+                CurrentIndex = OriginalIndex = index;
+            }
         }
 
         /// <summary>
@@ -57,14 +68,20 @@
             {
                 if (e.Type == ListCollectionEventType.Clear)
                 {
-                    OriginalIndex = 0;
-                    CurrentIndex = 0;
+                    lock (locker)
+                    {
+                        OriginalIndex = 0;
+                        CurrentIndex = 0;
+                    }
                 }
                 else if (e.Type == ListCollectionEventType.Add || e.Type == ListCollectionEventType.Insert)
                 {
-                    if (e.Index <= CurrentIndex)
+                    lock (locker)
                     {
-                        CurrentIndex++;
+                        if (e.Index <= CurrentIndex)
+                        {
+                            CurrentIndex++;
+                        }
                     }
                 }
             }
