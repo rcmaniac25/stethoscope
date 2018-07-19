@@ -1,30 +1,49 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Stethoscope.Collections;
+
+using System;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 
 namespace Stethoscope.Reactive
 {
-    internal class LiveListObservable<T> : ScheduledObservable<T, (IList<T> list, int index)>
+    internal class LiveListObservable<T> : ScheduledObservable<T, (IBaseListCollection<T> list, ListCollectionIndexOffsetTracker<T> tracker)>
     {
-        public LiveListObservable(IList<T> list, IScheduler scheduler) : base(ObservableType.LiveUpdating, scheduler, (list, 0))
+        private const int STARTING_INDEX = 0;
+
+        private static ListCollectionIndexOffsetTracker<T> CreateTracker(IBaseListCollection<T> list, int startingIndex)
+        {
+            var tracker = new ListCollectionIndexOffsetTracker<T>()
+            {
+                OriginalIndex = startingIndex
+            };
+            list.CollectionChangedEvent += tracker.HandleEvent;
+            return tracker;
+        }
+
+        public LiveListObservable(IBaseListCollection<T> list, IScheduler scheduler) : base(ObservableType.LiveUpdating, scheduler, (list, CreateTracker(list, STARTING_INDEX)))
         {
             SupportsLongRunning = true;
         }
 
-        protected override void IndividualExecution((IList<T> list, int index) state, IObserver<T> observer, Action<(IList<T> list, int index)> continueExecution)
+        protected override (IBaseListCollection<T> list, ListCollectionIndexOffsetTracker<T> tracker) AboutToExecute((IBaseListCollection<T> list, ListCollectionIndexOffsetTracker<T> tracker) state)
         {
-            var currentIndex = state.index;
+            return (state.list, CreateTracker(state.list, STARTING_INDEX));
+        }
+
+        protected override void IndividualExecution((IBaseListCollection<T> list, ListCollectionIndexOffsetTracker<T> tracker) state, IObserver<T> observer, Action<(IBaseListCollection<T> list, ListCollectionIndexOffsetTracker<T> tracker)> continueExecution)
+        {
+            var tracker = state.tracker;
             try
             {
-                if (currentIndex >= state.list.Count)
+                if (tracker.CurrentIndex >= state.list.Count)
                 {
                     observer.OnCompleted();
                 }
                 else
                 {
-                    observer.OnNext(state.list[currentIndex]);
-                    continueExecution((state.list, currentIndex + 1));
+                    observer.OnNext(state.list.GetAt(tracker.CurrentIndex));
+                    tracker.SetOriginalIndexAndResetCurrent(tracker.CurrentIndex + 1);
+                    continueExecution((state.list, tracker));
                 }
             }
             catch (Exception e)
@@ -33,21 +52,22 @@ namespace Stethoscope.Reactive
             }
         }
 
-        protected override void LongExecution((IList<T> list, int index) state, IObserver<T> observer, ICancelable cancelable)
+        protected override void LongExecution((IBaseListCollection<T> list, ListCollectionIndexOffsetTracker<T> tracker) state, IObserver<T> observer, ICancelable cancelable)
         {
-            var currentIndex = state.index;
+            var tracker = state.tracker;
             try
             {
                 while (!cancelable.IsDisposed)
                 {
-                    if (currentIndex >= state.list.Count)
+                    if (tracker.CurrentIndex >= state.list.Count)
                     {
                         observer.OnCompleted();
                         break;
                     }
                     else
                     {
-                        observer.OnNext(state.list[currentIndex++]);
+                        observer.OnNext(state.list.GetAt(tracker.CurrentIndex));
+                        tracker.SetOriginalIndexAndResetCurrent(tracker.CurrentIndex + 1);
                     }
                 }
             }

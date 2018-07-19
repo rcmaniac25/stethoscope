@@ -1058,3 +1058,13 @@ void doSomethingCool(std::ifstream& input)
 - That's actually harder... because I didn't have the time to debug it. The closest I got to was "I concat 2 observables. One is the registry storage entries and the other is the logs being processed. Because of the threadpool scheduler that operates on the 2 observables, but not the concat, it ends up running only part of the observable when doing tests. The result is that the first assert passes, but the second doesn't."
 - That's not good... as it should be "just working". I'll try having concat run on the same scheduler.
 - Also not good: my expectation was that each Subscribe happens once-per-use. If all the sudden one subscribe "uses" the first observable in a concat, and then the next subscribe "uses" the second observable, then I may need to write my own concat or figure out what's going wrong with my expectaion (latter, not former...).
+
+#98.2. 7/18/2018:
+- I managed to write a unit test that reproduces my issue.
+- I then managed to fix the unit test, and cause an infinite loop elsewhere...
+- The issue was that the state persisted with the instance instead of every time it was run.
+- This meant that the first run of something would be fine, then the second run would still have the indices of the first.
+- I tried to pass state, but it came across as hacky. So I tried to pass state internally within the LiveListObservable... but that just cause an infinite loop.
+- I will have to continue working on this tomorrow... err...]
+- Plan B. I undid all the changes I had written and went back to the hacky-ish functional-like code. Ran the tests... everything passed.
+- I will do this, so that I can finally move onto LINQ work tomorrow instead.

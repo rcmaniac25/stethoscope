@@ -49,8 +49,8 @@ namespace Stethoscope.Reactive
         {
             try
             {
-                AboutToExecute(state.innerState);
-                LongExecution(state.innerState, state.observable, cancelable);
+                S innerStateToUse = AboutToExecute(state.innerState);
+                LongExecution(innerStateToUse, state.observable, cancelable);
             }
             catch (Exception e)
             {
@@ -75,11 +75,12 @@ namespace Stethoscope.Reactive
             {
                 try
                 {
+                    S innerStateToUse = state.innerState;
                     if (state.firstExecute)
                     {
-                        AboutToExecute(state.innerState);
+                        innerStateToUse = AboutToExecute(innerStateToUse);
                     }
-                    IndividualExecution(state.innerState, state.observable, (newState) =>
+                    IndividualExecution(innerStateToUse, state.observable, (newState) =>
                     {
                         recurse((newState, state.observable, state.cancelable, firstExecute: false));
                     });
@@ -91,8 +92,9 @@ namespace Stethoscope.Reactive
             }
         }
 
-        protected virtual void AboutToExecute(S state)
+        protected virtual S AboutToExecute(S state)
         {
+            return state;
         }
 
         protected virtual void LongExecution(S state, IObserver<T> observer, ICancelable cancelable)

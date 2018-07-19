@@ -1,5 +1,6 @@
 ﻿using Metrics;
 
+using Stethoscope.Collections;
 using Stethoscope.Common;
 using Stethoscope.Reactive;
 
@@ -90,7 +91,7 @@ namespace Stethoscope.Log.Internal.Storage
             clearCounter = listStorageContext.Counter("Clear", Unit.Calls, "registry, storage");
         }
 
-        private List<ILogEntry> logs = new List<ILogEntry>();
+        private IBaseReadWriteListCollection<ILogEntry> logs = ((IList<ILogEntry>)new List<ILogEntry>()).AsListCollection();
         private readonly LogEntryComparer logEntryComparer = new LogEntryComparer();
 
         /// <summary>
