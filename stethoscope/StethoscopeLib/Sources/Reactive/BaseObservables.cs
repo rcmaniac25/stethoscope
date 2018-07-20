@@ -20,11 +20,15 @@ namespace Stethoscope.Reactive
 
     internal abstract class ScheduledObservable<T, S> : TypedObservable<T>
     {
-        private readonly S state;
+        private readonly Func<S> stateGenerator;
 
-        protected ScheduledObservable(ObservableType type, IScheduler scheduler, S state) : base(type, scheduler)
+        protected ScheduledObservable(ObservableType type, IScheduler scheduler) : this(type, scheduler, () => default(S))
         {
-            this.state = state;
+        }
+
+        protected ScheduledObservable(ObservableType type, IScheduler scheduler, Func<S> stateGenerator) : base(type, scheduler)
+        {
+            this.stateGenerator = stateGenerator;
         }
 
         protected bool SupportsLongRunning { get; set; }
@@ -37,11 +41,11 @@ namespace Stethoscope.Reactive
                 var longRunning = scheduler.AsLongRunning();
                 if (longRunning != null)
                 {
-                    return longRunning.ScheduleLongRunning((state, observer), SingleLongExecution);
+                    return longRunning.ScheduleLongRunning((stateGenerator(), observer), SingleLongExecution);
                 }
             }
             ICancelable disposable = new BooleanDisposable();
-            scheduler.Schedule((state, observer, disposable, firstExecute: true), RecursiveExecution);
+            scheduler.Schedule((stateGenerator(), observer, disposable), RecursiveExecution);
             return disposable;
         }
 
@@ -49,8 +53,7 @@ namespace Stethoscope.Reactive
         {
             try
             {
-                S innerStateToUse = AboutToExecute(state.innerState);
-                LongExecution(innerStateToUse, state.observable, cancelable);
+                LongExecution(state.innerState, state.observable, cancelable);
             }
             catch (Exception e)
             {
@@ -59,7 +62,7 @@ namespace Stethoscope.Reactive
         }
 
         // Based on the general flow of System.Reactive.Linq.ObservableImpl.ToObservable's "sink" LoopRec function.
-        private void RecursiveExecution((S innerState, IObserver<T> observable, ICancelable cancelable, bool firstExecute) state, Action<(S innerState, IObserver<T> observable, ICancelable cancelable, bool firstExecute)> recurse)
+        private void RecursiveExecution((S innerState, IObserver<T> observable, ICancelable cancelable) state, Action<(S innerState, IObserver<T> observable, ICancelable cancelable)> recurse)
         {
             if (state.cancelable.IsDisposed)
             {
@@ -75,14 +78,9 @@ namespace Stethoscope.Reactive
             {
                 try
                 {
-                    S innerStateToUse = state.innerState;
-                    if (state.firstExecute)
+                    IndividualExecution(state.innerState, state.observable, (newState) =>
                     {
-                        innerStateToUse = AboutToExecute(innerStateToUse);
-                    }
-                    IndividualExecution(innerStateToUse, state.observable, (newState) =>
-                    {
-                        recurse((newState, state.observable, state.cancelable, firstExecute: false));
+                        recurse((newState, state.observable, state.cancelable));
                     });
                 }
                 catch (Exception e)
@@ -91,12 +89,7 @@ namespace Stethoscope.Reactive
                 }
             }
         }
-
-        protected virtual S AboutToExecute(S state)
-        {
-            return state;
-        }
-
+        
         protected virtual void LongExecution(S state, IObserver<T> observer, ICancelable cancelable)
         {
             throw new NotSupportedException("Developer didn't implement LongExecution function while setting SupportsLongRunning = true");

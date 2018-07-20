@@ -1068,3 +1068,8 @@ void doSomethingCool(std::ifstream& input)
 - I will have to continue working on this tomorrow... err...]
 - Plan B. I undid all the changes I had written and went back to the hacky-ish functional-like code. Ran the tests... everything passed.
 - I will do this, so that I can finally move onto LINQ work tomorrow instead.
+
+#99.2. 7/19/2018:
+- I did some minor updates to the ScheduledObservable and LiveListObservable to make them simpler and prevent the "state is stored by the observable" using a simple state generator.
+- By making a generator, when a subscribe/schedule operation occurs, the state is generated then. It's then kept throughout execution but never gets stored in the observable.
+- This allows us to remove the "prepare" function (because the generator "is" the prepare function), reduce the logic for carrying the state around, and just makes it cleaner.

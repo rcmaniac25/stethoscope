@@ -20,14 +20,9 @@ namespace Stethoscope.Reactive
             return tracker;
         }
 
-        public LiveListObservable(IBaseListCollection<T> list, IScheduler scheduler) : base(ObservableType.LiveUpdating, scheduler, (list, CreateTracker(list, STARTING_INDEX)))
+        public LiveListObservable(IBaseListCollection<T> list, IScheduler scheduler) : base(ObservableType.LiveUpdating, scheduler, () => (list, CreateTracker(list, STARTING_INDEX)))
         {
             SupportsLongRunning = true;
-        }
-
-        protected override (IBaseListCollection<T> list, ListCollectionIndexOffsetTracker<T> tracker) AboutToExecute((IBaseListCollection<T> list, ListCollectionIndexOffsetTracker<T> tracker) state)
-        {
-            return (state.list, CreateTracker(state.list, STARTING_INDEX));
         }
 
         protected override void IndividualExecution((IBaseListCollection<T> list, ListCollectionIndexOffsetTracker<T> tracker) state, IObserver<T> observer, Action<(IBaseListCollection<T> list, ListCollectionIndexOffsetTracker<T> tracker)> continueExecution)
