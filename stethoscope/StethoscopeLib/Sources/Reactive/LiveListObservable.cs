@@ -19,8 +19,8 @@ namespace Stethoscope.Reactive
             list.CollectionChangedEvent += tracker.HandleEvent;
             return tracker;
         }
-
-        public LiveListObservable(IBaseListCollection<T> list, IScheduler scheduler) : base(ObservableType.LiveUpdating, scheduler, () => (list, CreateTracker(list, STARTING_INDEX)))
+        
+        public LiveListObservable(IBaseListCollection<T> list, IScheduler scheduler, int startingIndex = STARTING_INDEX) : base(ObservableType.LiveUpdating, scheduler, () => (list, CreateTracker(list, startingIndex)))
         {
             SupportsLongRunning = true;
         }
