@@ -41,7 +41,7 @@ namespace Stethoscope
             {
                 extraArgs = options.Parse(args);
             }
-            catch (OptionException e)
+            catch (OptionException)
             {
                 //TODO
                 return false;
@@ -78,8 +78,8 @@ namespace Stethoscope
 
         public void Setup()
         {
-            Metric.Config.WithHttpEndpoint("http://localhost:2581/").WithAllCounters();
-
+            Metric.Config.WithHttpEndpoint("http://localhost:2581/").WithSystemCounters();
+            
             //XXX use config to get this info
             var registryFactory = LogRegistryFactory.Create();
 
@@ -114,6 +114,8 @@ namespace Stethoscope
                 program.Process();
                 program.Print();
             }
+            Console.WriteLine("Press Any Key to Continue");
+            Console.In.Read();
         }
     }
 }
