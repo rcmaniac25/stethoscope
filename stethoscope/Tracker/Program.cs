@@ -114,8 +114,11 @@ namespace Stethoscope
                 program.Process();
                 program.Print();
             }
-            Console.WriteLine("Press Any Key to Continue");
-            Console.In.Read();
+            if (System.Diagnostics.Debugger.IsAttached)
+            {
+                Console.WriteLine("Press Any Key to Continue");
+                Console.In.Read();
+            }
         }
     }
 }
