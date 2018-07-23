@@ -1101,3 +1101,31 @@ void doSomethingCool(std::ifstream& input)
 - I mentioned elsewhere, there's also the case of `Where(log => log.Timestamp > <time>)` (or `SkipUntil(log => log.Timestamp > <time>)`) because it means internally we can do `for(int i = col.BinarySearch(<time>, <special comparision>); i < col.Count; i++) { ... }` and do one fast operation since that happens once.
 - I need to make a list of all operators that I can ignore as they don't change range, and maybe the inverse. The smaller list will be the one I use to determine "can I optimize this?" when the Expression evaluates the IQbservable.
 - Ok... you can't tell via text, but the difference between when I wrote ^^ and this line is about 18 hours. A "short break" became a full night sleep + more. Given how I commit stuff the following day then when I worked on it, I will take advantage and commit it now. I didn't make my list of Observable operators (should actually be Qbservable operators since that is what would be used), but will get to that.
+
+#102.2. 7/22/2018:
+- In an effort to reduce the chances of missing a day, I will keep this one short
+- I started making a list of all operators I can ignore and can't ignore when going to run a query.
+- If I see `<skip>.<skip>.<skip>.Skip(10).<skip>.<skip>...` then I can optimize a bit. `<skip>.<skip>.<skip>.Skip(10).<noskip>.<skip>...`, I can still optimize. "<skip>.<skip>.<noskip>.Skip(10).<skip>.<skip>..." then I can't optimize execution and I need to iterate over all values till 10 have passed.
+- An example of <skip> is "Map" or "ObserveOn" because they don't modify the items I'm operating on. Item 0 will be returned first, while Item 10 will be returned as the 10th item.
+- Example of <noskip> is "All" and "Sum" since they change the iteration...
+- Now there's a catch, and for this reason I've already given up on the list: what is skip and noskip can change based on paramters. Take Concat for an example. "Logs.Concat(<others>).Skip(100)" might at first be a <skip> because you skip the first 100 items of Logs, then go to <others>. In reality, it's <noskip> because I might only have 10 logs, so now the Expression (how all these Queryable things get run) becomes "<others>.Skip(90)". It becomes even more interesting when you know the types. So I could go and say "if I knew the lengths of some of these at the time of expression evaluation, I can do that "Logs.Concat(<others>).Skip(100)" -> "<others>.Skip(90)" optimization, which in turn (if <others> is of my own type again), I can turn it into "<others (i=90)>" and the expression has effectivly reduced to an extreme extent".
+- Also, "Zip", if I know both Observables, I can tell moth to skip a certain amount. I already indicated my questioning if `Where(log => log.Timestamp > <time>)` can be optimized.
+- Given the complexity, I'd rather do something that leaves me uneasy but would possibly be better: just start implementing something. I can see how it works, fix things as I go, and then if I see something I could optimize, then I can try to optimize it.
+- Best case, I end up with a small framework that can optimize expressions when operating on lists. Worst case, I revert a bunch of work until I get things working again.
+- There are a couple aspects to wrap around: how do I know things will keep working? Is this just a time sink? Aren't there better things to work on?
+- Anwsers: unit tests; now: yes, but later: no; yes
+- So I do want to get to analysis and doing optmization work before having things to check for optmization is counter intuative.
+- As I have yet to find a DB that does Qbservables, there's a good chance I'll have to write one myself. That's terrifying on its own (there are many more qualified people to write SQL or similar queries then me), but I may have to do it. Knowing how to work on a list first would make it a lot easier then going straight to DB.
+- I need to work on unit tests again before I can go back to fancy work.
+- I'm getting the itch/realized I do need a never ending "live" observable.
+- See: I did the "live" observable thing to handle changes in enumerables. I planned out having one that stops when the end of the list is hit, and one that never ends. I opted to not do the never ending one (#92.2), because I believed a scheduler could change if it never ends of not. I was actually thinging of "Delay". All those still "end" and don't just keep running. In the split moment, now, when writing this, I went "but how would I do the infinite list without making it really messy?" and the solution is: I already have figured this out with IBaseListCollection.
+- When I had my "oh no, when something gets inserted before the current index, the index needs to move!" resulted in basically writing a small framework to handle changes to a list.
+- As such, I can to a classic academic producer-consumer. Run like normal, then when we run out of items, instead of calling OnCompleted, we instead Wait. When either the observable has been disposed or the list changes, we wake the sleeping threads and check if we are done or have new element(s), and either finish, return elements, or go back to sleep.
+- So... for me to writeup tomorrow in Tasks:
+-- Merge poc back into master since the goal of poc isn't even remotely close
+-- Write never-ending LiveListObservable (either updating the existing, or writing something new... probably write new and merge if similar enough). May be useful to have some way to switch from Live to LiveInfinite and back. That way we can return a nice default (Live) from Logs and then the user can say "never end". Most likely a "AsInfinite" which switches internally but for LiveList but is otherwise `obs.Concat(Qbservable.Never())` for everything else.
+-- One more bout of unit tests for all the work I've done since poc branch-off
+-- Make simple constant Qbservable provider/expression/etc. that just executes and doesn't do anything special.
+-- After ^^, start working on systems to analyze logs.
+-- After a ^^ has made some progress that is usable or seems sufficently complex, start trying to optimize expressions and LiveLists
+-- May need to write my own DB observable... after a DB is found that can be embeded OR external AND has notifications of when things changed (otherwise we'll never know if we're supposed to return something)
