@@ -1130,5 +1130,5 @@ void doSomethingCool(std::ifstream& input)
 -- After a ^^ has made some progress that is usable or seems sufficently complex, start trying to optimize expressions and LiveLists
 -- May need to write my own DB observable... after a DB is found that can be embeded OR external AND has notifications of when things changed (otherwise we'll never know if we're supposed to return something)
 
-#102.2. 7/22/2018:
+#103.2. 7/23/2018:
 - In the name of "sleep", I updated Tasks.md (it... didn't change too much. Just a bit) and merged back into master
