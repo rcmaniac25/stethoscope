@@ -2,7 +2,7 @@
 
 ## Tasks
 
-Sub-100 Day Crunch:
+PoC:
 - ListStorage's Entries will get an exception or completed whenever an entry is added. Need this to work multi-threaded (might require a custom implementation of an Observable instead of ToObservable)
 -- Time box: can extensions like Skip/SkipLast be "passed" to parent observable? This way, the "Live" observable can go "I was created but... I see that my first 100 elements will be ignored. I'll simply override that extension so it doesn't run, and source-side, I'll do the skips directly" as it would save time, resources, and a middle-man observable
 - (on an independent thread) Analyze logs to try and figure out what some logs are (can I do word counting or whatever the term is to determine similar syntax). Time box, and if no good results are found, then work on log templates to gather contents of logs
@@ -12,13 +12,21 @@ Sub-100 Day Crunch:
 - Iteration through stats (ex. find ID = "steve") and then display results and possibly indicate where things deviated (such as the above "fun=d" example) and other IDs where the same thing happened
 
 What needs to get done. Should make some of them tickets... (some of these may be trains-of-thought)
-- Process bigger logs
-	- May have to rewrite IPrinter or change names of PrinterFactory so IOPrinter doesn't "wait" for a specific thread's stream to finish before (starting to) printing the next thread
+- "PoC proper" (see details above and from log #102.2)
+	- NeverEndingLiveListObservable + method to switch between it and LiveListObservable before subscription (AsInfinite/AsFinite)
+	- Unit tests for changes
+		- Collections classes
+		- ConcatStream
+		- LiveListObservables + extensions
+	- Initial Qbservable implementation
+	- Initial log analysis
+	- DB research?
+- To handle larger logs: May have to rewrite IPrinter or change names of PrinterFactory so IOPrinter doesn't "wait" for a specific thread's stream to finish before (starting to) printing the next thread
 - Determine program arguments and the config file usage (are they redundent? Complementary? Can I setup everything with program arguments?)
 - Add logging (ironic... a log handling system, writing it's own logs). Will be useful when trying to figure out what went wrong with accesing remote logs and doing more advanced work.
 - Ensure this works under Mono (as the port to C++ is still a while away, and "this WILL be ported" opinion is always subject to change, though it's currently "it WILL happen")
-- Proper IQbservable support in RegistryStorage (and maybe additional storage options)
 - Support remote logs
+- Proper IQbservable support in RegistryStorage (and maybe additional storage options)
 - Look into the status of System.IO.Pipelines to see if more progress has been made (would also need to upgrade to at least .Net Core 2.1 and the .Net Framework equiv. Maybe https://github.com/mgravell/Pipelines.Sockets.Unofficial if nothing new)
 - (large) With larger logs, start to flesh out LogRegistry... maybe allow LINQ usage so components of logs can be searched through.
     - [Done?] Needs to support multiple sources (so there may be logs from same time but different log files), and how to query through that
