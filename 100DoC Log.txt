@@ -1132,3 +1132,10 @@ void doSomethingCool(std::ifstream& input)
 
 #103.2. 7/23/2018:
 - In the name of "sleep", I updated Tasks.md (it... didn't change too much. Just a bit) and merged back into master
+
+#104.2. 7/24/2018:
+- Plan for InfiniteLiveListObservable work:
+-- Clone LiveListObservable and update so it's "infinite"
+-- Combine LiveListObservable and InfiniteLiveListObservable so it can be switched on the fly
+-- Write extensions so Observables can be switched between Infinite and Finite. If LiveListObservable is encountered, it simply toggles it (note: not as easy as it sounds, as it would have to be per-state and not just global)
+- For tonight, due to time (again), I simply cloned and mocked out where the sleeps would be. Didn't want to start working on monitor/sleep/etc. stuff now.
