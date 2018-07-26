@@ -1139,3 +1139,10 @@ void doSomethingCool(std::ifstream& input)
 -- Combine LiveListObservable and InfiniteLiveListObservable so it can be switched on the fly
 -- Write extensions so Observables can be switched between Infinite and Finite. If LiveListObservable is encountered, it simply toggles it (note: not as easy as it sounds, as it would have to be per-state and not just global)
 - For tonight, due to time (again), I simply cloned and mocked out where the sleeps would be. Didn't want to start working on monitor/sleep/etc. stuff now.
+
+#105.2. 7/25/2018:
+- I implemented the monitor system so that if we hit the end of the list, we sleep until either we're canceled or the list changes.
+- The only issue is that polling was still needed. For individual execution, there was no alternative. I'm sticking to the abstraction, though I could change the disposable used.
+- As for long execution... looking at source for TaskManagerScheduler (which is what we use by default), a BooleanDisposable is used for the ICancelable. This has no way of notifying that it's been canceled/disposed. Instead of resigning myself to polling, I added in some minor logic so if whatever scheduler uses CancellationDisposable, we can register to alert us when it's disposed.
+- The end result is it provides a better busy-loop-plus-sleep then, well, busy-loop-plus-sleep. A classic situation... I wasn't expecting ICancelable to not have any way to be notified "this has now been disposed" but that's a different story.
+- Tomorrow we try to combine LiveListObservable and InfiniteLiveListObservable, then try to see if we can switch between them on the fly. (also want to be able to start as one or the other... not just LiveListObservable and then needing to switch it)
