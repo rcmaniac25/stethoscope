@@ -7,85 +7,14 @@ using System.Threading;
 
 namespace Stethoscope.Reactive
 {
-    #region LiveListObservable
-
-    internal class LiveListObservable<T> : ScheduledObservable<T, (IBaseListCollection<T> list, ListCollectionIndexOffsetTracker<T> tracker)>
+    struct LiveListState<T>
     {
-        private const int STARTING_INDEX = 0;
-
-        private static ListCollectionIndexOffsetTracker<T> CreateTracker(IBaseListCollection<T> list, int startingIndex)
-        {
-            var tracker = new ListCollectionIndexOffsetTracker<T>()
-            {
-                OriginalIndex = startingIndex
-            };
-            list.CollectionChangedEvent += tracker.HandleEvent;
-            return tracker;
-        }
+        public IBaseListCollection<T> List;
+        public ListCollectionIndexOffsetTracker<T> Tracker;
+        public TimeSpan Timeout;
+        public ObservableType ExecutionType;
         
-        public LiveListObservable(IBaseListCollection<T> list, IScheduler scheduler, int startingIndex = STARTING_INDEX) : base(ObservableType.LiveUpdating, scheduler, () => (list, CreateTracker(list, startingIndex)))
-        {
-            SupportsLongRunning = true;
-        }
-
-        protected override void IndividualExecution((IBaseListCollection<T> list, ListCollectionIndexOffsetTracker<T> tracker) state, IObserver<T> observer, Action<(IBaseListCollection<T> list, ListCollectionIndexOffsetTracker<T> tracker)> continueExecution)
-        {
-            var tracker = state.tracker;
-            try
-            {
-                if (tracker.CurrentIndex >= state.list.Count)
-                {
-                    observer.OnCompleted();
-                }
-                else
-                {
-                    observer.OnNext(state.list.GetAt(tracker.CurrentIndex));
-                    tracker.SetOriginalIndexAndResetCurrent(tracker.CurrentIndex + 1);
-                    continueExecution((state.list, tracker));
-                }
-            }
-            catch (Exception e)
-            {
-                observer.OnError(e);
-            }
-        }
-
-        protected override void LongExecution((IBaseListCollection<T> list, ListCollectionIndexOffsetTracker<T> tracker) state, IObserver<T> observer, ICancelable cancelable)
-        {
-            var tracker = state.tracker;
-            try
-            {
-                while (!cancelable.IsDisposed)
-                {
-                    if (tracker.CurrentIndex >= state.list.Count)
-                    {
-                        observer.OnCompleted();
-                        break;
-                    }
-                    else
-                    {
-                        observer.OnNext(state.list.GetAt(tracker.CurrentIndex));
-                        tracker.SetOriginalIndexAndResetCurrent(tracker.CurrentIndex + 1);
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                observer.OnError(e);
-            }
-        }
-    }
-
-    #endregion
-
-    #region InfiniteLiveListObservable
-
-    internal class InfiniteLiveListObservable<T> : ScheduledObservable<T, (IBaseListCollection<T> list, ListCollectionIndexOffsetTracker<T> tracker, TimeSpan timeout)>
-    {
-        private const int STARTING_INDEX = 0;
-        private static readonly TimeSpan DEFAULT_EX_TIMEOUT = TimeSpan.FromMilliseconds(100);
-
-        private static ListCollectionIndexOffsetTracker<T> CreateTracker(IBaseListCollection<T> list, int startingIndex)
+        public static LiveListState<T> CreateState(ObservableType executionType, IBaseListCollection<T> list, int startingIndex, TimeSpan timeout)
         {
             var tracker = new ListCollectionIndexOffsetTracker<T>()
             {
@@ -102,40 +31,59 @@ namespace Stethoscope.Reactive
                     }
                 }
             };
-            return tracker;
+            return new LiveListState<T>()
+            {
+                List = list,
+                Tracker = tracker,
+                Timeout = timeout,
+                ExecutionType = executionType
+            };
         }
+    }
 
-        public InfiniteLiveListObservable(IBaseListCollection<T> list, IScheduler scheduler, int startingIndex = STARTING_INDEX) : this(list, scheduler, DEFAULT_EX_TIMEOUT, startingIndex)
+    internal class LiveListObservable<T> : ScheduledObservable<T, LiveListState<T>>
+    {
+        private const int STARTING_INDEX = 0;
+        private static readonly TimeSpan DEFAULT_EX_TIMEOUT = TimeSpan.FromMilliseconds(100);
+        
+        public LiveListObservable(ObservableType type, IBaseListCollection<T> list, IScheduler scheduler, int startingIndex = STARTING_INDEX) : this(type, list, scheduler, DEFAULT_EX_TIMEOUT, startingIndex)
         {
         }
 
-        public InfiniteLiveListObservable(IBaseListCollection<T> list, IScheduler scheduler, TimeSpan executionTimeout, int startingIndex = STARTING_INDEX) : 
-            base(ObservableType.LiveUpdating, scheduler, () => (list, CreateTracker(list, startingIndex), executionTimeout))
+        public LiveListObservable(ObservableType type, IBaseListCollection<T> list, IScheduler scheduler, TimeSpan executionTimeout, int startingIndex = STARTING_INDEX) :
+            base(type, scheduler, () => LiveListState<T>.CreateState(type, list, startingIndex, executionTimeout))
         {
             SupportsLongRunning = true;
         }
 
-        protected override void IndividualExecution((IBaseListCollection<T> list, ListCollectionIndexOffsetTracker<T> tracker, TimeSpan timeout) state, IObserver<T> observer, 
-            Action<(IBaseListCollection<T> list, ListCollectionIndexOffsetTracker<T> tracker, TimeSpan timeout)> continueExecution)
+        protected override void IndividualExecution(LiveListState<T> state, IObserver<T> observer,
+            Action<LiveListState<T>> continueExecution)
         {
-            var tracker = state.tracker;
             try
             {
-                if (tracker.CurrentIndex >= state.list.Count)
+                if (state.Tracker.CurrentIndex >= state.List.Count)
                 {
-                    lock (tracker)
+                    if (state.ExecutionType == ObservableType.InfiniteLiveUpdating)
                     {
-                        // We do a timeout here because we have no knowedlge of the associated disposable. It's been abstracted away.
-                        // So we'd rather do a light busy loop then some crazy logic to get the external disposable
-                        Monitor.Wait(tracker, state.timeout);
+                        lock (state.Tracker)
+                        {
+                            // We do a timeout here because we have no knowedlge of the associated disposable. It's been abstracted away.
+                            // So we'd rather do a light busy loop then some crazy logic to get the external disposable
+                            Monitor.Wait(state.Tracker, state.Timeout);
+                        }
+                    }
+                    else
+                    {
+                        observer.OnCompleted();
+                        return;
                     }
                 }
                 else
                 {
-                    observer.OnNext(state.list.GetAt(tracker.CurrentIndex));
-                    tracker.SetOriginalIndexAndResetCurrent(tracker.CurrentIndex + 1);
+                    observer.OnNext(state.List.GetAt(state.Tracker.CurrentIndex));
+                    state.Tracker.SetOriginalIndexAndResetCurrent(state.Tracker.CurrentIndex + 1);
                 }
-                continueExecution((state.list, tracker, state.timeout));
+                continueExecution(state);
             }
             catch (Exception e)
             {
@@ -143,9 +91,8 @@ namespace Stethoscope.Reactive
             }
         }
 
-        protected override void LongExecution((IBaseListCollection<T> list, ListCollectionIndexOffsetTracker<T> tracker, TimeSpan timeout) state, IObserver<T> observer, ICancelable cancelable)
+        protected override void LongExecution(LiveListState<T> state, IObserver<T> observer, ICancelable cancelable)
         {
-            var tracker = state.tracker;
             var pollCancelable = !(cancelable is CancellationDisposable);
             try
             {
@@ -156,32 +103,37 @@ namespace Stethoscope.Reactive
                     {
                         lock (cancellationState)
                         {
-                            Monitor.Pulse(tracker);
+                            Monitor.Pulse(cancellationState);
                         }
-                    }, tracker);
+                    }, state.Tracker);
                 }
 
                 while (!cancelable.IsDisposed)
                 {
-                    if (tracker.CurrentIndex < state.list.Count)
+                    if (state.Tracker.CurrentIndex < state.List.Count)
                     {
-                        observer.OnNext(state.list.GetAt(tracker.CurrentIndex));
-                        tracker.SetOriginalIndexAndResetCurrent(tracker.CurrentIndex + 1);
+                        observer.OnNext(state.List.GetAt(state.Tracker.CurrentIndex));
+                        state.Tracker.SetOriginalIndexAndResetCurrent(state.Tracker.CurrentIndex + 1);
                     }
-                    else
+                    else if (state.ExecutionType == ObservableType.InfiniteLiveUpdating)
                     {
-                        lock (tracker)
+                        lock (state.Tracker)
                         {
                             // If we can notify that the thread was canceled, then we don't need to poll. If not, we need to poll the cancelable if it's been disposed.
                             if (pollCancelable)
                             {
-                                Monitor.Wait(tracker, state.timeout);
+                                Monitor.Wait(state.Tracker, state.Timeout);
                             }
                             else
                             {
-                                Monitor.Wait(tracker);
+                                Monitor.Wait(state.Tracker);
                             }
                         }
+                    }
+                    else
+                    {
+                        observer.OnCompleted();
+                        break;
                     }
                 }
             }
@@ -191,6 +143,4 @@ namespace Stethoscope.Reactive
             }
         }
     }
-
-    #endregion
 }

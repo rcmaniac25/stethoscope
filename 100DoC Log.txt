@@ -1146,3 +1146,8 @@ void doSomethingCool(std::ifstream& input)
 - As for long execution... looking at source for TaskManagerScheduler (which is what we use by default), a BooleanDisposable is used for the ICancelable. This has no way of notifying that it's been canceled/disposed. Instead of resigning myself to polling, I added in some minor logic so if whatever scheduler uses CancellationDisposable, we can register to alert us when it's disposed.
 - The end result is it provides a better busy-loop-plus-sleep then, well, busy-loop-plus-sleep. A classic situation... I wasn't expecting ICancelable to not have any way to be notified "this has now been disposed" but that's a different story.
 - Tomorrow we try to combine LiveListObservable and InfiniteLiveListObservable, then try to see if we can switch between them on the fly. (also want to be able to start as one or the other... not just LiveListObservable and then needing to switch it)
+
+#106.2. 7/26/2018:
+- Combined the infinte and finite LiveListObservables. It's a little more complex then I'd like, but I don't see it having any additional complexity.
+- I decided to put-off the switching between types until tomorrow for time purposes.
+- One challenge is that info is a execution state... is not class-based. So when I go off and say change between types, I need to figure out what to do. Maybe a AsInfinite/AsFinite isn't the right function... will think about it tomorrow.

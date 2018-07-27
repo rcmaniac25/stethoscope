@@ -19,7 +19,12 @@ namespace Stethoscope.Reactive
         /// <summary>
         /// As the source gets update, while the Observable is being consumed, new values will be returned when the Observable iteration reaches the values' indices. Upon hitting the end of the source, the observable is complete. If the source is cleared or the existing index is removed, the collection will complete.
         /// </summary>
-        LiveUpdating
+        LiveUpdating,
+
+        /// <summary>
+        /// Same as <see cref="LiveUpdating"/> but when the end of the source is encountered, it waits until either disposed or new data is provided. On disposed, it stops. On new data, it provides it so long as it's not before the existing indice.
+        /// </summary>
+        InfiniteLiveUpdating
     }
 
     /// <summary>
@@ -72,7 +77,8 @@ namespace Stethoscope.Reactive
             switch (type)
             {
                 case ObservableType.LiveUpdating:
-                    return new LiveListObservable<T>(source.AsListCollection(), scheduler);
+                case ObservableType.InfiniteLiveUpdating:
+                    return new LiveListObservable<T>(type, source.AsListCollection(), scheduler);
                 case ObservableType.Traditional:
                     return System.Reactive.Linq.Observable.ToObservable(source, scheduler);
             }
@@ -124,7 +130,8 @@ namespace Stethoscope.Reactive
             switch (type)
             {
                 case ObservableType.LiveUpdating:
-                    return new LiveListObservable<T>(source, scheduler);
+                case ObservableType.InfiniteLiveUpdating:
+                    return new LiveListObservable<T>(type, source, scheduler);
                 case ObservableType.Traditional:
                     return System.Reactive.Linq.Observable.ToObservable(source, scheduler);
             }
