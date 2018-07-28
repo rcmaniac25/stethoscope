@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reactive.Linq;
 
 namespace Stethoscope.Tests.Helpers
@@ -36,11 +37,31 @@ namespace Stethoscope.Tests.Helpers
             if (expectedObservableType.IsGenericType &&
                 (expectedObservableType.GetGenericTypeDefinition() == typeof(IObservable<>) || expectedObservableType.GetGenericTypeDefinition() == typeof(IQbservable<>)))
             {
-                var castGeneric = typeof(Observable).GetMethod("Cast");
-                var cast = castGeneric.MakeGenericMethod(expectedObservableType.GetGenericArguments());
-                return (IObservable<object>)cast.Invoke(null, new object[] { expectedObservable });
+                if (expectedObservableType.GenericTypeArguments[0].IsValueType)
+                {
+                    // ValueTypes need to be cast, but the existing Cast function doesn't support ValueTypes, so we need to do the work ourselves
+                    var selectGeneric = typeof(Observable).GetMethods().First(m => m.Name == "Select" && m.GetParameters()[1].ParameterType.GetGenericArguments().Length == 2);
+                    var select = selectGeneric.MakeGenericMethod(expectedObservableType.GenericTypeArguments[0], typeof(object));
+                    var castGeneric = typeof(Util).GetMethod(nameof(GenericObservableCast), System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+                    var cast = castGeneric.MakeGenericMethod(expectedObservableType.GenericTypeArguments);
+                    var funcCast = typeof(Func<>).Assembly.DefinedTypes.First(t => t.Name == "Func`2" && t.GenericTypeParameters.Length == 2).MakeGenericType(expectedObservableType.GenericTypeArguments[0], typeof(object));
+                    var castDelegate = Delegate.CreateDelegate(funcCast, cast);
+                    return (IObservable<object>)select.Invoke(null, new object[] { expectedObservable, castDelegate });
+                }
+                else
+                {
+                    // Non-ValueTypes can just use the cast function
+                    var castGeneric = typeof(Observable).GetMethod("Cast");
+                    var cast = castGeneric.MakeGenericMethod(expectedObservableType.GenericTypeArguments);
+                    return (IObservable<object>)cast.Invoke(null, new object[] { expectedObservable });
+                }
             }
             throw new ArgumentException("Argument is not of type IObservable", nameof(expectedObservableType));
+        }
+
+        private static object GenericObservableCast<T>(T value) where T : struct
+        {
+            return value;
         }
     }
 }

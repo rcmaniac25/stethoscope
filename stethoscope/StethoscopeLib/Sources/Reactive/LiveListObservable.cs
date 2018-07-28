@@ -20,7 +20,8 @@ namespace Stethoscope.Reactive
             {
                 OriginalIndex = startingIndex
             };
-            list.CollectionChangedEvent += tracker.HandleEvent;
+            //XXX This screams "race conditon"... (doesn't actually work... will need to change)
+            var addTrackerLate = list.Count == 0;
             list.CollectionChangedEvent += (_, e) =>
             {
                 if (e != null)
@@ -28,9 +29,18 @@ namespace Stethoscope.Reactive
                     lock (tracker)
                     {
                         Monitor.Pulse(tracker);
+                        if (addTrackerLate)
+                        {
+                            addTrackerLate = false;
+                            list.CollectionChangedEvent += tracker.HandleEvent;
+                        }
                     }
                 }
             };
+            if (!addTrackerLate)
+            {
+                list.CollectionChangedEvent += tracker.HandleEvent;
+            }
             return new LiveListState<T>()
             {
                 List = list,

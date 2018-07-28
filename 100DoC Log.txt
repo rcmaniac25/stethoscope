@@ -1151,3 +1151,25 @@ void doSomethingCool(std::ifstream& input)
 - Combined the infinte and finite LiveListObservables. It's a little more complex then I'd like, but I don't see it having any additional complexity.
 - I decided to put-off the switching between types until tomorrow for time purposes.
 - One challenge is that info is a execution state... is not class-based. So when I go off and say change between types, I need to figure out what to do. Maybe a AsInfinite/AsFinite isn't the right function... will think about it tomorrow.
+
+#107.2. 7/27/2018:
+- The plan was to work on switching between Infinite and Finite LiveList (and maybe other Observables), though I'm still not convinced I can.
+- Instead, I went to setup a simple one-time test case of execution where we wanted a value before we had it. It uncovered 2 cases I didn't think of:
+- 1. This is more a test issue - When trying to cast any ValueType observable (IObservable<int>, etc.) to a generic one (IObservable<object>), the cast fails because Observable.Cast (the function being used internally) throws an exception for ValueTypes.
+- 2. The CurrentIndex is not really usable once it hits the end of the list it's iterating over, when the LiveListObservable is in infinite mode.
+- Fixes for #1: Observable.Cast is really just doing Observable.Select(value => (object)value), so I did exectly that. It wasn't planned work, but it works now and covers a Cast case I never actually tried. Saves trouble for later tests.
+- As for #2... I did a bunch of debugging and did some changes within LiveListState.CreateState (see LiveListObservable.cs) and everything worked! And then I looked at it and went "That... is a race condition"
+- The challenge is that if the list is empty, the CurrentIndex of tracker could get changed by a list event before the observable executes.
+-- Ex. Empty list, Count = 0. CurrentIndex = 0. InfiniteLiveList. => Sits indefinitly. Element gets added. 1) Count = 1. 2) CurrentIndex = 1. 3) Observable executes (pulse or timeout). => Sits indefinitly.
+- Order is not garenteed with events/multi-delegates, so we have to do a bit of order enforcement. We test the number of elements, and if there are elements we say "all's good" and add the tracker to get events. Else, we do it _after_ we get an event.
+- The problemS are that:
+-- After we get an event... what if it's a Clear? Nothing actually happens and the cycle remains.
+-- If Count changes after the test against it, but before setting event handlers, we won't know the actual state we're supposed to be in.
+-- And the biggest issue of them all: it doesn't actually fix the issue. So this solves the problem for an empty list that has an element added... what happens when we add a new element?
+--- Zero elements: Stuck
+--- Add one element: With fix=works, without fix=stuck
+--- Add second element: With fix=stuck, without fix=stuck
+- The real solution is to ensure I'm testing and updating current index properly.
+- Basically: if CurrentIndex is at the end of the list, and an element is added to the end of the list, the element should be returned. But if the item is in the middle of the list, it shouldn't. This would prevent getting stuck at the end of a list.
+- There's then the issue of event handling order. While debugging, I encounted the CurrentIndex being incremented by list execution right before the tracker updated itself. This may be solved by locking the tracker before updating.
+- I will work on this tomorrow.
