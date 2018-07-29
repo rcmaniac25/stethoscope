@@ -34,6 +34,22 @@ namespace Stethoscope.Collections
         }
 
         /// <summary>
+        /// Get a read/write list as a <see cref="IBaseReadWriteListCollection{T}"/>.
+        /// </summary>
+        /// <typeparam name="T">The type of elements in the collection.</typeparam>
+        /// <param name="list">The read/write list of data.</param>
+        /// <returns>The <see cref="IBaseReadWriteListCollection{T}"/> representing <paramref name="list"/>.</returns>
+        public static IBaseReadWriteListCollection<T> AsListCollection<T>(this List<T> list)
+        {
+            // Convenience extension since List implements both IList and IReadOnlyList
+            if (list == null)
+            {
+                throw new ArgumentNullException(nameof(list));
+            }
+            return ((IList<T>)list).AsListCollection();
+        }
+
+        /// <summary>
         /// Get a read-only list as a <see cref="IBaseReadOnlyListCollection{T}"/>.
         /// </summary>
         /// <typeparam name="T">The type of elements in the collection.</typeparam>

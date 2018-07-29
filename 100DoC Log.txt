@@ -1173,3 +1173,7 @@ void doSomethingCool(std::ifstream& input)
 - Basically: if CurrentIndex is at the end of the list, and an element is added to the end of the list, the element should be returned. But if the item is in the middle of the list, it shouldn't. This would prevent getting stuck at the end of a list.
 - There's then the issue of event handling order. While debugging, I encounted the CurrentIndex being incremented by list execution right before the tracker updated itself. This may be solved by locking the tracker before updating.
 - I will work on this tomorrow.
+
+#108.2. 7/28/2018:
+- I started way to late, looked at the work needed, and said "I can't do this at this time" and instead started working on unit tests for Collections.
+- I will see if I can get to the race condition fix tomorrow, or if I should just finish the unit tests for Collections and then do the fix another day.

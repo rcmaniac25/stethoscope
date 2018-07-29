@@ -91,7 +91,7 @@ namespace Stethoscope.Log.Internal.Storage
             clearCounter = listStorageContext.Counter("Clear", Unit.Calls, "registry, storage");
         }
 
-        private IBaseReadWriteListCollection<ILogEntry> logs = ((IList<ILogEntry>)new List<ILogEntry>()).AsListCollection();
+        private IBaseReadWriteListCollection<ILogEntry> logs = new List<ILogEntry>().AsListCollection();
         private readonly LogEntryComparer logEntryComparer = new LogEntryComparer();
 
         /// <summary>
