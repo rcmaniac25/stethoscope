@@ -1177,3 +1177,7 @@ void doSomethingCool(std::ifstream& input)
 #108.2. 7/28/2018:
 - I started way to late, looked at the work needed, and said "I can't do this at this time" and instead started working on unit tests for Collections.
 - I will see if I can get to the race condition fix tomorrow, or if I should just finish the unit tests for Collections and then do the fix another day.
+
+#109.2. 7/29/2018:
+- I got to things late again, decided to work on the unit tests for Collections.
+- Still need to do the events test, but decided to do that tomorrow. It's just something that looks easy, but experience tells me I'm going to spend a sizeable chunk of time on it.
