@@ -1181,3 +1181,6 @@ void doSomethingCool(std::ifstream& input)
 #109.2. 7/29/2018:
 - I got to things late again, decided to work on the unit tests for Collections.
 - Still need to do the events test, but decided to do that tomorrow. It's just something that looks easy, but experience tells me I'm going to spend a sizeable chunk of time on it.
+
+#110.2. 7/30/2018:
+- Postponed today due to lack of internet. I had some service done, and lost internet. Argued on the phone for a while and now exhuasted.
