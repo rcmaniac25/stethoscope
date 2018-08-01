@@ -324,7 +324,105 @@ namespace Stethoscope.Tests
             Assert.That(collection, Is.Empty);
             Assert.That(collection.Count, Is.Zero);
         }
-        
-        //TODO: events
+
+        //TODO: move to helper namespace
+        private class EventCapture<T> where T : EventArgs
+        {
+            public List<(object sender, T eventObject)> CapturedEvents { get; private set; } = new List<(object sender, T eventObject)>();
+
+            public void CaptureEventHandler(object sender, T e)
+            {
+                CapturedEvents.Add((sender, e));
+            }
+        }
+
+        [Test(TestOf = typeof(IBaseReadWriteListCollection<>))]
+        public void AddEvent()
+        {
+            var list = new List<int>();
+
+            var collection = list.AsListCollection();
+            Assert.That(collection, Is.Empty);
+            Assert.That(collection.Count, Is.Zero);
+
+            var capture = new EventCapture<ListCollectionEventArgs<int>>();
+            collection.CollectionChangedEvent += capture.CaptureEventHandler;
+            Assert.That(capture.CapturedEvents, Is.Empty);
+
+            collection.Add(10);
+
+            Assert.That(collection, Is.Not.Empty);
+            Assert.That(collection.Count, Is.EqualTo(1));
+            Assert.That(collection[0], Is.EqualTo(10));
+
+            Assert.That(capture.CapturedEvents, Is.Not.Empty.And.Count.EqualTo(1));
+
+            var eventObject = capture.CapturedEvents[0].eventObject;
+            Assert.That(eventObject.Type, Is.EqualTo(ListCollectionEventType.Add));
+            Assert.That(eventObject.Index, Is.Zero);
+            Assert.That(eventObject.Value, Is.EqualTo(10));
+        }
+
+        [Test(TestOf = typeof(IBaseReadWriteListCollection<>))]
+        public void InsertEvent()
+        {
+            var list = new List<int>()
+            {
+                10
+            };
+
+            var collection = list.AsListCollection();
+            Assert.That(collection, Is.Not.Empty);
+            Assert.That(collection.Count, Is.EqualTo(1));
+            Assert.That(collection[0], Is.EqualTo(10));
+
+            var capture = new EventCapture<ListCollectionEventArgs<int>>();
+            collection.CollectionChangedEvent += capture.CaptureEventHandler;
+            Assert.That(capture.CapturedEvents, Is.Empty);
+
+            collection.Insert(0, 20);
+
+            Assert.That(collection, Is.Not.Empty);
+            Assert.That(collection.Count, Is.EqualTo(2));
+            Assert.That(collection[0], Is.EqualTo(20));
+            Assert.That(collection[1], Is.EqualTo(10));
+
+            Assert.That(capture.CapturedEvents, Is.Not.Empty.And.Count.EqualTo(1));
+
+            var eventObject = capture.CapturedEvents[0].eventObject;
+            Assert.That(eventObject.Type, Is.EqualTo(ListCollectionEventType.Insert));
+            Assert.That(eventObject.Index, Is.Zero);
+            Assert.That(eventObject.Value, Is.EqualTo(20));
+        }
+
+        [Test(TestOf = typeof(IBaseReadWriteListCollection<>))]
+        public void ClearEvent()
+        {
+            var list = new List<int>()
+            {
+                10
+            };
+
+            var collection = list.AsListCollection();
+            Assert.That(collection, Is.Not.Empty);
+            Assert.That(collection.Count, Is.EqualTo(1));
+            Assert.That(collection[0], Is.EqualTo(10));
+
+            var capture = new EventCapture<ListCollectionEventArgs<int>>();
+            collection.CollectionChangedEvent += capture.CaptureEventHandler;
+            Assert.That(capture.CapturedEvents, Is.Empty);
+
+            collection.Clear();
+
+            Assert.That(collection, Is.Empty);
+            Assert.That(collection.Count, Is.Zero);
+
+            Assert.That(capture.CapturedEvents, Is.Not.Empty.And.Count.EqualTo(1));
+
+            var eventObject = capture.CapturedEvents[0].eventObject;
+            Assert.That(eventObject.Type, Is.EqualTo(ListCollectionEventType.Clear));
+        }
+
+        //TODO: index tracker
     }
 }

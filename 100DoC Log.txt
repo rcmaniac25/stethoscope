@@ -1184,3 +1184,10 @@ void doSomethingCool(std::ifstream& input)
 
 #110.2. 7/30/2018:
 - Postponed today due to lack of internet. I had some service done, and lost internet. Argued on the phone for a while and now exhuasted.
+
+#111.2. 7/31/2018:
+- Got internet back, but Tuesdays have also become a day where I can't get much done due to scheduled events. This is also a bad week, so besides yesterday's internet challenge, this week will probably be minimal work.
+- As such, I finally got around to testing events. It wasn't long, but I realized I could make the little test class something generic for all event handlers.
+- I also realized I need to test the index tracker... this is important, as I need to specify how I expect it to work in many situations... and then I can make sure the multi-day push back on the race condition fix.
+- As it may be useful, I may just do the other unit tests to provide TDD setup for all the collection and observable work I did so I can ensure it works the way I'm expecting. If it doesn't work, fix the code until the tests pass.
+- Once all that's done, I will have something I can ensure will work as expected... and that will be needed for doing LINQ work.
