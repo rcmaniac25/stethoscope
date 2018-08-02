@@ -1191,3 +1191,6 @@ void doSomethingCool(std::ifstream& input)
 - I also realized I need to test the index tracker... this is important, as I need to specify how I expect it to work in many situations... and then I can make sure the multi-day push back on the race condition fix.
 - As it may be useful, I may just do the other unit tests to provide TDD setup for all the collection and observable work I did so I can ensure it works the way I'm expecting. If it doesn't work, fix the code until the tests pass.
 - Once all that's done, I will have something I can ensure will work as expected... and that will be needed for doing LINQ work.
+
+#112.2. 8/01/2018:
+- I got sick so I didn't get to this when I would've liked. I hope to finish the collection tests and then start on other tests.
