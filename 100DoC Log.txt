@@ -1194,3 +1194,8 @@ void doSomethingCool(std::ifstream& input)
 
 #112.2. 8/01/2018:
 - I got sick so I didn't get to this when I would've liked. I hope to finish the collection tests and then start on other tests.
+
+#113.2. 8/02/2018:
+- I have some important stuff going on tomorrow, so I want to finish early...
+- ...and that didn't happen due to other events, so at minimum I wanted to write up the tests to implement so I didn't just stare at "//TODO: index tracker"
+- Sometimes you just need to take baby steps before you can get back to work

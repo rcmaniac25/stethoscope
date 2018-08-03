@@ -423,6 +423,18 @@ namespace Stethoscope.Tests
             Assert.That(eventObject.Type, Is.EqualTo(ListCollectionEventType.Clear));
         }
 
-        //TODO: index tracker
+        //TODO: index tracker: sanity check (offset and current in same place without touching list)
+
+        //TODO: index tracker: insert before index
+
+        //TODO: index tracker: insert at index
+
+        //TODO: index tracker: insert after index
+
+        //TODO: index tracker: reset current index
+
+        //TODO: index tracker: set original and offset
+
+        //TODO: index tracker: multithread?
     }
 }
