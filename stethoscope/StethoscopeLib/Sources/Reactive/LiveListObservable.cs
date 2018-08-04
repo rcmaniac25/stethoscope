@@ -16,10 +16,9 @@ namespace Stethoscope.Reactive
         
         public static LiveListState<T> CreateState(ObservableType executionType, IBaseListCollection<T> list, int startingIndex, TimeSpan timeout)
         {
-            var tracker = new ListCollectionIndexOffsetTracker<T>()
-            {
-                OriginalIndex = startingIndex
-            };
+            var tracker = new ListCollectionIndexOffsetTracker<T>();
+            tracker.SetOriginalIndexAndResetCurrent(startingIndex);
+
             //XXX This screams "race conditon"... (doesn't actually work... will need to change)
             var addTrackerLate = list.Count == 0;
             list.CollectionChangedEvent += (_, e) =>

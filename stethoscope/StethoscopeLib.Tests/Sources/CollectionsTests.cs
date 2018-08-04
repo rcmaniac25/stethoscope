@@ -423,18 +423,180 @@ namespace Stethoscope.Tests
             Assert.That(eventObject.Type, Is.EqualTo(ListCollectionEventType.Clear));
         }
 
-        //TODO: index tracker: sanity check (offset and current in same place without touching list)
+        [Test(TestOf = typeof(ListCollectionIndexOffsetTracker<>))]
+        public void IndexTrackerSanityTest()
+        {
+            var index = new ListCollectionIndexOffsetTracker<int>();
+            Assert.That(index.OriginalIndex, Is.Zero);
+            Assert.That(index.CurrentIndex, Is.Zero);
+            Assert.That(index.Offset, Is.Zero);
 
-        //TODO: index tracker: insert before index
+            index.OriginalIndex = 2;
 
-        //TODO: index tracker: insert at index
+            Assert.That(index.OriginalIndex, Is.EqualTo(2));
+            Assert.That(index.CurrentIndex, Is.Zero);
+            Assert.That(index.Offset, Is.EqualTo(-2));
+        }
 
-        //TODO: index tracker: insert after index
+        [Test(TestOf = typeof(ListCollectionIndexOffsetTracker<>))]
+        public void IndexTrackerResetCurrentIndex()
+        {
+            var index = new ListCollectionIndexOffsetTracker<int>
+            {
+                OriginalIndex = 2
+            };
+            index.ResetCurrentIndex();
 
-        //TODO: index tracker: reset current index
+            Assert.That(index.OriginalIndex, Is.EqualTo(2));
+            Assert.That(index.CurrentIndex, Is.EqualTo(2));
+            Assert.That(index.Offset, Is.Zero);
+        }
 
-        //TODO: index tracker: set original and offset
+        [Test(TestOf = typeof(ListCollectionIndexOffsetTracker<>))]
+        public void IndexTrackerSetIndices()
+        {
+            var index = new ListCollectionIndexOffsetTracker<int>();
+            index.SetOriginalIndexAndResetCurrent(20);
 
+            Assert.That(index.OriginalIndex, Is.EqualTo(20));
+            Assert.That(index.CurrentIndex, Is.EqualTo(20));
+            Assert.That(index.Offset, Is.Zero);
+        }
+
+        [Test(TestOf = typeof(ListCollectionIndexOffsetTracker<>))]
+        public void IndexTrackerInsertBefore()
+        {
+            var list = new List<int>()
+            {
+                10,
+                20,
+                30
+            };
+
+            var collection = list.AsListCollection();
+
+            var capture = new EventCapture<ListCollectionEventArgs<int>>();
+            collection.CollectionChangedEvent += capture.CaptureEventHandler;
+            Assert.That(capture.CapturedEvents, Is.Empty);
+
+            var tracker = new ListCollectionIndexOffsetTracker<int>();
+            tracker.SetOriginalIndexAndResetCurrent(1);
+            collection.CollectionChangedEvent += tracker.HandleEvent;
+
+            Assert.That(tracker.OriginalIndex, Is.EqualTo(1));
+            Assert.That(tracker.CurrentIndex, Is.EqualTo(1));
+            Assert.That(tracker.Offset, Is.Zero);
+
+            Assert.That(collection[0], Is.EqualTo(10));
+            Assert.That(collection[1], Is.EqualTo(20));
+
+            collection.Insert(0, 40);
+
+            Assert.That(collection[0], Is.EqualTo(40));
+            Assert.That(collection[1], Is.EqualTo(10));
+
+            Assert.That(capture.CapturedEvents, Is.Not.Empty.And.Count.EqualTo(1));
+
+            var eventObject = capture.CapturedEvents[0].eventObject;
+            Assert.That(eventObject.Type, Is.EqualTo(ListCollectionEventType.Insert));
+            Assert.That(eventObject.Index, Is.Zero);
+            Assert.That(eventObject.Value, Is.EqualTo(40));
+
+            Assert.That(tracker.OriginalIndex, Is.EqualTo(1));
+            Assert.That(tracker.CurrentIndex, Is.EqualTo(2));
+            Assert.That(tracker.Offset, Is.EqualTo(1));
+        }
+
+        [Test(TestOf = typeof(ListCollectionIndexOffsetTracker<>))]
+        public void IndexTrackerInsertAt()
+        {
+            var list = new List<int>()
+            {
+                10,
+                20,
+                30
+            };
+
+            var collection = list.AsListCollection();
+
+            var capture = new EventCapture<ListCollectionEventArgs<int>>();
+            collection.CollectionChangedEvent += capture.CaptureEventHandler;
+            Assert.That(capture.CapturedEvents, Is.Empty);
+
+            var tracker = new ListCollectionIndexOffsetTracker<int>();
+            tracker.SetOriginalIndexAndResetCurrent(1);
+            collection.CollectionChangedEvent += tracker.HandleEvent;
+
+            Assert.That(tracker.OriginalIndex, Is.EqualTo(1));
+            Assert.That(tracker.CurrentIndex, Is.EqualTo(1));
+            Assert.That(tracker.Offset, Is.Zero);
+
+            Assert.That(collection[0], Is.EqualTo(10));
+            Assert.That(collection[1], Is.EqualTo(20));
+
+            collection.Insert(1, 40);
+
+            Assert.That(collection[0], Is.EqualTo(10));
+            Assert.That(collection[1], Is.EqualTo(40));
+
+            Assert.That(capture.CapturedEvents, Is.Not.Empty.And.Count.EqualTo(1));
+
+            var eventObject = capture.CapturedEvents[0].eventObject;
+            Assert.That(eventObject.Type, Is.EqualTo(ListCollectionEventType.Insert));
+            Assert.That(eventObject.Index, Is.EqualTo(1));
+            Assert.That(eventObject.Value, Is.EqualTo(40));
+
+            Assert.That(tracker.OriginalIndex, Is.EqualTo(1));
+            Assert.That(tracker.CurrentIndex, Is.EqualTo(2));
+            Assert.That(tracker.Offset, Is.EqualTo(1));
+        }
+
+        [Test(TestOf = typeof(ListCollectionIndexOffsetTracker<>))]
+        public void IndexTrackerInsertAfter()
+        {
+            var list = new List<int>()
+            {
+                10,
+                20,
+                30
+            };
+
+            var collection = list.AsListCollection();
+
+            var capture = new EventCapture<ListCollectionEventArgs<int>>();
+            collection.CollectionChangedEvent += capture.CaptureEventHandler;
+            Assert.That(capture.CapturedEvents, Is.Empty);
+
+            var tracker = new ListCollectionIndexOffsetTracker<int>();
+            tracker.SetOriginalIndexAndResetCurrent(1);
+            collection.CollectionChangedEvent += tracker.HandleEvent;
+
+            Assert.That(tracker.OriginalIndex, Is.EqualTo(1));
+            Assert.That(tracker.CurrentIndex, Is.EqualTo(1));
+            Assert.That(tracker.Offset, Is.Zero);
+
+            Assert.That(collection[0], Is.EqualTo(10));
+            Assert.That(collection[1], Is.EqualTo(20));
+            Assert.That(collection[2], Is.EqualTo(30));
+
+            collection.Insert(2, 40);
+
+            Assert.That(collection[0], Is.EqualTo(10));
+            Assert.That(collection[1], Is.EqualTo(20));
+            Assert.That(collection[2], Is.EqualTo(40));
+
+            Assert.That(capture.CapturedEvents, Is.Not.Empty.And.Count.EqualTo(1));
+
+            var eventObject = capture.CapturedEvents[0].eventObject;
+            Assert.That(eventObject.Type, Is.EqualTo(ListCollectionEventType.Insert));
+            Assert.That(eventObject.Index, Is.EqualTo(2));
+            Assert.That(eventObject.Value, Is.EqualTo(40));
+
+            Assert.That(tracker.OriginalIndex, Is.EqualTo(1));
+            Assert.That(tracker.CurrentIndex, Is.EqualTo(1));
+            Assert.That(tracker.Offset, Is.Zero);
+        }
+        
         //TODO: index tracker: multithread?
     }
 }

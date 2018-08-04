@@ -1199,3 +1199,13 @@ void doSomethingCool(std::ifstream& input)
 - I have some important stuff going on tomorrow, so I want to finish early...
 - ...and that didn't happen due to other events, so at minimum I wanted to write up the tests to implement so I didn't just stare at "//TODO: index tracker"
 - Sometimes you just need to take baby steps before you can get back to work
+
+#114.2. 8/03/2018:
+- All but the multithreading test is done for index tracking.
+- I need to think about a multithreading test for it... as this could result in API changes. Mainly, the one test I know I want is inserting at/before an index while updating the index.
+-- If the update occurs before the set, then the set (which right now the LiveList takes the current index and increments it while setting) will overwrite the current index.
+-- If the update occurs after the set, then everything is fine.
+- But if this is all happening async, then we never know the order this will occur in.
+- While it might sound easy to say "locks" or "allow directly setting the current index", it still is an issue. If the index is changed right before the lock to set the index, then we still have the problem.
+- One idea could be to have functions to do increment since that's all we need and we can expand the API as needed.
+- Also, realized that the LiveList didn't reset the current index after creation. I didn't notice because we always start at 0, but this would break if we skip indexes.

@@ -1,4 +1,6 @@
-﻿namespace Stethoscope.Collections
+﻿using System.Collections.Generic;
+
+namespace Stethoscope.Collections
 {
     /// <summary>
     /// Represents a read/write collection of items that are optimized for various internal usages within this library.
