@@ -1209,3 +1209,6 @@ void doSomethingCool(std::ifstream& input)
 - While it might sound easy to say "locks" or "allow directly setting the current index", it still is an issue. If the index is changed right before the lock to set the index, then we still have the problem.
 - One idea could be to have functions to do increment since that's all we need and we can expand the API as needed.
 - Also, realized that the LiveList didn't reset the current index after creation. I didn't notice because we always start at 0, but this would break if we skip indexes.
+
+#115.2. 8/04/2018:
+- Ok, I can see this becoming a habit, which I don't like, but I need to be blunt: I keep staying up late working on everything and then getting to this last. I need to work on this project earlier so I don't look at the clock and go "I... don't have the time". So for tonight, I'm skipping... but will try to be better tomorrow.
