@@ -1212,3 +1212,15 @@ void doSomethingCool(std::ifstream& input)
 
 #115.2. 8/04/2018:
 - Ok, I can see this becoming a habit, which I don't like, but I need to be blunt: I keep staying up late working on everything and then getting to this last. I need to work on this project earlier so I don't look at the clock and go "I... don't have the time". So for tonight, I'm skipping... but will try to be better tomorrow.
+
+#116.2. 8/05/2018:
+- I didn't get the test, but I did finally fix the logic for the index tracker and LiveListObservable.
+- I added a lock function (works similar to ApplyContextConfig) so that we can stop updating indicies multiple times, at the same time, but without exposing the lock object itself.
+- I wanted to add a small bit of logic to prevent invoking the function more then once (tracker.ApplyContextLock(tracker => tracker.ApplyContextLock(...))), and went down the Rabbit Hole, to say. So it's a bit more complex then desired to ensure state is handled properly.
+- Read the comments in it to get a better idea of what's going on.
+- I have a messy test that I've been using to test this. Originally it failed, then I did the race-condition logic from before and it worked. I did these changes and tested, still worked. Then reverted the race-condition logic, and it still worked. So that's good.
+- Next is writing some tests to actually have something to ensure it doesn't get broken.
+- What happened to the index increment code? I realized my functions got weird (ResetCurrent, SetOriginalIndexAndResetCurrent, IncrementCurrent, IncrementCurrentAndResetOriginal, etc.) and that all that it was doing was simple operations that would somehow require multiple statements... and this a lock.
+- Instead of doing a global lock (oh God, no) to work around our own framework, I wanted to expose the lock without, well, exposing the lock.
+- Luckily, this is the exact logic we went through already for log parsers. Just, without the multithreading.
+- So tomorrow (which will be busy for me, as usual), I will hopefully get to testing this.

@@ -18,9 +18,8 @@ namespace Stethoscope.Reactive
         {
             var tracker = new ListCollectionIndexOffsetTracker<T>();
             tracker.SetOriginalIndexAndResetCurrent(startingIndex);
-
-            //XXX This screams "race conditon"... (doesn't actually work... will need to change)
-            var addTrackerLate = list.Count == 0;
+            
+            list.CollectionChangedEvent += tracker.HandleEvent;
             list.CollectionChangedEvent += (_, e) =>
             {
                 if (e != null)
@@ -28,18 +27,9 @@ namespace Stethoscope.Reactive
                     lock (tracker)
                     {
                         Monitor.Pulse(tracker);
-                        if (addTrackerLate)
-                        {
-                            addTrackerLate = false;
-                            list.CollectionChangedEvent += tracker.HandleEvent;
-                        }
                     }
                 }
             };
-            if (!addTrackerLate)
-            {
-                list.CollectionChangedEvent += tracker.HandleEvent;
-            }
             return new LiveListState<T>()
             {
                 List = list,
@@ -65,12 +55,33 @@ namespace Stethoscope.Reactive
             SupportsLongRunning = true;
         }
 
+        private static void CompareAndObserveAt(LiveListState<T> state, IObserver<T> observer, int comparand)
+        {
+            // Get the value and update the index so long as the current index matches the test index. Else we want to retry (poor-man's atomics...)
+            var useValue = false;
+            var value = default(T);
+            state.Tracker.ApplyContextLock(tracker =>
+            {
+                if (comparand == state.Tracker.CurrentIndex)
+                {
+                    useValue = true;
+                    value = state.List.GetAt(state.Tracker.CurrentIndex);
+                    state.Tracker.SetOriginalIndexAndResetCurrent(state.Tracker.CurrentIndex + 1);
+                }
+            });
+            if (useValue)
+            {
+                observer.OnNext(value);
+            }
+        }
+
         protected override void IndividualExecution(LiveListState<T> state, IObserver<T> observer,
             Action<LiveListState<T>> continueExecution)
         {
             try
             {
-                if (state.Tracker.CurrentIndex >= state.List.Count)
+                int testIndex = state.Tracker.CurrentIndex;
+                if (testIndex >= state.List.Count)
                 {
                     if (state.ExecutionType == ObservableType.InfiniteLiveUpdating)
                     {
@@ -89,8 +100,7 @@ namespace Stethoscope.Reactive
                 }
                 else
                 {
-                    observer.OnNext(state.List.GetAt(state.Tracker.CurrentIndex));
-                    state.Tracker.SetOriginalIndexAndResetCurrent(state.Tracker.CurrentIndex + 1);
+                    CompareAndObserveAt(state, observer, testIndex);
                 }
                 continueExecution(state);
             }
@@ -108,21 +118,21 @@ namespace Stethoscope.Reactive
                 // If possible, we'd rather go to sleep the thread completely so long as we can notify it that the thread was canceled
                 if (cancelable is CancellationDisposable cancellationDisposable && !cancellationDisposable.IsDisposed)
                 {
-                    cancellationDisposable.Token.Register(cancellationState =>
+                    cancellationDisposable.Token.Register(stateTracker =>
                     {
-                        lock (cancellationState)
+                        lock (stateTracker)
                         {
-                            Monitor.Pulse(cancellationState);
+                            Monitor.Pulse(stateTracker);
                         }
                     }, state.Tracker);
                 }
 
                 while (!cancelable.IsDisposed)
                 {
-                    if (state.Tracker.CurrentIndex < state.List.Count)
+                    int testIndex = state.Tracker.CurrentIndex;
+                    if (testIndex < state.List.Count)
                     {
-                        observer.OnNext(state.List.GetAt(state.Tracker.CurrentIndex));
-                        state.Tracker.SetOriginalIndexAndResetCurrent(state.Tracker.CurrentIndex + 1);
+                        CompareAndObserveAt(state, observer, testIndex);
                     }
                     else if (state.ExecutionType == ObservableType.InfiniteLiveUpdating)
                     {
