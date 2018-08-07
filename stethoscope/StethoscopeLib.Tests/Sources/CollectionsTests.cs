@@ -4,7 +4,7 @@ using Stethoscope.Collections;
 
 using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 
 namespace Stethoscope.Tests
 {
@@ -596,7 +596,130 @@ namespace Stethoscope.Tests
             Assert.That(tracker.CurrentIndex, Is.EqualTo(1));
             Assert.That(tracker.Offset, Is.Zero);
         }
-        
-        //TODO: index tracker: multithread?
+
+        [Test(TestOf = typeof(ListCollectionIndexOffsetTracker<>))]
+        public void IndexTrackerLockThreadEnforceBefore()
+        {
+            var tracker = new ListCollectionIndexOffsetTracker<int>();
+            tracker.SetOriginalIndexAndResetCurrent(1);
+
+            Assert.That(tracker.CurrentIndex, Is.EqualTo(1));
+            Assert.That(tracker.OriginalIndex, Is.EqualTo(1));
+
+            tracker.HandleEvent(null, ListCollectionEventArgs<int>.CreateInsertEvent(0, 5));
+
+            Assert.That(tracker.CurrentIndex, Is.EqualTo(2));
+            Assert.That(tracker.OriginalIndex, Is.EqualTo(1));
+
+            tracker.ApplyContextLock(t =>
+            {
+                t.SetOriginalIndexAndResetCurrent(t.CurrentIndex + 1);
+            });
+            Assert.That(tracker.CurrentIndex, Is.EqualTo(3));
+            Assert.That(tracker.OriginalIndex, Is.EqualTo(3));
+        }
+
+        [Test(TestOf = typeof(ListCollectionIndexOffsetTracker<>))]
+        public void IndexTrackerLockThreadPotentiallyBefore()
+        {
+            var tracker = new ListCollectionIndexOffsetTracker<int>();
+            tracker.SetOriginalIndexAndResetCurrent(1);
+
+            bool check = false;
+            void finalCheck(Task t)
+            {
+                check = true;
+                Assert.That(tracker.CurrentIndex, Is.EqualTo(3));
+                Assert.That(tracker.OriginalIndex, Is.EqualTo(3));
+            }
+
+            Assert.That(tracker.CurrentIndex, Is.EqualTo(1));
+            Assert.That(tracker.OriginalIndex, Is.EqualTo(1));
+
+            var handleEvent = Task.Run(() => tracker.HandleEvent(null, ListCollectionEventArgs<int>.CreateInsertEvent(0, 5))); // Should happen before or as close to the set operation as possible
+
+            // We'll skip mid-tests to ensure there's a chance a lock contention would occur
+
+            tracker.ApplyContextLock(t =>
+            {
+                t.SetOriginalIndexAndResetCurrent(t.CurrentIndex + 1);
+            });
+
+            handleEvent.ContinueWith(finalCheck).Wait();
+
+            if (handleEvent.IsCompleted)
+            {
+                //finalCheck(null);
+            }
+            else
+            {
+                //handleEvent.ContinueWith(finalCheck).Wait();
+            }
+
+            Assert.That(check, Is.True);
+        }
+
+        [Test(TestOf = typeof(ListCollectionIndexOffsetTracker<>))]
+        public void IndexTrackerLockThreadEnforceAfter()
+        {
+            var tracker = new ListCollectionIndexOffsetTracker<int>();
+            tracker.SetOriginalIndexAndResetCurrent(1);
+
+            Assert.That(tracker.CurrentIndex, Is.EqualTo(1));
+            Assert.That(tracker.OriginalIndex, Is.EqualTo(1));
+
+            tracker.ApplyContextLock(t =>
+            {
+                t.SetOriginalIndexAndResetCurrent(t.CurrentIndex + 1);
+            });
+
+            Assert.That(tracker.CurrentIndex, Is.EqualTo(2));
+            Assert.That(tracker.OriginalIndex, Is.EqualTo(2));
+
+            tracker.HandleEvent(null, ListCollectionEventArgs<int>.CreateInsertEvent(0, 5));
+
+            Assert.That(tracker.CurrentIndex, Is.EqualTo(3));
+            Assert.That(tracker.OriginalIndex, Is.EqualTo(2));
+        }
+
+        [Test(TestOf = typeof(ListCollectionIndexOffsetTracker<>))]
+        public void IndexTrackerLockThreadPotentiallyAfter()
+        {
+            var tracker = new ListCollectionIndexOffsetTracker<int>();
+            tracker.SetOriginalIndexAndResetCurrent(1);
+
+            bool check = false;
+            void finalCheck(Task t)
+            {
+                check = true;
+                Assert.That(tracker.CurrentIndex, Is.EqualTo(3));
+                Assert.That(tracker.OriginalIndex, Is.EqualTo(3));
+            }
+
+            Assert.That(tracker.CurrentIndex, Is.EqualTo(1));
+            Assert.That(tracker.OriginalIndex, Is.EqualTo(1));
+
+            tracker.ApplyContextLock(t =>
+            {
+                t.SetOriginalIndexAndResetCurrent(t.CurrentIndex + 1);
+            });
+
+            // We'll skip mid-tests to ensure there's a chance a lock contention would occur
+
+            var handleEvent = Task.Run(() => tracker.HandleEvent(null, ListCollectionEventArgs<int>.CreateInsertEvent(0, 5))); // Should happen after or as close to the set operation as possible (high chance it will happen after)
+
+            handleEvent.ContinueWith(finalCheck).Wait();
+
+            if (handleEvent.IsCompleted)
+            {
+                //finalCheck(null);
+            }
+            else
+            {
+                //handleEvent.ContinueWith(finalCheck).Wait();
+            }
+
+            Assert.That(check, Is.True);
+        }
     }
 }

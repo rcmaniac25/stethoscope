@@ -17,6 +17,7 @@ namespace Stethoscope.Collections
         /// <summary>
         /// Get or set the original index to track.
         /// </summary>
+        /// <seealso cref="ApplyContextLock(Action{ListCollectionIndexOffsetTracker{T}})"/>
         public int OriginalIndex { get; set; }
 
         /// <summary>
@@ -41,6 +42,7 @@ namespace Stethoscope.Collections
         /// <summary>
         /// Reset <see cref="CurrentIndex"/> to <see cref="OriginalIndex"/> so <see cref="Offset"/> is zero.
         /// </summary>
+        /// <seealso cref="ApplyContextLock(Action{ListCollectionIndexOffsetTracker{T}})"/>
         public void ResetCurrentIndex()
         {
             lock (locker)
@@ -53,6 +55,7 @@ namespace Stethoscope.Collections
         /// Set <see cref="OriginalIndex"/> and reset <see cref="CurrentIndex"/>.
         /// </summary>
         /// <param name="index">The new original index.</param>
+        /// <seealso cref="ApplyContextLock(Action{ListCollectionIndexOffsetTracker{T}})"/>
         public void SetOriginalIndexAndResetCurrent(int index)
         {
             lock (locker)
@@ -65,6 +68,7 @@ namespace Stethoscope.Collections
         /// Do an action involving the tracker without any events or outside actions influencing it.
         /// </summary>
         /// <param name="lockedContext">The action to take place. Should not be long running.</param>
+        /// <exception cref="InvalidOperationException">If <see cref="ApplyContextLock(Action{ListCollectionIndexOffsetTracker{T}})"/> is recursivly invoked.</exception>
         public void ApplyContextLock(Action<ListCollectionIndexOffsetTracker<T>> lockedContext)
         {
             if (lockedContext == null)

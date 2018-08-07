@@ -1224,3 +1224,8 @@ void doSomethingCool(std::ifstream& input)
 - Instead of doing a global lock (oh God, no) to work around our own framework, I wanted to expose the lock without, well, exposing the lock.
 - Luckily, this is the exact logic we went through already for log parsers. Just, without the multithreading.
 - So tomorrow (which will be busy for me, as usual), I will hopefully get to testing this.
+
+#117.2. 8/06/2018:
+- Wrote the unit tests for handling event order.
+- Unfortunetly, two of the four tests fail. The logic should be correct, and playing with task continuation did managed to get one of them to start passing.
+- I will play with it more tomorrow as I'm busy tonight.
