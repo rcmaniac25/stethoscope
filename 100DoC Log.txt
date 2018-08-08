@@ -1229,3 +1229,8 @@ void doSomethingCool(std::ifstream& input)
 - Wrote the unit tests for handling event order.
 - Unfortunetly, two of the four tests fail. The logic should be correct, and playing with task continuation did managed to get one of them to start passing.
 - I will play with it more tomorrow as I'm busy tonight.
+
+#118.2. 8/07/2018:
+- Took a bit of work, but got the tests working. My math was wrong.
+- Also did something a little weird to ensure the ContinueWith is executed. I'd like something a little more explicit, but I worry it would be "reads code, scratches head, looks up docs, re-reads code, aha moment?" where as the "each stage increments a counter" approach means "if the count is not correct at the end, then some stage of the test didn't run"
+- With that test set done, I move on to testing ConcatStream.

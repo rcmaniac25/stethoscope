@@ -624,19 +624,15 @@ namespace Stethoscope.Tests
         {
             var tracker = new ListCollectionIndexOffsetTracker<int>();
             tracker.SetOriginalIndexAndResetCurrent(1);
-
-            bool check = false;
-            void finalCheck(Task t)
-            {
-                check = true;
-                Assert.That(tracker.CurrentIndex, Is.EqualTo(3));
-                Assert.That(tracker.OriginalIndex, Is.EqualTo(3));
-            }
-
+            
             Assert.That(tracker.CurrentIndex, Is.EqualTo(1));
             Assert.That(tracker.OriginalIndex, Is.EqualTo(1));
 
-            var handleEvent = Task.Run(() => tracker.HandleEvent(null, ListCollectionEventArgs<int>.CreateInsertEvent(0, 5))); // Should happen before or as close to the set operation as possible
+            var handleEvent = Task.Run(() =>
+            {
+                tracker.HandleEvent(null, ListCollectionEventArgs<int>.CreateInsertEvent(0, 5)); // Should happen before or as close to the set operation as possible
+                return 0;
+            });
 
             // We'll skip mid-tests to ensure there's a chance a lock contention would occur
 
@@ -645,18 +641,18 @@ namespace Stethoscope.Tests
                 t.SetOriginalIndexAndResetCurrent(t.CurrentIndex + 1);
             });
 
-            handleEvent.ContinueWith(finalCheck).Wait();
-
-            if (handleEvent.IsCompleted)
+            var state = handleEvent.ContinueWith(execState =>
             {
-                //finalCheck(null);
-            }
-            else
-            {
-                //handleEvent.ContinueWith(finalCheck).Wait();
-            }
+                var eState = execState.Result;
+                Assert.That(eState, Is.Zero);
 
-            Assert.That(check, Is.True);
+                Assert.That(tracker.CurrentIndex, Is.EqualTo(3));
+                Assert.That(tracker.OriginalIndex, Is.EqualTo(2));
+
+                return eState + 1;
+            }).Result;
+
+            Assert.That(state, Is.EqualTo(1)); // We do this test to ensure that the ContinueWith is always executed. There may be task continuation options to enforce this, but it's probably easier to understand "the state will only be correct if ContinueWith is executed"
         }
 
         [Test(TestOf = typeof(ListCollectionIndexOffsetTracker<>))]
@@ -687,15 +683,7 @@ namespace Stethoscope.Tests
         {
             var tracker = new ListCollectionIndexOffsetTracker<int>();
             tracker.SetOriginalIndexAndResetCurrent(1);
-
-            bool check = false;
-            void finalCheck(Task t)
-            {
-                check = true;
-                Assert.That(tracker.CurrentIndex, Is.EqualTo(3));
-                Assert.That(tracker.OriginalIndex, Is.EqualTo(3));
-            }
-
+            
             Assert.That(tracker.CurrentIndex, Is.EqualTo(1));
             Assert.That(tracker.OriginalIndex, Is.EqualTo(1));
 
@@ -705,21 +693,23 @@ namespace Stethoscope.Tests
             });
 
             // We'll skip mid-tests to ensure there's a chance a lock contention would occur
-
-            var handleEvent = Task.Run(() => tracker.HandleEvent(null, ListCollectionEventArgs<int>.CreateInsertEvent(0, 5))); // Should happen after or as close to the set operation as possible (high chance it will happen after)
-
-            handleEvent.ContinueWith(finalCheck).Wait();
-
-            if (handleEvent.IsCompleted)
+            
+            var state = Task.Run(() =>
             {
-                //finalCheck(null);
-            }
-            else
+                tracker.HandleEvent(null, ListCollectionEventArgs<int>.CreateInsertEvent(0, 5)); // Should happen after or as close to the set operation as possible (high chance it will happen after)
+                return 0;
+            }).ContinueWith(execState =>
             {
-                //handleEvent.ContinueWith(finalCheck).Wait();
-            }
+                var eState = execState.Result;
+                Assert.That(eState, Is.Zero);
 
-            Assert.That(check, Is.True);
+                Assert.That(tracker.CurrentIndex, Is.EqualTo(3));
+                Assert.That(tracker.OriginalIndex, Is.EqualTo(2));
+
+                return eState + 1;
+            }).Result;
+
+            Assert.That(state, Is.EqualTo(1)); // We do this test to ensure that the ContinueWith is always executed. There may be task continuation options to enforce this, but it's probably easier to understand "the state will only be correct if ContinueWith is executed"
         }
     }
 }

@@ -15,7 +15,6 @@ What needs to get done. Should make some of them tickets... (some of these may b
 - "PoC proper" (see details above and from log #102.2)
 	- NeverEndingLiveListObservable + method to switch between it and LiveListObservable before subscription (AsInfinite/AsFinite)
 	- Unit tests for changes
-		- Collections classes
 		- ConcatStream
 		- LiveListObservables + extensions
 	- Initial Qbservable implementation
