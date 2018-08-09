@@ -422,6 +422,4 @@ namespace Stethoscope.Parsers.Internal
             sources.Clear();
         }
     }
-
-    //TODO: needs unit tests
 }
