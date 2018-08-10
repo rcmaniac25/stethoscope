@@ -1238,3 +1238,8 @@ void doSomethingCool(std::ifstream& input)
 #119.2. 8/08/2018:
 - Can't have a late night, so I simply created the unit test file for ConcatStream, wrote a TODO of what tests need to be written (at a high level), then sat and stared at the screen for a while.
 - That last one is why I said "enough", because I was getting too easily distracted.
+
+#120.2. 8/09/2018:
+- Was planning to work on stream tests... and then only a couple empty base tests in, my computer's keyboard and mouse decided to no longer function.
+- It took the momentum out of me and took longer then I wanted to, to fix.
+- So I'll work on it again tomorrow.
