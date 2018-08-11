@@ -1,4 +1,6 @@
-﻿using NUnit.Framework;
+﻿using NSubstitute;
+
+using NUnit.Framework;
 
 using Stethoscope.Parsers.Internal;
 
@@ -7,6 +9,18 @@ namespace Stethoscope.Tests
     [TestFixture]
     public class StreamTests
     {
+        private IConcatStreamSource concatStreamSource1;
+        private IConcatStreamSource concatStreamSource2;
+
+        [SetUp]
+        public void Setup()
+        {
+            concatStreamSource1 = Substitute.For<IConcatStreamSource>();
+            concatStreamSource2 = Substitute.For<IConcatStreamSource>();
+        }
+
+        #region Empty Stream
+
         [Test(TestOf = typeof(ConcatStream))]
         public void EmptyStreamCanRead()
         {
@@ -146,12 +160,109 @@ namespace Stethoscope.Tests
                 cs.Seek(1, System.IO.SeekOrigin.End);
             });
         }
+
+        #endregion
+
+        #region Single Populated Stream
+
+        [Test(TestOf = typeof(ConcatStream))]
+        public void OnePopulatedStreamCanRead()
+        {
+            var cs = new ConcatStream();
+            cs.AppendSource(concatStreamSource1);
+
+            Assert.That(cs.CanRead, Is.True);
+        }
+
+        [Test(TestOf = typeof(ConcatStream))]
+        public void OnePopulatedStreamCanSeek()
+        {
+            concatStreamSource1.CanSeek.Returns(true);
+
+            var cs = new ConcatStream();
+            cs.AppendSource(concatStreamSource1);
+
+            Assert.That(cs.CanSeek, Is.True);
+        }
+
+        [Test(TestOf = typeof(ConcatStream))]
+        public void OnePopulatedStreamCanSeekFalse()
+        {
+            concatStreamSource1.CanSeek.Returns(false);
+
+            var cs = new ConcatStream();
+            cs.AppendSource(concatStreamSource1);
+
+            Assert.That(cs.CanSeek, Is.False);
+        }
         
-        //<use mock for data>
+        [Test(TestOf = typeof(ConcatStream))]
+        public void OnePopulatedStreamCanTimeout()
+        {
+            var cs = new ConcatStream();
+            cs.AppendSource(concatStreamSource1);
 
-        //TODO: One source with data, some basic property and function tests
+            Assert.That(cs.CanTimeout, Is.False);
+        }
 
-        //TODO: one source with no data, some basic property and function tests
+        [Test(TestOf = typeof(ConcatStream))]
+        public void OnePopulatedStreamCanWrite()
+        {
+            var cs = new ConcatStream();
+            cs.AppendSource(concatStreamSource1);
+
+            Assert.That(cs.CanWrite, Is.False);
+        }
+
+        [Test(TestOf = typeof(ConcatStream))]
+        public void OnePopulatedStreamPosition()
+        {
+            concatStreamSource1.Position.Returns(0);
+
+            var cs = new ConcatStream();
+            cs.AppendSource(concatStreamSource1);
+
+            Assert.That(cs.Position, Is.Zero);
+        }
+
+        [Test(TestOf = typeof(ConcatStream))]
+        public void OnePopulatedStreamPositionOffset()
+        {
+            concatStreamSource1.Position.Returns(10); // Stream source should continue operating without the ConcatStream caring
+
+            var cs = new ConcatStream();
+            cs.AppendSource(concatStreamSource1);
+
+            Assert.That(cs.Position, Is.Zero);
+        }
+
+        [Test(TestOf = typeof(ConcatStream))]
+        public void OnePopulatedStreamLength()
+        {
+            concatStreamSource1.Length.Returns(0);
+
+            var cs = new ConcatStream();
+            cs.AppendSource(concatStreamSource1);
+
+            Assert.That(cs.Length, Is.Zero);
+        }
+
+        [Test(TestOf = typeof(ConcatStream))]
+        public void OnePopulatedStreamLengthAlt()
+        {
+            concatStreamSource1.Length.Returns(20);
+
+            var cs = new ConcatStream();
+            cs.AppendSource(concatStreamSource1);
+
+            Assert.That(cs.Length, Is.EqualTo(20));
+        }
+
+        //TODO: functions
+
+        #endregion
+
+        //TODO: one source with no data, some basic property and function tests (don't forget to test "optimized" sources [see AppendSource arguments])
 
         //TODO: two sources with data, some basic property and function tests
 

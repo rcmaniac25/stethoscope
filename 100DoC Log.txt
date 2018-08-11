@@ -1243,3 +1243,7 @@ void doSomethingCool(std::ifstream& input)
 - Was planning to work on stream tests... and then only a couple empty base tests in, my computer's keyboard and mouse decided to no longer function.
 - It took the momentum out of me and took longer then I wanted to, to fix.
 - So I'll work on it again tomorrow.
+
+#121.2. 8/10/2018:
+- I only got the property-tests for one "populated" source stream.
+- The functions require a bit of thinking, and I started late again and am at my "I'm done" point. So hopefully function-tests will be done tomorrow for this group.
