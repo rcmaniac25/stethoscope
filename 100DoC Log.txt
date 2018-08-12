@@ -1247,3 +1247,7 @@ void doSomethingCool(std::ifstream& input)
 #121.2. 8/10/2018:
 - I only got the property-tests for one "populated" source stream.
 - The functions require a bit of thinking, and I started late again and am at my "I'm done" point. So hopefully function-tests will be done tomorrow for this group.
+
+#122.2. 8/11/2018:
+- Almost got the function-tests done. I encountered one bug that needed a simple fix and it took a couple iterations of what I liked for how the test should be written.
+- I'll finish these tomorrow and move on to the next group of Concat tests

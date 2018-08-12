@@ -165,6 +165,10 @@ namespace Stethoscope.Parsers.Internal
                 }
                 propertyDirty = DirtyProperties.All;
                 sources.Add(source);
+                if (sources.Count == 1 && source.CanSeek)
+                {
+                    absPos = source.Position;
+                }
             }
         }
 
