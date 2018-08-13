@@ -280,11 +280,11 @@ namespace Stethoscope.Parsers.Internal
                 case SeekOrigin.Begin:
                     if (offset < 0)
                     {
-                        throw new ArgumentException("Seek position is before start of stream", nameof(offset));
+                        throw new ArgumentOutOfRangeException("Seek position is before start of stream", nameof(offset));
                     }
                     else if (maxLength >= 0 && offset > maxLength)
                     {
-                        throw new ArgumentException("Seek position is after the end of the stream", nameof(offset));
+                        throw new ArgumentOutOfRangeException("Seek position is after the end of the stream", nameof(offset));
                     }
                     newPos = offset;
                     break;
@@ -292,11 +292,11 @@ namespace Stethoscope.Parsers.Internal
                     newPos = absPos + offset;
                     if (newPos < 0)
                     {
-                        throw new ArgumentException("Seek position is before start of stream", nameof(offset));
+                        throw new ArgumentOutOfRangeException("Seek position is before start of stream", nameof(offset));
                     }
                     else if (maxLength >= 0 && newPos > maxLength)
                     {
-                        throw new ArgumentException("Seek position is after the end of the stream", nameof(offset));
+                        throw new ArgumentOutOfRangeException("Seek position is after the end of the stream", nameof(offset));
                     }
                     break;
                 case SeekOrigin.End:
@@ -307,11 +307,11 @@ namespace Stethoscope.Parsers.Internal
                     newPos = maxLength + offset;
                     if (newPos < 0)
                     {
-                        throw new ArgumentException("Seek position is before start of stream", nameof(offset));
+                        throw new ArgumentOutOfRangeException("Seek position is before start of stream", nameof(offset));
                     }
                     else if (newPos > maxLength)
                     {
-                        throw new ArgumentException("Seek position is after the end of the stream", nameof(offset));
+                        throw new ArgumentOutOfRangeException("Seek position is after the end of the stream", nameof(offset));
                     }
                     break;
             }

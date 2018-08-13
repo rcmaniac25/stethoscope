@@ -1251,3 +1251,7 @@ void doSomethingCool(std::ifstream& input)
 #122.2. 8/11/2018:
 - Almost got the function-tests done. I encountered one bug that needed a simple fix and it took a couple iterations of what I liked for how the test should be written.
 - I'll finish these tomorrow and move on to the next group of Concat tests
+
+#123.2. 8/12/2018:
+- Finished the function-tests for a populated source.
+- At least made the place holder for a "used" source. Will do those tomorrow (hopefully, all of them)
