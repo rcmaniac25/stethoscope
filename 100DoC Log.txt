@@ -1255,3 +1255,9 @@ void doSomethingCool(std::ifstream& input)
 #123.2. 8/12/2018:
 - Finished the function-tests for a populated source.
 - At least made the place holder for a "used" source. Will do those tomorrow (hopefully, all of them)
+
+#124.2. 8/13/2018:
+- Simplified my plans for the stream tests a bit as the "idea" of testing many combinations is fine, the reality is some of them are already tested.
+- Once you eliminate those tests, it becomes only a handful that would "exist for the sake of existing"
+- Instead, I'm simplifying it to "single stream" and "two streams" (I'm assuming 2 is enough, and all > 2 setups will behave has two streams... but internally be > 2.
+- And to let me actually work on this tomorrow, I wrote what I needed to write tests for. Though "seek" is going to be a pain due to combos of tests.

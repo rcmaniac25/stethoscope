@@ -179,7 +179,7 @@ namespace Stethoscope.Tests
 
         #endregion
 
-        #region Single Populated Stream
+        #region Single Stream
 
         [Test(TestOf = typeof(ConcatStream))]
         public void OnePopulatedStreamCanRead()
@@ -547,306 +547,32 @@ namespace Stethoscope.Tests
 
         #endregion
 
-        /* Following tests are already done in the tests above:
-         * - CanRead
-         * - CanSeek
-         * - CanTimeout
-         * - CanWrite
-         * - Position
-         * - Length
-         */
+        #region Two Streams
 
-        #region Single Used Stream
+        //TODO: can seek (both seekable, only one seekable, not seekable)
 
-        //TODO
+        //TODO: length (seekable concat, non-seekable concat)
 
-#if false
-        [Test(TestOf = typeof(ConcatStream))]
-        public void OnePopulatedStreamReadZero()
-        {
-            var cs = new ConcatStream();
-            cs.AppendSource(concatStreamSourceData);
+        //TODO: AppendSource (seekable + seekable [no-optimize], seekable + seekable [optimize], seekable + no-seekable [no-optimize], seekable + no-seekable [optimize])
 
-            var buffer = new byte[0];
-            var res = cs.Read(buffer, 0, 0);
-            Assert.That(res, Is.Zero);
+        //TODO: read 1 byte (first stream, second stream, end of first stream, beginning of second stream, read 1 byte twice [1 from end of first, 1 from start of second])
 
-            concatStreamSourceData.DidNotReceiveWithAnyArgs().Read(null, 0, 0);
-        }
+        //TODO: read 2 byte (first stream into second stream)
 
-        [Test(TestOf = typeof(ConcatStream))]
-        public void OnePopulatedStreamReadOne()
-        {
-            concatStreamSourceData.Read(Arg.Is<byte[]>(x => x != null), 0, 1).Returns(1).AndDoes(i => i.ArgAt<byte[]>(0)[0] = 10);
-
-            var cs = new ConcatStream();
-            cs.AppendSource(concatStreamSourceData);
-
-            var buffer = new byte[1];
-            Assert.That(buffer[0], Is.Zero);
-
-            var res = cs.Read(buffer, 0, 1);
-            Assert.That(res, Is.EqualTo(1));
-
-            Assert.That(buffer[0], Is.EqualTo(10));
-
-            concatStreamSourceData.Received().Read(Arg.Any<byte[]>(), 0, 1);
-        }
-
-        [Test(TestOf = typeof(ConcatStream))]
-        public void OnePopulatedStreamReadOnePositionIsLength()
-        {
-            concatStreamSourceData.Position.Returns(1);
-            concatStreamSourceData.Length.Returns(1);
-            concatStreamSourceData.Read(null, 0, 0).ReturnsForAnyArgs(0);
-
-            var cs = new ConcatStream();
-            cs.AppendSource(concatStreamSourceData);
-
-            var buffer = new byte[1];
-            Assert.That(buffer[0], Is.Zero);
-
-            var res = cs.Read(buffer, 0, 1);
-            Assert.That(res, Is.Zero);
-
-            Assert.That(buffer[0], Is.Zero);
-
-            concatStreamSourceData.Received().Read(Arg.Any<byte[]>(), 0, 1);
-        }
-
-        [Test(TestOf = typeof(ConcatStream))]
-        public void OnePopulatedStreamReadByte()
-        {
-            concatStreamSourceData.Read(Arg.Is<byte[]>(x => x != null), 0, 1).Returns(1).AndDoes(i => i.ArgAt<byte[]>(0)[0] = 10);
-
-            var cs = new ConcatStream();
-            cs.AppendSource(concatStreamSourceData);
-
-            Assert.That(cs.ReadByte(), Is.EqualTo(10));
-
-            concatStreamSourceData.Received().Read(Arg.Any<byte[]>(), 0, 1);
-        }
-
-        [Test(TestOf = typeof(ConcatStream))]
-        public void OnePopulatedStreamReadBytePositionIsLength()
-        {
-            concatStreamSourceData.Position.Returns(1);
-            concatStreamSourceData.Length.Returns(1);
-            concatStreamSourceData.Read(null, 0, 0).ReturnsForAnyArgs(0);
-
-            var cs = new ConcatStream();
-            cs.AppendSource(concatStreamSourceData);
-
-            Assert.That(cs.ReadByte(), Is.EqualTo(-1));
-
-            concatStreamSourceData.Received().Read(Arg.Any<byte[]>(), 0, 1);
-        }
-
-        [Test(TestOf = typeof(ConcatStream))]
-        public void OnePopulatedStreamSeekBeginZero()
-        {
-            var cs = new ConcatStream();
-            cs.AppendSource(concatStreamSourceData);
-
-            var res = cs.Seek(0, System.IO.SeekOrigin.Begin);
-            Assert.That(res, Is.Zero);
-
-            concatStreamSourceData.DidNotReceiveWithAnyArgs().Position = 0;
-        }
-
-        [Test(TestOf = typeof(ConcatStream))]
-        public void OnePopulatedStreamSeekBeginZeroChanged()
-        {
-            concatStreamSourceData.Position.Returns(1);
-
-            var cs = new ConcatStream();
-            cs.AppendSource(concatStreamSourceData);
-
-            var res = cs.Seek(0, System.IO.SeekOrigin.Begin);
-            Assert.That(res, Is.Zero);
-
-            concatStreamSourceData.ReceivedWithAnyArgs().Position = 0;
-        }
-
-        [Test(TestOf = typeof(ConcatStream))]
-        public void OnePopulatedStreamSeekBeginChanged()
-        {
-            var cs = new ConcatStream();
-            cs.AppendSource(concatStreamSourceData);
-
-            var res = cs.Seek(1, System.IO.SeekOrigin.Begin);
-            Assert.That(res, Is.EqualTo(1));
-
-            concatStreamSourceData.ReceivedWithAnyArgs().Position = 1;
-        }
-
-        [Test(TestOf = typeof(ConcatStream))]
-        public void OnePopulatedStreamSeekBegin()
-        {
-            concatStreamSourceData.Position.Returns(1);
-
-            var cs = new ConcatStream();
-            cs.AppendSource(concatStreamSourceData);
-
-            var res = cs.Seek(1, System.IO.SeekOrigin.Begin);
-            Assert.That(res, Is.EqualTo(1));
-
-            concatStreamSourceData.DidNotReceiveWithAnyArgs().Position = 0;
-        }
-
-        [Test(TestOf = typeof(ConcatStream))]
-        public void OnePopulatedStreamSeekCurrentZero()
-        {
-            var cs = new ConcatStream();
-            cs.AppendSource(concatStreamSourceData);
-
-            var res = cs.Seek(0, System.IO.SeekOrigin.Current);
-            Assert.That(res, Is.Zero);
-
-            concatStreamSourceData.DidNotReceiveWithAnyArgs().Position = 0;
-        }
-
-        [Test(TestOf = typeof(ConcatStream))]
-        public void OnePopulatedStreamSeekCurrentZeroChanged()
-        {
-            concatStreamSourceData.Position.Returns(1);
-
-            var cs = new ConcatStream();
-            cs.AppendSource(concatStreamSourceData);
-
-            var res = cs.Seek(0, System.IO.SeekOrigin.Current);
-            Assert.That(res, Is.EqualTo(1));
-
-            concatStreamSourceData.DidNotReceiveWithAnyArgs().Position = 0;
-        }
-
-        [Test(TestOf = typeof(ConcatStream))]
-        public void OnePopulatedStreamSeekCurrentChanged()
-        {
-            var cs = new ConcatStream();
-            cs.AppendSource(concatStreamSourceData);
-
-            var res = cs.Seek(1, System.IO.SeekOrigin.Current);
-            Assert.That(res, Is.EqualTo(1));
-
-            concatStreamSourceData.ReceivedWithAnyArgs().Position = 1;
-        }
-
-        [Test(TestOf = typeof(ConcatStream))]
-        public void OnePopulatedStreamSeekCurrent()
-        {
-            concatStreamSourceData.Position.Returns(1);
-
-            var cs = new ConcatStream();
-            cs.AppendSource(concatStreamSourceData);
-
-            var res = cs.Seek(1, System.IO.SeekOrigin.Current);
-            Assert.That(res, Is.EqualTo(2));
-
-            concatStreamSourceData.ReceivedWithAnyArgs().Position = 2;
-        }
-
-        [Test(TestOf = typeof(ConcatStream))]
-        public void OnePopulatedStreamSeekCurrentInverse()
-        {
-            concatStreamSourceData.Position.Returns(1);
-
-            var cs = new ConcatStream();
-            cs.AppendSource(concatStreamSourceData);
-
-            var res = cs.Seek(-1, System.IO.SeekOrigin.Current);
-            Assert.That(res, Is.Zero);
-
-            concatStreamSourceData.ReceivedWithAnyArgs().Position = 0;
-        }
-
-        [Test(TestOf = typeof(ConcatStream))]
-        public void OnePopulatedStreamSeekEndZero()
-        {
-            var cs = new ConcatStream();
-            cs.AppendSource(concatStreamSourceData);
-
-            var res = cs.Seek(0, System.IO.SeekOrigin.End);
-            Assert.That(res, Is.EqualTo(StreamSourceDefaultLength));
-
-            concatStreamSourceData.ReceivedWithAnyArgs().Position = StreamSourceDefaultLength;
-        }
-
-        [Test(TestOf = typeof(ConcatStream))]
-        public void OnePopulatedStreamSeekEndZeroChanged()
-        {
-            concatStreamSourceData.Position.Returns(1);
-
-            var cs = new ConcatStream();
-            cs.AppendSource(concatStreamSourceData);
-
-            var res = cs.Seek(0, System.IO.SeekOrigin.End);
-            Assert.That(res, Is.EqualTo(StreamSourceDefaultLength));
-
-            concatStreamSourceData.ReceivedWithAnyArgs().Position = StreamSourceDefaultLength;
-        }
-
-        [Test(TestOf = typeof(ConcatStream))]
-        public void OnePopulatedStreamSeekEndChanged()
-        {
-            var cs = new ConcatStream();
-            cs.AppendSource(concatStreamSourceData);
-
-            Assert.Throws<System.ArgumentOutOfRangeException>(() =>
-            {
-                cs.Seek(1, System.IO.SeekOrigin.End);
-            });
-        }
-
-        [Test(TestOf = typeof(ConcatStream))]
-        public void OnePopulatedStreamSeekEnd()
-        {
-            concatStreamSourceData.Position.Returns(1);
-
-            var cs = new ConcatStream();
-            cs.AppendSource(concatStreamSourceData);
-
-            Assert.Throws<System.ArgumentOutOfRangeException>(() =>
-            {
-                cs.Seek(1, System.IO.SeekOrigin.End);
-            });
-        }
-
-        [Test(TestOf = typeof(ConcatStream))]
-        public void OnePopulatedStreamSeekEndChangedInverse()
-        {
-            var cs = new ConcatStream();
-            cs.AppendSource(concatStreamSourceData);
-
-            var res = cs.Seek(-1, System.IO.SeekOrigin.End);
-            Assert.That(res, Is.EqualTo(StreamSourceDefaultLength - 1));
-
-            concatStreamSourceData.ReceivedWithAnyArgs().Position = StreamSourceDefaultLength - 1;
-        }
-
-        [Test(TestOf = typeof(ConcatStream))]
-        public void OnePopulatedStreamSeekEndInverse()
-        {
-            concatStreamSourceData.Position.Returns(1);
-
-            var cs = new ConcatStream();
-            cs.AppendSource(concatStreamSourceData);
-
-            var res = cs.Seek(-1, System.IO.SeekOrigin.End);
-            Assert.That(res, Is.EqualTo(StreamSourceDefaultLength - 1));
-
-            concatStreamSourceData.ReceivedWithAnyArgs().Position = StreamSourceDefaultLength - 1;
-        }
-#endif
+        //TODO: seek (a whole bunch, including non-seekable concat)
 
         #endregion
 
-        //TODO: one source with no data, some basic property and function tests
-
-        //TODO: two sources with data, some basic property and function tests (don't forget to test "optimized" sources [see AppendSource arguments])
+        #region Byte Array Stream
 
         //TODO: byte array tests
 
+        #endregion
+
+        #region System.IO Stream
+
         //TODO: stream tests
+
+        #endregion
     }
 }
