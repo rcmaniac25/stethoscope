@@ -549,10 +549,81 @@ namespace Stethoscope.Tests
 
         #region Two Streams
 
-        //TODO: can seek (both seekable, only one seekable, not seekable)
+        [Test(TestOf = typeof(ConcatStream))]
+        public void TwoStreamCanSeek()
+        {
+            var cs = new ConcatStream();
+            cs.AppendSource(concatStreamSourceDataUsed);
+            cs.AppendSource(concatStreamSourceData);
 
-        //TODO: length (seekable concat, non-seekable concat)
+            Assert.That(cs.CanSeek, Is.True);
+        }
 
+        [Test(TestOf = typeof(ConcatStream))]
+        public void TwoStreamOneNotSeekableCanSeek()
+        {
+            concatStreamSourceData.CanSeek.Returns(false);
+
+            var cs = new ConcatStream();
+            cs.AppendSource(concatStreamSourceDataUsed);
+            cs.AppendSource(concatStreamSourceData);
+
+            Assert.That(cs.CanSeek, Is.False);
+        }
+
+        [Test(TestOf = typeof(ConcatStream))]
+        public void TwoStreamOneNotSeekableCanSeekReversed()
+        {
+            concatStreamSourceDataUsed.CanSeek.Returns(false);
+
+            var cs = new ConcatStream();
+            cs.AppendSource(concatStreamSourceDataUsed);
+            cs.AppendSource(concatStreamSourceData);
+
+            Assert.That(cs.CanSeek, Is.False);
+        }
+
+        [Test(TestOf = typeof(ConcatStream))]
+        public void TwoStreamBothNotSeekableCanSeek()
+        {
+            concatStreamSourceDataUsed.CanSeek.Returns(false);
+            concatStreamSourceData.CanSeek.Returns(false);
+
+            var cs = new ConcatStream();
+            cs.AppendSource(concatStreamSourceDataUsed);
+            cs.AppendSource(concatStreamSourceData);
+
+            Assert.That(cs.CanSeek, Is.False);
+        }
+
+        [Test(TestOf = typeof(ConcatStream))]
+        public void TwoStreamLength()
+        {
+            var cs = new ConcatStream();
+            cs.AppendSource(concatStreamSourceDataUsed);
+            cs.AppendSource(concatStreamSourceData);
+
+            Assert.That(cs.CanSeek, Is.True);
+            Assert.That(cs.Length, Is.EqualTo(StreamSourceDefaultLength * 2));
+        }
+
+        [Test(TestOf = typeof(ConcatStream))]
+        public void TwoStreamOneNotSeekableLength()
+        {
+            concatStreamSourceDataUsed.CanSeek.Returns(false);
+            concatStreamSourceDataUsed.Length.Returns(c => throw new System.NotSupportedException()); // Streams like FileStream will throw NotSupportedException if not seekable, but Length is called.
+
+            var cs = new ConcatStream();
+            cs.AppendSource(concatStreamSourceDataUsed);
+            cs.AppendSource(concatStreamSourceData);
+
+            Assert.That(cs.CanSeek, Is.False);
+            Assert.Throws<System.NotSupportedException>(() =>
+            {
+                var len = cs.Length;
+            });
+        }
+        
         //TODO: AppendSource (seekable + seekable [no-optimize], seekable + seekable [optimize], seekable + no-seekable [no-optimize], seekable + no-seekable [optimize])
 
         //TODO: read 1 byte (first stream, second stream, end of first stream, beginning of second stream, read 1 byte twice [1 from end of first, 1 from start of second])
