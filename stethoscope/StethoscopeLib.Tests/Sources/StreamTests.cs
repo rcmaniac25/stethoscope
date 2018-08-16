@@ -623,8 +623,65 @@ namespace Stethoscope.Tests
                 var len = cs.Length;
             });
         }
-        
-        //TODO: AppendSource (seekable + seekable [no-optimize], seekable + seekable [optimize], seekable + no-seekable [no-optimize], seekable + no-seekable [optimize])
+
+        private static int GetNumberOfSources(ConcatStream stream)
+        {
+            var field = typeof(ConcatStream).GetField("sources", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            var sources = field.GetValue(stream) as System.Collections.Generic.List<IConcatStreamSource>;
+            return sources.Count;
+        }
+
+        [Test(TestOf = typeof(ConcatStream))]
+        public void TwoStreamAppendSourceSeekablesNoOptimize()
+        {
+            var cs = new ConcatStream();
+            Assert.That(GetNumberOfSources(cs), Is.Zero);
+
+            cs.AppendSource(concatStreamSourceDataUsed);
+            cs.AppendSource(concatStreamSourceData, false);
+
+            Assert.That(GetNumberOfSources(cs), Is.EqualTo(2));
+        }
+
+        [Test(TestOf = typeof(ConcatStream))]
+        public void TwoStreamAppendSourceSeekablesOptimize()
+        {
+            var cs = new ConcatStream();
+            Assert.That(GetNumberOfSources(cs), Is.Zero);
+
+            cs.AppendSource(concatStreamSourceDataUsed);
+            cs.AppendSource(concatStreamSourceData, true);
+
+            Assert.That(GetNumberOfSources(cs), Is.EqualTo(2));
+        }
+
+        [Test(TestOf = typeof(ConcatStream))]
+        public void TwoStreamAppendSourceNotSeekablesNoOptimize()
+        {
+            concatStreamSourceData.CanSeek.Returns(false);
+
+            var cs = new ConcatStream();
+            Assert.That(GetNumberOfSources(cs), Is.Zero);
+
+            cs.AppendSource(concatStreamSourceDataUsed);
+            cs.AppendSource(concatStreamSourceData, false);
+
+            Assert.That(GetNumberOfSources(cs), Is.EqualTo(2));
+        }
+
+        [Test(TestOf = typeof(ConcatStream))]
+        public void TwoStreamAppendSourceNotSeekablesOptimize()
+        {
+            concatStreamSourceData.CanSeek.Returns(false);
+
+            var cs = new ConcatStream();
+            Assert.That(GetNumberOfSources(cs), Is.Zero);
+
+            cs.AppendSource(concatStreamSourceDataUsed);
+            cs.AppendSource(concatStreamSourceData, true);
+
+            Assert.That(GetNumberOfSources(cs), Is.EqualTo(1));
+        }
 
         //TODO: read 1 byte (first stream, second stream, end of first stream, beginning of second stream, read 1 byte twice [1 from end of first, 1 from start of second])
 

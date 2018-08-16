@@ -159,7 +159,7 @@ namespace Stethoscope.Parsers.Internal
             }
             lock (sources)
             {
-                if (optimizeIfPossible && sources.Count != 0 && CanSeek && !source.CanSeek)
+                if (optimizeIfPossible && sources.Count != 0 && !source.CanSeek)
                 {
                     OptimizeSources();
                 }

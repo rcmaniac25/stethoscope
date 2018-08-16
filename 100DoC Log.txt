@@ -1267,3 +1267,9 @@ void doSomethingCool(std::ifstream& input)
 - I got CanSeek and Length tests done for multi-source concat.
 - I got thrown off by the Length one because the only concat source that I know of that has CanSeek = false is a native Stream with CanSeek = false.
 - This means everything I test that expects an exception (as Length when CanSeek = false is documented), suddenly doesn't happen. So I had to throw an exception, and then expect that exception in the test... which is weird.
+
+#126.2. 8/15/2018:
+- Wrote the AppendSource tests but realizing that the optimize "method" doesn't really work... and yet it does what I wanted (which is adjust based on source index)
+- I'll need to fix that tomorrow (which will be about the most I can do tomorrow)
+- I also wonder if I should have it auto-optimize if CanSeek is false. So your reading finishes a source... remove it?
+- Random: I also wonder if I should add to the extensions to support IEnumerables so they can be appended as well. Bonus: if a 0 length source is added, should it just get removed on the spot? (it would mean another method in the "source" interface so I can go "is this empty but _can_ grow?")
