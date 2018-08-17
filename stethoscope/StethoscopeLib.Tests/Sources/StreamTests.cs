@@ -681,7 +681,10 @@ namespace Stethoscope.Tests
             cs.AppendSource(concatStreamSourceData, true);
 
             Assert.That(GetNumberOfSources(cs), Is.EqualTo(1));
+            concatStreamSourceDataUsed.Received().Dispose();
         }
+
+        //TODO: AppendSource tests for length
 
         //TODO: read 1 byte (first stream, second stream, end of first stream, beginning of second stream, read 1 byte twice [1 from end of first, 1 from start of second])
 

@@ -163,11 +163,35 @@ namespace Stethoscope.Parsers.Internal
                 {
                     OptimizeSources();
                 }
+
+                var priorCanSeek = CanSeek;
                 propertyDirty = DirtyProperties.All;
                 sources.Add(source);
+
                 if (sources.Count == 1 && source.CanSeek)
                 {
                     absPos = source.Position;
+                }
+                else if (sources.Count > 1 && priorCanSeek && sources[sources.Count - 2].CanSeek)
+                {
+                    var priorSource = sources[sources.Count - 2];
+                    var priorSourceDone = priorSource.Position >= priorSource.Length;
+                    if (priorSourceDone)
+                    {
+                        sourceIndex++;
+                    }
+
+                    if (source.CanSeek)
+                    {
+                        if (priorSourceDone)
+                        {
+                            absPos += source.Position;
+                        }
+                    }
+                    else if (optimizeIfPossible)
+                    {
+                        OptimizeSources();
+                    }
                 }
             }
         }

@@ -1273,3 +1273,7 @@ void doSomethingCool(std::ifstream& input)
 - I'll need to fix that tomorrow (which will be about the most I can do tomorrow)
 - I also wonder if I should have it auto-optimize if CanSeek is false. So your reading finishes a source... remove it?
 - Random: I also wonder if I should add to the extensions to support IEnumerables so they can be appended as well. Bonus: if a 0 length source is added, should it just get removed on the spot? (it would mean another method in the "source" interface so I can go "is this empty but _can_ grow?")
+
+#127.2. 8/16/2018:
+- In the process of fixing yesterday's issues, I also enabled all seekable streams to update the position of the ConcatStream
+- I might want to optimize the code for AppendSource, but I will implement all tests first so I don't screw something up later.
