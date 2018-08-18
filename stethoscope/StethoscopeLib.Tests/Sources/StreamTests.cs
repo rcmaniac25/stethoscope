@@ -684,7 +684,69 @@ namespace Stethoscope.Tests
             concatStreamSourceDataUsed.Received().Dispose();
         }
 
-        //TODO: AppendSource tests for length
+        [Test(TestOf = typeof(ConcatStream))]
+        public void TwoStreamAppendSourcePosition()
+        {
+            var cs = new ConcatStream();
+            Assert.That(cs.Position, Is.Zero);
+
+            cs.AppendSource(concatStreamSourceDataUsed);
+
+            Assert.That(cs.Position, Is.EqualTo(StreamSourceDefaultLength));
+        }
+
+        [Test(TestOf = typeof(ConcatStream))]
+        public void TwoStreamAppendSourcePositionDouble()
+        {
+            var cs = new ConcatStream();
+            Assert.That(cs.Position, Is.Zero);
+
+            cs.AppendSource(concatStreamSourceDataUsed);
+            cs.AppendSource(concatStreamSourceDataUsed);
+
+            Assert.That(cs.Position, Is.EqualTo(StreamSourceDefaultLength * 2));
+        }
+
+        [Test(TestOf = typeof(ConcatStream))]
+        public void TwoStreamAppendSourcePositionPlusZero()
+        {
+            var cs = new ConcatStream();
+            Assert.That(cs.Position, Is.Zero);
+
+            cs.AppendSource(concatStreamSourceDataUsed);
+            cs.AppendSource(concatStreamSourceData);
+
+            Assert.That(cs.Position, Is.EqualTo(StreamSourceDefaultLength));
+        }
+
+        [Test(TestOf = typeof(ConcatStream))]
+        public void TwoStreamAppendSourcePositionPlusTen()
+        {
+            concatStreamSourceData.Position.Returns(10);
+
+            var cs = new ConcatStream();
+            Assert.That(cs.Position, Is.Zero);
+
+            cs.AppendSource(concatStreamSourceDataUsed);
+            cs.AppendSource(concatStreamSourceData);
+
+            Assert.That(cs.Position, Is.EqualTo(StreamSourceDefaultLength + 10));
+        }
+
+        [Test(TestOf = typeof(ConcatStream))]
+        public void TwoStreamAppendSourcePositionPlusTenPlusInvalidTen()
+        {
+            concatStreamSourceData.Position.Returns(10);
+
+            var cs = new ConcatStream();
+            Assert.That(cs.Position, Is.Zero);
+
+            cs.AppendSource(concatStreamSourceDataUsed);
+            cs.AppendSource(concatStreamSourceData);
+            cs.AppendSource(concatStreamSourceData);
+
+            Assert.That(cs.Position, Is.EqualTo(StreamSourceDefaultLength + 10));
+        }
 
         //TODO: read 1 byte (first stream, second stream, end of first stream, beginning of second stream, read 1 byte twice [1 from end of first, 1 from start of second])
 

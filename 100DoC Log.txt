@@ -1279,3 +1279,12 @@ void doSomethingCool(std::ifstream& input)
 - I might want to optimize the code for AppendSource, but I will implement all tests first so I don't screw something up later.
 - Adding the following line to have a "more normal" commit, since the prior work was done early and not commited at the usual time.
 - Per the updated AppendSource, I now have a few more tests I need to write for it since it should update position within the ConcatStream.
+
+#128.2. 8/17/2018:
+- Added tests for position.
+- The last test, the "invalid" one. That's a bit wacky as it's invalid in what someone might expect it to do with regards to Position, but valid in expectation... and it gets weirder when you try to work with it...
+- In fact, thinking about it, I'm gonna add logic to prevent you from doing such a thing unless the stream is not seekable.
+- So the "invalid yet valid" thing: I can add a stream that has already been partially used. But if I add a second stream that is partially used, it screws things up. 2 streams, position=10, length=20. Concat... what is the position?
+- That's the "invalid" part. The valid part (such as when it can't be seeked) is being able to say "ready 20 bytes" and it reads 20... but it's really 10 from the first (at the end of the stream) and 10 from the second (at the end of the stream).
+- If I were to allow appending something like that with seekables would screw up seeking, screw up position (my above example: first stream would say ConcatStream.Position=10, second stream would say... ConcatStream.Position=10 because there's no other way to pick a position. Then after reading 20 bytes, it's ConcatStream.Position=30 BUT ConcatStream.Length=40 AND you can't read anymore. You could also then seek -40 which would result in ConcatStream.Position=-10). So I can't allow that.
+- Tomorrow: first CanSeek=true stream is always valid... second CanSeek=true stream must have position=0 OR position=length. Otherwise it has to be CanSeek=false. Tests will have to be updated.
