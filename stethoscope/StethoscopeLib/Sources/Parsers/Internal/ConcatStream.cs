@@ -159,6 +159,10 @@ namespace Stethoscope.Parsers.Internal
             }
             lock (sources)
             {
+                //TODO: CanSeek = first source valid, every other source must be 0 or Length unless it's sourceIndex. Doesn't optimize
+                //TODO: Can(not)Seek = always valid, does optimization
+                //XXX: how do I handle if reading or seeking has already occured? (if reading started, and they just so happened to finish a source, then suddenly appending a new source and it "causally" moving the position, we end up with the position moving without anyone moving it)
+
                 if (optimizeIfPossible && sources.Count != 0 && !source.CanSeek)
                 {
                     OptimizeSources();

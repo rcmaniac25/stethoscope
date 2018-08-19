@@ -743,9 +743,30 @@ namespace Stethoscope.Tests
 
             cs.AppendSource(concatStreamSourceDataUsed);
             cs.AppendSource(concatStreamSourceData);
-            cs.AppendSource(concatStreamSourceData);
+            Assert.Throws<System.ArgumentException>(() =>
+            {
+                cs.AppendSource(concatStreamSourceData);
+            });
 
             Assert.That(cs.Position, Is.EqualTo(StreamSourceDefaultLength + 10));
+        }
+
+        [Test(TestOf = typeof(ConcatStream))]
+        public void TwoStreamAppendSourcePositionPlusTenPlusNonSeekable()
+        {
+            concatStreamSourceData.Position.Returns(10);
+
+            var cs = new ConcatStream();
+            Assert.That(cs.Position, Is.Zero);
+            Assert.That(cs.CanSeek, Is.True);
+
+            cs.AppendSource(concatStreamSourceDataUsed);
+            cs.AppendSource(concatStreamSourceData);
+            Assert.That(cs.CanSeek, Is.True);
+
+            concatStreamSourceData.CanSeek.Returns(false);
+
+            cs.AppendSource(concatStreamSourceData);
         }
 
         //TODO: read 1 byte (first stream, second stream, end of first stream, beginning of second stream, read 1 byte twice [1 from end of first, 1 from start of second])

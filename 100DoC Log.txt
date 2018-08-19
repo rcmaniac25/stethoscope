@@ -1288,3 +1288,10 @@ void doSomethingCool(std::ifstream& input)
 - That's the "invalid" part. The valid part (such as when it can't be seeked) is being able to say "ready 20 bytes" and it reads 20... but it's really 10 from the first (at the end of the stream) and 10 from the second (at the end of the stream).
 - If I were to allow appending something like that with seekables would screw up seeking, screw up position (my above example: first stream would say ConcatStream.Position=10, second stream would say... ConcatStream.Position=10 because there's no other way to pick a position. Then after reading 20 bytes, it's ConcatStream.Position=30 BUT ConcatStream.Length=40 AND you can't read anymore. You could also then seek -40 which would result in ConcatStream.Position=-10). So I can't allow that.
 - Tomorrow: first CanSeek=true stream is always valid... second CanSeek=true stream must have position=0 OR position=length. Otherwise it has to be CanSeek=false. Tests will have to be updated.
+
+#129.2. 8/18/2018:
+- Fun fact: I almost didn't have a commit yesterday because I lost power but it came on for just long enough for me to commit the code and push it.
+- So I realized that a CanSeek=true stream is valid if it's "sourceIndex" aka, current.
+- But I also realized that if reading or seeking have already occured, the values can't be touched.
+- I at least added some tests (but need tests for the "can't append some types if read/seek have been used)
+- As this is a bit bigger then before, I'll attempt to work on it tomorrow so I don't have to fight the clock today.
