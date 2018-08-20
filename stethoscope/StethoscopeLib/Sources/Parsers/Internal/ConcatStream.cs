@@ -37,6 +37,8 @@ namespace Stethoscope.Parsers.Internal
         private DirtyProperties propertyDirty = DirtyProperties.All;
         private bool dCanSeek = false;
         private long dLength = 0L;
+        private bool dReadingOccured = false;
+        private bool dSeekingOccured = false;
 
         #region Properties
 
@@ -271,6 +273,7 @@ namespace Stethoscope.Parsers.Internal
                     }
                     break;
                 }
+                dReadingOccured = true;
                 totalRead += sourceRead;
                 bufferOffset += sourceRead;
                 count -= sourceRead;
@@ -345,6 +348,7 @@ namespace Stethoscope.Parsers.Internal
             }
             if (newPos != absPos)
             {
+                dSeekingOccured = true;
                 if (newPos < absPos)
                 {
                     while (absPos != newPos)

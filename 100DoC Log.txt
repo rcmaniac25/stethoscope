@@ -1295,3 +1295,6 @@ void doSomethingCool(std::ifstream& input)
 - But I also realized that if reading or seeking have already occured, the values can't be touched.
 - I at least added some tests (but need tests for the "can't append some types if read/seek have been used)
 - As this is a bit bigger then before, I'll attempt to work on it tomorrow so I don't have to fight the clock today.
+
+#130.2. 8/19/2018:
+- I only added 2 variables. I need to finish really early today and the work shouldn't be "hard" but it's a bit more then I can easily do in a short time frame.
