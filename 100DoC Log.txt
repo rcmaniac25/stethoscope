@@ -1298,3 +1298,9 @@ void doSomethingCool(std::ifstream& input)
 
 #130.2. 8/19/2018:
 - I only added 2 variables. I need to finish really early today and the work shouldn't be "hard" but it's a bit more then I can easily do in a short time frame.
+
+#131.2. 8/20/2018:
+- I went through and wrote a bunch of code for AppendSource... but I can barely stay awake right now.
+- It's like coding under the influence, and contrary to any movie or university discussion, it isn't a sign of proficency. It's a sign that your code will probably have bugs in it.
+- So instead of buggy code, I'm going to review/finish this tomorrow instead.
+- I did write the test cases though.

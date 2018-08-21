@@ -116,6 +116,8 @@ namespace Stethoscope.Parsers.Internal
 
         private void OptimizeSources()
         {
+            // Expectation (enforced outside): locked, stream is not seekable
+
             // optimzation - if the current sources are seekable, but the new source is not seekable, then we can do some cleanup and dispose and remove the old sources since we will no longer be able to seek or change position once we add the new source
             if (sourceIndex >= sources.Count)
             {
@@ -149,6 +151,22 @@ namespace Stethoscope.Parsers.Internal
             sourceIndex = 0;
         }
 
+        private int GetIndexPosition()
+        {
+            // Expectation (enforced outside): locked, reading/seeking hasn't occured, stream is seekable
+
+            int i = 0;
+            for (; i < sources.Count; i++)
+            {
+                var source = sources[i];
+                if (source.Position < source.Length)
+                {
+                    break;
+                }
+            }
+            return i;
+        }
+
         public void AppendSource(IConcatStreamSource source, bool optimizeIfPossible = true)
         {
             if (disposed)
@@ -161,10 +179,43 @@ namespace Stethoscope.Parsers.Internal
             }
             lock (sources)
             {
-                //TODO: CanSeek = first source valid, every other source must be 0 or Length unless it's sourceIndex. Doesn't optimize
-                //TODO: Can(not)Seek = always valid, does optimization
-                //XXX: how do I handle if reading or seeking has already occured? (if reading started, and they just so happened to finish a source, then suddenly appending a new source and it "causally" moving the position, we end up with the position moving without anyone moving it)
+                var priorCanSeek = CanSeek;
 
+                if (source.CanSeek)
+                {
+                    if (priorCanSeek && (dSeekingOccured || dReadingOccured))
+                    {
+                        throw new InvalidOperationException("Cannot append a seekable source to a seekable stream if reading or seeking has already occured");
+                    }
+                }
+                var currentMeasuredIndexPosition = -1;
+                if (priorCanSeek)
+                {
+                    currentMeasuredIndexPosition = GetIndexPosition();
+                }
+
+                propertyDirty = DirtyProperties.All;
+                sources.Add(source);
+
+                if (priorCanSeek && (sources.Count > 1 || source.CanSeek))
+                {
+                    sourceIndex = Math.Min(sources.Count - 1, currentMeasuredIndexPosition);
+                    absPos = 0;
+                    for (int i = 0; i <= sourceIndex; i++)
+                    {
+                        absPos += sources[i].Position;
+                    }
+                }
+                if (!source.CanSeek && optimizeIfPossible)
+                {
+                    OptimizeSources();
+                }
+
+                //TODO: CanSeek = first source valid, every other source must be 0 or Length unless it's sourceIndex. Doesn't optimize
+                ////TODO: Can(not)Seek = always valid, does optimization
+                ////XXX: how do I handle if reading or seeking has already occured? (if reading started, and they just so happened to finish a source, then suddenly appending a new source and it "causally" moving the position, we end up with the position moving without anyone moving it)
+
+#if false
                 if (optimizeIfPossible && sources.Count != 0 && !source.CanSeek)
                 {
                     OptimizeSources();
@@ -199,6 +250,7 @@ namespace Stethoscope.Parsers.Internal
                         OptimizeSources();
                     }
                 }
+#endif
             }
         }
 

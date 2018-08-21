@@ -769,6 +769,61 @@ namespace Stethoscope.Tests
             cs.AppendSource(concatStreamSourceData);
         }
 
+        [Test(TestOf = typeof(ConcatStream))]
+        public void TwoStreamAppendSourcePostSeek()
+        {
+            concatStreamSourceData.Position.Returns(10);
+
+            var cs = new ConcatStream();
+            Assert.That(cs.Position, Is.Zero);
+
+            cs.AppendSource(concatStreamSourceDataUsed);
+
+            Assert.That(cs.Position, Is.EqualTo(StreamSourceDefaultLength));
+
+            cs.Seek(10, System.IO.SeekOrigin.Begin);
+            concatStreamSourceDataUsed.Received().Position = 10;
+            Assert.That(cs.Position, Is.EqualTo(10));
+            concatStreamSourceDataUsed.Position.Returns(10); // We first check we got the position, then we ensure we actually return the value
+
+            cs.Seek(0, System.IO.SeekOrigin.End);
+            concatStreamSourceDataUsed.Received().Position = StreamSourceDefaultLength;
+            Assert.That(cs.Position, Is.EqualTo(StreamSourceDefaultLength));
+            concatStreamSourceDataUsed.Position.Returns(StreamSourceDefaultLength);
+
+            Assert.Throws<System.InvalidOperationException>(() =>
+            {
+                cs.AppendSource(concatStreamSourceData);
+            });
+        }
+
+        [Test(TestOf = typeof(ConcatStream))]
+        public void TwoStreamAppendSourcePostRead()
+        {
+            concatStreamSourceData.Position.Returns(10);
+
+            var cs = new ConcatStream();
+            Assert.That(cs.Position, Is.Zero);
+
+            cs.AppendSource(concatStreamSourceDataUsed);
+
+            Assert.That(cs.Position, Is.EqualTo(StreamSourceDefaultLength));
+
+            cs.Seek(StreamSourceDefaultLength - 1, System.IO.SeekOrigin.Begin);
+            concatStreamSourceDataUsed.Received().Position = StreamSourceDefaultLength - 1;
+            Assert.That(cs.Position, Is.EqualTo(StreamSourceDefaultLength - 1));
+            concatStreamSourceDataUsed.Position.Returns(StreamSourceDefaultLength - 1);
+
+            concatStreamSourceDataUsed.Read(Arg.Any<byte[]>(), 0, 1).Returns(1);
+            cs.ReadByte();
+            concatStreamSourceDataUsed.Position.Returns(StreamSourceDefaultLength);
+
+            Assert.Throws<System.InvalidOperationException>(() =>
+            {
+                cs.AppendSource(concatStreamSourceData);
+            });
+        }
+
         //TODO: read 1 byte (first stream, second stream, end of first stream, beginning of second stream, read 1 byte twice [1 from end of first, 1 from start of second])
 
         //TODO: read 2 byte (first stream into second stream)
