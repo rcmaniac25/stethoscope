@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.CompilerServices;
 
 namespace Stethoscope.Parsers.Internal
 {
@@ -18,27 +19,61 @@ namespace Stethoscope.Parsers.Internal
     public class ConcatStream : Stream
     {
         [Flags]
-        private enum DirtyProperties
+        private enum PropertyFlags
         {
-            Clean = 0,
+            ResetAll = 0,
 
-            Seek = 0x1,
-            Length = 0x2,
+            DirtySeek = 0x1 << 0,
+            DirtyLength = 0x1 << 1,
+            DirtyMask = DirtySeek | DirtyLength,
+            DirtyAll = DirtyMask,
 
-            All = Seek | Length
+            PropertyCanSeek = 0x1 << 2,
+            PropertyMask = PropertyCanSeek,
+
+            EventReadingOccured = 0x1 << 3,
+            EventSeekingOccured = 0x1 << 4,
+            EventMask = EventReadingOccured | EventSeekingOccured
         }
 
         private bool disposed = false;
 
         private List<IConcatStreamSource> sources = new List<IConcatStreamSource>();
         private long absPos = 0L;
+        private long propertyLength = 0L;
         private int sourceIndex = 0;
 
-        private DirtyProperties propertyDirty = DirtyProperties.All;
-        private bool dCanSeek = false;
-        private long dLength = 0L;
-        private bool dReadingOccured = false;
-        private bool dSeekingOccured = false;
+        #region Flags
+
+        private PropertyFlags flags = PropertyFlags.DirtyAll;
+
+        // The functions aren't needed, but it allows the code to be slightly cleaner. And if the MethodImpl flag works, it should inline it anyway
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void ReplaceFlags(PropertyFlags mask, PropertyFlags value)
+        {
+            flags = (flags & ~mask) | (value & mask);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void AddFlags(PropertyFlags value)
+        {
+            flags |= value;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void RemoveFlags(PropertyFlags value)
+        {
+            flags &= ~value;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private bool HasFlags(PropertyFlags value)
+        {
+            return (flags & value) == value;
+        }
+
+        #endregion
 
         #region Properties
 
@@ -54,21 +89,21 @@ namespace Stethoscope.Parsers.Internal
                 }
                 lock (sources)
                 {
-                    if ((propertyDirty & DirtyProperties.Seek) == DirtyProperties.Seek)
+                    if (HasFlags(PropertyFlags.DirtySeek))
                     {
-                        dCanSeek = true;
+                        AddFlags(PropertyFlags.PropertyCanSeek);
                         foreach (var source in sources)
                         {
                             if (!source.CanSeek)
                             {
-                                dCanSeek = false;
+                                RemoveFlags(PropertyFlags.PropertyCanSeek);
                                 break;
                             }
                         }
-                        propertyDirty &= ~DirtyProperties.Seek;
+                        RemoveFlags(PropertyFlags.DirtySeek);
                     }
                 }
-                return dCanSeek;
+                return HasFlags(PropertyFlags.PropertyCanSeek);
             }
         }
         public override long Length
@@ -81,17 +116,17 @@ namespace Stethoscope.Parsers.Internal
                 }
                 lock (sources)
                 {
-                    if ((propertyDirty & DirtyProperties.Length) == DirtyProperties.Length)
+                    if (HasFlags(PropertyFlags.DirtyLength))
                     {
-                        dLength = 0L;
+                        propertyLength = 0L;
                         foreach (var source in sources)
                         {
-                            dLength += source.Length;
+                            propertyLength += source.Length;
                         }
-                        propertyDirty &= ~DirtyProperties.Length;
+                        RemoveFlags(PropertyFlags.DirtyLength);
                     }
                 }
-                return dLength;
+                return propertyLength;
             }
         }
         public override long Position
@@ -171,7 +206,7 @@ namespace Stethoscope.Parsers.Internal
             {
                 throw new InvalidOperationException("DEV: Lock is not held when trying to get index position");
             }
-            else if (dSeekingOccured || dReadingOccured)
+            else if (HasFlags(PropertyFlags.EventSeekingOccured) || HasFlags(PropertyFlags.EventReadingOccured))
             {
                 throw new InvalidOperationException("DEV: Cannot get index position if seeking/reading has occured already");
             }
@@ -213,7 +248,7 @@ namespace Stethoscope.Parsers.Internal
 
                 if (source.CanSeek)
                 {
-                    if (priorCanSeek && (dSeekingOccured || dReadingOccured))
+                    if (priorCanSeek && (HasFlags(PropertyFlags.EventSeekingOccured) || HasFlags(PropertyFlags.EventReadingOccured)))
                     {
                         throw new InvalidOperationException("Cannot append a seekable source to a seekable stream if reading or seeking has already occured");
                     }
@@ -229,8 +264,8 @@ namespace Stethoscope.Parsers.Internal
                         throw new ArgumentException("Invalid seekable source");
                     }
                 }
-
-                propertyDirty = DirtyProperties.All;
+                
+                ReplaceFlags(PropertyFlags.DirtyMask, PropertyFlags.DirtyAll);
                 sources.Add(source);
 
                 if (priorCanSeek && (sources.Count > 1 || source.CanSeek))
@@ -320,7 +355,7 @@ namespace Stethoscope.Parsers.Internal
                     }
                     break;
                 }
-                dReadingOccured = true;
+                AddFlags(PropertyFlags.EventReadingOccured);
                 totalRead += sourceRead;
                 bufferOffset += sourceRead;
                 count -= sourceRead;
@@ -395,7 +430,7 @@ namespace Stethoscope.Parsers.Internal
             }
             if (newPos != absPos)
             {
-                dSeekingOccured = true;
+                AddFlags(PropertyFlags.EventSeekingOccured);
                 if (newPos < absPos)
                 {
                     while (absPos != newPos)

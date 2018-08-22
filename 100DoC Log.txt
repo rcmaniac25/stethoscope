@@ -1308,3 +1308,4 @@ void doSomethingCool(std::ifstream& input)
 #132.2. 8/21/2018:
 - I did the work and... all the tests pass. Yay!
 - I also realized I had a couple functions that do a simple task but don't do value checks. Usually, this is bad. But in this case, they aren't needed. They're just abstracted out functions. Doing checks when there is no way the data could get messed up (sans memory corruption) is basically a no-up. But since we have a bunch of tests, what better place to enforce it then in a `#if DEBUG` block.
+- I got a bit annoyed with having multiple booleans, and simply combined them all into one flag set.
