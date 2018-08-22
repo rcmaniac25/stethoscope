@@ -118,6 +118,17 @@ namespace Stethoscope.Parsers.Internal
         {
             // Expectation (enforced outside): locked, stream is not seekable
 
+#if DEBUG
+            if (!System.Threading.Monitor.IsEntered(sources))
+            {
+                throw new InvalidOperationException("DEV: Lock is not held when trying to optimize sources");
+            }
+            else if (CanSeek)
+            {
+                throw new InvalidOperationException("DEV: Stream must not be seekable to optimize sources");
+            }
+#endif
+
             // optimzation - if the current sources are seekable, but the new source is not seekable, then we can do some cleanup and dispose and remove the old sources since we will no longer be able to seek or change position once we add the new source
             if (sourceIndex >= sources.Count)
             {
@@ -155,6 +166,21 @@ namespace Stethoscope.Parsers.Internal
         {
             // Expectation (enforced outside): locked, reading/seeking hasn't occured, stream is seekable
 
+#if DEBUG
+            if (!System.Threading.Monitor.IsEntered(sources))
+            {
+                throw new InvalidOperationException("DEV: Lock is not held when trying to get index position");
+            }
+            else if (dSeekingOccured || dReadingOccured)
+            {
+                throw new InvalidOperationException("DEV: Cannot get index position if seeking/reading has occured already");
+            }
+            else if (!CanSeek)
+            {
+                throw new InvalidOperationException("DEV: Stream must be seekable to get index position");
+            }
+#endif
+
             int i = 0;
             for (; i < sources.Count; i++)
             {
@@ -179,6 +205,10 @@ namespace Stethoscope.Parsers.Internal
             }
             lock (sources)
             {
+                // CanSeek = first source valid, every other source must be 0 or Length unless it's sourceIndex. Doesn't optimize
+                // Can(not)Seek = always valid, does optimization
+                // If reading and seeking have already occured, don't allow appending seekable sources, otherwise internal state can be messed up
+
                 var priorCanSeek = CanSeek;
 
                 if (source.CanSeek)
@@ -192,6 +222,12 @@ namespace Stethoscope.Parsers.Internal
                 if (priorCanSeek)
                 {
                     currentMeasuredIndexPosition = GetIndexPosition();
+                    if (source.CanSeek && sources.Count != 0 && 
+                        source.Position != 0 && source.Position != source.Length && 
+                        currentMeasuredIndexPosition != sources.Count)
+                    {
+                        throw new ArgumentException("Invalid seekable source");
+                    }
                 }
 
                 propertyDirty = DirtyProperties.All;
@@ -210,47 +246,6 @@ namespace Stethoscope.Parsers.Internal
                 {
                     OptimizeSources();
                 }
-
-                //TODO: CanSeek = first source valid, every other source must be 0 or Length unless it's sourceIndex. Doesn't optimize
-                ////TODO: Can(not)Seek = always valid, does optimization
-                ////XXX: how do I handle if reading or seeking has already occured? (if reading started, and they just so happened to finish a source, then suddenly appending a new source and it "causally" moving the position, we end up with the position moving without anyone moving it)
-
-#if false
-                if (optimizeIfPossible && sources.Count != 0 && !source.CanSeek)
-                {
-                    OptimizeSources();
-                }
-
-                var priorCanSeek = CanSeek;
-                propertyDirty = DirtyProperties.All;
-                sources.Add(source);
-
-                if (sources.Count == 1 && source.CanSeek)
-                {
-                    absPos = source.Position;
-                }
-                else if (sources.Count > 1 && priorCanSeek && sources[sources.Count - 2].CanSeek)
-                {
-                    var priorSource = sources[sources.Count - 2];
-                    var priorSourceDone = priorSource.Position >= priorSource.Length;
-                    if (priorSourceDone)
-                    {
-                        sourceIndex++;
-                    }
-
-                    if (source.CanSeek)
-                    {
-                        if (priorSourceDone)
-                        {
-                            absPos += source.Position;
-                        }
-                    }
-                    else if (optimizeIfPossible)
-                    {
-                        OptimizeSources();
-                    }
-                }
-#endif
             }
         }
 
