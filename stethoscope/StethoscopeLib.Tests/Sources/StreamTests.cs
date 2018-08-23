@@ -824,10 +824,117 @@ namespace Stethoscope.Tests
             });
         }
 
-        //TODO: read 1 byte (first stream, second stream, end of first stream, beginning of second stream, read 1 byte twice [1 from end of first, 1 from start of second])
+        [Test(TestOf = typeof(ConcatStream))]
+        public void TwoStreamsReadOneFirstStream()
+        {
+            concatStreamSourceData.Position.Returns(10);
+            concatStreamSourceData.Read(Arg.Any<byte[]>(), 0, 1).Returns(1);
 
-        //TODO: read 2 byte (first stream into second stream)
+            var cs = new ConcatStream();
+            cs.AppendSource(concatStreamSourceData);
+            cs.AppendSource(concatStreamSourceNoData);
 
+            var value = cs.ReadByte();
+            Assert.That(value, Is.Not.EqualTo(-1));
+
+            concatStreamSourceData.Received(1).Read(Arg.Any<byte[]>(), 0, 1);
+            concatStreamSourceNoData.DidNotReceiveWithAnyArgs().Read(null, 0, 0);
+        }
+
+        [Test(TestOf = typeof(ConcatStream))]
+        public void TwoStreamsReadOneSecondStream()
+        {
+            concatStreamSourceData.Position.Returns(10);
+            concatStreamSourceData.Read(Arg.Any<byte[]>(), 0, 1).Returns(1);
+
+            var cs = new ConcatStream();
+            cs.AppendSource(concatStreamSourceDataUsed);
+            cs.AppendSource(concatStreamSourceData);
+
+            var value = cs.ReadByte();
+            Assert.That(value, Is.Not.EqualTo(-1));
+
+            concatStreamSourceData.Received(1).Read(Arg.Any<byte[]>(), 0, 1);
+            concatStreamSourceDataUsed.DidNotReceiveWithAnyArgs().Read(null, 0, 0);
+        }
+
+        [Test(TestOf = typeof(ConcatStream))]
+        public void TwoStreamsReadOneAtEndFirstStream()
+        {
+            concatStreamSourceData.Position.Returns(StreamSourceDefaultLength - 1);
+            concatStreamSourceData.Read(Arg.Any<byte[]>(), 0, 1).Returns(1);
+
+            var cs = new ConcatStream();
+            cs.AppendSource(concatStreamSourceData);
+            cs.AppendSource(concatStreamSourceNoData);
+
+            var value = cs.ReadByte();
+            Assert.That(value, Is.Not.EqualTo(-1));
+
+            concatStreamSourceData.Received(1).Read(Arg.Any<byte[]>(), 0, 1);
+            concatStreamSourceNoData.DidNotReceiveWithAnyArgs().Read(null, 0, 0);
+        }
+
+        [Test(TestOf = typeof(ConcatStream))]
+        public void TwoStreamsReadOneAtStartSecondStream()
+        {
+            concatStreamSourceData.Read(Arg.Any<byte[]>(), 0, 1).Returns(1);
+            concatStreamSourceDataUsed.Read(null, 0, 0).ReturnsForAnyArgs(0);
+
+            var cs = new ConcatStream();
+            cs.AppendSource(concatStreamSourceDataUsed);
+            cs.AppendSource(concatStreamSourceData);
+
+            var value = cs.ReadByte();
+            Assert.That(value, Is.Not.EqualTo(-1));
+
+            concatStreamSourceData.Received(1).Read(Arg.Any<byte[]>(), 0, 1);
+        }
+
+        [Test(TestOf = typeof(ConcatStream))]
+        public void TwoStreamsReadTwoIndependent()
+        {
+            concatStreamSourceData.Position.Returns(StreamSourceDefaultLength - 1);
+            concatStreamSourceData.Read(Arg.Any<byte[]>(), 0, 1).Returns(1, 0);
+
+            concatStreamSourceNoData.Length.Returns(StreamSourceDefaultLength); // Just to prevent making and setting up a new mock
+            concatStreamSourceNoData.Read(Arg.Any<byte[]>(), 0, 1).Returns(1);
+
+            var cs = new ConcatStream();
+            cs.AppendSource(concatStreamSourceData);
+            cs.AppendSource(concatStreamSourceNoData);
+
+            var value = cs.ReadByte();
+            Assert.That(value, Is.Not.EqualTo(-1));
+            value = cs.ReadByte();
+            Assert.That(value, Is.Not.EqualTo(-1));
+
+            concatStreamSourceData.Received(2).Read(Arg.Any<byte[]>(), 0, 1);
+            concatStreamSourceNoData.Received(1).Read(Arg.Any<byte[]>(), 0, 1);
+        }
+
+        [Test(TestOf = typeof(ConcatStream))]
+        public void TwoStreamsReadTwo()
+        {
+            concatStreamSourceData.Position.Returns(StreamSourceDefaultLength - 1);
+            concatStreamSourceData.Read(Arg.Any<byte[]>(), 0, 2).Returns(1);
+            concatStreamSourceData.Read(Arg.Any<byte[]>(), 1, 1).Returns(0);
+
+            concatStreamSourceNoData.Length.Returns(StreamSourceDefaultLength); // Just to prevent making and setting up a new mock
+            concatStreamSourceNoData.Read(Arg.Any<byte[]>(), 1, 1).Returns(1);
+
+            var cs = new ConcatStream();
+            cs.AppendSource(concatStreamSourceData);
+            cs.AppendSource(concatStreamSourceNoData);
+
+            var buffer = new byte[2];
+            var count = cs.Read(buffer, 0, 2);
+            Assert.That(count, Is.EqualTo(2));
+
+            concatStreamSourceData.ReceivedWithAnyArgs(2).Read(null, 0, 0);
+            concatStreamSourceNoData.Received(1).Read(Arg.Any<byte[]>(), 1, 1);
+        }
+        
         //TODO: seek (a whole bunch, including non-seekable concat)
 
         #endregion

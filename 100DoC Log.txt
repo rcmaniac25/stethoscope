@@ -1309,3 +1309,8 @@ void doSomethingCool(std::ifstream& input)
 - I did the work and... all the tests pass. Yay!
 - I also realized I had a couple functions that do a simple task but don't do value checks. Usually, this is bad. But in this case, they aren't needed. They're just abstracted out functions. Doing checks when there is no way the data could get messed up (sans memory corruption) is basically a no-up. But since we have a bunch of tests, what better place to enforce it then in a `#if DEBUG` block.
 - I got a bit annoyed with having multiple booleans, and simply combined them all into one flag set.
+
+#133.2. 8/22/2018:
+- Read tests with multiple streams are done.
+- That's it. Nothing crazy. Took a couple tries with testing reading across source bounds, because reading 2 bytes (independently) produces different Read invocations then reading 2 bytes (consecutively).
+- Next up: seeking
