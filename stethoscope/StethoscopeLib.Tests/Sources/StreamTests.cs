@@ -934,8 +934,16 @@ namespace Stethoscope.Tests
             concatStreamSourceData.ReceivedWithAnyArgs(2).Read(null, 0, 0);
             concatStreamSourceNoData.Received(1).Read(Arg.Any<byte[]>(), 1, 1);
         }
-        
-        //TODO: seek (a whole bunch, including non-seekable concat)
+
+        //TODO: 2 streams, seek 1st (current)
+
+        //TODO: 2 streams, seek 1st (begin)
+
+        //TODO: 2 streams, seek into 2nd (current)
+
+        //TODO: 2 streams, seek 2nd (end)
+
+        //TODO: 2 streams, seek (non-seekable stream)
 
         #endregion
 

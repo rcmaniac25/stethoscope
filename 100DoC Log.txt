@@ -1314,3 +1314,11 @@ void doSomethingCool(std::ifstream& input)
 - Read tests with multiple streams are done.
 - That's it. Nothing crazy. Took a couple tries with testing reading across source bounds, because reading 2 bytes (independently) produces different Read invocations then reading 2 bytes (consecutively).
 - Next up: seeking
+
+#134.2. 8/23/2018:
+- I'm tired today, so just plan out what tests to write.
+- I probably write too many tests (at work, we do... I can't remember the name of it, but it's described as "make a truth table, remove all impossible combinations, write tests for those... and also only write for specific combos"
+- The end result of ^^ is that 12 tests = 98% coverage, 14 = 98.5% coverage, 20 = 99%, 50 = 99.5%, 148 = 100% coverage. I fudged those numbers, but the example stands.
+- I'd love 100%, but 98.5% will do since I can write so many fewer tests. But I have no idea if I'm writing too many or not.
+- For ConcatStream, I have a bunch that test 1 stream. Then when I go to 2 streams, and I have a set of tests that test the first stream... but why?
+- For now, I'll continue. But when I go to do the observables, I will try to keep them to non-duplicates.
