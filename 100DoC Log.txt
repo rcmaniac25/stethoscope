@@ -1325,3 +1325,4 @@ void doSomethingCool(std::ifstream& input)
 
 #135.2. 8/24/2018:
 - Seeking support. Not too bad, though at least it tests moving between streams.
+- Makred out what tests to write to finish StreamTests

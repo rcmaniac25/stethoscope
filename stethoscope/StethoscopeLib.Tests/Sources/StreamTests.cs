@@ -1033,18 +1033,68 @@ namespace Stethoscope.Tests
                 cs.Seek(-1, System.IO.SeekOrigin.End);
             });
         }
-        
+
         #endregion
 
         #region Byte Array Stream
 
-        //TODO: byte array tests
+        //TODO: null data source
+
+        //TODO: empty data source, length
+
+        //TODO: non-empty data source, length
+
+        //TODO: can seek
+
+        //TODO: position (get)
+
+        //TODO: position (set)
+
+        //TODO: position (set, out of bounds)
+
+        //TODO: empty data source, read (null)
+
+        //TODO: empty data source, read (not-null, 0, 0)
+
+        //TODO: empty data source, read (not-null, 0, 1)
+
+        //TODO: empty data source, read (not-null, 1, 1)
+
+        //TODO: empty data source, read (not-null, -1, 1)
+
+        //TODO: empty data source, read (not-null, 0, -1)
+
+        //TODO: non-empty data source, read (null)
+
+        //TODO: non-empty data source, read (not-null, 0, 0)
+
+        //TODO: non-empty data source, read (not-null, 0, 1)
+
+        //TODO: non-empty data source, read (not-null, 1, 1)
+
+        //TODO: non-empty data source, read (not-null, -1, 1)
+
+        //TODO: non-empty data source, read (not-null, 0, -1)
 
         #endregion
 
         #region System.IO Stream
 
-        //TODO: stream tests
+        //TODO: null data source
+
+        //TODO: non-null data source (readble)
+
+        //TODO: non-null data source (not-readble)
+
+        //TODO: can seek (probably 2 of these)
+
+        //TODO: position (get)
+
+        //TODO: position (set)
+
+        //TODO: position (set, out of bounds)
+
+        //TODO: read (just test changes to data source, as it's just passing the parameters to the stream's Read function, so it's stream specific)
 
         #endregion
     }
