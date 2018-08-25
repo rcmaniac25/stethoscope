@@ -935,16 +935,105 @@ namespace Stethoscope.Tests
             concatStreamSourceNoData.Received(1).Read(Arg.Any<byte[]>(), 1, 1);
         }
 
-        //TODO: 2 streams, seek 1st (current)
+        [Test(TestOf = typeof(ConcatStream))]
+        public void TwoStreamsSeekFirstCurrent()
+        {
+            concatStreamSourceData.Position.Returns(1);
 
-        //TODO: 2 streams, seek 1st (begin)
+            concatStreamSourceNoData.Length.Returns(StreamSourceDefaultLength); // Just to prevent making and setting up a new mock
 
-        //TODO: 2 streams, seek into 2nd (current)
+            var cs = new ConcatStream();
+            cs.AppendSource(concatStreamSourceData);
+            cs.AppendSource(concatStreamSourceNoData);
 
-        //TODO: 2 streams, seek 2nd (end)
+            var res = cs.Seek(1, System.IO.SeekOrigin.Current);
+            Assert.That(res, Is.EqualTo(2));
 
-        //TODO: 2 streams, seek (non-seekable stream)
+            concatStreamSourceData.ReceivedWithAnyArgs().Position = 2;
+            concatStreamSourceNoData.DidNotReceiveWithAnyArgs().Position = 0;
+        }
 
+        [Test(TestOf = typeof(ConcatStream))]
+        public void TwoStreamsSeekFirstBegin()
+        {
+            concatStreamSourceNoData.Length.Returns(StreamSourceDefaultLength); // Just to prevent making and setting up a new mock
+
+            var cs = new ConcatStream();
+            cs.AppendSource(concatStreamSourceData);
+            cs.AppendSource(concatStreamSourceNoData);
+
+            var res = cs.Seek(1, System.IO.SeekOrigin.Begin);
+            Assert.That(res, Is.EqualTo(1));
+
+            concatStreamSourceData.ReceivedWithAnyArgs().Position = 1;
+            concatStreamSourceNoData.DidNotReceiveWithAnyArgs().Position = 0;
+        }
+
+        [Test(TestOf = typeof(ConcatStream))]
+        public void TwoStreamsSeekIntoSecond()
+        {
+            concatStreamSourceData.Position.Returns(StreamSourceDefaultLength - 1);
+
+            concatStreamSourceNoData.Length.Returns(StreamSourceDefaultLength); // Just to prevent making and setting up a new mock
+
+            var cs = new ConcatStream();
+            cs.AppendSource(concatStreamSourceData);
+            cs.AppendSource(concatStreamSourceNoData);
+
+            var res = cs.Seek(2, System.IO.SeekOrigin.Current);
+            Assert.That(res, Is.EqualTo(StreamSourceDefaultLength + 1));
+
+            concatStreamSourceData.ReceivedWithAnyArgs().Position = StreamSourceDefaultLength;
+            concatStreamSourceNoData.ReceivedWithAnyArgs().Position = 1;
+        }
+
+        [Test(TestOf = typeof(ConcatStream))]
+        public void TwoStreamsSeekIntoFirst()
+        {
+            concatStreamSourceData.Position.Returns(1);
+            
+            var cs = new ConcatStream();
+            cs.AppendSource(concatStreamSourceDataUsed);
+            cs.AppendSource(concatStreamSourceData);
+
+            var res = cs.Seek(-2, System.IO.SeekOrigin.Current);
+            Assert.That(res, Is.EqualTo(StreamSourceDefaultLength - 1));
+
+            concatStreamSourceDataUsed.ReceivedWithAnyArgs().Position = StreamSourceDefaultLength - 1;
+            concatStreamSourceData.ReceivedWithAnyArgs().Position = 0;
+        }
+
+        [Test(TestOf = typeof(ConcatStream))]
+        public void TwoStreamsSeekSecondEnd()
+        {
+            concatStreamSourceData.Position.Returns(1);
+
+            var cs = new ConcatStream();
+            cs.AppendSource(concatStreamSourceDataUsed);
+            cs.AppendSource(concatStreamSourceData);
+
+            var res = cs.Seek(-1, System.IO.SeekOrigin.End);
+            Assert.That(res, Is.EqualTo((StreamSourceDefaultLength * 2) - 1));
+
+            concatStreamSourceDataUsed.DidNotReceiveWithAnyArgs().Position = 0;
+            concatStreamSourceData.ReceivedWithAnyArgs().Position = StreamSourceDefaultLength - 1;
+        }
+
+        [Test(TestOf = typeof(ConcatStream))]
+        public void TwoStreamsSeekNonSeekable()
+        {
+            concatStreamSourceData.CanSeek.Returns(false);
+
+            var cs = new ConcatStream();
+            cs.AppendSource(concatStreamSourceDataUsed);
+            cs.AppendSource(concatStreamSourceData);
+
+            Assert.Throws<System.NotSupportedException>(() =>
+            {
+                cs.Seek(-1, System.IO.SeekOrigin.End);
+            });
+        }
+        
         #endregion
 
         #region Byte Array Stream

@@ -1322,3 +1322,6 @@ void doSomethingCool(std::ifstream& input)
 - I'd love 100%, but 98.5% will do since I can write so many fewer tests. But I have no idea if I'm writing too many or not.
 - For ConcatStream, I have a bunch that test 1 stream. Then when I go to 2 streams, and I have a set of tests that test the first stream... but why?
 - For now, I'll continue. But when I go to do the observables, I will try to keep them to non-duplicates.
+
+#135.2. 8/24/2018:
+- Seeking support. Not too bad, though at least it tests moving between streams.
