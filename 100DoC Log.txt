@@ -1326,3 +1326,6 @@ void doSomethingCool(std::ifstream& input)
 #135.2. 8/24/2018:
 - Seeking support. Not too bad, though at least it tests moving between streams.
 - Makred out what tests to write to finish StreamTests
+
+#136.2. 8/25/2018:
+- Today was a long day.. so the most I got was a few initial tests around the internal types that wrap streams and byte arrays.

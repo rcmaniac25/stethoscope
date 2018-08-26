@@ -1038,14 +1038,63 @@ namespace Stethoscope.Tests
 
         #region Byte Array Stream
 
-        //TODO: null data source
+        [Test(TestOf = typeof(ConcatStream))]
+        public void ByteArrayNull()
+        {
+            byte[] data = null;
 
-        //TODO: empty data source, length
+            var cs = new ConcatStream();
 
-        //TODO: non-empty data source, length
+            Assert.Throws<System.ArgumentNullException>(() =>
+            {
+                cs.Append(data);
+            });
+        }
 
-        //TODO: can seek
+        [Test(TestOf = typeof(ConcatStream))]
+        public void ByteArrayAppendEquality()
+        {
+            var data = new byte[0];
 
+            var cs = new ConcatStream();
+            var stream = cs.Append(data);
+
+            Assert.That(cs, Is.EqualTo(stream));
+        }
+
+        [Test(TestOf = typeof(ConcatStream))]
+        public void ByteArrayEmptyLength()
+        {
+            var data = new byte[0];
+
+            var cs = new ConcatStream();
+            cs.Append(data);
+
+            Assert.That(cs.Length, Is.Zero);
+        }
+
+        [Test(TestOf = typeof(ConcatStream))]
+        public void ByteArrayLength()
+        {
+            var data = new byte[10];
+
+            var cs = new ConcatStream();
+            cs.Append(data);
+
+            Assert.That(cs.Length, Is.EqualTo(10));
+        }
+
+        [Test(TestOf = typeof(ConcatStream))]
+        public void ByteArrayCanSeek()
+        {
+            var data = new byte[0];
+
+            var cs = new ConcatStream();
+            cs.Append(data);
+
+            Assert.That(cs.CanSeek, Is.True);
+        }
+        
         //TODO: position (get)
 
         //TODO: position (set)
@@ -1080,7 +1129,29 @@ namespace Stethoscope.Tests
 
         #region System.IO Stream
 
-        //TODO: null data source
+        [Test(TestOf = typeof(ConcatStream))]
+        public void SystemIOStreamNull()
+        {
+            System.IO.Stream data = null;
+
+            var cs = new ConcatStream();
+
+            Assert.Throws<System.ArgumentNullException>(() =>
+            {
+                cs.Append(data);
+            });
+        }
+
+        [Test(TestOf = typeof(ConcatStream))]
+        public void SystemIOAppendEquality()
+        {
+            var data = new System.IO.MemoryStream();
+
+            var cs = new ConcatStream();
+            var stream = cs.Append(data);
+
+            Assert.That(cs, Is.EqualTo(stream));
+        }
 
         //TODO: non-null data source (readble)
 
