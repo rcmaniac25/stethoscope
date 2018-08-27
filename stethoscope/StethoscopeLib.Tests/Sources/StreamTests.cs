@@ -1094,12 +1094,48 @@ namespace Stethoscope.Tests
 
             Assert.That(cs.CanSeek, Is.True);
         }
-        
-        //TODO: position (get)
 
-        //TODO: position (set)
+        [Test(TestOf = typeof(ConcatStream))]
+        public void ByteArrayGetPosition()
+        {
+            var data = new byte[10];
 
-        //TODO: position (set, out of bounds)
+            var cs = new ConcatStream();
+            cs.Append(data);
+
+            Assert.That(cs.Position, Is.Zero);
+        }
+
+        [Test(TestOf = typeof(ConcatStream))]
+        public void ByteArraySetPosition()
+        {
+            var data = new byte[10];
+
+            var cs = new ConcatStream();
+            cs.Append(data);
+
+            Assert.That(cs.Position, Is.Zero);
+            cs.Position = 5;
+            Assert.That(cs.Position, Is.EqualTo(5));
+        }
+
+        [Test(TestOf = typeof(ConcatStream))]
+        public void ByteArraySetPositionInvalid()
+        {
+            var data = new byte[10];
+
+            var cs = new ConcatStream();
+            cs.Append(data);
+
+            Assert.Throws<System.ArgumentOutOfRangeException>(() =>
+            {
+                cs.Position = -1;
+            });
+            Assert.Throws<System.ArgumentOutOfRangeException>(() =>
+            {
+                cs.Position = 11;
+            });
+        }
 
         //TODO: empty data source, read (null)
 

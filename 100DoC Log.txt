@@ -1329,3 +1329,8 @@ void doSomethingCool(std::ifstream& input)
 
 #136.2. 8/25/2018:
 - Today was a long day.. so the most I got was a few initial tests around the internal types that wrap streams and byte arrays.
+
+#137.2. 8/26/2018:
+- I ended up doing a lot of stuff today and didn't have a lot of time...
+- ...and I just mentally crashed.
+- So, I only did a few tests. Would've liked to finish them, but something that was supposed to be "quick" wasn't quick.
