@@ -34,7 +34,7 @@ namespace Stethoscope.Tests
             concatStreamSourceNoData.Length.Returns(0);
             concatStreamSourceNoData.CanSeek.Returns(true);
         }
-
+        
         #region Empty Stream
 
         [Test(TestOf = typeof(ConcatStream))]
@@ -1137,29 +1137,116 @@ namespace Stethoscope.Tests
             });
         }
 
-        //TODO: empty data source, read (null)
+        #region ConcatStream Read Test Functions
 
-        //TODO: empty data source, read (not-null, 0, 0)
+        // Realized later, refactoring this to seperate functions was unnecessary. But it doesn't hurt and is more time to put back together (or awkardly put back together)
 
-        //TODO: empty data source, read (not-null, 0, 1)
+        public enum ReadResult
+        {
+            NullException,
+            ArgumentException,
+            OutOfRangeException,
 
-        //TODO: empty data source, read (not-null, 1, 1)
+            NonZeroResult,
+            ZeroResult
+        }
 
-        //TODO: empty data source, read (not-null, -1, 1)
+        public enum BufferType
+        {
+            Null,
+            Instance
+        }
 
-        //TODO: empty data source, read (not-null, 0, -1)
+        private const int ReadingSourceEmpty = 0;
+        private const int ReadingSourceNotEmpty = 1;
+        private static readonly byte[][] ReadingSourceData = new byte[][]
+        {
+            new byte[0],
+            new byte[] { 10, 20, 30 } // Don't go more then 5 elements
+        };
 
-        //TODO: non-empty data source, read (null)
+        private void ConcatStreamReadTestVerification(BufferType bufferType, int offset, int length, ReadResult expectedResult)
+        {
+            // Ensure we don't ever make a combo of arguments that will always fail
 
-        //TODO: non-empty data source, read (not-null, 0, 0)
+            if (bufferType == BufferType.Null && expectedResult == ReadResult.NonZeroResult)
+            {
+                Assert.Fail("Won't be able to check results if buffer is null");
+            }
+        }
 
-        //TODO: non-empty data source, read (not-null, 0, 1)
+        public void ConcatStreamReadTest(ConcatStream cs, BufferType bufferType, int offset, int length, ReadResult expectedResult)
+        {
+            ConcatStreamReadTestVerification(bufferType, offset, length, expectedResult);
 
-        //TODO: non-empty data source, read (not-null, 1, 1)
+            byte[] buffer = bufferType == BufferType.Null ? null : new byte[5];
 
-        //TODO: non-empty data source, read (not-null, -1, 1)
+            switch (expectedResult)
+            {
+                case ReadResult.NullException:
+                case ReadResult.ArgumentException:
+                case ReadResult.OutOfRangeException:
+                    TestDelegate testDelegate = () =>
+                    {
+                        cs.Read(buffer, offset, length);
+                    };
+                    switch (expectedResult)
+                    {
+                        case ReadResult.NullException: Assert.Throws<System.ArgumentNullException>(testDelegate); break;
+                        case ReadResult.ArgumentException: Assert.Throws<System.ArgumentException>(testDelegate); break;
+                        case ReadResult.OutOfRangeException: Assert.Throws<System.ArgumentOutOfRangeException>(testDelegate); break;
+                    }
 
-        //TODO: non-empty data source, read (not-null, 0, -1)
+                    break;
+
+                case ReadResult.ZeroResult:
+                    var result = cs.Read(buffer, offset, length);
+                    Assert.That(result, Is.Zero);
+                    if (bufferType == BufferType.Instance)
+                    {
+                        Assert.That(buffer, Is.All.Zero);
+                    }
+                    break;
+
+                case ReadResult.NonZeroResult:
+                    result = cs.Read(buffer, offset, length);
+                    Assert.That(result, Is.Not.Zero);
+                    if (bufferType == BufferType.Instance)
+                    {
+                        for (int i = offset; i < (result + offset); i++)
+                        {
+                            Assert.That(buffer[i], Is.EqualTo(ReadingSourceData[ReadingSourceNotEmpty][i - offset]));
+                        }
+                    }
+                    break;
+
+                default:
+                    Assert.Fail($"Unknown {nameof(expectedResult)}: {expectedResult}");
+                    break;
+            }
+        }
+
+        #endregion
+        
+        [TestCase(ReadingSourceEmpty, BufferType.Null, 0, 0, ReadResult.NullException, TestOf = typeof(ConcatStream))]
+        [TestCase(ReadingSourceEmpty, BufferType.Instance, 0, 0, ReadResult.ZeroResult, TestOf = typeof(ConcatStream))]
+        [TestCase(ReadingSourceEmpty, BufferType.Instance, 0, 1, ReadResult.ZeroResult, TestOf = typeof(ConcatStream))]
+        [TestCase(ReadingSourceEmpty, BufferType.Instance, 1, 1, ReadResult.ZeroResult, TestOf = typeof(ConcatStream))]
+        [TestCase(ReadingSourceEmpty, BufferType.Instance, -1, 1, ReadResult.OutOfRangeException, TestOf = typeof(ConcatStream))]
+        [TestCase(ReadingSourceEmpty, BufferType.Instance, 0, -1, ReadResult.OutOfRangeException, TestOf = typeof(ConcatStream))]
+        [TestCase(ReadingSourceNotEmpty, BufferType.Null, 0, 0, ReadResult.NullException, TestOf = typeof(ConcatStream))]
+        [TestCase(ReadingSourceNotEmpty, BufferType.Instance, 0, 0, ReadResult.ZeroResult, TestOf = typeof(ConcatStream))]
+        [TestCase(ReadingSourceNotEmpty, BufferType.Instance, 0, 1, ReadResult.NonZeroResult, TestOf = typeof(ConcatStream))]
+        [TestCase(ReadingSourceNotEmpty, BufferType.Instance, 1, 1, ReadResult.NonZeroResult, TestOf = typeof(ConcatStream))]
+        [TestCase(ReadingSourceNotEmpty, BufferType.Instance, -1, 1, ReadResult.OutOfRangeException, TestOf = typeof(ConcatStream))]
+        [TestCase(ReadingSourceNotEmpty, BufferType.Instance, 0, -1, ReadResult.OutOfRangeException, TestOf = typeof(ConcatStream))]
+        public void ByteArrayRead(int dataIndex, BufferType bufferType, int offset, int length, ReadResult expectedResult)
+        {
+            var cs = new ConcatStream();
+            cs.Append(ReadingSourceData[dataIndex]);
+
+            ConcatStreamReadTest(cs, bufferType, offset, length, expectedResult);
+        }
 
         #endregion
 
@@ -1189,19 +1276,130 @@ namespace Stethoscope.Tests
             Assert.That(cs, Is.EqualTo(stream));
         }
 
-        //TODO: non-null data source (readble)
+        [Test(TestOf = typeof(ConcatStream))]
+        public void SystemIOStreamReadable()
+        {
+            var data = Substitute.For<System.IO.Stream>();
+            data.CanSeek.Returns(true);
+            data.CanRead.Returns(true);
+            data.Position.Returns(0);
+            data.Length.Returns(StreamSourceDefaultLength);
 
-        //TODO: non-null data source (not-readble)
+            var cs = new ConcatStream();
+            cs.Append(data);
+        }
 
-        //TODO: can seek (probably 2 of these)
+        [Test(TestOf = typeof(ConcatStream))]
+        public void SystemIOStreamNotReadable()
+        {
+            var data = Substitute.For<System.IO.Stream>();
+            data.CanSeek.Returns(true);
+            data.CanRead.Returns(false);
+            data.Position.Returns(0);
+            data.Length.Returns(StreamSourceDefaultLength);
 
-        //TODO: position (get)
+            var cs = new ConcatStream();
+            Assert.Throws<System.ArgumentException>(() =>
+            {
+                cs.Append(data);
+            });
+        }
 
-        //TODO: position (set)
+        [Test(TestOf = typeof(ConcatStream))]
+        public void SystemIOCanSeek()
+        {
+            var data = Substitute.For<System.IO.Stream>();
+            data.CanSeek.Returns(true);
+            data.CanRead.Returns(true);
+            data.Position.Returns(0);
+            data.Length.Returns(StreamSourceDefaultLength);
 
-        //TODO: position (set, out of bounds)
+            var cs = new ConcatStream();
+            cs.Append(data);
 
-        //TODO: read (just test changes to data source, as it's just passing the parameters to the stream's Read function, so it's stream specific)
+            Assert.That(cs.CanSeek, Is.True);
+        }
+
+        [Test(TestOf = typeof(ConcatStream))]
+        public void SystemIOCanSeekFalse()
+        {
+            var data = Substitute.For<System.IO.Stream>();
+            data.CanSeek.Returns(false);
+            data.CanRead.Returns(true);
+            data.Position.Returns(0);
+            data.Length.Returns(StreamSourceDefaultLength);
+
+            var cs = new ConcatStream();
+            cs.Append(data);
+
+            Assert.That(cs.CanSeek, Is.False);
+        }
+        
+        [Test(TestOf = typeof(ConcatStream))]
+        public void SystemIOGetPosition()
+        {
+            var data = new System.IO.MemoryStream(new byte[10]);
+
+            var cs = new ConcatStream();
+            cs.Append(data);
+
+            Assert.That(cs.Position, Is.Zero);
+            Assert.That(data.Position, Is.Zero);
+        }
+
+        [Test(TestOf = typeof(ConcatStream))]
+        public void SystemIOSetPosition()
+        {
+            var data = new System.IO.MemoryStream(new byte[10]);
+
+            var cs = new ConcatStream();
+            cs.Append(data);
+
+            Assert.That(cs.Position, Is.Zero);
+            Assert.That(data.Position, Is.Zero);
+            cs.Position = 5;
+            Assert.That(cs.Position, Is.EqualTo(5));
+            Assert.That(data.Position, Is.EqualTo(5));
+        }
+
+        [Test(TestOf = typeof(ConcatStream))]
+        public void SystemIOSetPositionInvalid()
+        {
+            var data = new System.IO.MemoryStream(new byte[10]);
+
+            var cs = new ConcatStream();
+            cs.Append(data);
+
+            Assert.Throws<System.ArgumentOutOfRangeException>(() =>
+            {
+                cs.Position = -1;
+            });
+            Assert.Throws<System.ArgumentOutOfRangeException>(() =>
+            {
+                cs.Position = 11;
+            });
+        }
+
+        [Test(TestOf = typeof(ConcatStream))]
+        public void SystemIOReadPassthrough()
+        {
+            // As calls are simply passed through to the stream, it's Stream dependent. So just make sure the stream was effected
+
+            var data = new System.IO.MemoryStream(new byte[10]);
+
+            var cs = new ConcatStream();
+            cs.Append(data);
+
+            Assert.That(cs.Position, Is.Zero);
+            Assert.That(data.Position, Is.Zero);
+
+            var buffer = new byte[5];
+            var read = cs.Read(buffer, 0, 3);
+
+            Assert.That(read, Is.EqualTo(3));
+            Assert.That(cs.Position, Is.EqualTo(3));
+            Assert.That(data.Position, Is.EqualTo(3));
+        }
 
         #endregion
     }

@@ -1334,3 +1334,8 @@ void doSomethingCool(std::ifstream& input)
 - I ended up doing a lot of stuff today and didn't have a lot of time...
 - ...and I just mentally crashed.
 - So, I only did a few tests. Would've liked to finish them, but something that was supposed to be "quick" wasn't quick.
+
+#138.2. 8/27/2018:
+- Alas, it's done.
+- I actually started early enough to finish the ConcatStream unit tests.
+- I won't have a lot of time tomorrow, but I might be able to at least make/setup the test files. If I'm lucky, I might also be able to start writing the "//TODO" statements

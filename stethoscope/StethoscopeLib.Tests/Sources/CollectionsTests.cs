@@ -619,7 +619,7 @@ namespace Stethoscope.Tests
             Assert.That(tracker.OriginalIndex, Is.EqualTo(3));
         }
 
-        [Test(TestOf = typeof(ListCollectionIndexOffsetTracker<>))]
+        [Test(TestOf = typeof(ListCollectionIndexOffsetTracker<>)), Repeat(3)]
         public void IndexTrackerLockThreadPotentiallyBefore()
         {
             var tracker = new ListCollectionIndexOffsetTracker<int>();
@@ -678,7 +678,7 @@ namespace Stethoscope.Tests
             Assert.That(tracker.OriginalIndex, Is.EqualTo(2));
         }
 
-        [Test(TestOf = typeof(ListCollectionIndexOffsetTracker<>))]
+        [Test(TestOf = typeof(ListCollectionIndexOffsetTracker<>)), Repeat(3)]
         public void IndexTrackerLockThreadPotentiallyAfter()
         {
             var tracker = new ListCollectionIndexOffsetTracker<int>();
