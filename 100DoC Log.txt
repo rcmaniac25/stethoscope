@@ -1339,3 +1339,6 @@ void doSomethingCool(std::ifstream& input)
 - Alas, it's done.
 - I actually started early enough to finish the ConcatStream unit tests.
 - I won't have a lot of time tomorrow, but I might be able to at least make/setup the test files. If I'm lucky, I might also be able to start writing the "//TODO" statements
+
+#139.2. 8/28/2018:
+- As stated yesterday, I didn't have a lot of time. But I at least got the test file setup.
