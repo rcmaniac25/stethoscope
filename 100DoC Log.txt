@@ -1342,3 +1342,7 @@ void doSomethingCool(std::ifstream& input)
 
 #139.2. 8/28/2018:
 - As stated yesterday, I didn't have a lot of time. But I at least got the test file setup.
+
+#140.2. 8/29/2018:
+- Ok, so I had a rough day... and fell asleep. So this is very "late"...
+- So I only wrote a couple TODOs and will write more later in the day

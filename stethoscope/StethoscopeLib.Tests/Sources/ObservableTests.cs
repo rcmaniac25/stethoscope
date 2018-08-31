@@ -2,11 +2,15 @@
 
 using NUnit.Framework;
 
-namespace Stethoscope.Tests.Sources
+namespace Stethoscope.Tests
 {
     [TestFixture]
     public class ObservableTests
     {
-        //TODO
+        //TODO: IList observables
+
+        //TODO: IBaseListCollection observables
+
+        //TODO: GetObservableType
     }
 }
