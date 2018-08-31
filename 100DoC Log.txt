@@ -1346,3 +1346,7 @@ void doSomethingCool(std::ifstream& input)
 #140.2. 8/29/2018:
 - Ok, so I had a rough day... and fell asleep. So this is very "late"...
 - So I only wrote a couple TODOs and will write more later in the day
+
+#141.2. 8/30/2018:
+- I didn't get to this until late due to catching up from everything I had planned todo yesterday...
+- So as I said "earlier", I expanded the TODOs. It's not every unit test, but it's at least a better idea of what will be written
