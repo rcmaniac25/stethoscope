@@ -2,12 +2,47 @@
 
 using NUnit.Framework;
 
+using Stethoscope.Collections;
+using Stethoscope.Reactive;
+
+using System.Collections.Generic;
+
 namespace Stethoscope.Tests
 {
     [TestFixture]
     public class ObservableTests
     {
+        [Test]
+        public void ToObservableListNull([Values]ObservableType type)
+        {
+            IList<int> list = null;
+            Assert.Throws<System.ArgumentNullException>(() =>
+            {
+                list.ToObservable(type);
+            });
+        }
+
+        [Test]
+        public void ToObservableBaseListCollectionNull([Values]ObservableType type)
+        {
+            IBaseListCollection<int> list = null;
+            Assert.Throws<System.ArgumentNullException>(() =>
+            {
+                list.ToObservable(type);
+            });
+        }
+
         //TODO: ToObservables
+
+        [Test]
+        public void GetObservableTypeNull()
+        {
+            System.IObservable<int> obs = null;
+            Assert.Throws<System.ArgumentNullException>(() =>
+            {
+                obs.GetObservableType();
+            });
+        }
 
         //TODO: GetObservableType
 
