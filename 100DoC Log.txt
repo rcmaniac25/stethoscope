@@ -1354,3 +1354,6 @@ void doSomethingCool(std::ifstream& input)
 #142.2. 8/31/2018:
 - I did a lot of things today... and time wasn't on my side. It's very late for me right now.
 - The most I did was make one test to ensure null inputs to ToObservable/GetObservableType doesn't break anything
+
+#143.2. 9/01/2018:
+- Did not do well due to how late things were yesterday, so finished the simple tests for creating and checking the observables.

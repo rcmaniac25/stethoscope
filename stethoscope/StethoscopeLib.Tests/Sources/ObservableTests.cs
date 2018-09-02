@@ -16,6 +16,7 @@ namespace Stethoscope.Tests
         public void ToObservableListNull([Values]ObservableType type)
         {
             IList<int> list = null;
+
             Assert.Throws<System.ArgumentNullException>(() =>
             {
                 list.ToObservable(type);
@@ -26,25 +27,86 @@ namespace Stethoscope.Tests
         public void ToObservableBaseListCollectionNull([Values]ObservableType type)
         {
             IBaseListCollection<int> list = null;
+
             Assert.Throws<System.ArgumentNullException>(() =>
             {
                 list.ToObservable(type);
             });
         }
 
-        //TODO: ToObservables
+        [Test]
+        public void ToObservableList([Values]ObservableType type)
+        {
+            var list = new List<int>();
+
+            var obs = list.ToObservable(type);
+            Assert.That(obs, Is.Not.Null);
+        }
+
+        [Test]
+        public void ToObservableBaseListCollection([Values]ObservableType type)
+        {
+            var list = new List<int>();
+            var baseList = list.AsListCollection();
+
+            var obs = baseList.ToObservable(type);
+            Assert.That(obs, Is.Not.Null);
+        }
 
         [Test]
         public void GetObservableTypeNull()
         {
             System.IObservable<int> obs = null;
+
             Assert.Throws<System.ArgumentNullException>(() =>
             {
                 obs.GetObservableType();
             });
         }
 
-        //TODO: GetObservableType
+        [Test]
+        public void GetObservableTypeList([Values]ObservableType type)
+        {
+            var list = new List<int>();
+            var obs = list.ToObservable(type);
+
+            var testedType = obs.GetObservableType();
+            Assert.That(testedType, Is.EqualTo(type));
+        }
+
+        [Test]
+        public void GetObservableTypeBaseListCollection([Values]ObservableType type)
+        {
+            var list = new List<int>();
+            var baseList = list.AsListCollection();
+            var obs = baseList.ToObservable(type);
+
+            var testedType = obs.GetObservableType();
+            Assert.That(testedType, Is.EqualTo(type));
+        }
+
+        [Test]
+        public void SchedulerListNull()
+        {
+            var list = new List<int>();
+
+            Assert.Throws<System.ArgumentNullException>(() =>
+            {
+                list.ToObservable(ObservableType.LiveUpdating, null);
+            });
+        }
+
+        [Test]
+        public void SchedulerBaseListCollectionNull()
+        {
+            var list = new List<int>();
+            var baseList = list.AsListCollection();
+
+            Assert.Throws<System.ArgumentNullException>(() =>
+            {
+                baseList.ToObservable(ObservableType.LiveUpdating, null);
+            });
+        }
 
         //TODO: basic tests with regular schedulers and long running schedulers
 
