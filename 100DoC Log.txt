@@ -1357,3 +1357,11 @@ void doSomethingCool(std::ifstream& input)
 
 #143.2. 9/01/2018:
 - Did not do well due to how late things were yesterday, so finished the simple tests for creating and checking the observables.
+
+#144.2. 9/02/2018:
+- Continuing the tradition of doing this much later then I should...
+- I'm stuck on a small mental challenge. I want to test that execution is the same between normal and long running schedulers... but I don't really know how to check they are the same besides going "no data, now some data, wait, now more data" and checking they both do the same within a small timeframe
+- But that's hard, requires threads, coordination, and more... it's not worth that much work.
+- At the same time, just throwing a mock in and ensuring that the expected functions are invoked... is also probbaly unnecessary because if it didn't, then there's a bigger issue with the API or it's changed.
+- Yet... it would be good to ensure that regardless of scheduler, the observables do the same thing.
+- Also, one benefit of the mock-approach is that I can pass in my own cancelation tokens and test the ones will actually notify when they've been invoked. Essentially allowing me to use a "real" sleep instead of a polling one, which I have to use because it doesn't seem any scheduler provides a sleep that notifies.
