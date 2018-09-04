@@ -107,8 +107,14 @@ namespace Stethoscope.Tests
                 baseList.ToObservable(ObservableType.LiveUpdating, null);
             });
         }
+        
+        //TODO: scheduler mocks (regular scheduler)
 
-        //TODO: basic tests with regular schedulers and long running schedulers
+        //TODO: scheduler mocks (long scheduler)
+
+        //TODO: scheduler mocks (long scheduler with CancellationDisposable)
+
+        //TODO: slightly complex: have some set of tests that test both schedulers (possibly with mocks) to ensure that they all execute the same way
 
         //--- Finite ---
 

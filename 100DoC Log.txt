@@ -1365,3 +1365,14 @@ void doSomethingCool(std::ifstream& input)
 - At the same time, just throwing a mock in and ensuring that the expected functions are invoked... is also probbaly unnecessary because if it didn't, then there's a bigger issue with the API or it's changed.
 - Yet... it would be good to ensure that regardless of scheduler, the observables do the same thing.
 - Also, one benefit of the mock-approach is that I can pass in my own cancelation tokens and test the ones will actually notify when they've been invoked. Essentially allowing me to use a "real" sleep instead of a polling one, which I have to use because it doesn't seem any scheduler provides a sleep that notifies.
+
+#145.2. 9/03/2018:
+- So this morning I wrote a couple TODOs for testing schedulers. I would do both, mock some basic tests, then (hopefully using mocks) would do a comparision between long and regular schedulers.
+- I started working on it and hit a roadblock pretty quickly: the schedule functions are generic or extensions.
+- What this meant is that the functions I was using were not actually member/interface functions, but extension functions. I can't mock those...
+- But what about the actual functions, the generics? Nope. See, mocks expect known types: I have my List<T> and I'm going to test adding an "int", but ints can only be used if it's List<int>. This, I will mock List<int> to test Add(int value).
+- But in this case, what is happening is that I have an internal state for the observable, which is passed into the extension function... which then does it's own wrapping/invocation. So without step-by-step testing to figure out the perfect state match, I can't test it.
+- There are a few Stack Overflow articles saying that's what people did to get around this issue. As a coworker once told me "that test is too rigid". What happens if the extension functions change? What if I change my state? Both can or would result in changtes to the state down the line.
+- The result is (example. Not actually tested) .Net Standard 2.0 tests pass but .Net Standard 2.1 do not. It becomes too tightly coupled. It goes against what we're supposed to test.
+- Which brings me to the current state... I will not be testing schedulers. I will attempt to use two real schedulars for testing and expect them both to pass.
+- That is probably how it should've been done. I will leave the TODOs in this commit just so they're recorded, but they'll be removed in the next commit.
