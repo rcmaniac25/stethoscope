@@ -6,12 +6,30 @@ using Stethoscope.Collections;
 using Stethoscope.Reactive;
 
 using System.Collections.Generic;
+using System.Reactive.Concurrency;
+using System.Reactive.Linq;
 
 namespace Stethoscope.Tests
 {
     [TestFixture]
     public class ObservableTests
     {
+        private IList<int> mockList;
+        private IBaseListCollection<int> mockBaseList;
+
+        private static IScheduler[] SchedulersToTest = new IScheduler[]
+        {
+            DefaultScheduler.Instance, // Regular scheduler
+            TaskPoolScheduler.Default  // Long scheduler
+        };
+
+        [SetUp]
+        public void Setup()
+        {
+            mockList = Substitute.For<IList<int>>();
+            mockBaseList = Substitute.For<IBaseListCollection<int>>();
+        }
+
         [Test]
         public void ToObservableListNull([Values]ObservableType type)
         {
@@ -107,18 +125,36 @@ namespace Stethoscope.Tests
                 baseList.ToObservable(ObservableType.LiveUpdating, null);
             });
         }
-        
-        //TODO: scheduler mocks (regular scheduler)
 
-        //TODO: scheduler mocks (long scheduler)
+        //TODO: need a scheduler sanity-check to ensure all expected schedulers exist
 
-        //TODO: scheduler mocks (long scheduler with CancellationDisposable)
-
-        //TODO: slightly complex: have some set of tests that test both schedulers (possibly with mocks) to ensure that they all execute the same way
+        //=========All the following should accept an argument for a scheduler, and then a values schedule will be provided to test regular and long scheduler==========
 
         //--- Finite ---
 
-        //TODO: exception
+        [Test]
+        public void LiveObservableListException([ValueSource("SchedulersToTest")]IScheduler scheduler)
+        {
+            mockList.Count.Returns(c => throw new System.InvalidOperationException());
+
+            var obs = mockList.ToObservable(ObservableType.LiveUpdating, scheduler);
+            Assert.Throws<System.InvalidOperationException>(() =>
+            {
+                obs.Wait();
+            });
+        }
+
+        [Test]
+        public void LiveObservableBaseListCollectionException([ValueSource("SchedulersToTest")]IScheduler scheduler)
+        {
+            mockBaseList.Count.Returns(c => throw new System.InvalidOperationException());
+
+            var obs = mockBaseList.ToObservable(ObservableType.LiveUpdating, scheduler);
+            Assert.Throws<System.InvalidOperationException>(() =>
+            {
+                obs.Wait();
+            });
+        }
 
         //TODO: no messages at all
 
@@ -130,7 +166,29 @@ namespace Stethoscope.Tests
 
         //--- Infinite ---
 
-        //TODO: exception
+        [Test]
+        public void InfiniteLiveObservableListException([ValueSource("SchedulersToTest")]IScheduler scheduler)
+        {
+            mockList.Count.Returns(c => throw new System.InvalidOperationException());
+
+            var obs = mockList.ToObservable(ObservableType.InfiniteLiveUpdating, scheduler);
+            Assert.Throws<System.InvalidOperationException>(() =>
+            {
+                obs.Wait();
+            });
+        }
+
+        [Test]
+        public void InfiniteLiveObservableBaseListCollectionException([ValueSource("SchedulersToTest")]IScheduler scheduler)
+        {
+            mockBaseList.Count.Returns(c => throw new System.InvalidOperationException());
+
+            var obs = mockBaseList.ToObservable(ObservableType.InfiniteLiveUpdating, scheduler);
+            Assert.Throws<System.InvalidOperationException>(() =>
+            {
+                obs.Wait();
+            });
+        }
 
         //TODO: no messages at all
 

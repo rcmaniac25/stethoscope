@@ -1376,3 +1376,9 @@ void doSomethingCool(std::ifstream& input)
 - The result is (example. Not actually tested) .Net Standard 2.0 tests pass but .Net Standard 2.1 do not. It becomes too tightly coupled. It goes against what we're supposed to test.
 - Which brings me to the current state... I will not be testing schedulers. I will attempt to use two real schedulars for testing and expect them both to pass.
 - That is probably how it should've been done. I will leave the TODOs in this commit just so they're recorded, but they'll be removed in the next commit.
+
+#146.2. 9/04/2018:
+- So I got the idea "just have the schedulers be arguments" and proceeded to write some initial tests where the schedulers are passed in as an argument.
+- This allows us to write the tests we want, and then if there's any difference between schedulers, it will be discovered upon execution of the test with that scheduler.
+- Now I can simply write the test
+- I didn't have time to do more then the initial experiments. Also, remembered I wanted a sanity-check test (tests that go "I'm testing a scheduler that is long running, and one that isn't... right?")
