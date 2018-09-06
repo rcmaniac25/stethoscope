@@ -1382,3 +1382,10 @@ void doSomethingCool(std::ifstream& input)
 - This allows us to write the tests we want, and then if there's any difference between schedulers, it will be discovered upon execution of the test with that scheduler.
 - Now I can simply write the test
 - I didn't have time to do more then the initial experiments. Also, remembered I wanted a sanity-check test (tests that go "I'm testing a scheduler that is long running, and one that isn't... right?")
+
+#147.2. 9/05/2018:
+- I was up too late last night, so I didn't want to spend too much time tonight working on this.
+- Also, infinite and finite observables will have different implementations.
+- So before I go kicking myself on trying to test something that "doesn't end", I wanted to do the finite cases.
+- I drew the line before testing "insert" functionality, because that will be both with and without threading... and that will be it's own pain.
+- So, to save time, and sanity: no threads or infinite observables today.
