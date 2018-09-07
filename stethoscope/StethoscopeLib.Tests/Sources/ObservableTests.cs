@@ -155,11 +155,7 @@ namespace Stethoscope.Tests
             Assert.That(hasRegularScheduler, Is.True);
             Assert.That(hasLongScheduler, Is.True);
         }
-
-        //=========All the following should accept an argument for a scheduler, and then a values schedule will be provided to test regular and long scheduler==========
-
-        //--- Finite ---
-
+        
         [Test]
         public void LiveObservableListException([ValueSource("SchedulersToTest")]IScheduler scheduler)
         {
@@ -185,7 +181,7 @@ namespace Stethoscope.Tests
         }
 
         [Test]
-        public void LiveObservableBaseListCollectionEmpty([ValueSource("SchedulersToTest")]IScheduler scheduler)
+        public void LiveObservableListEmpty([ValueSource("SchedulersToTest")]IScheduler scheduler)
         {
             var list = new List<int>();
 
@@ -194,26 +190,13 @@ namespace Stethoscope.Tests
         }
 
         [Test]
-        public void LiveObservableListEmpty([ValueSource("SchedulersToTest")]IScheduler scheduler)
+        public void LiveObservableBaseListCollectionEmpty([ValueSource("SchedulersToTest")]IScheduler scheduler)
         {
             var list = new List<int>();
             var baseList = list.AsListCollection();
 
-            var obs = list.ToObservable(ObservableType.LiveUpdating, scheduler);
+            var obs = baseList.ToObservable(ObservableType.LiveUpdating, scheduler);
             Assert.That(obs.IsEmpty().Wait());
-        }
-
-        [Test]
-        public void LiveObservableBaseListCollection([ValueSource("SchedulersToTest")]IScheduler scheduler)
-        {
-            var list = new List<int>
-            {
-                10,
-                20
-            };
-
-            var obs = list.ToObservable(ObservableType.LiveUpdating, scheduler);
-            Assert.That(obs.ToEnumerable(), Is.EquivalentTo(new int[] { 10, 20 }));
         }
 
         [Test]
@@ -224,18 +207,58 @@ namespace Stethoscope.Tests
                 10,
                 20
             };
-            var baseList = list.AsListCollection();
 
             var obs = list.ToObservable(ObservableType.LiveUpdating, scheduler);
             Assert.That(obs.ToEnumerable(), Is.EquivalentTo(new int[] { 10, 20 }));
         }
+
+        [Test]
+        public void LiveObservableBaseListCollection([ValueSource("SchedulersToTest")]IScheduler scheduler)
+        {
+            var list = new List<int>
+            {
+                10,
+                20
+            };
+            var baseList = list.AsListCollection();
+
+            var obs = baseList.ToObservable(ObservableType.LiveUpdating, scheduler);
+            Assert.That(obs.ToEnumerable(), Is.EquivalentTo(new int[] { 10, 20 }));
+        }
+
+        [Test]
+        public void LiveObservableListInsert([ValueSource("SchedulersToTest")]IScheduler scheduler)
+        {
+            var list = new List<int>
+            {
+                10,
+                20
+            };
+
+            var obs = list.ToObservable(ObservableType.LiveUpdating, scheduler);
+            Assert.That(obs.ToEnumerable(), Is.EquivalentTo(new int[] { 10, 20 }));
+
+            list.Insert(1, 30);
+            Assert.That(obs.ToEnumerable(), Is.EquivalentTo(new int[] { 10, 30, 20 }));
+        }
+
+        [Test]
+        public void LiveObservableBaseListCollectionInsert([ValueSource("SchedulersToTest")]IScheduler scheduler)
+        {
+            var list = new List<int>
+            {
+                10,
+                20
+            };
+            var baseList = list.AsListCollection();
+
+            var obs = baseList.ToObservable(ObservableType.LiveUpdating, scheduler);
+            Assert.That(obs.ToEnumerable(), Is.EquivalentTo(new int[] { 10, 20 }));
+
+            baseList.Insert(1, 30);
+            Assert.That(obs.ToEnumerable(), Is.EquivalentTo(new int[] { 10, 30, 20 }));
+        }
         
-        //TODO: insert into list (non-threaded)
-
-        //TODO: insert into list (threaded)
-
-        //--- Infinite ---
-
         [Test]
         public void InfiniteLiveObservableListException([ValueSource("SchedulersToTest")]IScheduler scheduler)
         {
@@ -269,5 +292,7 @@ namespace Stethoscope.Tests
         //TODO: insert into list (threaded)
 
         //TODO: something that produces a CancellationDisposable for use cancelable
+
+        //TODO: some long test
     }
 }

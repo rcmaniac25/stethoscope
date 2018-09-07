@@ -1389,3 +1389,12 @@ void doSomethingCool(std::ifstream& input)
 - So before I go kicking myself on trying to test something that "doesn't end", I wanted to do the finite cases.
 - I drew the line before testing "insert" functionality, because that will be both with and without threading... and that will be it's own pain.
 - So, to save time, and sanity: no threads or infinite observables today.
+
+#148.2. 9/06/2018:
+- I did the finite insert function.
+- I was gonna do a threaded and non-threaded version, but the whole ability to dynamically insert and get a value during iteration requires a lot more data. I will attempt to write a test for this at another time.
+- ...so I only did the non-threaded.
+- I then started thinking about the infinite observable but then... just lost interest (for tonight).
+- Sometimes at work I go on autopilot. Today was one of those days. I went all day and refactored/abstracted about 30 files varying from 1-2 lines to 50-70. It was more mechanical then thinking.
+- Doing that for hours... I was hungry, tired, and just wanted to finish it and go home. Unfortunetly, that leaves me in a bit of a shell-shocked state of "I... don't know what to do/want to do/do I want to do something?" state.
+- So I'm calling it a night so I don't just stare at these couple TODOs without actually doing anything.
