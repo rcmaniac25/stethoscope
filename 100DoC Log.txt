@@ -1398,3 +1398,8 @@ void doSomethingCool(std::ifstream& input)
 - Sometimes at work I go on autopilot. Today was one of those days. I went all day and refactored/abstracted about 30 files varying from 1-2 lines to 50-70. It was more mechanical then thinking.
 - Doing that for hours... I was hungry, tired, and just wanted to finish it and go home. Unfortunetly, that leaves me in a bit of a shell-shocked state of "I... don't know what to do/want to do/do I want to do something?" state.
 - So I'm calling it a night so I don't just stare at these couple TODOs without actually doing anything.
+
+#149.2. 9/07/2018:
+- "Don't not-sleep kids"
+- I've been tired all day, and got to my home late. I had a number of other tasks todo...
+- All I did was update dependencies and switch the tracker app to .Net Core 2.1 (I read it's much faster then 2.0)

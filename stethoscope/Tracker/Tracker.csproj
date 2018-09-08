@@ -5,7 +5,7 @@
     <Copyright>2018 Vincent Simonetti</Copyright>
     <AssemblyTitle>Log Tracker</AssemblyTitle>
     <VersionPrefix>0.0.1</VersionPrefix>
-    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
     <AssemblyName>Tracker</AssemblyName>
     <OutputType>Exe</OutputType>
     <PackageId>Tracker</PackageId>
