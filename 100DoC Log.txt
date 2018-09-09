@@ -1403,3 +1403,12 @@ void doSomethingCool(std::ifstream& input)
 - "Don't not-sleep kids"
 - I've been tired all day, and got to my home late. I had a number of other tasks todo...
 - All I did was update dependencies and switch the tracker app to .Net Core 2.1 (I read it's much faster then 2.0)
+
+#150.2. 9/08/2018:
+- Another busy day means not much gets done...
+- Or does it?
+- I managed to get the first (real) infinite test written. It's ugly, but testing frameworks just aren't written for "infinite".
+- Ideally, I would've loved to just call "obs.Wait()" but specify a timeout.
+- There is no such thing... rather then write one, I just used Subscribe, have the scheduler do something else (my way of saying "the scheduler isn't frozen or something") and wait until the second operation is done before saying "so, did it work?"
+- It does, though it's not fast (um... there are thread sleeps) and I'm a bit worried it's too complex for the tests I'm trying to do. But I should be able to adapt it for the remaining tests pretty easily.
+- I could do that now, but I'm late... again.

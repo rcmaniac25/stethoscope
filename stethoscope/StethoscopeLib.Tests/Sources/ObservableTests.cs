@@ -5,6 +5,7 @@ using NUnit.Framework;
 using Stethoscope.Collections;
 using Stethoscope.Reactive;
 
+using System;
 using System.Collections.Generic;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
@@ -283,7 +284,64 @@ namespace Stethoscope.Tests
             });
         }
 
-        //TODO: no messages at all
+        [Test]
+        public void InfiniteLiveObservableListEmpty([ValueSource("SchedulersToTest")]IScheduler scheduler)
+        {
+            var list = new List<int>();
+
+            bool recievedValue = false;
+            bool recievedError = false;
+            bool completed = false;
+            var waitSem = new System.Threading.SemaphoreSlim(0);
+
+            var obs = list.ToObservable(ObservableType.InfiniteLiveUpdating, scheduler);
+            var dis1 = obs.Subscribe(_ => recievedValue = true, _ => recievedError = true, () => completed = true);
+
+            var dis2 = scheduler.Schedule(() =>
+            {
+                System.Threading.Thread.Sleep(50);
+                waitSem.Release();
+            });
+
+            while (!waitSem.Wait(100)) ;
+
+            dis1.Dispose();
+            dis2.Dispose();
+
+            Assert.That(recievedValue, Is.False);
+            Assert.That(recievedError, Is.False);
+            Assert.That(completed, Is.False);
+        }
+
+        [Test]
+        public void InfiniteLiveObservableBaseListCollectionEmpty([ValueSource("SchedulersToTest")]IScheduler scheduler)
+        {
+            var list = new List<int>();
+            var baseList = list.AsListCollection();
+
+            bool recievedValue = false;
+            bool recievedError = false;
+            bool completed = false;
+            var waitSem = new System.Threading.SemaphoreSlim(0);
+
+            var obs = baseList.ToObservable(ObservableType.InfiniteLiveUpdating, scheduler);
+            var dis1 = obs.Subscribe(_ => recievedValue = true, _ => recievedError = true, () => completed = true);
+
+            var dis2 = scheduler.Schedule(() =>
+            {
+                System.Threading.Thread.Sleep(50);
+                waitSem.Release();
+            });
+
+            while (!waitSem.Wait(100)) ;
+
+            dis1.Dispose();
+            dis2.Dispose();
+
+            Assert.That(recievedValue, Is.False);
+            Assert.That(recievedError, Is.False);
+            Assert.That(completed, Is.False);
+        }
 
         //TODO: a couple messages
 
