@@ -343,7 +343,78 @@ namespace Stethoscope.Tests
             Assert.That(completed, Is.False);
         }
 
-        //TODO: a couple messages
+        [Test]
+        public void InfiniteLiveObservableList([ValueSource("SchedulersToTest")]IScheduler scheduler)
+        {
+            var list = new List<int>
+            {
+                10,
+                20
+            };
+            
+            var recievedValues = new List<int>();
+            bool recievedError = false;
+            bool completed = false;
+            var waitSem = new System.Threading.SemaphoreSlim(0);
+
+            var obs = list.ToObservable(ObservableType.InfiniteLiveUpdating, scheduler);
+            var dis1 = obs.Subscribe(x => recievedValues.Add(x), _ => recievedError = true, () => completed = true);
+
+            var dis2 = scheduler.Schedule(() =>
+            {
+                if (recievedValues.Count != 2)
+                {
+                    System.Threading.Thread.Sleep(50);
+                }
+                waitSem.Release();
+            });
+
+            while (!waitSem.Wait(100)) ;
+
+            dis1.Dispose();
+            dis2.Dispose();
+            
+            Assert.That(recievedValues, Is.EquivalentTo(new int[] { 10, 20 }));
+            Assert.That(recievedError, Is.False);
+            Assert.That(completed, Is.False);
+        }
+
+        [Test]
+        public void InfiniteLiveObservableBaseListCollection([ValueSource("SchedulersToTest")]IScheduler scheduler)
+        {
+            var list = new List<int>
+            {
+                10,
+                20
+            };
+            var baseList = list.AsListCollection();
+
+            var recievedValues = new List<int>();
+            bool recievedError = false;
+            bool completed = false;
+            var waitSem = new System.Threading.SemaphoreSlim(0);
+
+            var obs = baseList.ToObservable(ObservableType.InfiniteLiveUpdating, scheduler);
+            var dis1 = obs.Subscribe(x => recievedValues.Add(x), _ => recievedError = true, () => completed = true);
+
+            var dis2 = scheduler.Schedule(() =>
+            {
+                if (recievedValues.Count != 2)
+                {
+                    System.Threading.Thread.Sleep(50);
+                }
+                waitSem.Release();
+            });
+
+            while (!waitSem.Wait(100)) ;
+
+            dis1.Dispose();
+            dis2.Dispose();
+
+            Assert.That(recievedValues, Is.EquivalentTo(new int[] { 10, 20 }));
+            Assert.That(recievedError, Is.False);
+            Assert.That(completed, Is.False);
+        }
 
         //TODO: insert into list (non-threaded)
 

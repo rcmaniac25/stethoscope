@@ -1412,3 +1412,7 @@ void doSomethingCool(std::ifstream& input)
 - There is no such thing... rather then write one, I just used Subscribe, have the scheduler do something else (my way of saying "the scheduler isn't frozen or something") and wait until the second operation is done before saying "so, did it work?"
 - It does, though it's not fast (um... there are thread sleeps) and I'm a bit worried it's too complex for the tests I'm trying to do. But I should be able to adapt it for the remaining tests pretty easily.
 - I could do that now, but I'm late... again.
+
+#151.2. 9/09/2018:
+- I got the base-test for existing items.
+- I then started on insertion... and it didn't work. I will need to look at it tomorrow, as it's a little more complex then originally expected.
