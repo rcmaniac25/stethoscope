@@ -416,7 +416,174 @@ namespace Stethoscope.Tests
             Assert.That(completed, Is.False);
         }
 
-        //TODO: insert into list (non-threaded)
+
+
+        [Test, Repeat(3)]
+        public void InfiniteLiveObservableListInsert([ValueSource("SchedulersToTest")]IScheduler scheduler)
+        {
+            var list = new List<int>
+            {
+                10,
+                20
+            };
+
+            var recievedValues = new List<int>();
+            bool recievedError = false;
+            bool completed = false;
+            var waitSem = new System.Threading.SemaphoreSlim(0);
+
+            var obs = list.ToObservable(ObservableType.InfiniteLiveUpdating, scheduler);
+            var dis1 = obs.Subscribe(x => recievedValues.Add(x), _ => recievedError = true, () => completed = true);
+
+            var dis2 = scheduler.Schedule(() =>
+            {
+                if (recievedValues.Count != 2)
+                {
+                    System.Threading.Thread.Sleep(50);
+                }
+                waitSem.Release();
+            });
+
+            while (!waitSem.Wait(100)) ;
+
+            dis2.Dispose();
+
+            Assert.That(recievedValues, Is.EquivalentTo(new int[] { 10, 20 }));
+            Assert.That(recievedError, Is.False);
+            Assert.That(completed, Is.False);
+
+            list.Insert(1, 30);
+
+            dis2 = scheduler.Schedule(() =>
+            {
+                if (recievedValues.Count != 2)
+                {
+                    System.Threading.Thread.Sleep(50);
+                }
+                waitSem.Release();
+            });
+
+            while (!waitSem.Wait(100)) ;
+
+            dis1.Dispose();
+            dis2.Dispose();
+
+            // Difference between this and the finite one
+            // - finite one will have finished and a new subscription is needed to get the inserted value
+            // - infinite one will still be running and will get the notification of the inserted item. But the insertion will be past where the index is, so it will notify of it.
+            Assert.That(recievedValues, Is.EquivalentTo(new int[] { 10, 20 }));
+            Assert.That(recievedError, Is.False);
+            Assert.That(completed, Is.False);
+
+            // Sanity test
+            recievedValues.Clear();
+            recievedError = false;
+            completed = false;
+
+            dis1 = obs.Subscribe(x => recievedValues.Add(x), _ => recievedError = true, () => completed = true);
+            dis2 = scheduler.Schedule(() =>
+            {
+                if (recievedValues.Count != 3)
+                {
+                    System.Threading.Thread.Sleep(50);
+                }
+                waitSem.Release();
+            });
+
+            while (!waitSem.Wait(100)) ;
+
+            dis1.Dispose();
+            dis2.Dispose();
+
+            Assert.That(recievedValues, Is.EquivalentTo(new int[] { 10, 30, 20 }));
+            Assert.That(recievedError, Is.False);
+            Assert.That(completed, Is.False);
+        }
+
+        [Test, Repeat(3)]
+        public void InfiniteLiveObservableBaseListCollectionInsert([ValueSource("SchedulersToTest")]IScheduler scheduler)
+        {
+            var list = new List<int>
+            {
+                10,
+                20
+            };
+            var baseList = list.AsListCollection();
+
+            var recievedValues = new List<int>();
+            bool recievedError = false;
+            bool completed = false;
+            var waitSem = new System.Threading.SemaphoreSlim(0);
+
+            var obs = baseList.ToObservable(ObservableType.InfiniteLiveUpdating, scheduler);
+            var dis1 = obs.Subscribe(x => recievedValues.Add(x), _ => recievedError = true, () => completed = true);
+
+            var dis2 = scheduler.Schedule(() =>
+            {
+                if (recievedValues.Count != 2)
+                {
+                    System.Threading.Thread.Sleep(50);
+                }
+                waitSem.Release();
+            });
+
+            while (!waitSem.Wait(100)) ;
+
+            dis2.Dispose();
+
+            Assert.That(recievedValues, Is.EquivalentTo(new int[] { 10, 20 }));
+            Assert.That(recievedError, Is.False);
+            Assert.That(completed, Is.False);
+
+            list.Insert(1, 30);
+
+            dis2 = scheduler.Schedule(() =>
+            {
+                if (recievedValues.Count != 2)
+                {
+                    System.Threading.Thread.Sleep(50);
+                }
+                waitSem.Release();
+            });
+
+            while (!waitSem.Wait(100)) ;
+
+            dis1.Dispose();
+            dis2.Dispose();
+
+            // Difference between this and the finite one
+            // - finite one will have finished and a new subscription is needed to get the inserted value
+            // - infinite one will still be running and will get the notification of the inserted item. But the insertion will be past where the index is, so it will notify of it.
+            Assert.That(recievedValues, Is.EquivalentTo(new int[] { 10, 20 }));
+            Assert.That(recievedError, Is.False);
+            Assert.That(completed, Is.False);
+
+            // Sanity test
+            recievedValues.Clear();
+            recievedError = false;
+            completed = false;
+
+            dis1 = obs.Subscribe(x => recievedValues.Add(x), _ => recievedError = true, () => completed = true);
+            dis2 = scheduler.Schedule(() =>
+            {
+                if (recievedValues.Count != 3)
+                {
+                    System.Threading.Thread.Sleep(50);
+                }
+                waitSem.Release();
+            });
+
+            while (!waitSem.Wait(100)) ;
+
+            dis1.Dispose();
+            dis2.Dispose();
+
+            Assert.That(recievedValues, Is.EquivalentTo(new int[] { 10, 30, 20 }));
+            Assert.That(recievedError, Is.False);
+            Assert.That(completed, Is.False);
+        }
+
+        //TODO: read 100DoC log (152.2) as it has some additional "todos"
 
         //TODO: insert into list (threaded)
 

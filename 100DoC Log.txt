@@ -1416,3 +1416,13 @@ void doSomethingCool(std::ifstream& input)
 #151.2. 9/09/2018:
 - I got the base-test for existing items.
 - I then started on insertion... and it didn't work. I will need to look at it tomorrow, as it's a little more complex then originally expected.
+
+#152.2. 9/10/2018:
+- I was lucky, I didn't need to do too much to fix the insertion test.
+- Basically, I forgot the purpose of the live observables: allow iteration as they are modifed.
+- The challenge is that by the time the insertion happens (non-threaded), the iteration is already done.
+- Knowing this, I avoided the threaded test for finite observables. I'm wondering if I should still do them because...
+- ...for infinite tests, non-threaded will produce a different result just because of how the value check is being done (finite - new subscription each test, infinite - one subscription per test).
+- But, for the threaded tests: they should have the same response: if the insertion happens after the subscription finishes, the inserted value won't be there. Otherwise, it will be there.
+- Bonus "should I do this?" is changing the finite observables to test the same as the infinite observables.
+- "yes" but it should be an additional test. The ToEnumerable test is still something to test, and won't work for infinite observables, but having the tests be the same will make it easier to do direct comparisions of results.
