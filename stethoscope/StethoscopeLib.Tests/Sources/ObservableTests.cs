@@ -201,7 +201,7 @@ namespace Stethoscope.Tests
         }
 
         [Test]
-        public void LiveObservableList([ValueSource("SchedulersToTest")]IScheduler scheduler)
+        public void LiveObservableListToEnumerable([ValueSource("SchedulersToTest")]IScheduler scheduler)
         {
             var list = new List<int>
             {
@@ -214,7 +214,7 @@ namespace Stethoscope.Tests
         }
 
         [Test]
-        public void LiveObservableBaseListCollection([ValueSource("SchedulersToTest")]IScheduler scheduler)
+        public void LiveObservableBaseListCollectionToEnumerable([ValueSource("SchedulersToTest")]IScheduler scheduler)
         {
             var list = new List<int>
             {
@@ -225,6 +225,55 @@ namespace Stethoscope.Tests
 
             var obs = baseList.ToObservable(ObservableType.LiveUpdating, scheduler);
             Assert.That(obs.ToEnumerable(), Is.EquivalentTo(new int[] { 10, 20 }));
+        }
+        
+        [Test]
+        public void LiveObservableList([ValueSource("SchedulersToTest")]IScheduler scheduler)
+        {
+            var list = new List<int>
+            {
+                10,
+                20
+            };
+
+            var recievedValues = new List<int>();
+            bool recievedError = false;
+            var waitSem = new System.Threading.SemaphoreSlim(0);
+
+            var obs = list.ToObservable(ObservableType.LiveUpdating, scheduler);
+            var dis = obs.Subscribe(x => recievedValues.Add(x), _ => recievedError = true, () => waitSem.Release());
+            
+            while (!waitSem.Wait(100)) ;
+            
+            dis.Dispose();
+
+            Assert.That(recievedValues, Is.EquivalentTo(new int[] { 10, 20 }));
+            Assert.That(recievedError, Is.False);
+        }
+
+        [Test]
+        public void LiveObservableBaseListCollection([ValueSource("SchedulersToTest")]IScheduler scheduler)
+        {
+            var list = new List<int>
+            {
+                10,
+                20
+            };
+            var baseList = list.AsListCollection();
+
+            var recievedValues = new List<int>();
+            bool recievedError = false;
+            var waitSem = new System.Threading.SemaphoreSlim(0);
+
+            var obs = baseList.ToObservable(ObservableType.LiveUpdating, scheduler);
+            var dis = obs.Subscribe(x => recievedValues.Add(x), _ => recievedError = true, () => waitSem.Release());
+
+            while (!waitSem.Wait(100)) ;
+
+            dis.Dispose();
+
+            Assert.That(recievedValues, Is.EquivalentTo(new int[] { 10, 20 }));
+            Assert.That(recievedError, Is.False);
         }
 
         [Test]
@@ -259,6 +308,8 @@ namespace Stethoscope.Tests
             baseList.Insert(1, 30);
             Assert.That(obs.ToEnumerable(), Is.EquivalentTo(new int[] { 10, 30, 20 }));
         }
+
+        //TODO: threaded insertion
         
         [Test]
         public void InfiniteLiveObservableListException([ValueSource("SchedulersToTest")]IScheduler scheduler)
@@ -416,16 +467,22 @@ namespace Stethoscope.Tests
             Assert.That(completed, Is.False);
         }
 
-
-
         [Test, Repeat(3)]
         public void InfiniteLiveObservableListInsert([ValueSource("SchedulersToTest")]IScheduler scheduler)
         {
+            /* Test parts:
+             * 1. observe values (observable is still running)
+             * 2. insert value (observable is terminated) and ensure it was not observed (since it would be before the current "iteration index")
+             * 3. new observe values (observable is terminated) but this one should have the inserted value as it's a new iteration index and the value came after the new iteration index
+             */
+
             var list = new List<int>
             {
                 10,
                 20
             };
+
+            // 1
 
             var recievedValues = new List<int>();
             bool recievedError = false;
@@ -452,6 +509,8 @@ namespace Stethoscope.Tests
             Assert.That(recievedError, Is.False);
             Assert.That(completed, Is.False);
 
+            // 2
+
             list.Insert(1, 30);
 
             dis2 = scheduler.Schedule(() =>
@@ -475,7 +534,8 @@ namespace Stethoscope.Tests
             Assert.That(recievedError, Is.False);
             Assert.That(completed, Is.False);
 
-            // Sanity test
+            // 3
+
             recievedValues.Clear();
             recievedError = false;
             completed = false;
@@ -503,6 +563,14 @@ namespace Stethoscope.Tests
         [Test, Repeat(3)]
         public void InfiniteLiveObservableBaseListCollectionInsert([ValueSource("SchedulersToTest")]IScheduler scheduler)
         {
+            /* Test parts:
+             * 1. observe values (observable is still running)
+             * 2. insert value (observable is terminated) and ensure it was not observed (since it would be before the current "iteration index")
+             * 3. new observe values (observable is terminated) but this one should have the inserted value as it's a new iteration index and the value came after the new iteration index
+             */
+            
+            // 1
+
             var list = new List<int>
             {
                 10,
@@ -535,6 +603,8 @@ namespace Stethoscope.Tests
             Assert.That(recievedError, Is.False);
             Assert.That(completed, Is.False);
 
+            // 2
+
             list.Insert(1, 30);
 
             dis2 = scheduler.Schedule(() =>
@@ -558,7 +628,8 @@ namespace Stethoscope.Tests
             Assert.That(recievedError, Is.False);
             Assert.That(completed, Is.False);
 
-            // Sanity test
+            // 3
+
             recievedValues.Clear();
             recievedError = false;
             completed = false;
@@ -582,9 +653,7 @@ namespace Stethoscope.Tests
             Assert.That(recievedError, Is.False);
             Assert.That(completed, Is.False);
         }
-
-        //TODO: read 100DoC log (152.2) as it has some additional "todos"
-
+        
         //TODO: insert into list (threaded)
 
         //TODO: something that produces a CancellationDisposable for use cancelable

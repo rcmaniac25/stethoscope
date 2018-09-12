@@ -1426,3 +1426,11 @@ void doSomethingCool(std::ifstream& input)
 - But, for the threaded tests: they should have the same response: if the insertion happens after the subscription finishes, the inserted value won't be there. Otherwise, it will be there.
 - Bonus "should I do this?" is changing the finite observables to test the same as the infinite observables.
 - "yes" but it should be an additional test. The ToEnumerable test is still something to test, and won't work for infinite observables, but having the tests be the same will make it easier to do direct comparisions of results.
+
+#153.2. 9/11/2018:
+- I made sure the basic test operated the same way as for finite as it did for infinite observables
+- I was going to do the same for insertion... but I would have no way to test this.
+- Since the finite observable would finish, I couldn't do a check that the inserted value wasn't returned without re-running the observable OR threading it...
+- ...which answers the question of if I should still do a threaded insertion test for finite observables.
+- I also updated the "what the heck is happening" inside the insert infinite observable tests.
+- Tomorrow I'm hoping to do the threaded tests.
