@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
+using System.Threading.Tasks;
 
 namespace Stethoscope.Tests
 {
@@ -309,8 +310,123 @@ namespace Stethoscope.Tests
             Assert.That(obs.ToEnumerable(), Is.EquivalentTo(new int[] { 10, 30, 20 }));
         }
 
-        //TODO: threaded insertion
-        
+        [Test, Repeat(3)]
+        public void LiveObservableListInsertThreaded([ValueSource("SchedulersToTest")]IScheduler scheduler)
+        {
+            /* Test parts:
+             * 1. observe values when insertion and observation occurs (at least from an API call perspective) at the same time
+             * 2. observe values when insertion occurs after observation was started
+             */
+
+            var list = new List<int>
+            {
+                10,
+                20
+            };
+
+            var obs = list.ToObservable(ObservableType.LiveUpdating, scheduler);
+
+            var recievedValues = new List<int>();
+            bool recievedError = false;
+
+            void listInsert() => list.Insert(1, 30);
+            void enumerateValues()
+            {
+                var waitSem = new System.Threading.SemaphoreSlim(0);
+
+                var dis = obs.Subscribe(x => recievedValues.Add(x), _ => recievedError = true, () => waitSem.Release());
+
+                while (!waitSem.Wait(100)) ;
+
+                dis.Dispose();
+            }
+
+            // 1
+
+            Parallel.Invoke
+            (
+                listInsert,
+                enumerateValues
+            );
+
+            Assert.That(recievedValues, Is.EquivalentTo(new int[] { 10, 30, 20 }));
+            Assert.That(recievedError, Is.False);
+
+            // 2
+
+            recievedValues.Clear();
+            recievedError = false;
+
+            list.RemoveAt(1);
+
+            var enumerateTask = Task.Run((Action)enumerateValues);
+            var insertTask = Task.Delay(1).ContinueWith(_ => listInsert());
+
+            Task.WaitAll(enumerateTask, insertTask);
+
+            Assert.That(recievedValues, Is.EquivalentTo(new int[] { 10, 20 }));
+            Assert.That(recievedError, Is.False);
+        }
+
+        [Test, Repeat(3)]
+        public void LiveObservableBaseListCollectionInsertThreaded([ValueSource("SchedulersToTest")]IScheduler scheduler)
+        {
+            /* Test parts:
+             * 1. observe values when insertion and observation occurs (at least from an API call perspective) at the same time
+             * 2. observe values when insertion occurs after observation was started
+             */
+
+            var list = new List<int>
+            {
+                10,
+                20
+            };
+            var baseList = list.AsListCollection();
+
+            var obs = baseList.ToObservable(ObservableType.LiveUpdating, scheduler);
+
+            var recievedValues = new List<int>();
+            bool recievedError = false;
+
+            void listInsert() => baseList.Insert(1, 30);
+            void enumerateValues()
+            {
+                var waitSem = new System.Threading.SemaphoreSlim(0);
+
+                var dis = obs.Subscribe(x => recievedValues.Add(x), _ => recievedError = true, () => waitSem.Release());
+
+                while (!waitSem.Wait(100)) ;
+
+                dis.Dispose();
+            }
+
+            // 1
+
+            Parallel.Invoke
+            (
+                listInsert,
+                enumerateValues
+            );
+
+            Assert.That(recievedValues, Is.EquivalentTo(new int[] { 10, 30, 20 }));
+            Assert.That(recievedError, Is.False);
+
+            // 2
+
+            recievedValues.Clear();
+            recievedError = false;
+
+            list.RemoveAt(1);
+
+            var enumerateTask = Task.Run((Action)enumerateValues);
+            var insertTask = Task.Delay(1).ContinueWith(_ => listInsert());
+
+            Task.WaitAll(enumerateTask, insertTask);
+
+            Assert.That(recievedValues, Is.EquivalentTo(new int[] { 10, 20 }));
+            Assert.That(recievedError, Is.False);
+        }
+
         [Test]
         public void InfiniteLiveObservableListException([ValueSource("SchedulersToTest")]IScheduler scheduler)
         {
@@ -653,8 +769,147 @@ namespace Stethoscope.Tests
             Assert.That(recievedError, Is.False);
             Assert.That(completed, Is.False);
         }
-        
-        //TODO: insert into list (threaded)
+
+        [Test, Repeat(3)]
+        public void InfiniteLiveObservableListInsertThreaded([ValueSource("SchedulersToTest")]IScheduler scheduler)
+        {
+            /* Test parts:
+             * 1. observe values when insertion and observation occurs (at least from an API call perspective) at the same time
+             * 2. observe values when insertion occurs after observation was started
+             */
+
+            var list = new List<int>
+            {
+                10,
+                20
+            };
+
+            var obs = list.ToObservable(ObservableType.InfiniteLiveUpdating, scheduler);
+
+            var recievedValues = new List<int>();
+            bool recievedError = false;
+            bool completed = false;
+            var waitSem = new System.Threading.SemaphoreSlim(0);
+
+            void listInsert() => list.Insert(1, 30);
+            Action enumerateValues(int expectedCount) => new Action(() =>
+            {
+                var dis1 = obs.Subscribe(x => recievedValues.Add(x), _ => recievedError = true, () => completed = true);
+                var dis2 = scheduler.Schedule(() =>
+                {
+                    if (recievedValues.Count != expectedCount)
+                    {
+                        System.Threading.Thread.Sleep(50);
+                    }
+                    waitSem.Release();
+                });
+
+                while (!waitSem.Wait(100)) ;
+
+                dis1.Dispose();
+                dis2.Dispose();
+            });
+
+            // 1
+
+            Parallel.Invoke
+            (
+                listInsert,
+                enumerateValues(3)
+            );
+
+            Assert.That(recievedValues, Is.EquivalentTo(new int[] { 10, 30, 20 }));
+            Assert.That(recievedError, Is.False);
+            Assert.That(completed, Is.False);
+
+            // 2
+
+            recievedValues.Clear();
+            recievedError = false;
+            completed = false;
+
+            list.RemoveAt(1);
+
+            var enumerateTask = Task.Run(enumerateValues(2));
+            var insertTask = Task.Delay(1).ContinueWith(_ => listInsert());
+
+            Task.WaitAll(enumerateTask, insertTask);
+
+            Assert.That(recievedValues, Is.EquivalentTo(new int[] { 10, 20 }));
+            Assert.That(recievedError, Is.False);
+            Assert.That(completed, Is.False);
+        }
+
+        [Test, Repeat(3)]
+        public void InfiniteLiveObservableBaseListCollectionInsertThreaded([ValueSource("SchedulersToTest")]IScheduler scheduler)
+        {
+            /* Test parts:
+             * 1. observe values when insertion and observation occurs (at least from an API call perspective) at the same time
+             * 2. observe values when insertion occurs after observation was started
+             */
+
+            var list = new List<int>
+            {
+                10,
+                20
+            };
+            var baseList = list.AsListCollection();
+
+            var obs = baseList.ToObservable(ObservableType.InfiniteLiveUpdating, scheduler);
+
+            var recievedValues = new List<int>();
+            bool recievedError = false;
+            bool completed = false;
+            var waitSem = new System.Threading.SemaphoreSlim(0);
+
+            void listInsert() => baseList.Insert(1, 30);
+            Action enumerateValues(int expectedCount) => new Action(() =>
+            {
+                var dis1 = obs.Subscribe(x => recievedValues.Add(x), _ => recievedError = true, () => completed = true);
+                var dis2 = scheduler.Schedule(() =>
+                {
+                    if (recievedValues.Count != expectedCount)
+                    {
+                        System.Threading.Thread.Sleep(50);
+                    }
+                    waitSem.Release();
+                });
+
+                while (!waitSem.Wait(100)) ;
+
+                dis1.Dispose();
+                dis2.Dispose();
+            });
+
+            // 1
+
+            Parallel.Invoke
+            (
+                listInsert,
+                enumerateValues(3)
+            );
+
+            Assert.That(recievedValues, Is.EquivalentTo(new int[] { 10, 30, 20 }));
+            Assert.That(recievedError, Is.False);
+            Assert.That(completed, Is.False);
+
+            // 2
+
+            recievedValues.Clear();
+            recievedError = false;
+            completed = false;
+
+            list.RemoveAt(1);
+
+            var enumerateTask = Task.Run(enumerateValues(2));
+            var insertTask = Task.Delay(1).ContinueWith(_ => listInsert());
+
+            Task.WaitAll(enumerateTask, insertTask);
+
+            Assert.That(recievedValues, Is.EquivalentTo(new int[] { 10, 20 }));
+            Assert.That(recievedError, Is.False);
+            Assert.That(completed, Is.False);
+        }
 
         //TODO: something that produces a CancellationDisposable for use cancelable
 

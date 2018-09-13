@@ -1434,3 +1434,13 @@ void doSomethingCool(std::ifstream& input)
 - ...which answers the question of if I should still do a threaded insertion test for finite observables.
 - I also updated the "what the heck is happening" inside the insert infinite observable tests.
 - Tomorrow I'm hoping to do the threaded tests.
+
+#154.2. 9/12/2018:
+- I managed to figure out the threaded insertion tests
+- The challenge I had was how to ensure that insertion would occur at or during observation of the list.
+- The ideal test would be: 1. subscription starts. 2. Insert value. 3. finish observation.
+- ...but unless I add some backdoor/tracking function to what is essentially List<T>, which would just make it more complex... and I'd feel the need to test THAT api too.
+- (cont.) I have no way to ensure that when the subscription starts, teh insert didn't already occur.
+- For that reason, I did two things: use Parallel.Invoke (which from an API perspective, should ensure the insertion occurs "at or during" observation) and to ensure things aren't messed up, I do the observation before insertion.
+- And yes, to ensure that I won't accidentally insert at or during observation, I delay... by 1 ms.
+- In the end, the tests pass. I hope I covered it properly... but for now, it should be good enough.

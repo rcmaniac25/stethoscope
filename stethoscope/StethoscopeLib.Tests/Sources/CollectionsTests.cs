@@ -1,6 +1,7 @@
 ﻿using NUnit.Framework;
 
 using Stethoscope.Collections;
+using Stethoscope.Tests.Helpers;
 
 using System;
 using System.Collections.Generic;
@@ -324,18 +325,7 @@ namespace Stethoscope.Tests
             Assert.That(collection, Is.Empty);
             Assert.That(collection.Count, Is.Zero);
         }
-
-        //TODO: move to helper namespace
-        private class EventCapture<T> where T : EventArgs
-        {
-            public List<(object sender, T eventObject)> CapturedEvents { get; private set; } = new List<(object sender, T eventObject)>();
-
-            public void CaptureEventHandler(object sender, T e)
-            {
-                CapturedEvents.Add((sender, e));
-            }
-        }
-
+        
         [Test(TestOf = typeof(IBaseReadWriteListCollection<>))]
         public void AddEvent()
         {
