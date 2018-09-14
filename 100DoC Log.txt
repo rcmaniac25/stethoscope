@@ -1444,3 +1444,9 @@ void doSomethingCool(std::ifstream& input)
 - For that reason, I did two things: use Parallel.Invoke (which from an API perspective, should ensure the insertion occurs "at or during" observation) and to ensure things aren't messed up, I do the observation before insertion.
 - And yes, to ensure that I won't accidentally insert at or during observation, I delay... by 1 ms.
 - In the end, the tests pass. I hope I covered it properly... but for now, it should be good enough.
+
+#155.2. 9/13/2018:
+- Today was a late day, and I am not in the right mindset. I was even told "you seem more absentminded then usual today".
+- As I am struggling to focus, I will simply note the "TODO" and work on it tomorrow.
+- The "TODO" is testing the "wait" functionality of an infinite list, where it should not be complete, but will OnNext the values added to the end of the list.
+- I'll need to think about the CancellationDisposable test I also want to write... simply because every scheduler doesn't seem to use it and I don't want to write my own Scheduler.

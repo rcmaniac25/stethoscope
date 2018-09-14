@@ -911,6 +911,8 @@ namespace Stethoscope.Tests
             Assert.That(completed, Is.False);
         }
 
+        //TODO: infinte "wait" (start observation with empty list, get time and insert, when OnNext is invoked we want the timestamp, compare the timestamps to ensure they're close enough)
+
         //TODO: something that produces a CancellationDisposable for use cancelable
 
         //TODO: some long test
