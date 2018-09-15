@@ -124,11 +124,21 @@ namespace Stethoscope.Collections
                         CurrentIndex = 0;
                     }
                 }
-                else if (e.Type == ListCollectionEventType.Add || e.Type == ListCollectionEventType.Insert)
+                else if (e.Type == ListCollectionEventType.Insert)
                 {
                     lock (locker)
                     {
                         if (e.Index <= CurrentIndex)
+                        {
+                            CurrentIndex++;
+                        }
+                    }
+                }
+                else if (e.Type == ListCollectionEventType.Add)
+                {
+                    lock (locker)
+                    {
+                        if (e.Index < CurrentIndex)
                         {
                             CurrentIndex++;
                         }

@@ -1450,3 +1450,26 @@ void doSomethingCool(std::ifstream& input)
 - As I am struggling to focus, I will simply note the "TODO" and work on it tomorrow.
 - The "TODO" is testing the "wait" functionality of an infinite list, where it should not be complete, but will OnNext the values added to the end of the list.
 - I'll need to think about the CancellationDisposable test I also want to write... simply because every scheduler doesn't seem to use it and I don't want to write my own Scheduler.
+
+#156.2. 9/14/2018:
+- I ran into an interesting issue implementing the "wait" functionality.
+- I wrote the tests... they were a lot similar before I tried enforcing thread order. Why thread order? When I tried it without threads, it just... didn't run. It hung.
+- UPDATE:
+-- The working tests, I went back to the earlier, simplier model and it worked!
+-- Since I didn't need to do thread ordering, do some sleeps, and otherwise argue with the system, I was able to reduce the tolerence to 50 ms instead of 150 ms.
+-- So that reduces the issue down to just how the execution/tracker works.
+- CONT.
+- I realized the issue was the index tracker. Again. I don't know if there's a way to replace this or something... but I need some way to account for item insertion. Err.
+- The problem was that when using a list, there are no events for anything that happens. This means that the live observable just checks index position against list count.
+- But for a base list, it creates a tracker and specifies index 0 of a value. Observation begins and... it waits at index 0, count 0.
+- Suddenly a value gets added. Now, the index tracker goes "I'm at index 0, a value was added to index 0, this means the index I was tracking is now index 1". Observation now waits at index 1, count 1.
+- It basically gets stuck.
+- How to fix this? I knew I had to look at the tracker because... as I suspected, my update function uses "<=" for insert and add.
+- I wonder if I need <= for add?
+- UPDATE: I originally intended to just go "I will work on that tomorrow" at this point, but curiosity always gets me (and I got some good sleep so I'm not half asleep and can focus on this). As such, we continue...
+- I moved the Add case to a seperate if statement and changed <= to < for it. Ran collection tests: all pass. Ran the "wait" tests and... it passed! It was as I suspected, the indicies matched and moved the current index.
+- Now, it basically makes the add case useless because unless your current index is < the value added, nothing happens. If current index is = the value added, nothing happens.
+- If current index is > the value added, then it moves... but the index is passed the index of the value added... and "add" puts items at the end of the list, so current index is passed the end of the list.
+- I will leave it for now and remove it later.
+- I also left in the more-complex test, but will remove it later too.
+- Note: threshold went 10 -> 25 -> 50 -> 100 -> 150 -> 1 sec -> 100 -> 10 -> 25 -> 30 -> 50 ms throughout the development of this test. Some other tests failed at seemingly random points. I'm not sure what kind of timing I should expect or why some other tests failed... but as it works sometimes and not others, I will investigate when it fails.
