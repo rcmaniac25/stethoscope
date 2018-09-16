@@ -933,79 +933,22 @@ namespace Stethoscope.Tests
             }
 
             var dis = obs.Subscribe(onValue, _ => recievedError = true, () => completed = true);
-            
+
             var insertTime = DateTime.Now;
             list.Add(10);
 
-            while (!waitSem.Wait(100)) ;
+            while (!waitSem.Wait(10)) ;
 
             dis.Dispose();
             
             Assert.That(recievedValues, Is.EquivalentTo(new int[] { 10 }));
             Assert.That(recievedError, Is.False);
             Assert.That(completed, Is.False);
-            Assert.That(addedTime, Is.EqualTo(insertTime).Within(50).Milliseconds);
+            Assert.That(addedTime, Is.EqualTo(insertTime).Within(125).Milliseconds);
         }
 
         [Test, Repeat(3)]
         public void InfiniteLiveObservableBaseListCollectionPostAddition([ValueSource("SchedulersToTest")]IScheduler scheduler)
-#if false
-        {
-            var list = new List<int>();
-            var baseList = list.AsListCollection();
-
-            var obs = baseList.ToObservable(ObservableType.InfiniteLiveUpdating, scheduler);
-
-            var recievedValues = new List<int>();
-            bool recievedError = false;
-            bool completed = false;
-            var waitSem = new System.Threading.SemaphoreSlim(0);
-
-            var addedTime = DateTime.Now.AddSeconds(1);
-            var insertTime = DateTime.Now;
-
-            void getValue()
-            {
-                void onValue(int x)
-                {
-                    addedTime = DateTime.Now;
-                    recievedValues.Add(x);
-                    waitSem.Release();
-                }
-
-                var dis = obs.Subscribe(onValue, _ => recievedError = true, () => completed = true);
-
-                waitSem.Release();
-
-                if (recievedValues.Count != 1)
-                {
-                    System.Threading.Thread.Sleep(50);
-                }
-
-                while (!waitSem.Wait(100)) ;
-
-                dis.Dispose();
-            }
-            void addValue()
-            {
-                while (!waitSem.Wait(100)) ;
-
-                insertTime = DateTime.Now;
-                baseList.Add(10);
-            }
-
-            Parallel.Invoke
-            (
-                getValue,
-                addValue
-            );
-            
-            Assert.That(recievedValues, Is.EquivalentTo(new int[] { 10 }));
-            Assert.That(recievedError, Is.False);
-            Assert.That(completed, Is.False);
-            Assert.That(addedTime, Is.EqualTo(insertTime).Within(150).Milliseconds);
-        }
-#else
         {
             var list = new List<int>();
             var baseList = list.AsListCollection();
@@ -1031,16 +974,15 @@ namespace Stethoscope.Tests
             var insertTime = DateTime.Now;
             baseList.Add(10);
 
-            while (!waitSem.Wait(100)) ;
+            while (!waitSem.Wait(10)) ;
 
             dis.Dispose();
 
             Assert.That(recievedValues, Is.EquivalentTo(new int[] { 10 }));
             Assert.That(recievedError, Is.False);
             Assert.That(completed, Is.False);
-            Assert.That(addedTime, Is.EqualTo(insertTime).Within(50).Milliseconds);
+            Assert.That(addedTime, Is.EqualTo(insertTime).Within(125).Milliseconds);
         }
-#endif
 
         //TODO: something that produces a CancellationDisposable for use cancelable
 

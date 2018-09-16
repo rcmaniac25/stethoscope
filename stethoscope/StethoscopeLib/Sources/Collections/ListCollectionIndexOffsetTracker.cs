@@ -134,16 +134,6 @@ namespace Stethoscope.Collections
                         }
                     }
                 }
-                else if (e.Type == ListCollectionEventType.Add)
-                {
-                    lock (locker)
-                    {
-                        if (e.Index < CurrentIndex)
-                        {
-                            CurrentIndex++;
-                        }
-                    }
-                }
             }
         }
     }

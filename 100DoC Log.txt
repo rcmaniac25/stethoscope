@@ -1473,3 +1473,10 @@ void doSomethingCool(std::ifstream& input)
 - I will leave it for now and remove it later.
 - I also left in the more-complex test, but will remove it later too.
 - Note: threshold went 10 -> 25 -> 50 -> 100 -> 150 -> 1 sec -> 100 -> 10 -> 25 -> 30 -> 50 ms throughout the development of this test. Some other tests failed at seemingly random points. I'm not sure what kind of timing I should expect or why some other tests failed... but as it works sometimes and not others, I will investigate when it fails.
+
+#157.2. 9/15/2018:
+- No progress. I've been playing about and sometimes tests fail, sometimes they pass.
+- The particular tests are ones using threading or checking times.
+- Ok, I did actually make a bit of progress because I realized I have a hard-coded timeout. The live observables have a hard-coded timeout. I made the +/- value in the test "that" + 25 ms. This way if it's at that point, it doesn't always fail.
+- I have other tests that are complaining about missing or extra values, which is probably the index tracker again. But I need to look into it.
+- Bonus: they never fail when run on their own, but do when _all_ tests are run. So it's probably a thread/task switching challenge. Yay.
