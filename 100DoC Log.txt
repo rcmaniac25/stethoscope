@@ -1480,3 +1480,11 @@ void doSomethingCool(std::ifstream& input)
 - Ok, I did actually make a bit of progress because I realized I have a hard-coded timeout. The live observables have a hard-coded timeout. I made the +/- value in the test "that" + 25 ms. This way if it's at that point, it doesn't always fail.
 - I have other tests that are complaining about missing or extra values, which is probably the index tracker again. But I need to look into it.
 - Bonus: they never fail when run on their own, but do when _all_ tests are run. So it's probably a thread/task switching challenge. Yay.
+
+#158.2. 9/16/2018:
+- Not enough time to do any work today.
+- I keep running the tests and noting the ones that fail.
+- Most failures can probably be resolved by adjusting delays and timers. It makes me wonder:
+-- 1) If non-observable tests that also involve timing are as sensitive, or are they actually not written correctly
+-- 2) Can I write a setup function to kickoff a couple tasks to try and create a "current" timing and then save as a variable to use by the tests.
+- Could be worth a check on both... but not this immediate moment.
