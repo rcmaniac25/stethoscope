@@ -18,6 +18,7 @@ namespace Stethoscope.Tests
     {
         private IList<int> mockList;
         private IBaseListCollection<int> mockBaseList;
+        private TimeSpan taskDelays;
 
         private static IScheduler[] SchedulersToTest = new IScheduler[]
         {
@@ -30,6 +31,26 @@ namespace Stethoscope.Tests
         {
             mockList = Substitute.For<IList<int>>();
             mockBaseList = Substitute.For<IBaseListCollection<int>>();
+
+            //XXX to remove
+            var invokeTaskTime = new DateTime[6];
+            var invokeTime = DateTime.Now;
+            Parallel.Invoke
+            (
+                () => invokeTaskTime[0] = DateTime.Now,
+                () => invokeTaskTime[1] = DateTime.Now,
+                () => invokeTaskTime[2] = DateTime.Now,
+                () => invokeTaskTime[3] = DateTime.Now,
+                () => invokeTaskTime[4] = DateTime.Now,
+                () => invokeTaskTime[5] = DateTime.Now
+            );
+
+            var span = TimeSpan.Zero;
+            foreach (var time in invokeTaskTime)
+            {
+                span += time - invokeTime;
+            }
+            taskDelays = span / invokeTaskTime.Length;
         }
 
         [Test]

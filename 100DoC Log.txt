@@ -1488,3 +1488,8 @@ void doSomethingCool(std::ifstream& input)
 -- 1) If non-observable tests that also involve timing are as sensitive, or are they actually not written correctly
 -- 2) Can I write a setup function to kickoff a couple tasks to try and create a "current" timing and then save as a variable to use by the tests.
 - Could be worth a check on both... but not this immediate moment.
+
+#159.2. 9/17/2018:
+- So I ran an attempt of #2 and... it didn't work.
+- I'm wondering how I can try to resolve this... I don't have many ideas off the top of my head.
+- Tomorrow will be busy, so I won't get much done but I'll see if I can do #1 and just review tests that involve timing and try to figure out if any of them are as unstable as the Observable tests. Hopefully not.
