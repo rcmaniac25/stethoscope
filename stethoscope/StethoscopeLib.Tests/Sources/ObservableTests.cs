@@ -18,7 +18,6 @@ namespace Stethoscope.Tests
     {
         private IList<int> mockList;
         private IBaseListCollection<int> mockBaseList;
-        private TimeSpan taskDelays;
 
         private static IScheduler[] SchedulersToTest = new IScheduler[]
         {
@@ -31,26 +30,6 @@ namespace Stethoscope.Tests
         {
             mockList = Substitute.For<IList<int>>();
             mockBaseList = Substitute.For<IBaseListCollection<int>>();
-
-            //XXX to remove
-            var invokeTaskTime = new DateTime[6];
-            var invokeTime = DateTime.Now;
-            Parallel.Invoke
-            (
-                () => invokeTaskTime[0] = DateTime.Now,
-                () => invokeTaskTime[1] = DateTime.Now,
-                () => invokeTaskTime[2] = DateTime.Now,
-                () => invokeTaskTime[3] = DateTime.Now,
-                () => invokeTaskTime[4] = DateTime.Now,
-                () => invokeTaskTime[5] = DateTime.Now
-            );
-
-            var span = TimeSpan.Zero;
-            foreach (var time in invokeTaskTime)
-            {
-                span += time - invokeTime;
-            }
-            taskDelays = span / invokeTaskTime.Length;
         }
 
         [Test]
@@ -58,7 +37,7 @@ namespace Stethoscope.Tests
         {
             IList<int> list = null;
 
-            Assert.Throws<System.ArgumentNullException>(() =>
+            Assert.Throws<ArgumentNullException>(() =>
             {
                 list.ToObservable(type);
             });
@@ -69,7 +48,7 @@ namespace Stethoscope.Tests
         {
             IBaseListCollection<int> list = null;
 
-            Assert.Throws<System.ArgumentNullException>(() =>
+            Assert.Throws<ArgumentNullException>(() =>
             {
                 list.ToObservable(type);
             });
@@ -97,9 +76,9 @@ namespace Stethoscope.Tests
         [Test]
         public void GetObservableTypeNull()
         {
-            System.IObservable<int> obs = null;
+            IObservable<int> obs = null;
 
-            Assert.Throws<System.ArgumentNullException>(() =>
+            Assert.Throws<ArgumentNullException>(() =>
             {
                 obs.GetObservableType();
             });
@@ -131,7 +110,7 @@ namespace Stethoscope.Tests
         {
             var list = new List<int>();
 
-            Assert.Throws<System.ArgumentNullException>(() =>
+            Assert.Throws<ArgumentNullException>(() =>
             {
                 list.ToObservable(ObservableType.LiveUpdating, null);
             });
@@ -143,7 +122,7 @@ namespace Stethoscope.Tests
             var list = new List<int>();
             var baseList = list.AsListCollection();
 
-            Assert.Throws<System.ArgumentNullException>(() =>
+            Assert.Throws<ArgumentNullException>(() =>
             {
                 baseList.ToObservable(ObservableType.LiveUpdating, null);
             });
@@ -182,10 +161,10 @@ namespace Stethoscope.Tests
         [Test]
         public void LiveObservableListException([ValueSource("SchedulersToTest")]IScheduler scheduler)
         {
-            mockList.Count.Returns(c => throw new System.InvalidOperationException());
+            mockList.Count.Returns(c => throw new InvalidOperationException());
 
             var obs = mockList.ToObservable(ObservableType.LiveUpdating, scheduler);
-            Assert.Throws<System.InvalidOperationException>(() =>
+            Assert.Throws<InvalidOperationException>(() =>
             {
                 obs.Wait();
             });
@@ -194,10 +173,10 @@ namespace Stethoscope.Tests
         [Test]
         public void LiveObservableBaseListCollectionException([ValueSource("SchedulersToTest")]IScheduler scheduler)
         {
-            mockBaseList.Count.Returns(c => throw new System.InvalidOperationException());
+            mockBaseList.Count.Returns(c => throw new InvalidOperationException());
 
             var obs = mockBaseList.ToObservable(ObservableType.LiveUpdating, scheduler);
-            Assert.Throws<System.InvalidOperationException>(() =>
+            Assert.Throws<InvalidOperationException>(() =>
             {
                 obs.Wait();
             });
@@ -451,10 +430,10 @@ namespace Stethoscope.Tests
         [Test]
         public void InfiniteLiveObservableListException([ValueSource("SchedulersToTest")]IScheduler scheduler)
         {
-            mockList.Count.Returns(c => throw new System.InvalidOperationException());
+            mockList.Count.Returns(c => throw new InvalidOperationException());
 
             var obs = mockList.ToObservable(ObservableType.InfiniteLiveUpdating, scheduler);
-            Assert.Throws<System.InvalidOperationException>(() =>
+            Assert.Throws<InvalidOperationException>(() =>
             {
                 obs.Wait();
             });
@@ -463,10 +442,10 @@ namespace Stethoscope.Tests
         [Test]
         public void InfiniteLiveObservableBaseListCollectionException([ValueSource("SchedulersToTest")]IScheduler scheduler)
         {
-            mockBaseList.Count.Returns(c => throw new System.InvalidOperationException());
+            mockBaseList.Count.Returns(c => throw new InvalidOperationException());
 
             var obs = mockBaseList.ToObservable(ObservableType.InfiniteLiveUpdating, scheduler);
-            Assert.Throws<System.InvalidOperationException>(() =>
+            Assert.Throws<InvalidOperationException>(() =>
             {
                 obs.Wait();
             });
@@ -1004,7 +983,7 @@ namespace Stethoscope.Tests
             Assert.That(completed, Is.False);
             Assert.That(addedTime, Is.EqualTo(insertTime).Within(125).Milliseconds);
         }
-
+ 
         //TODO: something that produces a CancellationDisposable for use cancelable
 
         //TODO: some long test
