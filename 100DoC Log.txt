@@ -1499,3 +1499,6 @@ void doSomethingCool(std::ifstream& input)
 - But... the tests are for lock contention. Basically, it's either right or wrong, depending on what process gets to the lock first.
 - So I don't need to worry about that as it's not: right, wrong, maybe?
 - That was the most I got done today. I will need to decide tomorrow what I should do next...
+
+#161.2. 9/19/2018:
+- I had a rough morning because I was up late yesterday... I need to end things early. I didn't get a chance to "make a decision"... tomorrow.
