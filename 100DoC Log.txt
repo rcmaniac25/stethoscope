@@ -1502,3 +1502,19 @@ void doSomethingCool(std::ifstream& input)
 
 #161.2. 9/19/2018:
 - I had a rough morning because I was up late yesterday... I need to end things early. I didn't get a chance to "make a decision"... tomorrow.
+
+#162.2. 9/20/2018:
+- After multiple days of pushing back, I finally thought about "what to do"
+- Basically: nothing
+- The issue of failing tests happens randomly. I'd like to make them not-random, but the only way I can get 2 things to happen at the same time is with tasks/threads.
+- Using tasks/threads means the test is at the mercy of the system's scheduler.
+- Without doing some overly complex rewrite of observables to have triggers or events or something that says "go now", I don't know when I should run without simply specifying a hard-coded delay.
+- In addition, the last 2 tests... I'm not doing. The one for CancellationDisposable usage isn't possible without writing my own long scheduler, and it's not something I expect to ever do.
+- If somewhere down the line, I decide that I need my own scheduler, then I will write this scheduler and implement the test... but I don't need anything except the default schedulers right now, so I can't do the test. See the comment in the code about this.
+- I also had "do long test"... I don't know what that was for. I may have something written in the logs that says what that is, but I'm not sure off the top of my head.
+- Regardless, the best I can think of a long test is either: 1) running hundreds of values. 2) waiting for a value with an infinite observable.
+- For 1) There shouldn't be a difference between short and long runs, so if it doesn't work with short, it won't work with long. And the only thing a long test would provide is "this works for a long time", and that will be quickly noticed during execution (and probably would be better spotted in perf. then a unit test).
+- For 2) I essentially already wrote that.
+- Thus... both are kindof unneeded for additional implementation.
+- With that done (!!), I'd like to make a decision on if I _need_ to be able to switch between infinite and finite observables.
+- I'll leave it there for tonight just so I have something to do tomorrow... and I'm tired.

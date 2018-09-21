@@ -983,9 +983,7 @@ namespace Stethoscope.Tests
             Assert.That(completed, Is.False);
             Assert.That(addedTime, Is.EqualTo(insertTime).Within(125).Milliseconds);
         }
- 
-        //TODO: something that produces a CancellationDisposable for use cancelable
 
-        //TODO: some long test
+        // Want to test a long scheduler that uses CancellationDisposable, but no current implementations utilizes it. Instead they all utilize BooleanDisposable which has no way to determine if it's been disposed without polling.
     }
 }

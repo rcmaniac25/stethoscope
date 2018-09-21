@@ -14,8 +14,6 @@ PoC:
 What needs to get done. Should make some of them tickets... (some of these may be trains-of-thought)
 - "PoC proper" (see details above and from log #102.2)
 	- NeverEndingLiveListObservable + method to switch between it and LiveListObservable before subscription (AsInfinite/AsFinite)
-	- Unit tests for changes
-		- LiveListObservables + extensions
 	- Initial Qbservable implementation
 	- Initial log analysis
 	- DB research? ("Database triggers" are the cloeset I've found to being able to implement Qbservable for a DB. If embedable DBs can do it, then I may give it a try)
