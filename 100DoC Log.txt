@@ -1518,3 +1518,12 @@ void doSomethingCool(std::ifstream& input)
 - Thus... both are kindof unneeded for additional implementation.
 - With that done (!!), I'd like to make a decision on if I _need_ to be able to switch between infinite and finite observables.
 - I'll leave it there for tonight just so I have something to do tomorrow... and I'm tired.
+
+#163.2. 9/21/2018:
+- Ok, I can't really do any work tonight as I have a busy day coming up...
+- So, a decision: I will give an attempt to switch between finite and infinite live observables.
+- If I can't get it to work, then I have the slight challenge/annoyance of needing either 2 properties in ILogRegistry (finite and infinite) or needing a "get" function that takes an argument.
+- I'm not sure if it should be just a change of type (obs.AsFinite()...), a testable type (obs.FiniteUntil(x => x > 30)...), or something else.
+- Bonus: it's nice to talk about doing this, but observable operations don't expose the internal observable. So liveObs.AsFinite() would work, but liveObs.Where(x => x > 10).AsFinite() would not. So how would I walk the operation list and get to the root operations?
+- Maybe... this is an IQbservable? This way at evaluation time, we can get the root observable and apply the request (or at least have a reference to it) while the rest of the operations occur later.
+- For tomorrow... and probably the day after, to decide.
