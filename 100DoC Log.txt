@@ -1527,3 +1527,6 @@ void doSomethingCool(std::ifstream& input)
 - Bonus: it's nice to talk about doing this, but observable operations don't expose the internal observable. So liveObs.AsFinite() would work, but liveObs.Where(x => x > 10).AsFinite() would not. So how would I walk the operation list and get to the root operations?
 - Maybe... this is an IQbservable? This way at evaluation time, we can get the root observable and apply the request (or at least have a reference to it) while the rest of the operations occur later.
 - For tomorrow... and probably the day after, to decide.
+
+#164.2. 9/22/2018:
+- I simply don't have time tonight... punting to tomorrow (as warned yesterday)
