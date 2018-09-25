@@ -1534,3 +1534,17 @@ void doSomethingCool(std::ifstream& input)
 #165.2. 9/23/2018:
 - Err... I finally get to this and, due to the past week or so + busy and long past couple days, I crashed.
 - So... tomorrow. Again...
+
+#166.2. 9/24/2018:
+- So... I was sick yesterday and didn't realize it until about the time I wrote yesterday's quick writeup. Reminder to not to kill yourself with code.
+- Also, I like where I ended #163.2, in that I think this is a IQbservable.
+- At first I would just have a simple AsFinite()/AsInfinite() operator.
+- Later I may add the testable type version which could be useful for cases where a log ends. Imagine: registry.Logs.AsInfinite().AsFiniteWhen(log => log.Message.Contains(": Shutdown Started"))...
+- It may seem weird and unneeded at first, but the ability to say "run indefinitly" is great for logs, while knowing when to stop is great for log processing. It would be possible to say "this is a complete log, which means we can say that any IDs that match this are linked to this log, and all other IDs have nothing to do with this log"
+- So... not needed for the home app/test, but needed when logs are run for days and days at a time.
+- The only real way to make that happen is to evaluate it from a LINQ standpoint. We would be able to say "every operator, filtered of non-infinite/finite operations, is now fin, fin, infin, fin-when. Thus, run as infin, but pass a callback/ref to the wrapper used in fin-when so that when it finally triggers, we can inform the base-level live observable to switch to finite"
+- It also means we have less of a problem with LINQ running on a encapsulation model, as we can say at execution time "this is the actual source" and operate on it to effect the operators that occur later.
+- It means I finally get to go to onto a topic I keep staring at but never get to: writing a LINQ provider and implementing IQbservable.
+- This will take a bit of time, but is a welcome change from infrastucture and unit tests... and putting off doing work because I don't want to write more unit tests for a bit.
+- ...though, once I at least get something basic, I should at least to some TDD.
+- Might just do some prep tomorrow... but then days after should be actual code.
