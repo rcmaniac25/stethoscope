@@ -1548,3 +1548,7 @@ void doSomethingCool(std::ifstream& input)
 - This will take a bit of time, but is a welcome change from infrastucture and unit tests... and putting off doing work because I don't want to write more unit tests for a bit.
 - ...though, once I at least get something basic, I should at least to some TDD.
 - Might just do some prep tomorrow... but then days after should be actual code.
+
+#167.2. 9/25/2018:
+- I didn't really get prep done. I just made a folder... not a whole lot that does.
+- Tomorrow.
