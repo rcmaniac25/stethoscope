@@ -1552,3 +1552,15 @@ void doSomethingCool(std::ifstream& input)
 #167.2. 9/25/2018:
 - I didn't really get prep done. I just made a folder... not a whole lot that does.
 - Tomorrow.
+
+#168.2. 9/26/2018:
+- So I went to start and realized... I don't really know where to start.
+- Instead of winging it, I'm going to go with the approach I'm taking for this whole application: incremental work
+- So I'm going to do/attempt this tutorial: "Walkthrough: Creating an IQueryable LINQ Provider" (https://msdn.microsoft.com/en-us/library/bb546158.aspx)
+- ...adapting it to be used in an observable. I will change the "source" of the data, but then clean it up and start to expand it as I need it.
+- One idea that crossed my mind, not sure how well it will work out, but have this be a middle-man-type system.
+- As in, I don't want to go crazy with doing all the parsing and would rather have a real implementation do the work... so intercept the execution, get the values I care about, and send the modified query to the underlying implementation.
+- An example: say we have a SQL-based log registry. I'm unaware of any IQbservable implementations for SQL... so do a normal IQueryable for SQL, get whatever I care about, and send the rest to the provider in SQL.
+- Since I don't have any DB system yet, instead, I want to strip out the verbs I want (such as skip, take, AsFinite, etc.) and then let the existing implementations take care of the rest.
+- It would only really work for types that don't modify type, but... first we do the tutorial, which I'll start tomorrow.
+- Right now is a very basic implementation that is just a class with a couple interface functions defined. This will get replaced.
