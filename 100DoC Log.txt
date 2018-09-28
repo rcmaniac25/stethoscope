@@ -1564,3 +1564,6 @@ void doSomethingCool(std::ifstream& input)
 - Since I don't have any DB system yet, instead, I want to strip out the verbs I want (such as skip, take, AsFinite, etc.) and then let the existing implementations take care of the rest.
 - It would only really work for types that don't modify type, but... first we do the tutorial, which I'll start tomorrow.
 - Right now is a very basic implementation that is just a class with a couple interface functions defined. This will get replaced.
+
+#169.2. 9/27/2018:
+- I'm late, so for today I'm only doing the first step in the tutorial
