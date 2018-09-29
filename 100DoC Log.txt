@@ -1567,3 +1567,7 @@ void doSomethingCool(std::ifstream& input)
 
 #169.2. 9/27/2018:
 - I'm late, so for today I'm only doing the first step in the tutorial
+
+#170.2. 9/28/2018:
+- ...and this time I'm falling asleep. I got another section of the tutorial done and already know there's difference (IQbservableProvider vs. IQueryProvider)
+- I will skip the server part and just return a constant execution of... something. But that's for tomorrow.

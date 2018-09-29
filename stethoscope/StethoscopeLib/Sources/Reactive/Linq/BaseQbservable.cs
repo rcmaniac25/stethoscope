@@ -45,19 +45,44 @@ namespace Stethoscope.Reactive.Linq
         }
     }
 
-    // #2 (TODO)
+    // #2
 
-    internal class BaseQbservableProvider : IQbservableProvider
+    class BaseQbservableProvider : IQbservableProvider
     {
         public IQbservable<T> CreateQuery<T>(Expression expression)
         {
-            throw new NotImplementedException();
+            return new BaseQbservable<T>(this, expression);
         }
 
         public T Execute<T>(Expression expression)
         {
+            var isObservable = (typeof(T).Name == "IObservable`1");
+
+            return (T)BaseQbservableContext.Execute(expression, isObservable);
+        }
+    }
+
+    // #3
+
+    class BaseQbservableContext
+    {
+        internal static object Execute(Expression expression, bool isObservable)
+        {
+            if (!IsQueryOverDataSource(expression))
+            {
+                throw new InvalidProgramException("No query over the data source was specified.");
+            }
+
             //TODO
-            return default(T);
+
+            throw new NotImplementedException();
+        }
+
+        private static bool IsQueryOverDataSource(Expression expression)
+        {
+            // If expression represents an unqueried IQbservable data source instance, 
+            // expression is of type ConstantExpression, not MethodCallExpression. 
+            return (expression is MethodCallExpression);
         }
     }
 }
