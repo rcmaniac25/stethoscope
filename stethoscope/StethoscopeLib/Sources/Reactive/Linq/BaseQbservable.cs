@@ -316,9 +316,10 @@ namespace Stethoscope.Reactive.Linq
             return allPlaces.ToArray();
         }
 
+#if false
         private static Place[] CallGetPlaceListMethod(string location)
         {
-#if false
+
             var client = new TerraServiceSoapClient();
             PlaceFacts[] placeFacts = null;
 
@@ -356,37 +357,108 @@ namespace Stethoscope.Reactive.Linq
                 client.Abort();
                 throw;
             }
-#endif
+        }
+#else
+        private static readonly Place[] masterList = new Place[]
+        {
+            new Place("Central Park", "New York", PlaceType.ParkBeach),
+            new Place("Grand Central Station", "New York", PlaceType.AirRailStation),
+            new Place("Penn Station", "New York", PlaceType.AirRailStation),
+            new Place("John F. Kennedy Airport", "New York", PlaceType.AirRailStation),
+            new Place("La Guardia Airport", "New York", PlaceType.AirRailStation),
+            new Place("New York City", "New York", PlaceType.CityTown),
+            new Place("Manhattan", "New York", PlaceType.Island),
+            new Place("Staten Island", "New York", PlaceType.Island),
+            new Place("Battery Park", "New York", PlaceType.ParkBeach),
+            new Place("Hudson River", "New York", PlaceType.River),
+            new Place("East River", "New York", PlaceType.River),
+            new Place("Penn Station", "New Jersey", PlaceType.AirRailStation),
+            new Place("Newark Airport", "New Jersey", PlaceType.AirRailStation)
+        };
+        private static Dictionary<string, int[]> wordToMaster = new Dictionary<string, int[]>();
 
-            switch (location.ToLower())
+        private static void BuildWordToMap()
+        {
+            //XXX: not optimized for speed. That's why we do this once and never again
+
+            var words = new HashSet<string>();
+            foreach (var place in masterList)
             {
-                case "new york":
-                    return new Place[]
-                    {
-                        new Place("Central Park", "New York", PlaceType.ParkBeach),
-                        new Place("Grand Central Station", "New York", PlaceType.AirRailStation),
-                        new Place("Penn Station", "New York", PlaceType.AirRailStation),
-                        new Place("John F. Kennedy Airport", "New York", PlaceType.AirRailStation),
-                        new Place("La Guardia Airport", "New York", PlaceType.AirRailStation),
-                        new Place("New York City", "New York", PlaceType.CityTown),
-                        new Place("Manhattan", "New York", PlaceType.Island),
-                        new Place("Staten Island", "New York", PlaceType.Island),
-                        new Place("Battery Park", "New York", PlaceType.ParkBeach),
-                        new Place("Hudson River", "New York", PlaceType.River),
-                        new Place("East River", "New York", PlaceType.River)
-                    };
-                case "new jersey":
-                    return new Place[]
-                    {
-                        new Place("Penn Station", "New Jersey", PlaceType.AirRailStation),
-                        new Place("Newark Airpot", "New Jersey", PlaceType.AirRailStation)
-                    };
+                words.Add(place.Name.ToLower());
+                words.Add(place.State.ToLower());
+
+                if (place.Name.IndexOf(' ') > 0)
+                {
+                    var parts = place.Name.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries).Select(part => part.ToLower());
+                    words.UnionWith(parts);
+                }
+                if (place.State.IndexOf(' ') > 0)
+                {
+                    var parts = place.State.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries).Select(part => part.ToLower());
+                    words.UnionWith(parts);
+                }
             }
 
+            foreach (var word in words)
+            {
+                var indices = new HashSet<int>();
+                for (int i = 0; i < masterList.Length; i++)
+                {
+                    var place = masterList[i];
+                    if (place.Name.ToLower().Contains(word))
+                    {
+                        indices.Add(i);
+                    }
+                    if (place.State.ToLower().Contains(word))
+                    {
+                        indices.Add(i);
+                    }
+                }
+
+                wordToMaster.Add(word, indices.ToArray());
+            }
+        }
+
+        private static Place[] CallGetPlaceListMethod(string location)
+        {
+            if (wordToMaster.Count == 0)
+            {
+                BuildWordToMap();
+            }
+
+            var lowerCaseLocation = location.ToLower();
+
+            var wordMatches = new List<string>();
+            foreach (var keys in wordToMaster.Keys)
+            {
+                if (keys.Contains(lowerCaseLocation)) //XXX: if specific matching work is needed. Think, regex. Do it here
+                {
+                    wordMatches.Add(keys);
+                }
+            }
+
+            if (wordMatches.Count > 0)
+            {
+                var placeSet = new HashSet<int>();
+                foreach (var word in wordMatches)
+                {
+                    placeSet.UnionWith(wordToMaster[word]);
+                }
+
+                var places = new List<Place>();
+                foreach (int index in placeSet)
+                {
+                    places.Add(masterList[index]);
+                }
+
+                return places.ToArray();
+            }
+            
             throw new InvalidQueryException("Location not found");
         }
-    }
-    
+#endif
+        }
+
     internal class InnermostWhereFinder : ExpressionVisitor
     {
         private MethodCallExpression innermostWhereExpression;
@@ -450,6 +522,55 @@ namespace Stethoscope.Reactive.Linq
             }
             else
                 return base.VisitBinary(be);
+        }
+
+        protected override Expression VisitMethodCall(MethodCallExpression m)
+        {
+            if (m.Method.DeclaringType == typeof(String) && m.Method.Name == "StartsWith")
+            {
+                if (ExpressionTreeHelpers.IsSpecificMemberExpression(m.Object, typeof(Place), "Name") ||
+                ExpressionTreeHelpers.IsSpecificMemberExpression(m.Object, typeof(Place), "State"))
+                {
+                    locations.Add(ExpressionTreeHelpers.GetValueFromExpression(m.Arguments[0]));
+                    return m;
+                }
+
+            }
+            else if (m.Method.Name == "Contains")
+            {
+                Expression valuesExpression = null;
+
+                if (m.Method.DeclaringType == typeof(Enumerable))
+                {
+                    if (ExpressionTreeHelpers.IsSpecificMemberExpression(m.Arguments[1], typeof(Place), "Name") ||
+                    ExpressionTreeHelpers.IsSpecificMemberExpression(m.Arguments[1], typeof(Place), "State"))
+                    {
+                        valuesExpression = m.Arguments[0];
+                    }
+                }
+                else if (m.Method.DeclaringType == typeof(List<string>))
+                {
+                    if (ExpressionTreeHelpers.IsSpecificMemberExpression(m.Arguments[0], typeof(Place), "Name") ||
+                    ExpressionTreeHelpers.IsSpecificMemberExpression(m.Arguments[0], typeof(Place), "State"))
+                    {
+                        valuesExpression = m.Object;
+                    }
+                }
+
+                if (valuesExpression == null || valuesExpression.NodeType != ExpressionType.Constant)
+                    throw new Exception("Could not find the location values.");
+
+                ConstantExpression ce = (ConstantExpression)valuesExpression;
+
+                IEnumerable<string> placeStrings = (IEnumerable<string>)ce.Value;
+                // Add each string in the collection to the list of locations to obtain data about. 
+                foreach (string place in placeStrings)
+                    locations.Add(place);
+
+                return m;
+            }
+
+            return base.VisitMethodCall(m);
         }
     }
 

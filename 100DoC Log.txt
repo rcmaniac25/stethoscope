@@ -1577,3 +1577,5 @@ void doSomethingCool(std::ifstream& input)
 - So in Stethescope's case (remember? That's the name of this thing), the LogRegistry or more specifically, the registry storage, would have it's own qbservable implementation and provider.
 - Perhaps after some work, some generic functions can be determined where there's one qbservable and different providers... or maybe it's different qbservables and one provider. Depends... I think it's more likely to be different providers, as each storage will have it's own backend data that needs to be provided.
 - As such, I will just copy and paste the tutorial (even though it's for a queryable instead of a qbservable), and then work on an actual implementation for ListStorage.
+- It's interesting to see how the execution runs. I like it. And the example just so happens to deal with a list of data. I can see adapting this to return the live observable instead.
+- I added "more complex query capabilities" and also inadvertently wrote a very basic word search index. Oops. I think it's cool, but would definitly not cut it in the performance department.
