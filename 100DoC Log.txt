@@ -1571,3 +1571,9 @@ void doSomethingCool(std::ifstream& input)
 #170.2. 9/28/2018:
 - ...and this time I'm falling asleep. I got another section of the tutorial done and already know there's difference (IQbservableProvider vs. IQueryProvider)
 - I will skip the server part and just return a constant execution of... something. But that's for tomorrow.
+
+#171.2. 9/29/2018:
+- So, I was a bit naive and understand betterL the provider and queryable (qbservable) are specific to the data being handled.
+- So in Stethescope's case (remember? That's the name of this thing), the LogRegistry or more specifically, the registry storage, would have it's own qbservable implementation and provider.
+- Perhaps after some work, some generic functions can be determined where there's one qbservable and different providers... or maybe it's different qbservables and one provider. Depends... I think it's more likely to be different providers, as each storage will have it's own backend data that needs to be provided.
+- As such, I will just copy and paste the tutorial (even though it's for a queryable instead of a qbservable), and then work on an actual implementation for ListStorage.
