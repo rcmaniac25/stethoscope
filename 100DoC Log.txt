@@ -1579,3 +1579,10 @@ void doSomethingCool(std::ifstream& input)
 - As such, I will just copy and paste the tutorial (even though it's for a queryable instead of a qbservable), and then work on an actual implementation for ListStorage.
 - It's interesting to see how the execution runs. I like it. And the example just so happens to deal with a list of data. I can see adapting this to return the live observable instead.
 - I added "more complex query capabilities" and also inadvertently wrote a very basic word search index. Oops. I think it's cool, but would definitly not cut it in the performance department.
+
+#172.2. 9/30/2018:
+- Started working on a "real" implementation for ListStorage
+- It probably won't be as complex as the tutorial... maybe.
+- All I expect to do is to get the expression, find anything that skips a number of elements, get that value, and then directly return a live obersvable with an offset.
+- Finally, modify the expression so it doesn't have the skip operator... and swap the ListStorageQbservable for the live observable and let it run.
+- All the other stuff mentioned on previous days will be extra. Basic is just the skip code right now.

@@ -2,6 +2,7 @@
 
 using Stethoscope.Collections;
 using Stethoscope.Common;
+using Stethoscope.LogComponents.Internal.Storage.Linq;
 using Stethoscope.Reactive;
 
 using System;
@@ -92,6 +93,7 @@ namespace Stethoscope.Log.Internal.Storage
         }
 
         private IBaseReadWriteListCollection<ILogEntry> logs = new List<ILogEntry>().AsListCollection();
+        private ListStorageQbservable logQbservable = null;
         private readonly LogEntryComparer logEntryComparer = new LogEntryComparer();
 
         /// <summary>
@@ -99,6 +101,7 @@ namespace Stethoscope.Log.Internal.Storage
         /// </summary>
         public IScheduler LogScheduler { get; set; }
 
+#if true
         /// <summary>
         /// Access the log entries stored in this.
         /// </summary>
@@ -106,6 +109,22 @@ namespace Stethoscope.Log.Internal.Storage
             LogScheduler != null ?
             logs.ToObservable(ObservableType.LiveUpdating, LogScheduler).AsQbservable() :
             logs.ToObservable(ObservableType.LiveUpdating).AsQbservable();
+#else
+        /// <summary>
+        /// Access the log entries stored in this.
+        /// </summary>
+        public IQbservable<ILogEntry> Entries
+        {
+            get
+            {
+                if (logQbservable == null)
+                {
+                    logQbservable = new ListStorageQbservable(this, logs);
+                }
+                return logQbservable;
+            }
+        }
+#endif
 
         /// <summary>
         /// The number of logs stored.
