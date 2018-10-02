@@ -1586,3 +1586,19 @@ void doSomethingCool(std::ifstream& input)
 - All I expect to do is to get the expression, find anything that skips a number of elements, get that value, and then directly return a live obersvable with an offset.
 - Finally, modify the expression so it doesn't have the skip operator... and swap the ListStorageQbservable for the live observable and let it run.
 - All the other stuff mentioned on previous days will be extra. Basic is just the skip code right now.
+
+#173.2. 10/01/2018:
+- So I tried to wrap my head around who owns what (does the qbservable own the underlying data source? The provider? Something else?) and decided on "something else".
+- The general reason was that, well, the qbservable owns the data...
+- But if someone takes the provider (that "describes a qbservable") and asks it to create a query for a random expression, the expression has no knowledge of the underlying data source.
+- So then it's the provider that owns the data! But wait...
+- If the provider owns the data, then the qbservable can be made generic. <done>
+- So now the provider owns the data... but the execution happens in the qbservable. So then the qbservable is going to be created with the data, provided to the provider, then the provider will have the qbservable execute it?
+- That doesn't sound right. It's a circular dependency. Perhaps there was a good reason why, unlike the standard Linq queryable interfaces, a qbservable provider doesn't do the execution.
+- But there's an additional catch: nobody seems to have an explanation of who should do the excution. Most examples I see online execute somewhere else and let the queriable/qbservable and provider be a duo that enables compiler and programatic execution.
+- So then out conclusion: something else owns the data.
+- But I'm going to have a simple list, a DB, and who knows what else... I now need unique qbservables and providers?
+- Nah, I already made the qbservable generic, why not make the provider generic too. Now I added a new thing: an evaluator.
+- Simple: it knows it's data, and it takes an expression and turns it into the lowest form of data that is needed to execute: an observable.
+- So now each storage can have it's own evaluator, which may know what it can and cannot optimize or process, and simply says "have at it" and then the generic qbservable and provider can be evaluated or produce custom expressions to be evaluated and handle all the wacky code for Linq.
+- But I will start work on the evaluator tomorrow. For now, I have made progress that I am happy with.

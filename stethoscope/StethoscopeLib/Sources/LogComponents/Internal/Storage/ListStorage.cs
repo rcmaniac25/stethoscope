@@ -4,6 +4,7 @@ using Stethoscope.Collections;
 using Stethoscope.Common;
 using Stethoscope.LogComponents.Internal.Storage.Linq;
 using Stethoscope.Reactive;
+using Stethoscope.Reactive.Linq;
 
 using System;
 using System.Collections.Generic;
@@ -93,7 +94,7 @@ namespace Stethoscope.Log.Internal.Storage
         }
 
         private IBaseReadWriteListCollection<ILogEntry> logs = new List<ILogEntry>().AsListCollection();
-        private ListStorageQbservable logQbservable = null;
+        private EvaluatableQbservable<ILogEntry> logQbservable = null;
         private readonly LogEntryComparer logEntryComparer = new LogEntryComparer();
 
         /// <summary>
@@ -119,7 +120,8 @@ namespace Stethoscope.Log.Internal.Storage
             {
                 if (logQbservable == null)
                 {
-                    logQbservable = new ListStorageQbservable(this, logs);
+                    var evaluator = new ListStorageEvaluator(this, logs);
+                    logQbservable = new EvaluatableQbservable<ILogEntry>(evaluator);
                 }
                 return logQbservable;
             }
