@@ -102,7 +102,7 @@ namespace Stethoscope.Log.Internal.Storage
         /// </summary>
         public IScheduler LogScheduler { get; set; }
 
-#if true
+#if false
         /// <summary>
         /// Access the log entries stored in this.
         /// </summary>

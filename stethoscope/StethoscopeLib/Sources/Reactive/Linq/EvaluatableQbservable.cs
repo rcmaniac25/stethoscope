@@ -8,7 +8,7 @@ namespace Stethoscope.Reactive.Linq
     {
         internal EvaluatableQbservable(IObservableEvaluator evaluator)
         {
-            Provider = new EvaluatableQbservableProvider(evaluator);
+            Provider = new EvaluatableQbservableProvider(evaluator, GetType());
             Expression = Expression.Constant(this);
         }
 
@@ -34,7 +34,8 @@ namespace Stethoscope.Reactive.Linq
 
         public IDisposable Subscribe(IObserver<T> observer)
         {
-            return ((EvaluatableQbservableProvider)Provider).Evaluator.Evaluate<T>(Expression).Subscribe(observer);
+            var evalProvider = (EvaluatableQbservableProvider)Provider;
+            return evalProvider.Evaluator.Evaluate<T>(Expression, evalProvider.SourceType).Subscribe(observer);
         }
     }
 }

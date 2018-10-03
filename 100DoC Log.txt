@@ -1602,3 +1602,17 @@ void doSomethingCool(std::ifstream& input)
 - Simple: it knows it's data, and it takes an expression and turns it into the lowest form of data that is needed to execute: an observable.
 - So now each storage can have it's own evaluator, which may know what it can and cannot optimize or process, and simply says "have at it" and then the generic qbservable and provider can be evaluated or produce custom expressions to be evaluated and handle all the wacky code for Linq.
 - But I will start work on the evaluator tomorrow. For now, I have made progress that I am happy with.
+
+#174.2. 10/02/2018:
+- Nothing is implemented, but I wanted to give this a run. It worked but I saw some issues.
+- Main one: my guess on the Provider was more then true, it's used for turning expressions into queries. What I didn't expect is that it's almost "automatic".
+- `from v in data where v.Name.StartsWith("Steve") select v.Id;` does the following:
+-- 1. Qbservable(<const expression>)
+-- 2. #1.Provider.CreateQuery(Where(<const expression>, <lambda #1>))
+-- 3. #2.Provider.CreateQuery(Select(Where(<const expression>, <lambda #1>), <lambda #2>)
+-- 4. #3.Subscribe(<observable>)
+- What this means is that if my goal is "replace <const expression> with the actual source of data", I need to be able to find that expression multiple iterations down the road.
+- So I opted to add a type to search for. Similar to the tutorial code, I want the innermost value. Otherwise some sub-log data (embedded query) will suddenly have the the inner expression modified, while the outer one is left untouched and will error (maybe?)
+- My attempt to do this meant that if #3 changes some type before #4, then doing a search for that constant will give me the outer constant not the inner constant... and again, we're error (maybe?).
+- So I moved the type-storage to the provider, because that provider will be used for each query. And the source query is the data source, everything else is (probably) built upon that.
+- So provider knows the data source type, I should be able to start on actual code tomorrow.
