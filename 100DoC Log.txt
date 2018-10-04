@@ -1616,3 +1616,10 @@ void doSomethingCool(std::ifstream& input)
 - My attempt to do this meant that if #3 changes some type before #4, then doing a search for that constant will give me the outer constant not the inner constant... and again, we're error (maybe?).
 - So I moved the type-storage to the provider, because that provider will be used for each query. And the source query is the data source, everything else is (probably) built upon that.
 - So provider knows the data source type, I should be able to start on actual code tomorrow.
+
+#175.2. 10/03/2018:
+- I have an idea of how to do this. I blocked it out and got to work.
+- While I made good progress, I wanted to ensure I wasn't writing throw out code, so I manually tested a bit.
+- This is when I realized my error: Evaluate<T>, where T is... an observable of some type. Not the type used by the observable.
+- I need to redo the code a bit to fix this, but it's late, so it's not happening today.
+- I also need to do some work on the SkipCalculator (as I don't have any code that uses the skips, so I need to ensure that works (and define some tests while I'm at it, though they'll be implemented later)
