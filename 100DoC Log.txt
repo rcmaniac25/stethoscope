@@ -1627,3 +1627,19 @@ void doSomethingCool(std::ifstream& input)
 #176.2. 10/04/2018:
 - I had a lot to do tonight and have a busy day tomorrow. I need to skip tonight. I'm tired enough I can't focus on getting the type-issue resolved
 - Also, next couple days/week will be only minor work as I'm going to be busy
+
+#177.2. 10/05/2018:
+- I got to this late but was trying to work on it earlier in the day... I didn't succeed.
+- So this has become an interesting problem.
+- Basically:
+-- Expression of type ILogEntry is made.
+-- Expression passed into CreateQuery along with a new expression.
+-- Eventually, the expression type changes (IObservable<ILogEntry> -> IObservable<IGroupedObservable<object, ILogEntry>>)
+-- This means that the "T" in the generic has gone from ILogEntry to IGroupedObservable<object, ILogEntry> (which is effectivly IObservable<ILogEntry>)
+- So the challenge now is: how do I get the lowest original input?
+- Answer: I don't!
+- This isn't a generic. The original data source isn't type T, it's type ILogEntry.
+- I save the original expression type so that I can find it later and replace it with the data. But since the data isn't generic, I can skip the generic and just treat T as ILogEntry.
+- The one challenge I can see is I want to do a test early on type... but this isn't actually hard, just a GetType iteration.
+- So my original challenge is actually pretty easy. If/when I make a generic version of this solver, then it will be a bit of work... but not right now.
+- And... I started working on it and the type element is a bit much for me at this hour, so I will work on it tomorrow.
