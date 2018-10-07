@@ -1643,3 +1643,6 @@ void doSomethingCool(std::ifstream& input)
 - The one challenge I can see is I want to do a test early on type... but this isn't actually hard, just a GetType iteration.
 - So my original challenge is actually pretty easy. If/when I make a generic version of this solver, then it will be a bit of work... but not right now.
 - And... I started working on it and the type element is a bit much for me at this hour, so I will work on it tomorrow.
+
+#178.2. 10/06/2018:
+- I was having difficulty with Type, and it became really late again. So I will have to do it tomorrow... Err...
