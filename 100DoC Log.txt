@@ -1646,3 +1646,15 @@ void doSomethingCool(std::ifstream& input)
 
 #178.2. 10/06/2018:
 - I was having difficulty with Type, and it became really late again. So I will have to do it tomorrow... Err...
+
+#179.2. 10/07/2018:
+- I did some thinking and realized: I don't need this type check.
+- The type to check isn't <T> it's "sourceType" and sourceType only exists as a "hey, this is the type to remove", and that type should already be known as the evaluator has a specific constructor so it's known that the specific data will be used.
+- With that finally done, on to the next part: the SkipCalculator.
+- Already, an issue: Original plan expected a depth-first search of graph traversal, but ExpressionVisitor is programatic in the different expression elements choose how to visit and evaluate.
+- This means that "source.Concat(extra).Skip(10).Where(b => b.True)..." becomes "Concat(Skip(Where(..., <lambda>), 10), source, extra)" and evaluates: Where, Skip, Concat
+- So my original plan of "source, concat, skip, where... stop executing because the where will screw things up" needs to actually be "<maybe a skip exists somewhere...>, where... ok we need to reset the counter because a where will screw things up, skip, concat, source"
+- If there's anything I dislike (about both approaches) is somehow I need to check everything... does this function do an evaluation or is it an identity-type function? It doesn't do a "skip" for us, does it?
+- That's what makes this weird. There is the chance that we can't do any optimization, and that's fine. It's just sad that nothing could be done.
+- But there's an additional task: getting an amount of data to skip means we don't need the skip. We don't want to double-skip, so we need to remove them.
+- I will do that work later because the next couple days, I may not be able to work late, but also because that comes across as more of a reduce operation then a update/modify operation (which is most common with ExpressionVisitor).

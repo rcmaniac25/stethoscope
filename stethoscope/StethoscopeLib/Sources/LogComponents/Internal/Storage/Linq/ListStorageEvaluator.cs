@@ -1,6 +1,5 @@
 ﻿using Stethoscope.Collections;
 using Stethoscope.Common;
-using Stethoscope.Log.Internal;
 using Stethoscope.Reactive;
 using Stethoscope.Reactive.Linq;
 using Stethoscope.Reactive.Linq.Internal;
@@ -9,16 +8,17 @@ using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reactive.Concurrency;
+using System.Reactive.Linq;
 using System.Text;
 
-namespace Stethoscope.LogComponents.Internal.Storage.Linq
+namespace Stethoscope.Log.Internal.Storage.Linq
 {
     internal class ListStorageEvaluator : IObservableEvaluator
     {
         private readonly IRegistryStorage dataRegistryStorage;
-        private readonly IBaseReadWriteListCollection<ILogEntry> data;
+        private readonly IBaseListCollection<ILogEntry> data;
 
-        public ListStorageEvaluator(IRegistryStorage storage, IBaseReadWriteListCollection<ILogEntry> data)
+        public ListStorageEvaluator(IRegistryStorage storage, IBaseListCollection<ILogEntry> data)
         {
             this.dataRegistryStorage = storage;
             this.data = data;
@@ -33,50 +33,39 @@ namespace Stethoscope.LogComponents.Internal.Storage.Linq
             {
                 throw new InvalidOperationException("No query over the data source was specified.");
             }
-            
-#if false //XXX (see log)
-            // We only deal with ILogEntry, but we don't want to hardcode evaluators (it produces annoying compile errors)
-            if (typeof(T) != typeof(ILogEntry))
-            {
-                throw new InvalidOperationException("Evaluation only supported for ILogEntry types");
-            }
-            var dataSource = UnsafeUnbox<T, ILogEntry>(data);
-#endif
 
             // We want to know if we can adjust the starting index of the data source
             var skipBuilder = new SkipCalculator();
             var skip = skipBuilder.CalculateSkip(expression);
-
-#if false
+            
             // Get an observable for the data
             var schedulerToUse = DataScheduler ?? CurrentThreadScheduler.Instance;
-            IObservable<T> dataSourceObservable;
+            IObservable<ILogEntry> dataSourceObservable;
             if (skip.HasValue)
             {
-                dataSourceObservable = new LiveListObservable<T>(ObservableType.LiveUpdating, dataSource, schedulerToUse, skip.Value);
+                dataSourceObservable = new LiveListObservable<ILogEntry>(ObservableType.LiveUpdating, data, schedulerToUse, skip.Value);
             }
             else
             {
-                dataSourceObservable = new LiveListObservable<T>(ObservableType.LiveUpdating, dataSource, schedulerToUse);
+                dataSourceObservable = new LiveListObservable<ILogEntry>(ObservableType.LiveUpdating, data, schedulerToUse);
             }
-#endif
 
             // Update the expression so it no longer includes the skips we previously counted
-            throw new NotImplementedException();
+            var expressionToEvaluate = expression;
+            if (skip.HasValue)
+            {
+                throw new NotImplementedException();
+            }
 
             // Replace the data source instance with the observable
-            //TODO
+            var qDataSource = dataSourceObservable.AsQbservable();
+            var sourceReplacer = new DataSourceReplacer(qDataSource, sourceType);
+            var finalExpression = sourceReplacer.Visit(expressionToEvaluate);
 
             // Evaluate or build to get our observable
-            //TODO
+            return qDataSource.Provider.CreateQuery<T>(finalExpression);
         }
-
-        private static IBaseReadWriteListCollection<T> UnsafeUnbox<T, S>(IBaseReadWriteListCollection<S> data)
-        {
-            object obj = data;
-            return (IBaseReadWriteListCollection<T>)obj;
-        }
-
+        
         private static bool IsQueryOverDataSource(Expression expression)
         {
             // From https://msdn.microsoft.com/en-us/library/bb546158.aspx
@@ -84,6 +73,27 @@ namespace Stethoscope.LogComponents.Internal.Storage.Linq
             // If expression represents an unqueried IQbservable data source instance, 
             // expression is of type ConstantExpression, not MethodCallExpression. 
             return expression is MethodCallExpression;
+        }
+
+        private class DataSourceReplacer : ExpressionVisitor
+        {
+            private readonly IQbservable<ILogEntry> dataSource;
+            private readonly Type typeToReplace;
+
+            internal DataSourceReplacer(IQbservable<ILogEntry> qbservable, Type typeReplace)
+            {
+                dataSource = qbservable;
+                typeToReplace = typeReplace;
+            }
+
+            protected override Expression VisitConstant(ConstantExpression c)
+            {
+                if (c.Type == typeToReplace)
+                {
+                    return Expression.Constant(dataSource);
+                }
+                return c;
+            }
         }
     }
 }

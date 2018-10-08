@@ -34,7 +34,7 @@ namespace Stethoscope.Reactive.Linq.Internal
                     {
                         skipDepth = 0;
                     }
-                    //TODO
+                    skipDepth += ExpressionTreeHelpers.GetValueFromExpression<int>(expression.Arguments[1]);
                 }
 
                 Visit(expression.Arguments[0]);

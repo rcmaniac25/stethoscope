@@ -2,7 +2,7 @@
 
 using Stethoscope.Collections;
 using Stethoscope.Common;
-using Stethoscope.LogComponents.Internal.Storage.Linq;
+using Stethoscope.Log.Internal.Storage.Linq;
 using Stethoscope.Reactive;
 using Stethoscope.Reactive.Linq;
 

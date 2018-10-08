@@ -819,6 +819,17 @@ namespace Stethoscope.Reactive.Linq
                 throw new InvalidQueryException(
                     String.Format("The expression type {0} is not supported to obtain a value.", expression.NodeType));
         }
+
+        //------------
+        
+        internal static T GetValueFromExpression<T>(Expression expression)
+        {
+            if (expression.NodeType == ExpressionType.Constant)
+                return (T)(((ConstantExpression)expression).Value);
+            else
+                throw new InvalidQueryException(
+                    String.Format("The expression type {0} is not supported to obtain a value.", expression.NodeType));
+        }
     }
 
     class InvalidQueryException : System.Exception
