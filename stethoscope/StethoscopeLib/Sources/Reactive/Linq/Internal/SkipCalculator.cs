@@ -8,12 +8,10 @@ namespace Stethoscope.Reactive.Linq.Internal
     internal class SkipCalculator : ExpressionVisitor
     {
         private int skipDepth;
-        private bool processSkips;
 
         public int? CalculateSkip(Expression expression)
         {
             skipDepth = -1;
-            processSkips = true;
 
             Visit(expression);
 
@@ -26,19 +24,16 @@ namespace Stethoscope.Reactive.Linq.Internal
 
         protected override Expression VisitMethodCall(MethodCallExpression expression)
         {
-            if (processSkips)
+            if (expression.Method.Name == "Skip")
             {
-                if (expression.Method.Name == "Skip")
+                if (skipDepth < 0)
                 {
-                    if (skipDepth < 0)
-                    {
-                        skipDepth = 0;
-                    }
-                    skipDepth += ExpressionTreeHelpers.GetValueFromExpression<int>(expression.Arguments[1]);
+                    skipDepth = 0;
                 }
-
-                Visit(expression.Arguments[0]);
+                skipDepth += ExpressionTreeHelpers.GetValueFromExpression<int>(expression.Arguments[1]);
             }
+
+            Visit(expression.Arguments[0]);
 
             return expression;
         }

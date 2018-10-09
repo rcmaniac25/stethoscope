@@ -1658,3 +1658,8 @@ void doSomethingCool(std::ifstream& input)
 - That's what makes this weird. There is the chance that we can't do any optimization, and that's fine. It's just sad that nothing could be done.
 - But there's an additional task: getting an amount of data to skip means we don't need the skip. We don't want to double-skip, so we need to remove them.
 - I will do that work later because the next couple days, I may not be able to work late, but also because that comes across as more of a reduce operation then a update/modify operation (which is most common with ExpressionVisitor).
+
+#180.2. 10/08/2018:
+- I removed the processSkips boolean in SkipCalculator.
+- I then started working on a proper implementation... but realized this will take more time then I can do right now.
+- I will do it either slowly over a couple days, or once my event is done and I have time.
