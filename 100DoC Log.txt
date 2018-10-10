@@ -1663,3 +1663,8 @@ void doSomethingCool(std::ifstream& input)
 - I removed the processSkips boolean in SkipCalculator.
 - I then started working on a proper implementation... but realized this will take more time then I can do right now.
 - I will do it either slowly over a couple days, or once my event is done and I have time.
+
+#181.2. 10/09/2018:
+- Bit of work to ensure that the proper skip amount is known and reset if user lambdas are used.
+- That's all for today.
+- ...forgot to commit last night. Commiting early this morning.
