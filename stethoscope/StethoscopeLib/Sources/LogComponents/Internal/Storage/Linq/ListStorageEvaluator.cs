@@ -54,7 +54,8 @@ namespace Stethoscope.Log.Internal.Storage.Linq
             var expressionToEvaluate = expression;
             if (skip.HasValue)
             {
-                throw new NotImplementedException();
+                var modifier = new SkipTreeModifier();
+                expressionToEvaluate = modifier.Visit(expressionToEvaluate);
             }
 
             // Replace the data source instance with the observable

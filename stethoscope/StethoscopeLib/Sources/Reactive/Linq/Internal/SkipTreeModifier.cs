@@ -2,53 +2,47 @@
 
 namespace Stethoscope.Reactive.Linq.Internal
 {
-    internal class SkipCalculator : ExpressionVisitor
+    internal class SkipTreeModifier : ExpressionVisitor
     {
-        private int skipDepth;
+        private bool hasDepth;
 
-        public int? CalculateSkip(Expression expression)
+        public override Expression Visit(Expression node)
         {
-            skipDepth = -1;
-
-            Visit(expression);
-
-            if (skipDepth <= 0)
-            {
-                return null;
-            }
-            return skipDepth;
+            hasDepth = false;
+            var res = base.Visit(node);
+            return res;
         }
 
         protected override Expression VisitMethodCall(MethodCallExpression expression)
         {
+            var returnChild = false;
+            var originalHasDepth = hasDepth;
+
             if (expression.Method.Name == "Skip")
             {
                 // Only specific skips can be used
                 if (expression.Arguments[1].Type == typeof(int))
                 {
-                    if (skipDepth < 0)
-                    {
-                        skipDepth = 0;
-                    }
-                    skipDepth += ExpressionTreeHelpers.GetValueFromExpression<int>(expression.Arguments[1]);
+                    returnChild = true;
+                    hasDepth = true;
                 }
             }
-            else if (skipDepth >= 0 && expression.Arguments.Count > 1)
+            else if (hasDepth && expression.Arguments.Count > 1)
             {
                 // If any function takes a lambda, there's some programatic element that can't skip a specific amount
                 for (int i = 1; i < expression.Arguments.Count; i++)
                 {
                     if (expression.Arguments[i].NodeType == ExpressionType.Lambda)
                     {
-                        skipDepth = -1;
+                        hasDepth = false;
                         break;
                     }
                 }
             }
 
-            Visit(expression.Arguments[0]);
+            var child = base.Visit(expression.Arguments[0]);
 
-            return expression;
+            return returnChild && (hasDepth == originalHasDepth) ? child : expression;
         }
     }
 }

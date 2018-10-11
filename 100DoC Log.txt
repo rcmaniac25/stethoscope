@@ -1668,3 +1668,21 @@ void doSomethingCool(std::ifstream& input)
 - Bit of work to ensure that the proper skip amount is known and reset if user lambdas are used.
 - That's all for today.
 - ...forgot to commit last night. Commiting early this morning.
+
+#182.2. 10/10/2018:
+- So there is one thing I need to do, and one I want to do.
+- Need to do: modify the expression tree to remove skips.
+- Want to do: the skip calculaor and the tree modification should have the same logic, just have different results.
+- "Don't prematurely optimize" So I'll skip the want for now...
+- I started working on the tree modification. I got somewhere and have an idea of what to do, but I need to get the state logic flags right.
+- I see 3 stages:
+-- 1. <random call><one or more skips><random call>
+-- 2. <one or more skips><random call>
+-- 3. <random call><one or more skips>
+-- 4. <one or more skips>
+- Wait, I said 3. Why are there 4 listed? Because if I can get 1-3 done, the 4th should happen without any work and thus doesn't need to be tested.
+- The stages are to hit edge cases on what can happen.
+- That is why there is "state flags" because what might previously be handled when no skip is found, suddenly becomes "we have to handle this outside of the processing functions" and thus state is needed to check.
+- I didn't get it working. I got down the tree, but not back up. So <call 1>(<skip 1>(<skip 2>(<call 2>))) got to <call 1>(<call 2>) but then when processing <call 1>, the state I was tracking didn't do what I expected and I ended up with the original expression tree again.
+- It's also late (I'm trying to be done earlier), and I don't see it being done quickly... so I will work on it tomorrow.
+- Pay no attention to what I was doing... I tried planning ahead, then saw the time and started just throwing state combos at the wall to see what sticked... and then just stopped. So the code is weird and may be "why would anyone do this?" right now.
