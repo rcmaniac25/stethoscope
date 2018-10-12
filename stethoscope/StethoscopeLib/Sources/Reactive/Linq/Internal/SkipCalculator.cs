@@ -32,6 +32,10 @@ namespace Stethoscope.Reactive.Linq.Internal
                     }
                     skipDepth += ExpressionTreeHelpers.GetValueFromExpression<int>(expression.Arguments[1]);
                 }
+                else if (skipDepth >= 0)
+                {
+                    skipDepth = -1;
+                }
             }
             else if (skipDepth >= 0 && expression.Arguments.Count > 1)
             {

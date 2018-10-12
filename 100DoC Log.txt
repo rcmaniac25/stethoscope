@@ -1686,3 +1686,17 @@ void doSomethingCool(std::ifstream& input)
 - I didn't get it working. I got down the tree, but not back up. So <call 1>(<skip 1>(<skip 2>(<call 2>))) got to <call 1>(<call 2>) but then when processing <call 1>, the state I was tracking didn't do what I expected and I ended up with the original expression tree again.
 - It's also late (I'm trying to be done earlier), and I don't see it being done quickly... so I will work on it tomorrow.
 - Pay no attention to what I was doing... I tried planning ahead, then saw the time and started just throwing state combos at the wall to see what sticked... and then just stopped. So the code is weird and may be "why would anyone do this?" right now.
+
+#183.2. 10/11/2018:
+- This code gives me a slight gag reflux.
+- Read it and tell... well, pretend I'm listening, but tell me you understand what the heck is happening?
+- What is happening?
+- Basically, I iterate through the tree, then when I realize I need to skip functions, I start to skip them. All other functions get pushed into a stack.
+- As I finish iteration, I pop expressions off the stack. If there was an expression to use, I return it. Else, I return the `Visit`'s child.
+- It works and meets all my test cases... but man is it hard to understand from looking at, and there is probably a better way. No, there is a better way... I just need to think about it.
+- The "better way" that popped into my head is to do 2-3 passes. First pass I just determine if there are nodes I can skip (ironically, called Skip).
+- The last pass I re-visit the tree, but if I encounter a node I don't need, then I return the prior visit's child. There's probably a bit of state so that if I have started to modify the tree, I know to modify the arguments again, otherwise I'll get the original tree again.
+- The "maybe" middle step? Just look at the list of method calls and determine if there's anything to remove.
+- It may just reduce function size and make it easier to read... which is Very important. Experienced programmers have hit this, novice's, pay attention: one day you will find code that people will say "we don't know how it works, it just does" and you will stare at it and go "but I need to modify it...".
+- If code is not readable or maintainable, it will be worked around with hack after hack.
+- Bonus with the code I wrote right now: all but 3 tests pass. Woot! Will rewrite tomorrow...
