@@ -1700,3 +1700,8 @@ void doSomethingCool(std::ifstream& input)
 - It may just reduce function size and make it easier to read... which is Very important. Experienced programmers have hit this, novice's, pay attention: one day you will find code that people will say "we don't know how it works, it just does" and you will stare at it and go "but I need to modify it...".
 - If code is not readable or maintainable, it will be worked around with hack after hack.
 - Bonus with the code I wrote right now: all but 3 tests pass. Woot! Will rewrite tomorrow...
+
+#184.2. 10/12/2018:
+- I was planning on doing the refactor... but it was late so I decided to just write a log stating that and going on...
+- Then curiosity got the best of me, for the failing unit tests.
+- Issue has been found and resolved. 100% unit test passing (though still flaky when running all tests)

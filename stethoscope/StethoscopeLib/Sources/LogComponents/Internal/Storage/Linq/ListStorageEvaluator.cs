@@ -5,11 +5,9 @@ using Stethoscope.Reactive.Linq;
 using Stethoscope.Reactive.Linq.Internal;
 
 using System;
-using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
-using System.Text;
 
 namespace Stethoscope.Log.Internal.Storage.Linq
 {
@@ -28,34 +26,35 @@ namespace Stethoscope.Log.Internal.Storage.Linq
 
         public IObservable<T> Evaluate<T>(Expression expression, Type sourceType)
         {
+            var schedulerToUse = DataScheduler ?? CurrentThreadScheduler.Instance;
+            IObservable<ILogEntry> dataSourceObservable;
+            
+            var expressionToEvaluate = expression;
+
             // The expression must represent a query over the data source. 
             if (!IsQueryOverDataSource(expression))
             {
-                throw new InvalidOperationException("No query over the data source was specified.");
-            }
-
-            // We want to know if we can adjust the starting index of the data source
-            var skipBuilder = new SkipCalculator();
-            var skip = skipBuilder.CalculateSkip(expression);
-            
-            // Get an observable for the data
-            var schedulerToUse = DataScheduler ?? CurrentThreadScheduler.Instance;
-            IObservable<ILogEntry> dataSourceObservable;
-            if (skip.HasValue)
-            {
-                dataSourceObservable = new LiveListObservable<ILogEntry>(ObservableType.LiveUpdating, data, schedulerToUse, skip.Value);
+                dataSourceObservable = new LiveListObservable<ILogEntry>(ObservableType.LiveUpdating, data, schedulerToUse);
             }
             else
             {
-                dataSourceObservable = new LiveListObservable<ILogEntry>(ObservableType.LiveUpdating, data, schedulerToUse);
-            }
+                // We want to know if we can adjust the starting index of the data source
+                var skipBuilder = new SkipCalculator();
+                var skip = skipBuilder.CalculateSkip(expression);
 
-            // Update the expression so it no longer includes the skips we previously counted
-            var expressionToEvaluate = expression;
-            if (skip.HasValue)
-            {
-                var modifier = new SkipTreeModifier();
-                expressionToEvaluate = modifier.Visit(expressionToEvaluate);
+                // Get an observable for the data
+                if (skip.HasValue)
+                {
+                    dataSourceObservable = new LiveListObservable<ILogEntry>(ObservableType.LiveUpdating, data, schedulerToUse, skip.Value);
+
+                    // Update the expression so it no longer includes the skips we previously counted
+                    var modifier = new SkipTreeModifier();
+                    expressionToEvaluate = modifier.Visit(expressionToEvaluate);
+                }
+                else
+                {
+                    dataSourceObservable = new LiveListObservable<ILogEntry>(ObservableType.LiveUpdating, data, schedulerToUse);
+                }
             }
 
             // Replace the data source instance with the observable
