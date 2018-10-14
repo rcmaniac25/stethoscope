@@ -13,6 +13,8 @@ namespace Stethoscope.Log.Internal.Storage.Linq
 {
     internal class ListStorageEvaluator : IObservableEvaluator
     {
+        private const ObservableType LiveObservableType = ObservableType.LiveUpdating;
+
         private readonly IRegistryStorage dataRegistryStorage;
         private readonly IBaseListCollection<ILogEntry> data;
 
@@ -34,7 +36,7 @@ namespace Stethoscope.Log.Internal.Storage.Linq
             // The expression must represent a query over the data source. 
             if (!IsQueryOverDataSource(expression))
             {
-                dataSourceObservable = new LiveListObservable<ILogEntry>(ObservableType.LiveUpdating, data, schedulerToUse);
+                dataSourceObservable = new LiveListObservable<ILogEntry>(LiveObservableType, data, schedulerToUse);
             }
             else
             {
@@ -45,7 +47,7 @@ namespace Stethoscope.Log.Internal.Storage.Linq
                 // Get an observable for the data
                 if (skip.HasValue)
                 {
-                    dataSourceObservable = new LiveListObservable<ILogEntry>(ObservableType.LiveUpdating, data, schedulerToUse, skip.Value);
+                    dataSourceObservable = new LiveListObservable<ILogEntry>(LiveObservableType, data, schedulerToUse, skip.Value);
 
                     // Update the expression so it no longer includes the skips we previously counted
                     var modifier = new SkipTreeModifier();
@@ -53,7 +55,7 @@ namespace Stethoscope.Log.Internal.Storage.Linq
                 }
                 else
                 {
-                    dataSourceObservable = new LiveListObservable<ILogEntry>(ObservableType.LiveUpdating, data, schedulerToUse);
+                    dataSourceObservable = new LiveListObservable<ILogEntry>(LiveObservableType, data, schedulerToUse);
                 }
             }
 

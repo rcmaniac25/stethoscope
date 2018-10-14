@@ -1705,3 +1705,9 @@ void doSomethingCool(std::ifstream& input)
 - I was planning on doing the refactor... but it was late so I decided to just write a log stating that and going on...
 - Then curiosity got the best of me, for the failing unit tests.
 - Issue has been found and resolved. 100% unit test passing (though still flaky when running all tests)
+
+#185.2. 10/13/2018:
+- I prepared to do the refactor of the Skip... stuff, when a nagging thought came to em and I realized I would be stupid to ignore it.
+- I should write unit tests for this.
+- I started working on the unit tests so I could ensure the current version worked, and that the new version will continue to work.
+- I won't finish it today, simply due to time, but hope to finish it tomorrow.
