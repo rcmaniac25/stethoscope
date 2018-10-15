@@ -1711,3 +1711,7 @@ void doSomethingCool(std::ifstream& input)
 - I should write unit tests for this.
 - I started working on the unit tests so I could ensure the current version worked, and that the new version will continue to work.
 - I won't finish it today, simply due to time, but hope to finish it tomorrow.
+
+#186.2. 10/14/2018:
+- I'm trapped in a time loop where I keep thinking I did stuff on this project today, but then keep finding out I didn't when I go to commit
+- As such, I'm breaking out by leaving this status and working on the unit tests tomorrow.

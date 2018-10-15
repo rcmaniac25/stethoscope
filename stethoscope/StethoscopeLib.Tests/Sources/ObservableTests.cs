@@ -1174,8 +1174,6 @@ namespace Stethoscope.Tests
         //TODO: operation (2 skip, not int+int)
         //TODO: operation (1 skip, 1 not skip)
         //TODO: operation (1 not skip, 1 skip)
-        //TODO: operation (1 skip, 1 not skip (not int))
-        //TODO: operation (1 not skip (not int), 1 skip)
         //TODO: operation (1 not skip, 1 skip, 1 not skip)
         //TODO: operation (1 not skip, 1 skip (not int), 1 not skip)
         //XXX - there are explicit handling of lambda-related functions, yet none of these use any functions with lambdas. Something should be done with lambdas...
