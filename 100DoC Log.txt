@@ -1715,3 +1715,11 @@ void doSomethingCool(std::ifstream& input)
 #186.2. 10/14/2018:
 - I'm trapped in a time loop where I keep thinking I did stuff on this project today, but then keep finding out I didn't when I go to commit
 - As such, I'm breaking out by leaving this status and working on the unit tests tomorrow.
+
+#187.2. 10/15/2018:
+- I'm late... and I was thinking "I may have to move this to tomorrow" but decided to at least do a couple tests, since tomorrow will be short
+- I figured out what lambda tests I wanted, though the end result should still be "it works"
+- But the point is to try a bunch of combos to see if everything works when evaluating it
+- Perhaps once additional evaluators are created, all these tests will be refactored to functions, and the tests will simply create different IQbservables.
+- One thing I did realize is that this is just going to bloat Observable tests... so to make it easier to isolate, move it to it's own test fixture
+- That's where I'll end it tonight.
