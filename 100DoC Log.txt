@@ -1723,3 +1723,8 @@ void doSomethingCool(std::ifstream& input)
 - Perhaps once additional evaluators are created, all these tests will be refactored to functions, and the tests will simply create different IQbservables.
 - One thing I did realize is that this is just going to bloat Observable tests... so to make it easier to isolate, move it to it's own test fixture
 - That's where I'll end it tonight.
+
+#188.2. 10/16/2018:
+- Couple additional tests.
+- As the story goes... Was planning on doing more, but one evening event took longer then expected.
+- Tomorrow...
