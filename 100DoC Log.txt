@@ -1728,3 +1728,8 @@ void doSomethingCool(std::ifstream& input)
 - Couple additional tests.
 - As the story goes... Was planning on doing more, but one evening event took longer then expected.
 - Tomorrow...
+
+#189.2. 10/17/2018:
+- Finished the unit tests
+- Only issue is one of them fails...
+- I did a quick look and went "this requires more time" since everything appears to be working, but the numbers I expect and the numbers I get are different.

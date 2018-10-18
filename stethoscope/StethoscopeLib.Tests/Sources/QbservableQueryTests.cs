@@ -32,6 +32,8 @@ namespace Stethoscope.Tests
         {
             mockRegistryStorage = Substitute.For<IRegistryStorage>();
             mockLogEntry = Substitute.For<ILogEntry>();
+
+            mockLogEntry.IsValid.ReturnsForAnyArgs(true);
         }
         
         private IQbservable<ILogEntry> SetupListStorageQbservable(IList<ILogEntry> list, IScheduler schedulerToUse)
@@ -357,13 +359,229 @@ namespace Stethoscope.Tests
             Assert.That(nonNull, Is.EqualTo(1));
         }
 
+        [Test]
+        public void ListStorageSkipSandwich([ValueSource("SchedulersToTest")]IScheduler scheduler)
+        {
+            var list = new List<ILogEntry>()
+            {
+                null,
+                null,
+                mockLogEntry,
+                null,
+                null
+            };
+
+            var logQbservable = SetupListStorageQbservable(list, scheduler);
+            var waitSem = new System.Threading.SemaphoreSlim(0);
+
+            var queryToTest = logQbservable.Where(en => en != null && en.IsValid).Skip(1).Select(en => en != null ? en.Message : null);
+
+            int counter = 0;
+            int nonNull = -1;
+            var disposable = queryToTest.Subscribe(en =>
+            {
+                if (en != null)
+                {
+                    nonNull = counter;
+                }
+
+                counter++;
+            }, () => waitSem.Release());
+
+            while (!waitSem.Wait(10)) ;
+
+            disposable.Dispose();
+
+            Assert.That(counter, Is.EqualTo(1));
+            Assert.That(nonNull, Is.EqualTo(0));
+        }
+
+        [Test]
+        public void ListStorageAltSkipSandwich([ValueSource("SchedulersToTest")]IScheduler scheduler)
+        {
+            var list = new List<ILogEntry>()
+            {
+                null,
+                null,
+                mockLogEntry,
+                null,
+                null
+            };
+
+            var logQbservable = SetupListStorageQbservable(list, scheduler);
+            var waitSem = new System.Threading.SemaphoreSlim(0);
+
+            var queryToTest = logQbservable.Where(en => en != null && en.IsValid).Skip(TimeSpan.Zero).Select(en => en != null ? en.Message : null);
+
+            int counter = 0;
+            int nonNull = -1;
+            var disposable = queryToTest.Subscribe(en =>
+            {
+                if (en != null)
+                {
+                    nonNull = counter;
+                }
+
+                counter++;
+            }, () => waitSem.Release());
+
+            while (!waitSem.Wait(10)) ;
+
+            disposable.Dispose();
+
+            Assert.That(counter, Is.EqualTo(1));
+            Assert.That(nonNull, Is.EqualTo(0));
+        }
+
+        [Test]
+        public void ListStorageLambdaSkip([ValueSource("SchedulersToTest")]IScheduler scheduler)
+        {
+            var list = new List<ILogEntry>()
+            {
+                null,
+                null,
+                mockLogEntry,
+                null,
+                null
+            };
+
+            var logQbservable = SetupListStorageQbservable(list, scheduler);
+            var waitSem = new System.Threading.SemaphoreSlim(0);
+
+            var queryToTest = logQbservable.Skip(1).SkipWhile(en => en == null);
+
+            int counter = 0;
+            int nonNull = -1;
+            var disposable = queryToTest.Subscribe(en =>
+            {
+                if (en != null)
+                {
+                    nonNull = counter;
+                }
+
+                counter++;
+            }, () => waitSem.Release());
+
+            while (!waitSem.Wait(10)) ;
+
+            disposable.Dispose();
+
+            Assert.That(counter, Is.EqualTo(3));
+            Assert.That(nonNull, Is.EqualTo(0));
+        }
+
+        [Test]
+        public void ListStorageLambdaSkipReversed([ValueSource("SchedulersToTest")]IScheduler scheduler)
+        {
+            var list = new List<ILogEntry>()
+            {
+                null,
+                null,
+                mockLogEntry,
+                null,
+                null
+            };
+
+            var logQbservable = SetupListStorageQbservable(list, scheduler);
+            var waitSem = new System.Threading.SemaphoreSlim(0);
+
+            var queryToTest = logQbservable.SkipWhile(en => en == null).Skip(1);
+
+            int counter = 0;
+            int nonNull = -1;
+            var disposable = queryToTest.Subscribe(en =>
+            {
+                if (en != null)
+                {
+                    nonNull = counter;
+                }
+
+                counter++;
+            }, () => waitSem.Release());
+
+            while (!waitSem.Wait(10)) ;
+
+            disposable.Dispose();
+
+            Assert.That(counter, Is.EqualTo(2));
+            Assert.That(nonNull, Is.EqualTo(-1));
+        }
+
+        [Test]
+        public void ListStorageLambda([ValueSource("SchedulersToTest")]IScheduler scheduler)
+        {
+            var list = new List<ILogEntry>()
+            {
+                null,
+                null,
+                mockLogEntry,
+                null,
+                null
+            };
+
+            var logQbservable = SetupListStorageQbservable(list, scheduler);
+            var waitSem = new System.Threading.SemaphoreSlim(0);
+
+            var queryToTest = logQbservable.Skip(1).Select(en => en != null ? en.Message : null);
+
+            int counter = 0;
+            int nonNull = -1;
+            var disposable = queryToTest.Subscribe(en =>
+            {
+                if (en != null)
+                {
+                    nonNull = counter;
+                }
+
+                counter++;
+            }, () => waitSem.Release());
+
+            while (!waitSem.Wait(10)) ;
+
+            disposable.Dispose();
+
+            Assert.That(counter, Is.EqualTo(4));
+            Assert.That(nonNull, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void ListStorageLambdaReversed([ValueSource("SchedulersToTest")]IScheduler scheduler)
+        {
+            var list = new List<ILogEntry>()
+            {
+                null,
+                null,
+                mockLogEntry,
+                null,
+                null
+            };
+
+            var logQbservable = SetupListStorageQbservable(list, scheduler);
+            var waitSem = new System.Threading.SemaphoreSlim(0);
+
+            var queryToTest = logQbservable.Select(en => en != null ? en.Message : null).Skip(1);
+
+            int counter = 0;
+            int nonNull = -1;
+            var disposable = queryToTest.Subscribe(en =>
+            {
+                if (en != null)
+                {
+                    nonNull = counter;
+                }
+
+                counter++;
+            }, () => waitSem.Release());
+
+            while (!waitSem.Wait(10)) ;
+
+            disposable.Dispose();
+
+            Assert.That(counter, Is.EqualTo(4));
+            Assert.That(nonNull, Is.EqualTo(1));
+        }
+
         //XXX - put operations in order listed
-        //TODO: operation (1 not skip, 1 skip, 1 not skip)
-        //TODO: operation (1 not skip, 1 skip (not int), 1 not skip)
-        //TODO: operation (1 skip, 1 lambda skip)
-        //TODO: operation (1 lambda skip, 1 skip)
-        //TODO: operation (1 skip, 1 lambda not skip)
-        //TODO: operation (1 lambda not skip, 1 skip)
         //TODO: ... <continue work on rewrite of evaluator>
         //TODO: ... (anything that might invalidate some operation?)
     }
