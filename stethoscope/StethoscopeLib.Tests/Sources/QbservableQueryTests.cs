@@ -392,8 +392,8 @@ namespace Stethoscope.Tests
 
             disposable.Dispose();
 
-            Assert.That(counter, Is.EqualTo(1));
-            Assert.That(nonNull, Is.EqualTo(0));
+            Assert.That(counter, Is.EqualTo(0));
+            Assert.That(nonNull, Is.EqualTo(-1));
         }
 
         [Test]

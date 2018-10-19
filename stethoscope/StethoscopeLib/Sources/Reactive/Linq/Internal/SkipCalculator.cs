@@ -42,7 +42,7 @@ namespace Stethoscope.Reactive.Linq.Internal
                 // If any function takes a lambda, there's some programatic element that can't skip a specific amount
                 for (int i = 1; i < expression.Arguments.Count; i++)
                 {
-                    if (expression.Arguments[i].NodeType == ExpressionType.Lambda)
+                    if (expression.Arguments[i].NodeType == ExpressionType.Lambda || expression.Arguments[i].NodeType == ExpressionType.Quote)
                     {
                         skipDepth = -1;
                         break;
