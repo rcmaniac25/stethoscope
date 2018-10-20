@@ -211,7 +211,7 @@ namespace Stethoscope.Tests
             Assert.That(nonNull, Is.EqualTo(2));
         }
 
-        [Test, Retry(2)] // For some reason this has the tendency to fail with the default scheduler when run as with the rest of the fixture, but will pass when run individually. SO retry at least once if needed
+        [Test]
         public void ListStorageDoubleSkip([ValueSource("SchedulersToTest")]IScheduler scheduler)
         {
             var list = new List<ILogEntry>()

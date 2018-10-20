@@ -1738,3 +1738,21 @@ void doSomethingCool(std::ifstream& input)
 - Figured out the bug. Apparently it was a "quote" instead of a "lambda"
 - That fixed, we're all good with the unit tests.
 - Only thing... that's all I can do tonight.
+
+#191.2. 10/19/2018:
+- So I could say a lot here... but I won't because, basically, I'm writing some code and seeing how I feel about it.
+- A challenge I have is handling complex operations, in a repeatable fashion, that have a logical set of steps... AKA, a state machine.
+- So originally, as written #183.2, I went "I can just do a couple stages. One to gather, one (optional) to analyze, and one to count/operate"
+- This sounds easy, but I must look ahead: I'm not just dealing with Skip and a count.
+- What happens when I start going "I have to make exceptions for 30 functions, do an extra operation... and do this 2 or more times: one for getting info, one for modifying the expression tree, one for... something"
+- That's gonna be very ugly. Do I start making many sub-functions so I invoke the "main" function, which does a Visit, which invokes a stage, which calls a test, then does something else, then invokes another stage, etc.?
+- I can't say I won't... but trying to represent this logically, and in a way that I can modify to do a bit of that sub-logic differently will be... hard.
+- Where I am now: counting how much to skip and removing these skips are two classes. I don't know if I want to do both in one class, if I want to keep them seperate, or if I want to do something else (that I haven't determined)
+- A state machine (with some arguments) would allow me to say "execute 'this' particular state machine" and have it take some argument/logic unit that, for this, is one or more lambdas that do the specialized action.
+- I'd be able to know the logic will run the same for both, and the lambdas would allow the results to be different.
+- I could do the seperate or the combined operations AND they would look like a set of small functions that do easy to understand operations, and they could be mixed and matched. Basically a functional programming-style state machine.
+- Sounds like something some college/university student would go "that's cool! Do it!"
+- But as someone who is known to have minimal amounts of time, and has worked for a number of years, I know the answer: it depends.
+- The system sounds great, but it is a fare amount of overhead, and it would require implementing a state machine system or finding a library (and that library might now work the way I want).
+- Is it worth it? "Find out in the next episode" because I have other things to do.
+- Tomorrow I'll try doing the system I wrote for the tree modification. If I have time, I'll turn that into a simple state machine. If things work out, I'll consult some friends to see if they're horrified or go "that's awesome" or something in-between.
