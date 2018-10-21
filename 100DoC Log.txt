@@ -1756,3 +1756,10 @@ void doSomethingCool(std::ifstream& input)
 - The system sounds great, but it is a fare amount of overhead, and it would require implementing a state machine system or finding a library (and that library might now work the way I want).
 - Is it worth it? "Find out in the next episode" because I have other things to do.
 - Tomorrow I'll try doing the system I wrote for the tree modification. If I have time, I'll turn that into a simple state machine. If things work out, I'll consult some friends to see if they're horrified or go "that's awesome" or something in-between.
+
+#192.2. 10/20/2018:
+- Ok, managed to get SkipTreeModifer switched to the pesudo-state machine.
+- I had a short chat with a friend (waiting for others to provide opinions) which basically went "a complex recursive function is worse then a state machine"
+- The next thing I'll try is to figure out/find/make a state machine class so I can start to focus on "how to make this code cleaner/more compact"
+- If I like the code, I'll keep it (may keep the state machine code anyway). If I don't, or the friends can convince me otherwise, I'll comment it out at least until I start adding more functions.
+- If I commented out, and add more functions and it becomes too complex, I'll switch to the state machine. Else it will be the implementation already and I'll remove the commented code.
