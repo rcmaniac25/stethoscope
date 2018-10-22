@@ -1763,3 +1763,29 @@ void doSomethingCool(std::ifstream& input)
 - The next thing I'll try is to figure out/find/make a state machine class so I can start to focus on "how to make this code cleaner/more compact"
 - If I like the code, I'll keep it (may keep the state machine code anyway). If I don't, or the friends can convince me otherwise, I'll comment it out at least until I start adding more functions.
 - If I commented out, and add more functions and it becomes too complex, I'll switch to the state machine. Else it will be the implementation already and I'll remove the commented code.
+
+#193.2. 10/21/2018:
+- Ran out of time today...
+- The goal today, which I'll move to tomorrow, was figuring out the next stage of going to a state machine for processing.
+- All but one individual that I asked stated they found a complex recurisve function worse then a state machine.
+- The one individual then stated they believed the state machine was more complex based on how it would be traversed efficently in parallel and handle groupings of possible states.
+- I took that as "if you execute a state machine multiple times in parallel, it the handling of state and processing would be very complex and may make the state machine worse then the recursive function"
+- They backed it up with https://swtch.com/~rsc/regexp/regexp1.html (there example was also regex).
+- I pointed out that I would be running single threaded (I may want to add a lock to enforce this) and they responded "then complex recursive would be more complex"
+- But it made me curious: I don't know what the future would entail. Should I write my own state machine to fit my current plan? Use an exisiting one that may vastly exceed what I need right now but may fit the needs in the future? Do I continue with a compact recursive function and adjust later?
+- Technical superiority/perfection isn't the goal, maintainability is.
+- Most of the other parts that have been written were written as "this is what I want" and adapted as needed.
+- But the most important part of this whole system is being able to take this stream of logs and determine, for example, "this specific set of logs is really just the log-equiv. of a stack trace starting from this function"
+- 1. That's hard. 2. I need to be able to take gains where I can find them.
+- As such, I need to run queries and expressions. The less work I need the query to do, the better. It means one less thing to fail, one less thing to trace, less memory and CPU time, etc.
+- But to complete this will mean the full end-to-end system will have a complex mid-section, that needs to be efficent and not prone to error.
+- And to bring this full circle, to ensure that requires the code to be maintainable.
+- Letting .Net simply execute a full expression is a nice fallback, but as time goes on the "optimized" system will need improvement.
+- Which... oh, this went on much longer then expected. In short: things are going to get complex, need to be maintainable, reduce resources, and it's unknown what the best path is.
+- As per other implementations, I will see as time goes on. If I suddenly end up with a PoC that doesn't go much further then Skip... then besides rewriting/combining the Skip* classes, I'm not sure the state machines will be needed. But I'll learn that as I go. Perhaps I'll be going "why did I think I could do this with a recursive function?"
+- Last thing before my tiring-mind keeps repeating itself, state machine impls:
+-- Custom (ideally, let me define a state machine that can be used/altered by arguments so that I can define/update it once, but what happens can change for whatever purpose I have for it)
+-- Stateless (https://github.com/dotnet-state-machine/stateless), seems it may go further then I need right now... but may be ideal for long term
+-- System.Activities.Statements.StateMachine (.Net native, http://msdn.microsoft.com/en-us/library/system.activities.statements.statemachine.aspx), good that there is a built in one... but info seems to only present it as being built with a utility which may reduce it's reusability.
+- Also forgot, based on the earlier conversation, I wonder if there's any merit to supporting parallel state executions or "grouping" (whatever that is...). Would I eventually end up with the evalulator passing the expression into a "big" state machine and either the original expression is returned or some (super) optimized one? Sounds nifty, but is it ideal?
+- Cutting myself off now...
