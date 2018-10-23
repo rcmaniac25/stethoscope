@@ -1,0 +1,40 @@
+@startuml
+
+title LINQ Processing
+
+[*] --> Uninitialized
+Uninitialized --> CanProcessExpression
+
+state ProcessSkip
+CanProcessExpression --> ProcessSkip : Has Unprocessed\nSkip Expressions
+
+state "Process Skip" as ProcessSkip {
+  SetupProcessing --> MethodCollection
+
+  MethodCollection --> FindProcessingRange : Has Methods
+  MethodCollection --> ReturnNull : No Methods
+  
+  FindProcessingRange --> VisitExpressionTree
+  VisitExpressionTree --> FindProcessingRange
+
+  FindProcessingRange --> CountAndRemoveSkips : Has Methods
+  FindProcessingRange --> ReturnNull : No Methods
+  
+  CountAndRemoveSkips --> VisitExpressionTree
+  VisitExpressionTree --> CountAndRemoveSkips
+
+  CountAndRemoveSkips --> ReturnCountAndTree
+  
+  ReturnNull --> DoneProcessing
+  ReturnCountAndTree --> DoneProcessing
+}
+
+ProcessSkip --> CanProcessExpression : Done
+
+CanProcessExpression --> ProcessSomething : Has Unprocessed\n<name> Expressions
+ProcessSomething --> CanProcessExpression : Done
+
+CanProcessExpression --> ReturnExpression : No More Expressions\nto process
+ReturnExpression --> [*]
+
+@enduml

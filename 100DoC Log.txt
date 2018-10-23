@@ -1789,3 +1789,17 @@ void doSomethingCool(std::ifstream& input)
 -- System.Activities.Statements.StateMachine (.Net native, http://msdn.microsoft.com/en-us/library/system.activities.statements.statemachine.aspx), good that there is a built in one... but info seems to only present it as being built with a utility which may reduce it's reusability.
 - Also forgot, based on the earlier conversation, I wonder if there's any merit to supporting parallel state executions or "grouping" (whatever that is...). Would I eventually end up with the evalulator passing the expression into a "big" state machine and either the original expression is returned or some (super) optimized one? Sounds nifty, but is it ideal?
 - Cutting myself off now...
+
+#194.2. 10/22/2018:
+- So I thought for a short bit and will try Stateless. Based on the description, it was supposedly written to be simpler then Windows Workflow (System.Activities.Statements.StateMachine).
+- It doesn't really work the way I envisioned, and will need a wrapper, but it also is probably the most flexible for my needs at the moment.
+- And I don't need to spend the time to write my own state machine...
+- 2 thoughts have nagged me:
+-- 1. Can I do the entire LINQ evaluation (at least for ListStorage) as one large state machine?
+-- 2. What the heck does this look like?
+- For #1: this needs a picture
+- For #2: I made a picture (Docs/LisStorageEvaluatorLINQStates.puml) which is in PlantUML format.
+- The picture made me go "yes, it is possible... though a wrapper is needed" and "I want some others to take a look and determine if they see a state machine or a flowchart"
+- In some ways, it looks like a flow chart to me... but state machines are basically flow charts. Or is it flow charts are basically state machines?
+- Regardless, I have something I can reference when I go to rewrite code. I won't have much time tomorrow, but I'll see how far I can get.
+- I think my first step will be combining the two classes so I only have one to need class to do work on/use.
