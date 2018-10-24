@@ -1803,3 +1803,8 @@ void doSomethingCool(std::ifstream& input)
 - In some ways, it looks like a flow chart to me... but state machines are basically flow charts. Or is it flow charts are basically state machines?
 - Regardless, I have something I can reference when I go to rewrite code. I won't have much time tomorrow, but I'll see how far I can get.
 - I think my first step will be combining the two classes so I only have one to need class to do work on/use.
+
+#195.2. 10/23/2018:
+- Yea... I don't have the time tonight.
+- I probably could, but I need to fix my sleep schedule and this won't help it right now.
+- Tomorrow.
