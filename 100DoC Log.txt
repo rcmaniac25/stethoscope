@@ -1808,3 +1808,10 @@ void doSomethingCool(std::ifstream& input)
 - Yea... I don't have the time tonight.
 - I probably could, but I need to fix my sleep schedule and this won't help it right now.
 - Tomorrow.
+
+#196.2. 10/24/2018:
+- And tomorrow came... and the code was finished :D
+- I combined the two skip classes, made it a bit more functional (very very minor bit...), and reduced the amount of code that the evaluator actually has.
+- All the tests passed but... I've had another nagging thought: is it working?
+- Like, the tests pass, which means it does what I want it to as an end goal. But did it reduce the expression to?
+- I'll... figure that out tomorrow. After I know everything works, then I'll go on to the actual state machine work.

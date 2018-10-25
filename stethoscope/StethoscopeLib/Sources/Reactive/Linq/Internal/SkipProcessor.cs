@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 
 namespace Stethoscope.Reactive.Linq.Internal
 {
-    internal class SkipCalculator : ExpressionVisitor
+    internal class SkipProcessor : ExpressionVisitor
     {
         private enum VisitStage
         {
@@ -16,17 +17,31 @@ namespace Stethoscope.Reactive.Linq.Internal
             Done
         }
 
+        private Expression finalExpression;
         private int skipDepth;
         private VisitStage stage = VisitStage.Uninitialized;
         private List<MethodCallExpression> methodCalls;
 
-        public int? CalculateSkip(Expression expression)
+        public int? SkipCount
+        {
+            get
+            {
+                if (skipDepth <= 0)
+                {
+                    return null;
+                }
+                return skipDepth;
+            }
+        }
+
+        public Expression Process(Expression expression)
         {
             if (stage != VisitStage.Uninitialized)
             {
-                throw new InvalidOperationException($"{nameof(CalculateSkip)} is already doing a calculation. Create a new instance for each calculation you want to perform.");
+                throw new InvalidOperationException($"{nameof(Process)} is already doing a calculation. Create a new instance for each concurrent operation you want to perform.");
             }
             Reset();
+            finalExpression = expression;
 
             while (stage != VisitStage.Done)
             {
@@ -35,13 +50,9 @@ namespace Stethoscope.Reactive.Linq.Internal
 
             stage = VisitStage.Uninitialized;
 
-            if (skipDepth <= 0)
-            {
-                return null;
-            }
-            return skipDepth;
+            return finalExpression;
         }
-
+        
         private void Reset()
         {
             stage = VisitStage.Stage1;
@@ -54,6 +65,10 @@ namespace Stethoscope.Reactive.Linq.Internal
             if (stage == VisitStage.Stage1)
             {
                 return VisitMethodCallStage1(expression);
+            }
+            else if (stage == VisitStage.Stage3)
+            {
+                return VisitMethodCallStage3(expression);
             }
 
             throw new InvalidOperationException($"Unknown stage: {stage}");
@@ -98,13 +113,13 @@ namespace Stethoscope.Reactive.Linq.Internal
 
         private void Stage1(Expression expression)
         {
-            Visit(expression);
+            base.Visit(expression);
         }
 
         private Expression VisitMethodCallStage1(MethodCallExpression expression)
         {
             methodCalls.Add(expression);
-            Visit(expression.Arguments[0]);
+            base.Visit(expression.Arguments[0]);
             return expression;
         }
 
@@ -142,7 +157,7 @@ namespace Stethoscope.Reactive.Linq.Internal
                 methodCalls.Clear();
             }
         }
-
+        
         private void Stage3(Expression expression)
         {
             foreach (var method in methodCalls)
@@ -156,6 +171,24 @@ namespace Stethoscope.Reactive.Linq.Internal
                     skipDepth += ExpressionTreeHelpers.GetValueFromExpression<int>(method.Arguments[1]);
                 }
             }
+            if (skipDepth > 0)
+            {
+                finalExpression = base.Visit(expression);
+            }
+        }
+
+        private Expression VisitMethodCallStage3(MethodCallExpression expression)
+        {
+            var child = base.Visit(expression.Arguments[0]);
+            if (expression.Method.Name == "Skip" && expression.Arguments[1].Type == typeof(int))
+            {
+                return child;
+            }
+            if (child != expression.Arguments[0])
+            {
+                return Expression.Call(expression.Method, new Expression[] { child }.Concat(expression.Arguments.Skip(1)));
+            }
+            return expression;
         }
     }
 }

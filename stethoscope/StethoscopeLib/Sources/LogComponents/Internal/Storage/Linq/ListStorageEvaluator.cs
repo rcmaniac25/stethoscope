@@ -29,33 +29,21 @@ namespace Stethoscope.Log.Internal.Storage.Linq
         public IObservable<T> Evaluate<T>(Expression expression, Type sourceType)
         {
             var schedulerToUse = DataScheduler ?? CurrentThreadScheduler.Instance;
-            IObservable<ILogEntry> dataSourceObservable;
+            IObservable<ILogEntry> dataSourceObservable = new LiveListObservable<ILogEntry>(LiveObservableType, data, schedulerToUse);
             
             var expressionToEvaluate = expression;
 
-            // The expression must represent a query over the data source. 
-            if (!IsQueryOverDataSource(expression))
-            {
-                dataSourceObservable = new LiveListObservable<ILogEntry>(LiveObservableType, data, schedulerToUse);
-            }
-            else
+            // The expression must represent a query over the data source.
+            if (IsQueryOverDataSource(expression))
             {
                 // We want to know if we can adjust the starting index of the data source
-                var skipBuilder = new SkipCalculator();
-                var skip = skipBuilder.CalculateSkip(expression);
+                var skipProcessor = new SkipProcessor();
+                expressionToEvaluate = skipProcessor.Process(expression);
 
                 // Get an observable for the data
-                if (skip.HasValue)
+                if (skipProcessor.SkipCount.HasValue)
                 {
-                    dataSourceObservable = new LiveListObservable<ILogEntry>(LiveObservableType, data, schedulerToUse, skip.Value);
-
-                    // Update the expression so it no longer includes the skips we previously counted
-                    var modifier = new SkipTreeModifier();
-                    expressionToEvaluate = modifier.Visit(expressionToEvaluate);
-                }
-                else
-                {
-                    dataSourceObservable = new LiveListObservable<ILogEntry>(LiveObservableType, data, schedulerToUse);
+                    dataSourceObservable = new LiveListObservable<ILogEntry>(LiveObservableType, data, schedulerToUse, skipProcessor.SkipCount.Value);
                 }
             }
 

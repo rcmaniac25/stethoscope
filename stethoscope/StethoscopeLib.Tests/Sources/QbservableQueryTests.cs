@@ -10,6 +10,7 @@ using Stethoscope.Reactive.Linq;
 
 using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 
@@ -45,6 +46,31 @@ namespace Stethoscope.Tests
             return new EvaluatableQbservable<ILogEntry>(evaluator);
         }
 
+        private void PrintExpression<T>(IQbservable<T> qbservable)
+        {
+            Console.WriteLine("Original Expression: {0}", qbservable.Expression);
+        }
+
+        private void PrintSubscribedExpression<T>(IQbservable<T> qbservable)
+        {
+            if (qbservable is EvaluatableQbservable<T> evaluatedExpression)
+            {
+                var evEx = evaluatedExpression.EvaluatedExpression;
+                if (evEx != null)
+                {
+                    Console.WriteLine("Evaluated Expression: {0}", evEx);
+                }
+                else
+                {
+                    Console.WriteLine("Qbservable has not been subscribed to or run yet");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Unknown qbservable. Can't get evaluated expression");
+            }
+        }
+
         [Test]
         public void ListStorageDirect([ValueSource("SchedulersToTest")]IScheduler scheduler)
         {
@@ -64,6 +90,7 @@ namespace Stethoscope.Tests
 
             int counter = 0;
             int nonNull = -1;
+            PrintExpression(queryToTest);
             var disposable = queryToTest.Subscribe(en =>
             {
                 if (en != null)
@@ -77,6 +104,7 @@ namespace Stethoscope.Tests
             while (!waitSem.Wait(10)) ;
 
             disposable.Dispose();
+            PrintSubscribedExpression(queryToTest);
 
             Assert.That(counter, Is.EqualTo(5));
             Assert.That(nonNull, Is.EqualTo(2));
@@ -96,7 +124,9 @@ namespace Stethoscope.Tests
 
             var logQbservable = SetupListStorageQbservable(list, scheduler);
 
+            PrintExpression(logQbservable);
             var res = logQbservable.LastOrDefaultAsync().Wait();
+            PrintSubscribedExpression(logQbservable);
             Assert.That(res, Is.Null);
         }
 
@@ -119,6 +149,7 @@ namespace Stethoscope.Tests
 
             int counter = 0;
             int nonNull = -1;
+            PrintExpression(queryToTest);
             var disposable = queryToTest.Subscribe(en =>
             {
                 if (en != null)
@@ -132,6 +163,7 @@ namespace Stethoscope.Tests
             while (!waitSem.Wait(10)) ;
 
             disposable.Dispose();
+            PrintSubscribedExpression(queryToTest);
 
             Assert.That(counter, Is.EqualTo(3));
             Assert.That(nonNull, Is.EqualTo(0));
@@ -156,6 +188,7 @@ namespace Stethoscope.Tests
 
             int counter = 0;
             int nonNull = -1;
+            PrintExpression(queryToTest);
             var disposable = queryToTest.Subscribe(en =>
             {
                 if (en != null)
@@ -169,6 +202,7 @@ namespace Stethoscope.Tests
             while (!waitSem.Wait(10)) ;
 
             disposable.Dispose();
+            PrintSubscribedExpression(queryToTest);
 
             Assert.That(counter, Is.EqualTo(3));
             Assert.That(nonNull, Is.EqualTo(0));
@@ -193,6 +227,7 @@ namespace Stethoscope.Tests
 
             int counter = 0;
             int nonNull = -1;
+            PrintExpression(queryToTest);
             var disposable = queryToTest.Subscribe(en =>
             {
                 if (en != null)
@@ -206,6 +241,7 @@ namespace Stethoscope.Tests
             while (!waitSem.Wait(10)) ;
 
             disposable.Dispose();
+            PrintSubscribedExpression(queryToTest);
 
             Assert.That(counter, Is.EqualTo(5));
             Assert.That(nonNull, Is.EqualTo(2));
@@ -230,6 +266,7 @@ namespace Stethoscope.Tests
 
             int counter = 0;
             int nonNull = -1;
+            PrintExpression(queryToTest);
             var disposable = queryToTest.Subscribe(en =>
             {
                 if (en != null)
@@ -243,6 +280,7 @@ namespace Stethoscope.Tests
             while (!waitSem.Wait(10)) ;
 
             disposable.Dispose();
+            PrintSubscribedExpression(queryToTest);
 
             Assert.That(counter, Is.EqualTo(4));
             Assert.That(nonNull, Is.EqualTo(1));
@@ -267,6 +305,7 @@ namespace Stethoscope.Tests
 
             int counter = 0;
             int nonNull = -1;
+            PrintExpression(queryToTest);
             var disposable = queryToTest.Subscribe(en =>
             {
                 if (en != null)
@@ -280,6 +319,7 @@ namespace Stethoscope.Tests
             while (!waitSem.Wait(10)) ;
 
             disposable.Dispose();
+            PrintSubscribedExpression(queryToTest);
 
             Assert.That(counter, Is.EqualTo(4));
             Assert.That(nonNull, Is.EqualTo(1));
@@ -304,6 +344,7 @@ namespace Stethoscope.Tests
 
             int counter = 0;
             int nonNull = -1;
+            PrintExpression(queryToTest);
             var disposable = queryToTest.Subscribe(en =>
             {
                 if (en != null)
@@ -317,6 +358,7 @@ namespace Stethoscope.Tests
             while (!waitSem.Wait(10)) ;
 
             disposable.Dispose();
+            PrintSubscribedExpression(queryToTest);
 
             Assert.That(counter, Is.EqualTo(4));
             Assert.That(nonNull, Is.EqualTo(1));
@@ -341,6 +383,7 @@ namespace Stethoscope.Tests
 
             int counter = 0;
             int nonNull = -1;
+            PrintExpression(queryToTest);
             var disposable = queryToTest.Subscribe(en =>
             {
                 if (en != null)
@@ -354,6 +397,7 @@ namespace Stethoscope.Tests
             while (!waitSem.Wait(10)) ;
 
             disposable.Dispose();
+            PrintSubscribedExpression(queryToTest);
 
             Assert.That(counter, Is.EqualTo(4));
             Assert.That(nonNull, Is.EqualTo(1));
@@ -378,6 +422,7 @@ namespace Stethoscope.Tests
 
             int counter = 0;
             int nonNull = -1;
+            PrintExpression(queryToTest);
             var disposable = queryToTest.Subscribe(en =>
             {
                 if (en != null)
@@ -391,6 +436,7 @@ namespace Stethoscope.Tests
             while (!waitSem.Wait(10)) ;
 
             disposable.Dispose();
+            PrintSubscribedExpression(queryToTest);
 
             Assert.That(counter, Is.EqualTo(0));
             Assert.That(nonNull, Is.EqualTo(-1));
@@ -415,6 +461,7 @@ namespace Stethoscope.Tests
 
             int counter = 0;
             int nonNull = -1;
+            PrintExpression(queryToTest);
             var disposable = queryToTest.Subscribe(en =>
             {
                 if (en != null)
@@ -428,6 +475,7 @@ namespace Stethoscope.Tests
             while (!waitSem.Wait(10)) ;
 
             disposable.Dispose();
+            PrintSubscribedExpression(queryToTest);
 
             Assert.That(counter, Is.EqualTo(1));
             Assert.That(nonNull, Is.EqualTo(0));
@@ -452,6 +500,7 @@ namespace Stethoscope.Tests
 
             int counter = 0;
             int nonNull = -1;
+            PrintExpression(queryToTest);
             var disposable = queryToTest.Subscribe(en =>
             {
                 if (en != null)
@@ -465,6 +514,7 @@ namespace Stethoscope.Tests
             while (!waitSem.Wait(10)) ;
 
             disposable.Dispose();
+            PrintSubscribedExpression(queryToTest);
 
             Assert.That(counter, Is.EqualTo(3));
             Assert.That(nonNull, Is.EqualTo(0));
@@ -489,6 +539,7 @@ namespace Stethoscope.Tests
 
             int counter = 0;
             int nonNull = -1;
+            PrintExpression(queryToTest);
             var disposable = queryToTest.Subscribe(en =>
             {
                 if (en != null)
@@ -502,6 +553,7 @@ namespace Stethoscope.Tests
             while (!waitSem.Wait(10)) ;
 
             disposable.Dispose();
+            PrintSubscribedExpression(queryToTest);
 
             Assert.That(counter, Is.EqualTo(2));
             Assert.That(nonNull, Is.EqualTo(-1));
@@ -526,6 +578,7 @@ namespace Stethoscope.Tests
 
             int counter = 0;
             int nonNull = -1;
+            PrintExpression(queryToTest);
             var disposable = queryToTest.Subscribe(en =>
             {
                 if (en != null)
@@ -539,6 +592,7 @@ namespace Stethoscope.Tests
             while (!waitSem.Wait(10)) ;
 
             disposable.Dispose();
+            PrintSubscribedExpression(queryToTest);
 
             Assert.That(counter, Is.EqualTo(4));
             Assert.That(nonNull, Is.EqualTo(1));
@@ -563,6 +617,7 @@ namespace Stethoscope.Tests
 
             int counter = 0;
             int nonNull = -1;
+            PrintExpression(queryToTest);
             var disposable = queryToTest.Subscribe(en =>
             {
                 if (en != null)
@@ -576,6 +631,7 @@ namespace Stethoscope.Tests
             while (!waitSem.Wait(10)) ;
 
             disposable.Dispose();
+            PrintSubscribedExpression(queryToTest);
 
             Assert.That(counter, Is.EqualTo(4));
             Assert.That(nonNull, Is.EqualTo(1));

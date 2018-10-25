@@ -34,12 +34,22 @@ namespace Stethoscope.Reactive.Linq
         public Expression Expression { get; private set; }
         public IQbservableProvider Provider { get; private set; }
 
+        internal Expression EvaluatedExpression { get; private set; }
+
         public IDisposable Subscribe(IObserver<T> observer)
         {
             if (source == null)
             {
                 var evalProvider = (EvaluatableQbservableProvider)Provider;
                 source = evalProvider.Evaluator.Evaluate<T>(Expression, evalProvider.SourceType);
+                
+#if DEBUG
+                // For testing purposes
+                if (source is IQbservable<T> qSource)
+                {
+                    EvaluatedExpression = qSource.Expression;
+                }
+#endif
             }
             return source.Subscribe(observer);
         }
