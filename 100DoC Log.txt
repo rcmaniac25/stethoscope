@@ -1815,3 +1815,8 @@ void doSomethingCool(std::ifstream& input)
 - All the tests passed but... I've had another nagging thought: is it working?
 - Like, the tests pass, which means it does what I want it to as an end goal. But did it reduce the expression to?
 - I'll... figure that out tomorrow. After I know everything works, then I'll go on to the actual state machine work.
+
+#197.2. 10/25/2018:
+- Started looking through Stateless.
+- Didn't get very far... and this is about the most I can do tonight...
+- Next couple days will be short.

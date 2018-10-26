@@ -3,10 +3,56 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 
+using Stateless;
+
 namespace Stethoscope.Reactive.Linq.Internal
 {
     internal class SkipProcessor : ExpressionVisitor
     {
+#if false
+        private enum State
+        {
+            Uninitialized,
+            Setup,
+            MethodCollection,
+            FindProcessingRange,
+            VisitExpressionTree,
+            CountAndRemoveSkips,
+            Done
+        }
+
+        private enum Trigger
+        {
+            Done,
+            Invoke,
+
+            HasMethods,
+            NoMethods
+        }
+
+        private readonly StateMachine<State, Trigger>.TriggerWithParameters<Expression> processTrigger = new StateMachine<State, Trigger>.TriggerWithParameters<Expression>(Trigger.Invoke);
+
+        public int? SkipCount { get; private set; } //TODO
+
+        public Expression Process(Expression expression)
+        {
+            var machine = CreateStateMachine();
+            machine.Fire(processTrigger, expression);
+
+            //TODO
+
+            return expression;
+        }
+
+        private StateMachine<State, Trigger> CreateStateMachine()
+        {
+            var machine = new StateMachine<State, Trigger>(State.Uninitialized);
+
+            //TODO
+
+            return machine;
+        }
+#else
         private enum VisitStage
         {
             Uninitialized,
@@ -190,5 +236,6 @@ namespace Stethoscope.Reactive.Linq.Internal
             }
             return expression;
         }
+#endif
     }
 }

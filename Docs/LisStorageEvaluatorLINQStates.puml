@@ -9,24 +9,24 @@ state ProcessSkip
 CanProcessExpression --> ProcessSkip : Has Unprocessed\nSkip Expressions
 
 state "Process Skip" as ProcessSkip {
-  SetupProcessing --> MethodCollection
+  SetupProcessing --> MethodCollection : Invoke
+
+  MethodCollection --> VisitExpressionTree : Invoke
+  VisitExpressionTree --> MethodCollection : Done
 
   MethodCollection --> FindProcessingRange : Has Methods
   MethodCollection --> ReturnNull : No Methods
   
-  FindProcessingRange --> VisitExpressionTree
-  VisitExpressionTree --> FindProcessingRange
-
   FindProcessingRange --> CountAndRemoveSkips : Has Methods
   FindProcessingRange --> ReturnNull : No Methods
   
-  CountAndRemoveSkips --> VisitExpressionTree
-  VisitExpressionTree --> CountAndRemoveSkips
+  CountAndRemoveSkips --> VisitExpressionTree : Invoke
+  VisitExpressionTree --> CountAndRemoveSkips : Done
 
-  CountAndRemoveSkips --> ReturnCountAndTree
+  CountAndRemoveSkips --> ReturnCountAndTree : Done
   
-  ReturnNull --> DoneProcessing
-  ReturnCountAndTree --> DoneProcessing
+  ReturnNull --> DoneProcessing : Done
+  ReturnCountAndTree --> DoneProcessing : Done
 }
 
 ProcessSkip --> CanProcessExpression : Done
