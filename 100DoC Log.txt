@@ -1820,3 +1820,9 @@ void doSomethingCool(std::ifstream& input)
 - Started looking through Stateless.
 - Didn't get very far... and this is about the most I can do tonight...
 - Next couple days will be short.
+
+#198.2. 10/26/2018:
+- I got to this too late. I need to look at how to setup Stateless.
+- It can do a lot... I just wish it could store some variables.
+- How do I basically say "I'm in this state, store/use this data" so I can just say "here's a state machine, Fire this off... then get me the internal data.
+- Just... something to prevent me needing to store a global state. It would make it a self-contained system.
