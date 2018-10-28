@@ -1826,3 +1826,6 @@ void doSomethingCool(std::ifstream& input)
 - It can do a lot... I just wish it could store some variables.
 - How do I basically say "I'm in this state, store/use this data" so I can just say "here's a state machine, Fire this off... then get me the internal data.
 - Just... something to prevent me needing to store a global state. It would make it a self-contained system.
+
+#199.2. 10/27/2018:
+- Unfortunetly I am unable to get the time tonight.
