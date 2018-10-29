@@ -1829,3 +1829,9 @@ void doSomethingCool(std::ifstream& input)
 
 #199.2. 10/27/2018:
 - Unfortunetly I am unable to get the time tonight.
+
+#200.2. 10/28/2018:
+- For day 200 (...ignore the days I didn't get to doing work...), we have a state machine.
+- I read through some blogs, looked at code, and got through all the functions that the state machine had.
+- I was iffy at first, but I think I got the hang of it.
+- I need to do the actual implementations and then we'll see if everything goes according to plan.

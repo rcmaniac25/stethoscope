@@ -32,23 +32,102 @@ namespace Stethoscope.Reactive.Linq.Internal
 
         private readonly StateMachine<State, Trigger>.TriggerWithParameters<Expression> processTrigger = new StateMachine<State, Trigger>.TriggerWithParameters<Expression>(Trigger.Invoke);
 
-        public int? SkipCount { get; private set; } //TODO
+        private StateMachine<State, Trigger> stateMachine;
+        private Expression finalExpression;
+        private int skipDepth;
+
+        public int? SkipCount
+        {
+            get
+            {
+                if (skipDepth <= 0)
+                {
+                    return null;
+                }
+                return skipDepth;
+            }
+        }
 
         public Expression Process(Expression expression)
         {
-            var machine = CreateStateMachine();
-            machine.Fire(processTrigger, expression);
+            if (stateMachine == null)
+            {
+                stateMachine = CreateStateMachine();
+            }
+            stateMachine.Fire(processTrigger, expression);
 
-            //TODO
-
-            return expression;
+            return finalExpression;
         }
 
         private StateMachine<State, Trigger> CreateStateMachine()
         {
             var machine = new StateMachine<State, Trigger>(State.Uninitialized);
 
-            //TODO
+            List<MethodCallExpression> methodCalls;
+            var priorState = State.Uninitialized;
+
+            machine.Configure(State.Uninitialized)
+                .Permit(Trigger.Invoke, State.Setup);
+
+            machine.Configure(State.Setup)
+                .OnEntryFrom(processTrigger, expression =>
+                {
+                    skipDepth = -1;
+                    finalExpression = expression;
+                    machine.Fire(Trigger.Done);
+                })
+                .PermitReentry(Trigger.Invoke)
+                .Permit(Trigger.Done, State.MethodCollection);
+
+            machine.Configure(State.MethodCollection)
+                .OnEntry(transition =>
+                {
+                    if (transition.Source == State.VisitExpressionTree)
+                    {
+                        //TODO
+                    }
+                    else
+                    {
+                        //TODO
+                    }
+                })
+                .Permit(Trigger.Invoke, State.VisitExpressionTree)
+                .Permit(Trigger.HasMethods, State.FindProcessingRange)
+                .Permit(Trigger.NoMethods, State.Done);
+
+            machine.Configure(State.FindProcessingRange)
+                .OnEntry(() =>
+                {
+                    //TODO
+                })
+                .Permit(Trigger.HasMethods, State.CountAndRemoveSkips)
+                .Permit(Trigger.NoMethods, State.Done);
+
+            machine.Configure(State.CountAndRemoveSkips)
+                .OnEntry(transition =>
+                {
+                    if (transition.Source == State.VisitExpressionTree)
+                    {
+                        //TODO
+                    }
+                    else
+                    {
+                        //TODO
+                    }
+                })
+                .Permit(Trigger.Invoke, State.VisitExpressionTree)
+                .Permit(Trigger.Done, State.Done);
+
+            machine.Configure(State.VisitExpressionTree)
+                .OnEntry(() =>
+                {
+                    //TODO
+                })
+                .PermitDynamic(Trigger.Done, () => priorState)
+                .OnExit(() => priorState = State.Uninitialized);
+
+            machine.Configure(State.Done)
+                .PermitIf(processTrigger, State.Setup);
 
             return machine;
         }
