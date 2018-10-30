@@ -1835,3 +1835,11 @@ void doSomethingCool(std::ifstream& input)
 - I read through some blogs, looked at code, and got through all the functions that the state machine had.
 - I was iffy at first, but I think I got the hang of it.
 - I need to do the actual implementations and then we'll see if everything goes according to plan.
+
+#201.2. 10/29/2018:
+- And... everything is now implemented. And it passes unit tests :D
+- 3 things:
+-- 1. I turned the one "big pain" into a small class (the ExpressionVisitor doesn't have state, so if I want a simple function that I can say "visit and do X" I'm stuck with coding the decision logic. This way it's a generic lambda)
+-- 2. Right now there's this external state that pains me a bit. Assuming the code expands, there will be additional states or sub-SMs. I can either make an outer SM, or be able to keep state info internal. I realized I could use TriggerWithParameters to carry the state between states... but I'm not doing that yet.
+-- 3. I had a moment... where I didn't finish the state machine (it basically did setup) and I ran a unit test instead if debugging it. And it passed. This caught me as bad because it means I don't know if my code is actually doing the work or just acting as an identity function. As such, I need to work on the unit tests so without the skip processor, it fails.
+- I won't have a lot of time tomorrow, but I will be doing #2 and #3 next... not sure if in the same order.

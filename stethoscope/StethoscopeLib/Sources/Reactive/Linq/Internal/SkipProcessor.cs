@@ -1,15 +1,49 @@
-﻿using System;
+﻿using Stateless;
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 
-using Stateless;
-
 namespace Stethoscope.Reactive.Linq.Internal
 {
-    internal class SkipProcessor : ExpressionVisitor
+    internal class SkipProcessor
     {
-#if false
+        private class SkipVisitor<T> : ExpressionVisitor
+        {
+            private int depth = -1;
+            private T state;
+
+            public Func<MethodCallExpression, int, T, Func<Expression, Expression>, Expression> MethodVisitHandler { get; set; }
+
+            public Expression Visit(Expression node, T state)
+            {
+                if (depth >= 0)
+                {
+                    throw new InvalidOperationException("Visitor already in use");
+                }
+
+                this.state = state;
+                depth = -1;
+                var res = base.Visit(node);
+                depth = -1;
+
+                return res;
+            }
+
+            protected override Expression VisitMethodCall(MethodCallExpression expression)
+            {
+                Expression result = expression;
+                depth++;
+                if (MethodVisitHandler != null)
+                {
+                    result = MethodVisitHandler(expression, depth, state, base.Visit);
+                }
+                depth--;
+                return result;
+            }
+        }
+
         private enum State
         {
             Uninitialized,
@@ -63,8 +97,9 @@ namespace Stethoscope.Reactive.Linq.Internal
         {
             var machine = new StateMachine<State, Trigger>(State.Uninitialized);
 
-            List<MethodCallExpression> methodCalls;
+            List<MethodCallExpression> methodCalls = null;
             var priorState = State.Uninitialized;
+            var skipVisitor = new SkipVisitor<State>();
 
             machine.Configure(State.Uninitialized)
                 .Permit(Trigger.Invoke, State.Setup);
@@ -74,6 +109,7 @@ namespace Stethoscope.Reactive.Linq.Internal
                 {
                     skipDepth = -1;
                     finalExpression = expression;
+                    methodCalls = new List<MethodCallExpression>();
                     machine.Fire(Trigger.Done);
                 })
                 .PermitReentry(Trigger.Invoke)
@@ -84,11 +120,18 @@ namespace Stethoscope.Reactive.Linq.Internal
                 {
                     if (transition.Source == State.VisitExpressionTree)
                     {
-                        //TODO
+                        machine.Fire(methodCalls.Count > 0 ? Trigger.HasMethods : Trigger.NoMethods);
                     }
                     else
                     {
-                        //TODO
+                        skipVisitor.MethodVisitHandler = (mexp, d, s, visit) =>
+                        {
+                            methodCalls.Add(mexp);
+                            visit(mexp.Arguments[0]);
+                            return mexp;
+                        };
+                        priorState = State.MethodCollection;
+                        machine.Fire(Trigger.Invoke);
                     }
                 })
                 .Permit(Trigger.Invoke, State.VisitExpressionTree)
@@ -96,10 +139,7 @@ namespace Stethoscope.Reactive.Linq.Internal
                 .Permit(Trigger.NoMethods, State.Done);
 
             machine.Configure(State.FindProcessingRange)
-                .OnEntry(() =>
-                {
-                    //TODO
-                })
+                .OnEntry(() => FindProcessingRange(methodCalls))
                 .Permit(Trigger.HasMethods, State.CountAndRemoveSkips)
                 .Permit(Trigger.NoMethods, State.Done);
 
@@ -108,11 +148,31 @@ namespace Stethoscope.Reactive.Linq.Internal
                 {
                     if (transition.Source == State.VisitExpressionTree)
                     {
-                        //TODO
+                        machine.Fire(Trigger.Done);
                     }
                     else
                     {
-                        //TODO
+                        foreach (var method in methodCalls)
+                        {
+                            if (method != null && method.Method.Name == "Skip" && method.Arguments[1].Type == typeof(int))
+                            {
+                                if (skipDepth < 0)
+                                {
+                                    skipDepth = 0;
+                                }
+                                skipDepth += ExpressionTreeHelpers.GetValueFromExpression<int>(method.Arguments[1]);
+                            }
+                        }
+                        if (skipDepth > 0)
+                        {
+                            skipVisitor.MethodVisitHandler = VisitExpressionToCountAndModify;
+                            priorState = State.CountAndRemoveSkips;
+                            machine.Fire(Trigger.Invoke);
+                        }
+                        else
+                        {
+                            machine.Fire(Trigger.Done);
+                        }
                     }
                 })
                 .Permit(Trigger.Invoke, State.VisitExpressionTree)
@@ -121,7 +181,8 @@ namespace Stethoscope.Reactive.Linq.Internal
             machine.Configure(State.VisitExpressionTree)
                 .OnEntry(() =>
                 {
-                    //TODO
+                    finalExpression = skipVisitor.Visit(finalExpression, priorState);
+                    machine.Fire(Trigger.Done);
                 })
                 .PermitDynamic(Trigger.Done, () => priorState)
                 .OnExit(() => priorState = State.Uninitialized);
@@ -131,124 +192,8 @@ namespace Stethoscope.Reactive.Linq.Internal
 
             return machine;
         }
-#else
-        private enum VisitStage
-        {
-            Uninitialized,
 
-            Stage1,
-            Stage2,
-            Stage3,
-            Done
-        }
-
-        private Expression finalExpression;
-        private int skipDepth;
-        private VisitStage stage = VisitStage.Uninitialized;
-        private List<MethodCallExpression> methodCalls;
-
-        public int? SkipCount
-        {
-            get
-            {
-                if (skipDepth <= 0)
-                {
-                    return null;
-                }
-                return skipDepth;
-            }
-        }
-
-        public Expression Process(Expression expression)
-        {
-            if (stage != VisitStage.Uninitialized)
-            {
-                throw new InvalidOperationException($"{nameof(Process)} is already doing a calculation. Create a new instance for each concurrent operation you want to perform.");
-            }
-            Reset();
-            finalExpression = expression;
-
-            while (stage != VisitStage.Done)
-            {
-                ExecuteStages(expression);
-            }
-
-            stage = VisitStage.Uninitialized;
-
-            return finalExpression;
-        }
-        
-        private void Reset()
-        {
-            stage = VisitStage.Stage1;
-            skipDepth = -1;
-            methodCalls = new List<MethodCallExpression>();
-        }
-
-        protected override Expression VisitMethodCall(MethodCallExpression expression)
-        {
-            if (stage == VisitStage.Stage1)
-            {
-                return VisitMethodCallStage1(expression);
-            }
-            else if (stage == VisitStage.Stage3)
-            {
-                return VisitMethodCallStage3(expression);
-            }
-
-            throw new InvalidOperationException($"Unknown stage: {stage}");
-        }
-
-        private void ExecuteStages(Expression expression)
-        {
-            if (stage == VisitStage.Stage1)
-            {
-                Stage1(expression);
-                if (methodCalls.Count > 0)
-                {
-                    stage = VisitStage.Stage2;
-                }
-                else
-                {
-                    stage = VisitStage.Done;
-                }
-            }
-            else if (stage == VisitStage.Stage2)
-            {
-                Stage2(expression);
-                if (methodCalls.Count > 0)
-                {
-                    stage = VisitStage.Stage3;
-                }
-                else
-                {
-                    stage = VisitStage.Done;
-                }
-            }
-            else if (stage == VisitStage.Stage3)
-            {
-                Stage3(expression);
-                stage = VisitStage.Done;
-            }
-            else
-            {
-                throw new InvalidOperationException($"Unknown stage: {stage}");
-            }
-        }
-
-        private void Stage1(Expression expression)
-        {
-            base.Visit(expression);
-        }
-
-        private Expression VisitMethodCallStage1(MethodCallExpression expression)
-        {
-            methodCalls.Add(expression);
-            base.Visit(expression.Arguments[0]);
-            return expression;
-        }
-
-        private void Stage2(Expression expression)
+        private void FindProcessingRange(List<MethodCallExpression> methodCalls)
         {
             int countSkipsFrom = 0;
             for (int i = 0; i < methodCalls.Count; i++)
@@ -276,35 +221,17 @@ namespace Stethoscope.Reactive.Linq.Internal
                 {
                     methodCalls[i] = null;
                 }
+                stateMachine.Fire(Trigger.HasMethods);
             }
             else
             {
-                methodCalls.Clear();
-            }
-        }
-        
-        private void Stage3(Expression expression)
-        {
-            foreach (var method in methodCalls)
-            {
-                if (method != null && method.Method.Name == "Skip" && method.Arguments[1].Type == typeof(int))
-                {
-                    if (skipDepth < 0)
-                    {
-                        skipDepth = 0;
-                    }
-                    skipDepth += ExpressionTreeHelpers.GetValueFromExpression<int>(method.Arguments[1]);
-                }
-            }
-            if (skipDepth > 0)
-            {
-                finalExpression = base.Visit(expression);
+                stateMachine.Fire(Trigger.NoMethods);
             }
         }
 
-        private Expression VisitMethodCallStage3(MethodCallExpression expression)
+        private Expression VisitExpressionToCountAndModify<T>(MethodCallExpression expression, int depth, T state, Func<Expression, Expression> visit)
         {
-            var child = base.Visit(expression.Arguments[0]);
+            var child = visit(expression.Arguments[0]);
             if (expression.Method.Name == "Skip" && expression.Arguments[1].Type == typeof(int))
             {
                 return child;
@@ -315,6 +242,5 @@ namespace Stethoscope.Reactive.Linq.Internal
             }
             return expression;
         }
-#endif
     }
 }
