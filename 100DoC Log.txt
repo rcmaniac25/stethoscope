@@ -1843,3 +1843,12 @@ void doSomethingCool(std::ifstream& input)
 -- 2. Right now there's this external state that pains me a bit. Assuming the code expands, there will be additional states or sub-SMs. I can either make an outer SM, or be able to keep state info internal. I realized I could use TriggerWithParameters to carry the state between states... but I'm not doing that yet.
 -- 3. I had a moment... where I didn't finish the state machine (it basically did setup) and I ran a unit test instead if debugging it. And it passed. This caught me as bad because it means I don't know if my code is actually doing the work or just acting as an identity function. As such, I need to work on the unit tests so without the skip processor, it fails.
 - I won't have a lot of time tomorrow, but I will be doing #2 and #3 next... not sure if in the same order.
+
+#202.2. 10/30/2018:
+- Technically I should do the unit tests first, but as stated yesterday, the external state pains me.
+- Fix the pain... Stateless is very cool in the sense that it's quite flexible and since it doesn't maintain it's own state, you do all the work for state management.
+- This means, in the skip processor's case, I will pass the state via paramaterized triggers.
+- I got a good portion working, but have other work todo.
+- It's questionable if this is needed, but a self-contained (to an extent) state machine could make it easier to work with in the long run.
+- Why? It basically becomes a functional programming language. There is no external state that needs to be tracked, just the state itself.
+- It plays into (potential) future expansion where new states or components result in an additional state of trigger usage... but nothing else changes. No additional "but if coming from this state, don't do this" logic. A temporary oddity results in easier to maintain code.

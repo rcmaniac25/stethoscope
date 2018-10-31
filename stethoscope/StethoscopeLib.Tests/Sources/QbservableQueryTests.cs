@@ -10,7 +10,6 @@ using Stethoscope.Reactive.Linq;
 
 using System;
 using System.Collections.Generic;
-using System.Linq.Expressions;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 
@@ -70,6 +69,8 @@ namespace Stethoscope.Tests
                 Console.WriteLine("Unknown qbservable. Can't get evaluated expression");
             }
         }
+
+        //TODO: wrap the process of execution and also compare the expression strings to ensure they're different
 
         [Test]
         public void ListStorageDirect([ValueSource("SchedulersToTest")]IScheduler scheduler)
