@@ -1852,3 +1852,10 @@ void doSomethingCool(std::ifstream& input)
 - It's questionable if this is needed, but a self-contained (to an extent) state machine could make it easier to work with in the long run.
 - Why? It basically becomes a functional programming language. There is no external state that needs to be tracked, just the state itself.
 - It plays into (potential) future expansion where new states or components result in an additional state of trigger usage... but nothing else changes. No additional "but if coming from this state, don't do this" logic. A temporary oddity results in easier to maintain code.
+
+#203.2. 10/31/2018:
+- Ok, it's not perfect, but the state machine now has it's own "immutable" internal state that it passes around.
+- Basically it's a funtional-style state machine (someone is gonna yell at me over this... I know it)
+- I didn't get to working on the test expression comparison, but I'll do that tomorrow.
+- This was more then I expected. I still have to compare execution between the recursive and state-machine implementations (and I'd like to time it too).
+- Todos: unit test exprssion comparison; compare recursive and state-machine implementations; move on to more advanced implementations(?)
