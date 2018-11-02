@@ -1859,3 +1859,7 @@ void doSomethingCool(std::ifstream& input)
 - I didn't get to working on the test expression comparison, but I'll do that tomorrow.
 - This was more then I expected. I still have to compare execution between the recursive and state-machine implementations (and I'd like to time it too).
 - Todos: unit test exprssion comparison; compare recursive and state-machine implementations; move on to more advanced implementations(?)
+
+#204.2. 11/01/2018:
+- Got a partial wrapper for expression comparision but forgot that there will be at least on const replacement internally... so the comparision will always have the same result.
+- Once I fix do something about that, I can call the code done and go on to the comparisons and advanced usage.

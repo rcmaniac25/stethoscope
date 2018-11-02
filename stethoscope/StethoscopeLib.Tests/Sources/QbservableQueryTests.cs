@@ -45,29 +45,63 @@ namespace Stethoscope.Tests
             return new EvaluatableQbservable<ILogEntry>(evaluator);
         }
 
-        private void PrintExpression<T>(IQbservable<T> qbservable)
+        private string PrintExpression<T>(IQbservable<T> qbservable)
         {
-            Console.WriteLine("Original Expression: {0}", qbservable.Expression);
+            var expressionString = qbservable.Expression.ToString();
+            Console.WriteLine("Original Expression: {0}", expressionString);
+            return expressionString;
         }
 
-        private void PrintSubscribedExpression<T>(IQbservable<T> qbservable)
+        private string PrintSubscribedExpression<T>(IQbservable<T> qbservable)
         {
             if (qbservable is EvaluatableQbservable<T> evaluatedExpression)
             {
                 var evEx = evaluatedExpression.EvaluatedExpression;
                 if (evEx != null)
                 {
-                    Console.WriteLine("Evaluated Expression: {0}", evEx);
+                    var expressionString = evEx.ToString();
+                    Console.WriteLine("Evaluated Expression: {0}", expressionString);
+                    return expressionString;
                 }
                 else
                 {
                     Console.WriteLine("Qbservable has not been subscribed to or run yet");
+                    return string.Empty;
                 }
             }
             else
             {
                 Console.WriteLine("Unknown qbservable. Can't get evaluated expression");
+                return null;
             }
+        }
+
+        private bool ListStorageTest<T>(IQbservable<T> queryToTest, out int count, out int nonNullIndex)
+        {
+            var waitSem = new System.Threading.SemaphoreSlim(0);
+
+            int counter = 0;
+            int nonNull = -1;
+            var originalExpression = PrintExpression(queryToTest);
+            var disposable = queryToTest.Subscribe(en =>
+            {
+                if (en != null)
+                {
+                    nonNull = counter;
+                }
+
+                counter++;
+            }, () => waitSem.Release());
+
+            while (!waitSem.Wait(10)) ;
+
+            disposable.Dispose();
+            var evaluatedExpression = PrintSubscribedExpression(queryToTest);
+
+            count = counter;
+            nonNullIndex = nonNull;
+
+            return originalExpression != evaluatedExpression;
         }
 
         //TODO: wrap the process of execution and also compare the expression strings to ensure they're different
@@ -85,27 +119,10 @@ namespace Stethoscope.Tests
             };
 
             var logQbservable = SetupListStorageQbservable(list, scheduler);
-            var waitSem = new System.Threading.SemaphoreSlim(0);
 
             var queryToTest = logQbservable;
 
-            int counter = 0;
-            int nonNull = -1;
-            PrintExpression(queryToTest);
-            var disposable = queryToTest.Subscribe(en =>
-            {
-                if (en != null)
-                {
-                    nonNull = counter;
-                }
-
-                counter++;
-            }, () => waitSem.Release());
-
-            while (!waitSem.Wait(10)) ;
-
-            disposable.Dispose();
-            PrintSubscribedExpression(queryToTest);
+            ListStorageTest(queryToTest, out int counter, out int nonNull);
 
             Assert.That(counter, Is.EqualTo(5));
             Assert.That(nonNull, Is.EqualTo(2));
@@ -125,10 +142,11 @@ namespace Stethoscope.Tests
 
             var logQbservable = SetupListStorageQbservable(list, scheduler);
 
-            PrintExpression(logQbservable);
+            var originalExpression = PrintExpression(logQbservable);
             var res = logQbservable.LastOrDefaultAsync().Wait();
-            PrintSubscribedExpression(logQbservable);
+            var evaluatedExpression = PrintSubscribedExpression(logQbservable);
             Assert.That(res, Is.Null);
+            //TODO
         }
 
         [Test]
@@ -144,27 +162,10 @@ namespace Stethoscope.Tests
             };
 
             var logQbservable = SetupListStorageQbservable(list, scheduler);
-            var waitSem = new System.Threading.SemaphoreSlim(0);
 
             var queryToTest = logQbservable.Skip(2);
 
-            int counter = 0;
-            int nonNull = -1;
-            PrintExpression(queryToTest);
-            var disposable = queryToTest.Subscribe(en =>
-            {
-                if (en != null)
-                {
-                    nonNull = counter;
-                }
-
-                counter++;
-            }, () => waitSem.Release());
-
-            while (!waitSem.Wait(10)) ;
-
-            disposable.Dispose();
-            PrintSubscribedExpression(queryToTest);
+            ListStorageTest(queryToTest, out int counter, out int nonNull);
 
             Assert.That(counter, Is.EqualTo(3));
             Assert.That(nonNull, Is.EqualTo(0));
@@ -183,27 +184,10 @@ namespace Stethoscope.Tests
             };
 
             var logQbservable = SetupListStorageQbservable(list, scheduler);
-            var waitSem = new System.Threading.SemaphoreSlim(0);
 
             var queryToTest = logQbservable.Skip(1).Skip(1);
 
-            int counter = 0;
-            int nonNull = -1;
-            PrintExpression(queryToTest);
-            var disposable = queryToTest.Subscribe(en =>
-            {
-                if (en != null)
-                {
-                    nonNull = counter;
-                }
-
-                counter++;
-            }, () => waitSem.Release());
-
-            while (!waitSem.Wait(10)) ;
-
-            disposable.Dispose();
-            PrintSubscribedExpression(queryToTest);
+            ListStorageTest(queryToTest, out int counter, out int nonNull);
 
             Assert.That(counter, Is.EqualTo(3));
             Assert.That(nonNull, Is.EqualTo(0));
@@ -222,27 +206,10 @@ namespace Stethoscope.Tests
             };
 
             var logQbservable = SetupListStorageQbservable(list, scheduler);
-            var waitSem = new System.Threading.SemaphoreSlim(0);
 
             var queryToTest = logQbservable.Skip(TimeSpan.Zero);
 
-            int counter = 0;
-            int nonNull = -1;
-            PrintExpression(queryToTest);
-            var disposable = queryToTest.Subscribe(en =>
-            {
-                if (en != null)
-                {
-                    nonNull = counter;
-                }
-
-                counter++;
-            }, () => waitSem.Release());
-
-            while (!waitSem.Wait(10)) ;
-
-            disposable.Dispose();
-            PrintSubscribedExpression(queryToTest);
+            ListStorageTest(queryToTest, out int counter, out int nonNull);
 
             Assert.That(counter, Is.EqualTo(5));
             Assert.That(nonNull, Is.EqualTo(2));
@@ -261,27 +228,10 @@ namespace Stethoscope.Tests
             };
 
             var logQbservable = SetupListStorageQbservable(list, scheduler);
-            var waitSem = new System.Threading.SemaphoreSlim(0);
 
             var queryToTest = logQbservable.Skip(1).Skip(TimeSpan.Zero);
 
-            int counter = 0;
-            int nonNull = -1;
-            PrintExpression(queryToTest);
-            var disposable = queryToTest.Subscribe(en =>
-            {
-                if (en != null)
-                {
-                    nonNull = counter;
-                }
-
-                counter++;
-            }, () => waitSem.Release());
-
-            while (!waitSem.Wait(10)) ;
-
-            disposable.Dispose();
-            PrintSubscribedExpression(queryToTest);
+            ListStorageTest(queryToTest, out int counter, out int nonNull);
 
             Assert.That(counter, Is.EqualTo(4));
             Assert.That(nonNull, Is.EqualTo(1));
@@ -300,27 +250,10 @@ namespace Stethoscope.Tests
             };
 
             var logQbservable = SetupListStorageQbservable(list, scheduler);
-            var waitSem = new System.Threading.SemaphoreSlim(0);
 
             var queryToTest = logQbservable.Skip(TimeSpan.Zero).Skip(1);
 
-            int counter = 0;
-            int nonNull = -1;
-            PrintExpression(queryToTest);
-            var disposable = queryToTest.Subscribe(en =>
-            {
-                if (en != null)
-                {
-                    nonNull = counter;
-                }
-
-                counter++;
-            }, () => waitSem.Release());
-
-            while (!waitSem.Wait(10)) ;
-
-            disposable.Dispose();
-            PrintSubscribedExpression(queryToTest);
+            ListStorageTest(queryToTest, out int counter, out int nonNull);
 
             Assert.That(counter, Is.EqualTo(4));
             Assert.That(nonNull, Is.EqualTo(1));
@@ -339,27 +272,10 @@ namespace Stethoscope.Tests
             };
 
             var logQbservable = SetupListStorageQbservable(list, scheduler);
-            var waitSem = new System.Threading.SemaphoreSlim(0);
 
             var queryToTest = logQbservable.Skip(1).Select(en => en != null ? en.Message : null);
 
-            int counter = 0;
-            int nonNull = -1;
-            PrintExpression(queryToTest);
-            var disposable = queryToTest.Subscribe(en =>
-            {
-                if (en != null)
-                {
-                    nonNull = counter;
-                }
-
-                counter++;
-            }, () => waitSem.Release());
-
-            while (!waitSem.Wait(10)) ;
-
-            disposable.Dispose();
-            PrintSubscribedExpression(queryToTest);
+            ListStorageTest(queryToTest, out int counter, out int nonNull);
 
             Assert.That(counter, Is.EqualTo(4));
             Assert.That(nonNull, Is.EqualTo(1));
@@ -378,27 +294,10 @@ namespace Stethoscope.Tests
             };
 
             var logQbservable = SetupListStorageQbservable(list, scheduler);
-            var waitSem = new System.Threading.SemaphoreSlim(0);
 
             var queryToTest = logQbservable.Select(en => en != null ? en.Message : null).Skip(1);
 
-            int counter = 0;
-            int nonNull = -1;
-            PrintExpression(queryToTest);
-            var disposable = queryToTest.Subscribe(en =>
-            {
-                if (en != null)
-                {
-                    nonNull = counter;
-                }
-
-                counter++;
-            }, () => waitSem.Release());
-
-            while (!waitSem.Wait(10)) ;
-
-            disposable.Dispose();
-            PrintSubscribedExpression(queryToTest);
+            ListStorageTest(queryToTest, out int counter, out int nonNull);
 
             Assert.That(counter, Is.EqualTo(4));
             Assert.That(nonNull, Is.EqualTo(1));
@@ -417,27 +316,10 @@ namespace Stethoscope.Tests
             };
 
             var logQbservable = SetupListStorageQbservable(list, scheduler);
-            var waitSem = new System.Threading.SemaphoreSlim(0);
 
             var queryToTest = logQbservable.Where(en => en != null && en.IsValid).Skip(1).Select(en => en != null ? en.Message : null);
 
-            int counter = 0;
-            int nonNull = -1;
-            PrintExpression(queryToTest);
-            var disposable = queryToTest.Subscribe(en =>
-            {
-                if (en != null)
-                {
-                    nonNull = counter;
-                }
-
-                counter++;
-            }, () => waitSem.Release());
-
-            while (!waitSem.Wait(10)) ;
-
-            disposable.Dispose();
-            PrintSubscribedExpression(queryToTest);
+            ListStorageTest(queryToTest, out int counter, out int nonNull);
 
             Assert.That(counter, Is.EqualTo(0));
             Assert.That(nonNull, Is.EqualTo(-1));
@@ -456,27 +338,10 @@ namespace Stethoscope.Tests
             };
 
             var logQbservable = SetupListStorageQbservable(list, scheduler);
-            var waitSem = new System.Threading.SemaphoreSlim(0);
 
             var queryToTest = logQbservable.Where(en => en != null && en.IsValid).Skip(TimeSpan.Zero).Select(en => en != null ? en.Message : null);
 
-            int counter = 0;
-            int nonNull = -1;
-            PrintExpression(queryToTest);
-            var disposable = queryToTest.Subscribe(en =>
-            {
-                if (en != null)
-                {
-                    nonNull = counter;
-                }
-
-                counter++;
-            }, () => waitSem.Release());
-
-            while (!waitSem.Wait(10)) ;
-
-            disposable.Dispose();
-            PrintSubscribedExpression(queryToTest);
+            ListStorageTest(queryToTest, out int counter, out int nonNull);
 
             Assert.That(counter, Is.EqualTo(1));
             Assert.That(nonNull, Is.EqualTo(0));
@@ -495,27 +360,10 @@ namespace Stethoscope.Tests
             };
 
             var logQbservable = SetupListStorageQbservable(list, scheduler);
-            var waitSem = new System.Threading.SemaphoreSlim(0);
 
             var queryToTest = logQbservable.Skip(1).SkipWhile(en => en == null);
 
-            int counter = 0;
-            int nonNull = -1;
-            PrintExpression(queryToTest);
-            var disposable = queryToTest.Subscribe(en =>
-            {
-                if (en != null)
-                {
-                    nonNull = counter;
-                }
-
-                counter++;
-            }, () => waitSem.Release());
-
-            while (!waitSem.Wait(10)) ;
-
-            disposable.Dispose();
-            PrintSubscribedExpression(queryToTest);
+            ListStorageTest(queryToTest, out int counter, out int nonNull);
 
             Assert.That(counter, Is.EqualTo(3));
             Assert.That(nonNull, Is.EqualTo(0));
@@ -534,27 +382,10 @@ namespace Stethoscope.Tests
             };
 
             var logQbservable = SetupListStorageQbservable(list, scheduler);
-            var waitSem = new System.Threading.SemaphoreSlim(0);
 
             var queryToTest = logQbservable.SkipWhile(en => en == null).Skip(1);
 
-            int counter = 0;
-            int nonNull = -1;
-            PrintExpression(queryToTest);
-            var disposable = queryToTest.Subscribe(en =>
-            {
-                if (en != null)
-                {
-                    nonNull = counter;
-                }
-
-                counter++;
-            }, () => waitSem.Release());
-
-            while (!waitSem.Wait(10)) ;
-
-            disposable.Dispose();
-            PrintSubscribedExpression(queryToTest);
+            ListStorageTest(queryToTest, out int counter, out int nonNull);
 
             Assert.That(counter, Is.EqualTo(2));
             Assert.That(nonNull, Is.EqualTo(-1));
@@ -573,27 +404,10 @@ namespace Stethoscope.Tests
             };
 
             var logQbservable = SetupListStorageQbservable(list, scheduler);
-            var waitSem = new System.Threading.SemaphoreSlim(0);
 
             var queryToTest = logQbservable.Skip(1).Select(en => en != null ? en.Message : null);
 
-            int counter = 0;
-            int nonNull = -1;
-            PrintExpression(queryToTest);
-            var disposable = queryToTest.Subscribe(en =>
-            {
-                if (en != null)
-                {
-                    nonNull = counter;
-                }
-
-                counter++;
-            }, () => waitSem.Release());
-
-            while (!waitSem.Wait(10)) ;
-
-            disposable.Dispose();
-            PrintSubscribedExpression(queryToTest);
+            ListStorageTest(queryToTest, out int counter, out int nonNull);
 
             Assert.That(counter, Is.EqualTo(4));
             Assert.That(nonNull, Is.EqualTo(1));
@@ -612,28 +426,11 @@ namespace Stethoscope.Tests
             };
 
             var logQbservable = SetupListStorageQbservable(list, scheduler);
-            var waitSem = new System.Threading.SemaphoreSlim(0);
 
             var queryToTest = logQbservable.Select(en => en != null ? en.Message : null).Skip(1);
 
-            int counter = 0;
-            int nonNull = -1;
-            PrintExpression(queryToTest);
-            var disposable = queryToTest.Subscribe(en =>
-            {
-                if (en != null)
-                {
-                    nonNull = counter;
-                }
-
-                counter++;
-            }, () => waitSem.Release());
-
-            while (!waitSem.Wait(10)) ;
-
-            disposable.Dispose();
-            PrintSubscribedExpression(queryToTest);
-
+            ListStorageTest(queryToTest, out int counter, out int nonNull);
+            
             Assert.That(counter, Is.EqualTo(4));
             Assert.That(nonNull, Is.EqualTo(1));
         }
