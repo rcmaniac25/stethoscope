@@ -18,6 +18,14 @@ namespace Stethoscope.Tests
     [TestFixture]
     public class QbservableQueryTests
     {
+        private enum ExpressionStringComparision
+        {
+            Unknown,
+
+            Same,
+            Different
+        }
+
         private IRegistryStorage mockRegistryStorage;
         private ILogEntry mockLogEntry;
 
@@ -35,7 +43,7 @@ namespace Stethoscope.Tests
 
             mockLogEntry.IsValid.ReturnsForAnyArgs(true);
         }
-        
+
         private IQbservable<ILogEntry> SetupListStorageQbservable(IList<ILogEntry> list, IScheduler schedulerToUse)
         {
             mockRegistryStorage.LogScheduler.ReturnsForAnyArgs(schedulerToUse);
@@ -45,11 +53,48 @@ namespace Stethoscope.Tests
             return new EvaluatableQbservable<ILogEntry>(evaluator);
         }
 
+        private string SubstitueQbservableStrings(string expressionString)
+        {
+            int index = -1;
+            do
+            {
+                var endChar = ')';
+                index = expressionString.IndexOf("Stethoscope.Reactive.Linq.EvaluatableQbservable");
+                if (index < 0)
+                {
+                    endChar = ']';
+                    index = expressionString.IndexOf("Stethoscope.Reactive.LiveListObservable");
+                }
+                else if (expressionString.LastIndexOf("value(", index) >= 0)
+                {
+                    index = expressionString.LastIndexOf("value(", index);
+                }
+                if (index >= 0)
+                {
+                    int endIndex = expressionString.IndexOf('`', index);
+                    if (endIndex > 0)
+                    {
+                        var tindex = expressionString.IndexOf('[', endIndex + 3);
+                        endIndex = expressionString.IndexOf(endChar, endIndex + 1);
+                        if (tindex > 0 && tindex < endIndex)
+                        {
+                            throw new Exception("Dev update: need to support recursive quote removals: example is embedded generics (List`1[List`1[int]])");
+                        }
+                        if (endIndex > 0)
+                        {
+                            expressionString = $"{expressionString.Substring(0, index)}TestQbservable{expressionString.Substring(endIndex + 1)}";
+                        }
+                    }
+                }
+            } while (index >= 0);
+            return expressionString;
+        }
+
         private string PrintExpression<T>(IQbservable<T> qbservable)
         {
             var expressionString = qbservable.Expression.ToString();
             Console.WriteLine("Original Expression: {0}", expressionString);
-            return expressionString;
+            return SubstitueQbservableStrings(expressionString);
         }
 
         private string PrintSubscribedExpression<T>(IQbservable<T> qbservable)
@@ -61,7 +106,7 @@ namespace Stethoscope.Tests
                 {
                     var expressionString = evEx.ToString();
                     Console.WriteLine("Evaluated Expression: {0}", expressionString);
-                    return expressionString;
+                    return SubstitueQbservableStrings(expressionString);
                 }
                 else
                 {
@@ -76,36 +121,48 @@ namespace Stethoscope.Tests
             }
         }
 
-        private bool ListStorageTest<T>(IQbservable<T> queryToTest, out int count, out int nonNullIndex)
+        private ExpressionStringComparision CompareExpressionsTest<T>(IQbservable<T> queryToTest, Action<IQbservable<T>> test)
+        {
+            var originalExpression = PrintExpression(queryToTest);
+            test(queryToTest);
+            var evaluatedExpression = PrintSubscribedExpression(queryToTest);
+
+            if (originalExpression == evaluatedExpression)
+            {
+                return ExpressionStringComparision.Same;
+            }
+            return ExpressionStringComparision.Different;
+        }
+
+        private ExpressionStringComparision ListStorageTest<T>(IQbservable<T> queryToTest, out int count, out int nonNullIndex)
         {
             var waitSem = new System.Threading.SemaphoreSlim(0);
 
             int counter = 0;
             int nonNull = -1;
-            var originalExpression = PrintExpression(queryToTest);
-            var disposable = queryToTest.Subscribe(en =>
+            var result = CompareExpressionsTest(queryToTest, query =>
             {
-                if (en != null)
+                var disposable = query.Subscribe(en =>
                 {
-                    nonNull = counter;
-                }
+                    if (en != null)
+                    {
+                        nonNull = counter;
+                    }
 
-                counter++;
-            }, () => waitSem.Release());
+                    counter++;
+                }, () => waitSem.Release());
 
-            while (!waitSem.Wait(10)) ;
+                while (!waitSem.Wait(10)) ;
 
-            disposable.Dispose();
-            var evaluatedExpression = PrintSubscribedExpression(queryToTest);
+                disposable.Dispose();
+            });
 
             count = counter;
             nonNullIndex = nonNull;
 
-            return originalExpression != evaluatedExpression;
+            return result;
         }
-
-        //TODO: wrap the process of execution and also compare the expression strings to ensure they're different
-
+        
         [Test]
         public void ListStorageDirect([ValueSource("SchedulersToTest")]IScheduler scheduler)
         {
@@ -122,10 +179,11 @@ namespace Stethoscope.Tests
 
             var queryToTest = logQbservable;
 
-            ListStorageTest(queryToTest, out int counter, out int nonNull);
+            var comp = ListStorageTest(queryToTest, out int counter, out int nonNull);
 
             Assert.That(counter, Is.EqualTo(5));
             Assert.That(nonNull, Is.EqualTo(2));
+            Assert.That(comp, Is.EqualTo(ExpressionStringComparision.Same));
         }
 
         [Test]
@@ -141,12 +199,16 @@ namespace Stethoscope.Tests
             };
 
             var logQbservable = SetupListStorageQbservable(list, scheduler);
+            
+            var queryToTest = logQbservable.LastOrDefaultAsync();
 
-            var originalExpression = PrintExpression(logQbservable);
-            var res = logQbservable.LastOrDefaultAsync().Wait();
-            var evaluatedExpression = PrintSubscribedExpression(logQbservable);
+            ILogEntry res = null;
+            var comp = CompareExpressionsTest(queryToTest, query =>
+            {
+                res = query.Wait();
+            });
             Assert.That(res, Is.Null);
-            //TODO
+            Assert.That(comp, Is.EqualTo(ExpressionStringComparision.Same));
         }
 
         [Test]
@@ -165,10 +227,11 @@ namespace Stethoscope.Tests
 
             var queryToTest = logQbservable.Skip(2);
 
-            ListStorageTest(queryToTest, out int counter, out int nonNull);
+            var comp = ListStorageTest(queryToTest, out int counter, out int nonNull);
 
             Assert.That(counter, Is.EqualTo(3));
             Assert.That(nonNull, Is.EqualTo(0));
+            Assert.That(comp, Is.EqualTo(ExpressionStringComparision.Different));
         }
 
         [Test]
@@ -187,10 +250,11 @@ namespace Stethoscope.Tests
 
             var queryToTest = logQbservable.Skip(1).Skip(1);
 
-            ListStorageTest(queryToTest, out int counter, out int nonNull);
+            var comp = ListStorageTest(queryToTest, out int counter, out int nonNull);
 
             Assert.That(counter, Is.EqualTo(3));
             Assert.That(nonNull, Is.EqualTo(0));
+            Assert.That(comp, Is.EqualTo(ExpressionStringComparision.Different));
         }
 
         [Test]
@@ -209,10 +273,11 @@ namespace Stethoscope.Tests
 
             var queryToTest = logQbservable.Skip(TimeSpan.Zero);
 
-            ListStorageTest(queryToTest, out int counter, out int nonNull);
+            var comp = ListStorageTest(queryToTest, out int counter, out int nonNull);
 
             Assert.That(counter, Is.EqualTo(5));
             Assert.That(nonNull, Is.EqualTo(2));
+            Assert.That(comp, Is.EqualTo(ExpressionStringComparision.Same));
         }
 
         [Test]
@@ -231,10 +296,11 @@ namespace Stethoscope.Tests
 
             var queryToTest = logQbservable.Skip(1).Skip(TimeSpan.Zero);
 
-            ListStorageTest(queryToTest, out int counter, out int nonNull);
+            var comp = ListStorageTest(queryToTest, out int counter, out int nonNull);
 
             Assert.That(counter, Is.EqualTo(4));
             Assert.That(nonNull, Is.EqualTo(1));
+            Assert.That(comp, Is.EqualTo(ExpressionStringComparision.Different));
         }
 
         [Test]
@@ -253,10 +319,11 @@ namespace Stethoscope.Tests
 
             var queryToTest = logQbservable.Skip(TimeSpan.Zero).Skip(1);
 
-            ListStorageTest(queryToTest, out int counter, out int nonNull);
+            var comp = ListStorageTest(queryToTest, out int counter, out int nonNull);
 
             Assert.That(counter, Is.EqualTo(4));
             Assert.That(nonNull, Is.EqualTo(1));
+            Assert.That(comp, Is.EqualTo(ExpressionStringComparision.Same));
         }
 
         [Test]
@@ -275,10 +342,11 @@ namespace Stethoscope.Tests
 
             var queryToTest = logQbservable.Skip(1).Select(en => en != null ? en.Message : null);
 
-            ListStorageTest(queryToTest, out int counter, out int nonNull);
+            var comp = ListStorageTest(queryToTest, out int counter, out int nonNull);
 
             Assert.That(counter, Is.EqualTo(4));
             Assert.That(nonNull, Is.EqualTo(1));
+            Assert.That(comp, Is.EqualTo(ExpressionStringComparision.Different));
         }
 
         [Test]
@@ -297,10 +365,11 @@ namespace Stethoscope.Tests
 
             var queryToTest = logQbservable.Select(en => en != null ? en.Message : null).Skip(1);
 
-            ListStorageTest(queryToTest, out int counter, out int nonNull);
+            var comp = ListStorageTest(queryToTest, out int counter, out int nonNull);
 
             Assert.That(counter, Is.EqualTo(4));
             Assert.That(nonNull, Is.EqualTo(1));
+            Assert.That(comp, Is.EqualTo(ExpressionStringComparision.Same));
         }
 
         [Test]
@@ -319,10 +388,11 @@ namespace Stethoscope.Tests
 
             var queryToTest = logQbservable.Where(en => en != null && en.IsValid).Skip(1).Select(en => en != null ? en.Message : null);
 
-            ListStorageTest(queryToTest, out int counter, out int nonNull);
+            var comp = ListStorageTest(queryToTest, out int counter, out int nonNull);
 
             Assert.That(counter, Is.EqualTo(0));
             Assert.That(nonNull, Is.EqualTo(-1));
+            Assert.That(comp, Is.EqualTo(ExpressionStringComparision.Same));
         }
 
         [Test]
@@ -341,10 +411,11 @@ namespace Stethoscope.Tests
 
             var queryToTest = logQbservable.Where(en => en != null && en.IsValid).Skip(TimeSpan.Zero).Select(en => en != null ? en.Message : null);
 
-            ListStorageTest(queryToTest, out int counter, out int nonNull);
+            var comp = ListStorageTest(queryToTest, out int counter, out int nonNull);
 
             Assert.That(counter, Is.EqualTo(1));
             Assert.That(nonNull, Is.EqualTo(0));
+            Assert.That(comp, Is.EqualTo(ExpressionStringComparision.Same));
         }
 
         [Test]
@@ -363,10 +434,11 @@ namespace Stethoscope.Tests
 
             var queryToTest = logQbservable.Skip(1).SkipWhile(en => en == null);
 
-            ListStorageTest(queryToTest, out int counter, out int nonNull);
+            var comp = ListStorageTest(queryToTest, out int counter, out int nonNull);
 
             Assert.That(counter, Is.EqualTo(3));
             Assert.That(nonNull, Is.EqualTo(0));
+            Assert.That(comp, Is.EqualTo(ExpressionStringComparision.Different));
         }
 
         [Test]
@@ -385,10 +457,11 @@ namespace Stethoscope.Tests
 
             var queryToTest = logQbservable.SkipWhile(en => en == null).Skip(1);
 
-            ListStorageTest(queryToTest, out int counter, out int nonNull);
+            var comp = ListStorageTest(queryToTest, out int counter, out int nonNull);
 
             Assert.That(counter, Is.EqualTo(2));
             Assert.That(nonNull, Is.EqualTo(-1));
+            Assert.That(comp, Is.EqualTo(ExpressionStringComparision.Same));
         }
 
         [Test]
@@ -407,10 +480,11 @@ namespace Stethoscope.Tests
 
             var queryToTest = logQbservable.Skip(1).Select(en => en != null ? en.Message : null);
 
-            ListStorageTest(queryToTest, out int counter, out int nonNull);
+            var comp = ListStorageTest(queryToTest, out int counter, out int nonNull);
 
             Assert.That(counter, Is.EqualTo(4));
             Assert.That(nonNull, Is.EqualTo(1));
+            Assert.That(comp, Is.EqualTo(ExpressionStringComparision.Different));
         }
 
         [Test]
@@ -429,14 +503,14 @@ namespace Stethoscope.Tests
 
             var queryToTest = logQbservable.Select(en => en != null ? en.Message : null).Skip(1);
 
-            ListStorageTest(queryToTest, out int counter, out int nonNull);
+            var comp = ListStorageTest(queryToTest, out int counter, out int nonNull);
             
             Assert.That(counter, Is.EqualTo(4));
             Assert.That(nonNull, Is.EqualTo(1));
+            Assert.That(comp, Is.EqualTo(ExpressionStringComparision.Same));
         }
 
         //XXX - put operations in order listed
-        //TODO: ... <continue work on rewrite of evaluator>
         //TODO: ... (anything that might invalidate some operation?)
     }
 }

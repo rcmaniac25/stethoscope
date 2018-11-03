@@ -1863,3 +1863,10 @@ void doSomethingCool(std::ifstream& input)
 #204.2. 11/01/2018:
 - Got a partial wrapper for expression comparision but forgot that there will be at least on const replacement internally... so the comparision will always have the same result.
 - Once I fix do something about that, I can call the code done and go on to the comparisons and advanced usage.
+
+#205.2. 11/02/2018:
+- Finished the expression comparision.
+- Now, just to prevent confusion, I compare the expression strings instead of the expression because, AFAIK, 2 expressions can be the same but have different structures (consts and values and whatnot).
+- So the Expression comparision would always say "different" but the string comparision would say "same".
+- Maybe something to look at later, but for now, that's all I'm doing tonight.
+- Tomorrow I may not have too much time, but I'll try to do a comparsion between state machine and recursive implementations.

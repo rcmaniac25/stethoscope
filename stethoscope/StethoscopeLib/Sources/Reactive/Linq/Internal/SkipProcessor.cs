@@ -259,13 +259,21 @@ namespace Stethoscope.Reactive.Linq.Internal
 
         private void FindProcessingRange(SMState state)
         {
-            int? countSkipsFrom = null;
+            int? countSkipsFrom = null; // null means don't process, = MethodCalls.Count means skip everything so don't process, else we want to process
             for (int i = 0; i < state.MethodCalls.Count; i++)
             {
                 var method = state.MethodCalls[i];
-                if (method.Method.Name == "Skip" && method.Arguments[1].Type != typeof(int))
+                if (method.Method.Name == "Skip")
                 {
-                    countSkipsFrom = i + 1;
+                    if (method.Arguments[1].Type != typeof(int))
+                    {
+                        countSkipsFrom = i + 1;
+                    }
+                    else if (!countSkipsFrom.HasValue)
+                    {
+                        // Do this to ensure it's known there _are_ Skips that can be processed.
+                        countSkipsFrom = 0;
+                    }
                 }
                 else if (method.Arguments.Count > 1)
                 {
