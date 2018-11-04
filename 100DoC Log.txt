@@ -1870,3 +1870,7 @@ void doSomethingCool(std::ifstream& input)
 - So the Expression comparision would always say "different" but the string comparision would say "same".
 - Maybe something to look at later, but for now, that's all I'm doing tonight.
 - Tomorrow I may not have too much time, but I'll try to do a comparsion between state machine and recursive implementations.
+
+#206.2. 11/03/2018:
+- Today just... ran out of time. I tried at one point, but spent it staring at the code instead of doing anything.
+- Tomorrow.
