@@ -1874,3 +1874,7 @@ void doSomethingCool(std::ifstream& input)
 #206.2. 11/03/2018:
 - Today just... ran out of time. I tried at one point, but spent it staring at the code instead of doing anything.
 - Tomorrow.
+
+#207.2. 11/04/2018:
+- And... push back to tomorrow.
+- My mental prep for the comparision tests basically got me to go "this isn't something I can do in a couple min. Will be an hour or more" and I don't want to spend that hour "now"
