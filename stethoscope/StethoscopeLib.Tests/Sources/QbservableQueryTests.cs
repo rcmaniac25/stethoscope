@@ -26,6 +26,8 @@ namespace Stethoscope.Tests
             Different
         }
 
+        private readonly Metrics.Timer ExpressionEvaluationTimer = Metrics.Metric.Context("QbservableQueryTests").Timer("Expression Timer", Metrics.Unit.Calls, tags: "test, qbservable, expression");
+
         private IRegistryStorage mockRegistryStorage;
         private ILogEntry mockLogEntry;
 
@@ -42,6 +44,24 @@ namespace Stethoscope.Tests
             mockLogEntry = Substitute.For<ILogEntry>();
 
             mockLogEntry.IsValid.ReturnsForAnyArgs(true);
+        }
+
+        private static string GetSchedulerName(IScheduler scheduler)
+        {
+            if (scheduler == null)
+            {
+                throw new ArgumentNullException(nameof(scheduler));
+            }
+            Assert.That(SchedulersToTest.Length, Is.EqualTo(2));
+            if (scheduler == SchedulersToTest[0])
+            {
+                return "Default";
+            }
+            else if (scheduler == SchedulersToTest[1])
+            {
+                return "TaskPool";
+            }
+            return "Unknown";
         }
 
         private IQbservable<ILogEntry> SetupListStorageQbservable(IList<ILogEntry> list, IScheduler schedulerToUse)
@@ -121,10 +141,10 @@ namespace Stethoscope.Tests
             }
         }
 
-        private ExpressionStringComparision CompareExpressionsTest<T>(IQbservable<T> queryToTest, Action<IQbservable<T>> test)
+        private ExpressionStringComparision CompareExpressionsTest<T>(IQbservable<T> queryToTest, Action<IQbservable<T>, Metrics.Timer> test)
         {
             var originalExpression = PrintExpression(queryToTest);
-            test(queryToTest);
+            test(queryToTest, ExpressionEvaluationTimer);
             var evaluatedExpression = PrintSubscribedExpression(queryToTest);
 
             if (originalExpression == evaluatedExpression)
@@ -134,23 +154,29 @@ namespace Stethoscope.Tests
             return ExpressionStringComparision.Different;
         }
 
-        private ExpressionStringComparision ListStorageTest<T>(IQbservable<T> queryToTest, out int count, out int nonNullIndex)
+        private ExpressionStringComparision ListStorageTest<T>(IQbservable<T> queryToTest, IScheduler scheduler, out int count, out int nonNullIndex)
         {
+            var schedulerName = GetSchedulerName(scheduler);
+
             var waitSem = new System.Threading.SemaphoreSlim(0);
 
             int counter = 0;
             int nonNull = -1;
-            var result = CompareExpressionsTest(queryToTest, query =>
+            var result = CompareExpressionsTest(queryToTest, (query, timer) =>
             {
-                var disposable = query.Subscribe(en =>
+                IDisposable disposable;
+                using (timer.NewContext(schedulerName))
                 {
-                    if (en != null)
+                    disposable = query.Subscribe(en =>
                     {
-                        nonNull = counter;
-                    }
+                        if (en != null)
+                        {
+                            nonNull = counter;
+                        }
 
-                    counter++;
-                }, () => waitSem.Release());
+                        counter++;
+                    }, () => waitSem.Release());
+                }
 
                 while (!waitSem.Wait(10)) ;
 
@@ -179,7 +205,7 @@ namespace Stethoscope.Tests
 
             var queryToTest = logQbservable;
 
-            var comp = ListStorageTest(queryToTest, out int counter, out int nonNull);
+            var comp = ListStorageTest(queryToTest, scheduler, out int counter, out int nonNull);
 
             Assert.That(counter, Is.EqualTo(5));
             Assert.That(nonNull, Is.EqualTo(2));
@@ -203,9 +229,13 @@ namespace Stethoscope.Tests
             var queryToTest = logQbservable.LastOrDefaultAsync();
 
             ILogEntry res = null;
-            var comp = CompareExpressionsTest(queryToTest, query =>
+            var comp = CompareExpressionsTest(queryToTest, (query, timer) =>
             {
-                res = query.Wait();
+                var schedulerName = GetSchedulerName(scheduler);
+                using (timer.NewContext(schedulerName))
+                {
+                    res = query.Wait();
+                }
             });
             Assert.That(res, Is.Null);
             Assert.That(comp, Is.EqualTo(ExpressionStringComparision.Same));
@@ -227,7 +257,7 @@ namespace Stethoscope.Tests
 
             var queryToTest = logQbservable.Skip(2);
 
-            var comp = ListStorageTest(queryToTest, out int counter, out int nonNull);
+            var comp = ListStorageTest(queryToTest, scheduler, out int counter, out int nonNull);
 
             Assert.That(counter, Is.EqualTo(3));
             Assert.That(nonNull, Is.EqualTo(0));
@@ -250,7 +280,7 @@ namespace Stethoscope.Tests
 
             var queryToTest = logQbservable.Skip(1).Skip(1);
 
-            var comp = ListStorageTest(queryToTest, out int counter, out int nonNull);
+            var comp = ListStorageTest(queryToTest, scheduler, out int counter, out int nonNull);
 
             Assert.That(counter, Is.EqualTo(3));
             Assert.That(nonNull, Is.EqualTo(0));
@@ -273,7 +303,7 @@ namespace Stethoscope.Tests
 
             var queryToTest = logQbservable.Skip(TimeSpan.Zero);
 
-            var comp = ListStorageTest(queryToTest, out int counter, out int nonNull);
+            var comp = ListStorageTest(queryToTest, scheduler, out int counter, out int nonNull);
 
             Assert.That(counter, Is.EqualTo(5));
             Assert.That(nonNull, Is.EqualTo(2));
@@ -296,7 +326,7 @@ namespace Stethoscope.Tests
 
             var queryToTest = logQbservable.Skip(1).Skip(TimeSpan.Zero);
 
-            var comp = ListStorageTest(queryToTest, out int counter, out int nonNull);
+            var comp = ListStorageTest(queryToTest, scheduler, out int counter, out int nonNull);
 
             Assert.That(counter, Is.EqualTo(4));
             Assert.That(nonNull, Is.EqualTo(1));
@@ -319,7 +349,7 @@ namespace Stethoscope.Tests
 
             var queryToTest = logQbservable.Skip(TimeSpan.Zero).Skip(1);
 
-            var comp = ListStorageTest(queryToTest, out int counter, out int nonNull);
+            var comp = ListStorageTest(queryToTest, scheduler, out int counter, out int nonNull);
 
             Assert.That(counter, Is.EqualTo(4));
             Assert.That(nonNull, Is.EqualTo(1));
@@ -342,7 +372,7 @@ namespace Stethoscope.Tests
 
             var queryToTest = logQbservable.Skip(1).Select(en => en != null ? en.Message : null);
 
-            var comp = ListStorageTest(queryToTest, out int counter, out int nonNull);
+            var comp = ListStorageTest(queryToTest, scheduler, out int counter, out int nonNull);
 
             Assert.That(counter, Is.EqualTo(4));
             Assert.That(nonNull, Is.EqualTo(1));
@@ -365,7 +395,7 @@ namespace Stethoscope.Tests
 
             var queryToTest = logQbservable.Select(en => en != null ? en.Message : null).Skip(1);
 
-            var comp = ListStorageTest(queryToTest, out int counter, out int nonNull);
+            var comp = ListStorageTest(queryToTest, scheduler, out int counter, out int nonNull);
 
             Assert.That(counter, Is.EqualTo(4));
             Assert.That(nonNull, Is.EqualTo(1));
@@ -388,7 +418,7 @@ namespace Stethoscope.Tests
 
             var queryToTest = logQbservable.Where(en => en != null && en.IsValid).Skip(1).Select(en => en != null ? en.Message : null);
 
-            var comp = ListStorageTest(queryToTest, out int counter, out int nonNull);
+            var comp = ListStorageTest(queryToTest, scheduler, out int counter, out int nonNull);
 
             Assert.That(counter, Is.EqualTo(0));
             Assert.That(nonNull, Is.EqualTo(-1));
@@ -411,7 +441,7 @@ namespace Stethoscope.Tests
 
             var queryToTest = logQbservable.Where(en => en != null && en.IsValid).Skip(TimeSpan.Zero).Select(en => en != null ? en.Message : null);
 
-            var comp = ListStorageTest(queryToTest, out int counter, out int nonNull);
+            var comp = ListStorageTest(queryToTest, scheduler, out int counter, out int nonNull);
 
             Assert.That(counter, Is.EqualTo(1));
             Assert.That(nonNull, Is.EqualTo(0));
@@ -434,7 +464,7 @@ namespace Stethoscope.Tests
 
             var queryToTest = logQbservable.Skip(1).SkipWhile(en => en == null);
 
-            var comp = ListStorageTest(queryToTest, out int counter, out int nonNull);
+            var comp = ListStorageTest(queryToTest, scheduler, out int counter, out int nonNull);
 
             Assert.That(counter, Is.EqualTo(3));
             Assert.That(nonNull, Is.EqualTo(0));
@@ -457,7 +487,7 @@ namespace Stethoscope.Tests
 
             var queryToTest = logQbservable.SkipWhile(en => en == null).Skip(1);
 
-            var comp = ListStorageTest(queryToTest, out int counter, out int nonNull);
+            var comp = ListStorageTest(queryToTest, scheduler, out int counter, out int nonNull);
 
             Assert.That(counter, Is.EqualTo(2));
             Assert.That(nonNull, Is.EqualTo(-1));
@@ -480,7 +510,7 @@ namespace Stethoscope.Tests
 
             var queryToTest = logQbservable.Skip(1).Select(en => en != null ? en.Message : null);
 
-            var comp = ListStorageTest(queryToTest, out int counter, out int nonNull);
+            var comp = ListStorageTest(queryToTest, scheduler, out int counter, out int nonNull);
 
             Assert.That(counter, Is.EqualTo(4));
             Assert.That(nonNull, Is.EqualTo(1));
@@ -503,7 +533,7 @@ namespace Stethoscope.Tests
 
             var queryToTest = logQbservable.Select(en => en != null ? en.Message : null).Skip(1);
 
-            var comp = ListStorageTest(queryToTest, out int counter, out int nonNull);
+            var comp = ListStorageTest(queryToTest, scheduler, out int counter, out int nonNull);
             
             Assert.That(counter, Is.EqualTo(4));
             Assert.That(nonNull, Is.EqualTo(1));

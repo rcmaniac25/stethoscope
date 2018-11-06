@@ -1878,3 +1878,11 @@ void doSomethingCool(std::ifstream& input)
 #207.2. 11/04/2018:
 - And... push back to tomorrow.
 - My mental prep for the comparision tests basically got me to go "this isn't something I can do in a couple min. Will be an hour or more" and I don't want to spend that hour "now"
+
+#208.2. 11/05/2018:
+- And... I did something today.
+- Minor: I didn't have the time to do the main work, but I did need something for timing...
+- Luckily, there's already a metrics collection code written so I don't need to do any work in collecting the times.
+- Main time I want to know is how long it takes to evaluate. Subscription atomics should be negligible since no execution happens until the schedulers decide to.
+- So with non-implementation specific metrics setup... tomorrow may be busy, but I'll see.
+- Plan is collect a couple execution runs of the state machine. Then make 2 branches: one will have the original 2 recursive classes. The second will have the middle-ground; recursive/fake-SM single class. Collect stats from those and compare (along with lines of code and general complexity)
