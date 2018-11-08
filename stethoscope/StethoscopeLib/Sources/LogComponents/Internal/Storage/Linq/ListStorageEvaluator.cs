@@ -37,14 +37,21 @@ namespace Stethoscope.Log.Internal.Storage.Linq
             if (IsQueryOverDataSource(expression))
             {
                 // We want to know if we can adjust the starting index of the data source
-                var skipProcessor = new SkipProcessor();
-                var (updatedExpression, skipCount) = skipProcessor.Process(expression);
-                expressionToEvaluate = updatedExpression;
-
+                var skipBuilder = new SkipCalculator();
+                var skip = skipBuilder.CalculateSkip(expression);
+                
                 // Get an observable for the data
-                if (skipCount.HasValue)
+                if (skip.HasValue)
                 {
-                    dataSourceObservable = new LiveListObservable<ILogEntry>(LiveObservableType, data, schedulerToUse, skipCount.Value);
+                    dataSourceObservable = new LiveListObservable<ILogEntry>(LiveObservableType, data, schedulerToUse, skip.Value);
+
+                    // Update the expression so it no longer includes the skips we previously counted
+                    var modifier = new SkipTreeModifier();
+                    expressionToEvaluate = modifier.Visit(expressionToEvaluate);
+                }
+                else
+                {
+                    dataSourceObservable = new LiveListObservable<ILogEntry>(LiveObservableType, data, schedulerToUse);
                 }
             }
 
