@@ -38,13 +38,12 @@ namespace Stethoscope.Log.Internal.Storage.Linq
             {
                 // We want to know if we can adjust the starting index of the data source
                 var skipProcessor = new SkipProcessor();
-                var (updatedExpression, skipCount) = skipProcessor.Process(expression);
-                expressionToEvaluate = updatedExpression;
+                expressionToEvaluate = skipProcessor.Process(expression);
 
                 // Get an observable for the data
-                if (skipCount.HasValue)
+                if (skipProcessor.SkipCount.HasValue)
                 {
-                    dataSourceObservable = new LiveListObservable<ILogEntry>(LiveObservableType, data, schedulerToUse, skipCount.Value);
+                    dataSourceObservable = new LiveListObservable<ILogEntry>(LiveObservableType, data, schedulerToUse, skipProcessor.SkipCount.Value);
                 }
             }
 

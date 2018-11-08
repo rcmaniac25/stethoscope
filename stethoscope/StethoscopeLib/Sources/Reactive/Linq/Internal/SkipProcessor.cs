@@ -1,279 +1,137 @@
-﻿using Stateless;
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 
 namespace Stethoscope.Reactive.Linq.Internal
 {
-    internal class SkipProcessor
+    internal class SkipProcessor : ExpressionVisitor
     {
-        #region SkipVisitor
-
-        private class SkipVisitor<T> : ExpressionVisitor
-        {
-            private int depth = -1;
-            private T state;
-
-            public Func<MethodCallExpression, int, T, Func<Expression, Expression>, Expression> MethodVisitHandler { get; set; }
-
-            public Expression Visit(Expression node, T state)
-            {
-                if (depth >= 0)
-                {
-                    throw new InvalidOperationException("Visitor already in use");
-                }
-
-                this.state = state;
-                depth = -1;
-                var res = base.Visit(node);
-                depth = -1;
-
-                return res;
-            }
-
-            protected override Expression VisitMethodCall(MethodCallExpression expression)
-            {
-                Expression result = expression;
-                depth++;
-                if (MethodVisitHandler != null)
-                {
-                    result = MethodVisitHandler(expression, depth, state, base.Visit);
-                }
-                depth--;
-                return result;
-            }
-        }
-
-        #endregion
-
-        #region SMState
-
-        private struct SMState : ICloneable
-        {
-            public static SMState InvalidState = new SMState() { SkipDepth = -1 };
-
-            public Expression Expression { get; private set; }
-            public int SkipDepth { get; private set; }
-
-            public List<MethodCallExpression> MethodCalls { get; private set; }
-            public State PriorState { get; private set; }
-            public SkipVisitor<List<MethodCallExpression>> SkipVisitor { get; private set; }
-
-            public StateMachine<State, Trigger> StateMachine { get; private set; }
-            public Action<SMState> DoneHandler { get; private set; }
-
-            public SMState(Expression expression, StateMachine<State, Trigger> stateMachine, Action<SMState> doneHandler)
-            {
-                Expression = expression;
-                SkipDepth = -1;
-
-                MethodCalls = new List<MethodCallExpression>();
-                PriorState = State.Uninitialized;
-                SkipVisitor = new SkipVisitor<List<MethodCallExpression>>();
-
-                StateMachine = stateMachine;
-                DoneHandler = doneHandler;
-            }
-
-            public SMState SetExpression(Expression expression)
-            {
-                var clone = (SMState)Clone();
-                clone.Expression = expression;
-                return clone;
-            }
-
-            public SMState SetSkipDepth(int skipDepth)
-            {
-                var clone = (SMState)Clone();
-                clone.SkipDepth = skipDepth;
-                return clone;
-            }
-
-            public SMState SetPriorState(State priorState)
-            {
-                var clone = (SMState)Clone();
-                clone.PriorState = priorState;
-                return clone;
-            }
-
-            public object Clone()
-            {
-                return new SMState()
-                {
-                    Expression = Expression,
-                    SkipDepth = SkipDepth,
-
-                    MethodCalls = MethodCalls,
-                    PriorState = PriorState,
-                    SkipVisitor = SkipVisitor,
-
-                    StateMachine = StateMachine,
-                    DoneHandler = DoneHandler
-                };
-            }
-        }
-
-        #endregion
-
-        #region States and Triggers
-
-        private enum State
+        private enum VisitStage
         {
             Uninitialized,
-            Setup,
-            MethodCollection,
-            FindProcessingRange,
-            VisitExpressionTree,
-            CountAndRemoveSkips,
+
+            Stage1,
+            Stage2,
+            Stage3,
             Done
         }
 
-        private enum Trigger
-        {
-            Done,
-            Invoke,
+        private Expression finalExpression;
+        private int skipDepth;
+        private VisitStage stage = VisitStage.Uninitialized;
+        private List<MethodCallExpression> methodCalls;
 
-            HasMethods,
-            NoMethods
+        public int? SkipCount
+        {
+            get
+            {
+                if (skipDepth <= 0)
+                {
+                    return null;
+                }
+                return skipDepth;
+            }
         }
 
-        #endregion
-
-        private readonly StateMachine<State, Trigger>.TriggerWithParameters<(Expression, Action<SMState>)> processTrigger = new StateMachine<State, Trigger>.TriggerWithParameters<(Expression, Action<SMState>)>(Trigger.Invoke);
-        private readonly StateMachine<State, Trigger>.TriggerWithParameters<SMState> hasMethodsTrigger = new StateMachine<State, Trigger>.TriggerWithParameters<SMState>(Trigger.HasMethods);
-        private readonly StateMachine<State, Trigger>.TriggerWithParameters<SMState> invokeTrigger = new StateMachine<State, Trigger>.TriggerWithParameters<SMState>(Trigger.Invoke);
-        private readonly StateMachine<State, Trigger>.TriggerWithParameters<SMState> doneTrigger = new StateMachine<State, Trigger>.TriggerWithParameters<SMState>(Trigger.Done);
-        
-        public (Expression expression, int? skipDepth) Process(Expression expression)
+        public Expression Process(Expression expression)
         {
-            var finishedState = SMState.InvalidState;
-            void ProcessIsComplete(SMState state)
+            if (stage != VisitStage.Uninitialized)
             {
-                finishedState = state;
+                throw new InvalidOperationException($"{nameof(Process)} is already doing a calculation. Create a new instance for each concurrent operation you want to perform.");
+            }
+            Reset();
+            finalExpression = expression;
+
+            while (stage != VisitStage.Done)
+            {
+                ExecuteStages(expression);
             }
 
-            var stateMachine = CreateStateMachine();
-            stateMachine.Fire(processTrigger, (expression, ProcessIsComplete));
-            
-            if (finishedState.SkipDepth > 0)
+            stage = VisitStage.Uninitialized;
+
+            return finalExpression;
+        }
+
+        private void Reset()
+        {
+            stage = VisitStage.Stage1;
+            skipDepth = -1;
+            methodCalls = new List<MethodCallExpression>();
+        }
+
+        protected override Expression VisitMethodCall(MethodCallExpression expression)
+        {
+            if (stage == VisitStage.Stage1)
             {
-                return (finishedState.Expression, finishedState.SkipDepth);
+                return VisitMethodCallStage1(expression);
             }
-            return (expression, null);
-        }
-
-        #region Create State Machine
-
-        private StateMachine<State, Trigger> CreateStateMachine()
-        {
-            var machine = new StateMachine<State, Trigger>(State.Uninitialized);
-            
-            machine.Configure(State.Uninitialized)
-                .Permit(Trigger.Invoke, State.Setup);
-
-            machine.Configure(State.Setup)
-                .OnEntryFrom(processTrigger, ((Expression expression, Action<SMState> doneHandler) processParameters) =>
-                {
-                    var internalState = new SMState(processParameters.expression, machine, processParameters.doneHandler);
-                    machine.Fire(doneTrigger, internalState);
-                })
-                .PermitReentry(Trigger.Invoke)
-                .Permit(Trigger.Done, State.MethodCollection);
-
-            machine.Configure(State.MethodCollection)
-                .OnEntryFrom(doneTrigger, (state, transition) =>
-                {
-                    if (transition.Source == State.VisitExpressionTree)
-                    {
-                        DoneCollectingMethods(state);
-                    }
-                    else
-                    {
-                        CollectMethods(state);
-                    }
-                })
-                .Permit(Trigger.Invoke, State.VisitExpressionTree)
-                .Permit(Trigger.HasMethods, State.FindProcessingRange)
-                .Permit(Trigger.NoMethods, State.Done);
-
-            machine.Configure(State.FindProcessingRange)
-                .OnEntryFrom(hasMethodsTrigger, FindProcessingRange)
-                .Permit(Trigger.HasMethods, State.CountAndRemoveSkips)
-                .Permit(Trigger.NoMethods, State.Done);
-
-            machine.Configure(State.CountAndRemoveSkips)
-                .OnEntryFrom(doneTrigger, (state, transition) =>
-                {
-                    if (transition.Source == State.VisitExpressionTree)
-                    {
-                        machine.Fire(doneTrigger, state);
-                    }
-                })
-                .OnEntryFrom(hasMethodsTrigger, CountAndRemoveSkips)
-                .Permit(Trigger.Invoke, State.VisitExpressionTree)
-                .Permit(Trigger.Done, State.Done);
-
-            machine.Configure(State.VisitExpressionTree)
-                .OnEntryFrom(invokeTrigger, state =>
-                {
-                    var expression = state.SkipVisitor.Visit(state.Expression, state.MethodCalls);
-                    machine.Fire(doneTrigger, state.SetExpression(expression));
-                })
-                .PermitDynamic(doneTrigger, state => state.PriorState);
-
-            machine.Configure(State.Done)
-                .OnEntryFrom(doneTrigger, state => state.DoneHandler(state))
-                .PermitIf(processTrigger, State.Setup);
-
-            return machine;
-        }
-
-        #endregion
-
-        #region State Entry Operations
-
-        private void CollectMethods(SMState state)
-        {
-            state.SkipVisitor.MethodVisitHandler = (mexp, d, methCalls, visit) =>
+            else if (stage == VisitStage.Stage3)
             {
-                methCalls.Add(mexp);
-                visit(mexp.Arguments[0]);
-                return mexp;
-            };
-            state.StateMachine.Fire(invokeTrigger, state.SetPriorState(State.MethodCollection));
+                return VisitMethodCallStage3(expression);
+            }
+
+            throw new InvalidOperationException($"Unknown stage: {stage}");
         }
 
-        private void DoneCollectingMethods(SMState state)
+        private void ExecuteStages(Expression expression)
         {
-            if (state.MethodCalls.Count > 0)
+            if (stage == VisitStage.Stage1)
             {
-                state.StateMachine.Fire(hasMethodsTrigger, state);
+                Stage1(expression);
+                if (methodCalls.Count > 0)
+                {
+                    stage = VisitStage.Stage2;
+                }
+                else
+                {
+                    stage = VisitStage.Done;
+                }
+            }
+            else if (stage == VisitStage.Stage2)
+            {
+                Stage2(expression);
+                if (methodCalls.Count > 0)
+                {
+                    stage = VisitStage.Stage3;
+                }
+                else
+                {
+                    stage = VisitStage.Done;
+                }
+            }
+            else if (stage == VisitStage.Stage3)
+            {
+                Stage3(expression);
+                stage = VisitStage.Done;
             }
             else
             {
-                state.StateMachine.Fire(Trigger.NoMethods);
+                throw new InvalidOperationException($"Unknown stage: {stage}");
             }
         }
 
-        private void FindProcessingRange(SMState state)
+        private void Stage1(Expression expression)
         {
-            int? countSkipsFrom = null; // null means don't process, = MethodCalls.Count means skip everything so don't process, else we want to process
-            for (int i = 0; i < state.MethodCalls.Count; i++)
+            base.Visit(expression);
+        }
+
+        private Expression VisitMethodCallStage1(MethodCallExpression expression)
+        {
+            methodCalls.Add(expression);
+            base.Visit(expression.Arguments[0]);
+            return expression;
+        }
+
+        private void Stage2(Expression expression)
+        {
+            int countSkipsFrom = 0;
+            for (int i = 0; i < methodCalls.Count; i++)
             {
-                var method = state.MethodCalls[i];
-                if (method.Method.Name == "Skip")
+                var method = methodCalls[i];
+                if (method.Method.Name == "Skip" && method.Arguments[1].Type != typeof(int))
                 {
-                    if (method.Arguments[1].Type != typeof(int))
-                    {
-                        countSkipsFrom = i + 1;
-                    }
-                    else if (!countSkipsFrom.HasValue)
-                    {
-                        // Do this to ensure it's known there _are_ Skips that can be processed.
-                        countSkipsFrom = 0;
-                    }
+                    countSkipsFrom = i + 1;
                 }
                 else if (method.Arguments.Count > 1)
                 {
@@ -287,24 +145,22 @@ namespace Stethoscope.Reactive.Linq.Internal
                     }
                 }
             }
-            if (countSkipsFrom.HasValue && countSkipsFrom < state.MethodCalls.Count)
+            if (countSkipsFrom < methodCalls.Count)
             {
                 for (int i = 0; i < countSkipsFrom; i++)
                 {
-                    state.MethodCalls[i] = null;
+                    methodCalls[i] = null;
                 }
-                state.StateMachine.Fire(hasMethodsTrigger, state);
             }
             else
             {
-                state.StateMachine.Fire(Trigger.NoMethods);
+                methodCalls.Clear();
             }
         }
 
-        private void CountAndRemoveSkips(SMState state)
+        private void Stage3(Expression expression)
         {
-            var skipDepth = -1;
-            foreach (var method in state.MethodCalls)
+            foreach (var method in methodCalls)
             {
                 if (method != null && method.Method.Name == "Skip" && method.Arguments[1].Type == typeof(int))
                 {
@@ -315,20 +171,15 @@ namespace Stethoscope.Reactive.Linq.Internal
                     skipDepth += ExpressionTreeHelpers.GetValueFromExpression<int>(method.Arguments[1]);
                 }
             }
-            if (skipDepth >= 0)
+            if (skipDepth > 0)
             {
-                state.SkipVisitor.MethodVisitHandler = VisitExpressionToCountAndModify;
-                state.StateMachine.Fire(invokeTrigger, state.SetPriorState(State.CountAndRemoveSkips).SetSkipDepth(skipDepth));
-            }
-            else
-            {
-                state.StateMachine.Fire(doneTrigger, state);
+                finalExpression = base.Visit(expression);
             }
         }
 
-        private Expression VisitExpressionToCountAndModify<T>(MethodCallExpression expression, int depth, T state, Func<Expression, Expression> visit)
+        private Expression VisitMethodCallStage3(MethodCallExpression expression)
         {
-            var child = visit(expression.Arguments[0]);
+            var child = base.Visit(expression.Arguments[0]);
             if (expression.Method.Name == "Skip" && expression.Arguments[1].Type == typeof(int))
             {
                 return child;
@@ -339,7 +190,5 @@ namespace Stethoscope.Reactive.Linq.Internal
             }
             return expression;
         }
-
-        #endregion
     }
 }
