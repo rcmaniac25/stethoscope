@@ -1890,3 +1890,13 @@ void doSomethingCool(std::ifstream& input)
 #209.2. 11/06/2018:
 - Ok, this time, I had the time...
 - Instead I was catching up with election stuff (there's real stuff outside these screens)... I'll try again tomorrow
+
+#209.2. 11/07/2018:
+- So I actually managed to get the "fake" state machine implemented, and all unit tests passed without modification :D
+- I was thinking to maybe to the real original impl, but decided I would call it a night at that...
+- ...then I started to gather stats.
+- But I realized a potential issue: when I go to do the measurements, I measure the subscription time.
+- This may not seem like an issue, except there are 2 bad measurements that could occur:
+-- 1. I have one non-standard function, and that function could be running differently... and the results could skew the rest of the measurements.
+-- 2. Subscribe time is not what I want to measure... I want to measure how long it takes to "Evaluate" an expression. I may be getting "lock the IScheduler impl's queue and enqueue this request for execution"
+- I'll have to resolve those issues tomorrow (though I see a more likely case of me implementing the final experimentm, and then doing the metric fix later)
