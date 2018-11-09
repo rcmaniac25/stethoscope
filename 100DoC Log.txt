@@ -1900,3 +1900,8 @@ void doSomethingCool(std::ifstream& input)
 -- 1. I have one non-standard function, and that function could be running differently... and the results could skew the rest of the measurements.
 -- 2. Subscribe time is not what I want to measure... I want to measure how long it takes to "Evaluate" an expression. I may be getting "lock the IScheduler impl's queue and enqueue this request for execution"
 - I'll have to resolve those issues tomorrow (though I see a more likely case of me implementing the final experimentm, and then doing the metric fix later)
+
+#210.2. 11/08/2018:
+- Did the second branch and got the original recursive code implemented.
+- The good news? It also passed unit tests!
+- I'm behind on some things today, so I'm going to work on the fixes for the measurements tomorrow.
