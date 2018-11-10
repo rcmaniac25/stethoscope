@@ -164,19 +164,22 @@ namespace Stethoscope.Tests
             int nonNull = -1;
             var result = CompareExpressionsTest(queryToTest, (query, timer) =>
             {
-                IDisposable disposable;
+                IDisposable tmpDisp; //XXX
                 using (timer.NewContext(schedulerName))
                 {
-                    disposable = query.Subscribe(en =>
-                    {
-                        if (en != null)
-                        {
-                            nonNull = counter;
-                        }
-
-                        counter++;
-                    }, () => waitSem.Release());
+                    tmpDisp = query.Subscribe();
                 }
+                tmpDisp?.Dispose();
+
+                var disposable = query.Subscribe(en =>
+                {
+                    if (en != null)
+                    {
+                        nonNull = counter;
+                    }
+
+                    counter++;
+                }, () => waitSem.Release());
 
                 while (!waitSem.Wait(10)) ;
 
@@ -228,16 +231,10 @@ namespace Stethoscope.Tests
             
             var queryToTest = logQbservable.LastOrDefaultAsync();
 
-            ILogEntry res = null;
-            var comp = CompareExpressionsTest(queryToTest, (query, timer) =>
-            {
-                var schedulerName = GetSchedulerName(scheduler);
-                using (timer.NewContext(schedulerName))
-                {
-                    res = query.Wait();
-                }
-            });
-            Assert.That(res, Is.Null);
+            var comp = ListStorageTest(queryToTest, scheduler, out int counter, out int nonNull);
+
+            Assert.That(counter, Is.EqualTo(1));
+            Assert.That(nonNull, Is.EqualTo(-1));
             Assert.That(comp, Is.EqualTo(ExpressionStringComparision.Same));
         }
 

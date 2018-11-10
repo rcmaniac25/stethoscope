@@ -1905,3 +1905,26 @@ void doSomethingCool(std::ifstream& input)
 - Did the second branch and got the original recursive code implemented.
 - The good news? It also passed unit tests!
 - I'm behind on some things today, so I'm going to work on the fixes for the measurements tomorrow.
+
+#211.2. 11/09/2018:
+- Fixed #1 for consistancy
+- Next up: benchmark fixes.
+- So, I realized I can't leave this permanent... and I can't think of a good way to do otherwise without implementing a debug implementation (which I don't want)...
+- ...but I require calling Subscribe twice. First time just runs the expression evaluation, second time will actually subscribe to it.
+- Now, to see if it matters: yes.
+- I did 3 runs with and without the "evaluate only" code. Numbers:
+-- Evaluation only:
+--- Average "total time": avg(83+72+65)=73.33ms
+--- Min time (one evaluation): min(0.03, 0.03, 0.04)=0.03ms
+--- Max time (one evaluation): max(73.22, 65.21, 56.52)=73.22ms
+--- Average std-dev of the 3 runs (that doesn't sound right...): avg(13.01+11.68+10.12)=11.60ms
+-- Evaluation and Subscription:
+--- Average "total time": avg(250+152+201)=201.00ms
+--- Min time (one evaluation): min(0.66, 0.49, 0.56)=0.49ms
+--- Max time (one evaluation): max(132.82, 109.53, 113.54)=132.82ms
+--- Average std-dev of the 3 runs (that doesn't sound right...): avg(23.65+19.42+19.99)=21.02ms
+- Stats are not my strong suit, so forgive me if I did it wrong.
+- Given that the difference is more then or near a factor of 2, I only want the evaluation results.
+- Also, while the normal build stat (eval and sub) won't get the same numbers used in the benchmarks, it would at least return the numbers that people will actually have when they run this.
+- Next up: grabbing the numbers from the other branches.
+- ...it's late, I'll get the numbers tomorrow
