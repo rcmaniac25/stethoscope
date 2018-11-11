@@ -1913,13 +1913,14 @@ void doSomethingCool(std::ifstream& input)
 - ...but I require calling Subscribe twice. First time just runs the expression evaluation, second time will actually subscribe to it.
 - Now, to see if it matters: yes.
 - I did 3 runs with and without the "evaluate only" code. Numbers:
+-- Total evaluations: 30
 -- Evaluation only:
---- Average "total time": avg(83+72+65)=73.33ms
+--- Average "total time": avg(83+72+65)=73.33ms (~2.44ms per eval)
 --- Min time (one evaluation): min(0.03, 0.03, 0.04)=0.03ms
 --- Max time (one evaluation): max(73.22, 65.21, 56.52)=73.22ms
 --- Average std-dev of the 3 runs (that doesn't sound right...): avg(13.01+11.68+10.12)=11.60ms
 -- Evaluation and Subscription:
---- Average "total time": avg(250+152+201)=201.00ms
+--- Average "total time": avg(250+152+201)=201.00ms (~6.70ms per eval)
 --- Min time (one evaluation): min(0.66, 0.49, 0.56)=0.49ms
 --- Max time (one evaluation): max(132.82, 109.53, 113.54)=132.82ms
 --- Average std-dev of the 3 runs (that doesn't sound right...): avg(23.65+19.42+19.99)=21.02ms
@@ -1928,3 +1929,42 @@ void doSomethingCool(std::ifstream& input)
 - Also, while the normal build stat (eval and sub) won't get the same numbers used in the benchmarks, it would at least return the numbers that people will actually have when they run this.
 - Next up: grabbing the numbers from the other branches.
 - ...it's late, I'll get the numbers tomorrow
+
+#212.2. 11/10/2018:
+- Results:
+-- fake-sm
+--- Average "total time": avg(14+12+13)=13.00ms (~0.43ms per eval)
+--- Min time (one evaluation): min(0.02, 0.02, 0.02)=0.02ms
+--- Max time (one evaluation): max(10.14, 8.48, 9.80)=10.14ms
+--- Average std-dev of the 3 runs (that doesn't sound right...): avg(1.84+1.52+1.76)=1.71ms
+-- recursive
+--- Average "total time": avg(12+11+11)=11.33ms (~0.37ms per eval)
+--- Min time (one evaluation): min(0.02, 0.02, 0.02)=0.02ms
+--- Max time (one evaluation): max(9.30, 8.30, 7.81)=9.30ms
+--- Average std-dev of the 3 runs (that doesn't sound right...): avg(1.68+1.50+1.43)=1.54ms
+- So... this is fun.
+- So, from an evaluation POV, the real state machine is 5.5-6.5x slower then the fake state machine or recursive function.
+- On top of that, the real SM is 345 lines of code (LOC), fake SM is 194 LOC, and the recursive function (which is 2 classes) is a total of 143 LOC.
+- Now, if I had to go from LOC + perf only... I'd go with the fake SM because it doesn't repeat functionality between 2 classes and only has a minor perf hit while breaking up functionality.
+- But there's a small catch with if I revert back to fake SM or use the real one and take the perf hit: I don't believe expression evaluation to be a bottleneck for execution.
+- "Explain?"
+- First, Pros and cons for the state machines
+-- Real
+--- Pro: Easily extensible, can inspect graph to ensure it meets expectations, library can possibly be sped up, logic can be followed, formal design that can be viewed and maintained
+--- Con: Slower by an avg. factor of 6, larger file, relies on an external library.
+-- Fake
+--- Pro: Faster by a sizable amount, smaller file, self contained, easy to understand in concept
+--- Con: Can't tell at a glance how the program runs, is informal (and some will question "can't you use a real SM"
+- Second, How often will this run?
+-- This... can't really be answered. But the way I see it, the largest evaluations whould only happen upon user change.
+-- Like, the user adds a new server to pull logs from. It generates 1-x expressions that need to be evaluated.
+-- "What about when the result of an expression is operated upon?" well, unless the C# compiler decides that every time, say, group has a new key, it needs to create a new expression, it will create one expression and evaluate it once. We then calculate the result and save it.
+-- Which is why, if my understanding is correct, user action is the only time things will happen.
+-- Thus, expressions won't evaluate too often... and processing time isn't too much of a factor.
+-- Minor: also, remember that the evaluate/subscribe operation takes over 2x the amount of time as just evaluate. So the time savings still has a floor of total execution time.
+- So if time isn't really a factor, then it comes down to... "the real state machine has a larger source code file"? Basically.
+- There are a lot of additional benefits to using the real state machine over the fake one.
+- Now it does mean that if I start doing dynamic evaluations (totally possible), and they happen very frequently, the fake state machine may be a better option. Or... "why not both?"
+- What if, for the built in types, the real state machine is used. With all it's depth and inter-connected-ness or whatnot. But then for dynamic expressions, just use the similar code that will evaluate a lot faster (hoping that user-defined expressions are short lived)
+- TL:DR - benchmarks are useful, but speed of evaluation may not actually be important... in which case the older impls. just don't have the benefits of the real state machine. So I'll keep the current impl.
+- What's next? I need to check... it's late, I'll look tomorrow.

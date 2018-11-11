@@ -50,7 +50,6 @@ namespace Stethoscope.Reactive.Linq
                     EvaluatedExpression = qSource.Expression;
                 }
 #endif
-                return System.Reactive.Disposables.Disposable.Empty; //XXX
             }
             return source.Subscribe(observer);
         }

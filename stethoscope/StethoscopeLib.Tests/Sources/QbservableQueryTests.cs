@@ -164,22 +164,19 @@ namespace Stethoscope.Tests
             int nonNull = -1;
             var result = CompareExpressionsTest(queryToTest, (query, timer) =>
             {
-                IDisposable tmpDisp; //XXX
+                IDisposable disposable;
                 using (timer.NewContext(schedulerName))
                 {
-                    tmpDisp = query.Subscribe();
-                }
-                tmpDisp?.Dispose();
-
-                var disposable = query.Subscribe(en =>
-                {
-                    if (en != null)
+                    disposable = query.Subscribe(en =>
                     {
-                        nonNull = counter;
-                    }
+                        if (en != null)
+                        {
+                            nonNull = counter;
+                        }
 
-                    counter++;
-                }, () => waitSem.Release());
+                        counter++;
+                    }, () => waitSem.Release());
+                }
 
                 while (!waitSem.Wait(10)) ;
 
