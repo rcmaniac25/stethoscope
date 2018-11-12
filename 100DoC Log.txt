@@ -1573,7 +1573,7 @@ void doSomethingCool(std::ifstream& input)
 - I will skip the server part and just return a constant execution of... something. But that's for tomorrow.
 
 #171.2. 9/29/2018:
-- So, I was a bit naive and understand betterL the provider and queryable (qbservable) are specific to the data being handled.
+- So, I was a bit naive and understand better: the provider and queryable (qbservable) are specific to the data being handled.
 - So in Stethescope's case (remember? That's the name of this thing), the LogRegistry or more specifically, the registry storage, would have it's own qbservable implementation and provider.
 - Perhaps after some work, some generic functions can be determined where there's one qbservable and different providers... or maybe it's different qbservables and one provider. Depends... I think it's more likely to be different providers, as each storage will have it's own backend data that needs to be provided.
 - As such, I will just copy and paste the tutorial (even though it's for a queryable instead of a qbservable), and then work on an actual implementation for ListStorage.
@@ -1968,3 +1968,16 @@ void doSomethingCool(std::ifstream& input)
 - What if, for the built in types, the real state machine is used. With all it's depth and inter-connected-ness or whatnot. But then for dynamic expressions, just use the similar code that will evaluate a lot faster (hoping that user-defined expressions are short lived)
 - TL:DR - benchmarks are useful, but speed of evaluation may not actually be important... in which case the older impls. just don't have the benefits of the real state machine. So I'll keep the current impl.
 - What's next? I need to check... it's late, I'll look tomorrow.
+
+#213.2. 11/11/2018:
+- I spent today reading backwards and will review:
+-- #101.2 (minor...)
+-- #102.2
+-- #163.2
+-- #166.2
+-- #168.2
+- Namely, these are ideas for what to do next on observable evaluation.
+- Outside of evaluation, I want to determine if I can finally move the ListStorage to use the evaluator instead of "AsQbservable".
+- If that can be switched, and all tests pass, then I want to make sure that the application actually works. (It did before, but haven't tested since before the evaluator was written)
+- With that, I just need to decide (there's a lot of deciding here, isn't there?) if I should go onto "write expressions to do actual log evaluation" or "continue working on more and more evaluation improvements".
+- Decision: write expressions. As they're written will determine what evaluator updates should be done.
