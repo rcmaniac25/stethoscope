@@ -1981,3 +1981,12 @@ void doSomethingCool(std::ifstream& input)
 - If that can be switched, and all tests pass, then I want to make sure that the application actually works. (It did before, but haven't tested since before the evaluator was written)
 - With that, I just need to decide (there's a lot of deciding here, isn't there?) if I should go onto "write expressions to do actual log evaluation" or "continue working on more and more evaluation improvements".
 - Decision: write expressions. As they're written will determine what evaluator updates should be done.
+
+#214.2. 11/12/2018:
+- I still need to review the days I listed yesterday, but in the mean time, I have switched ListStorage to use the real Qbservable system.
+- All unit tests passed and the Tracker program ran without issue.
+- As such, I wanted to ensure there was no difference between the Qbservable and non-Qbservable versions of Tracker.
+- I was short on time, so I didn't want to figure out how to run Tracker (which, being a .Net Core app, lacks an executable)
+- Instead, I opted to add a new Printer that could print to a file.
+- It can use some work, but otherwise works well.
+- I have it append, though I'm not sure if it needs to.

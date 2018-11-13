@@ -101,16 +101,7 @@ namespace Stethoscope.Log.Internal.Storage
         /// Scheduler for retrieving logs from storage. Ignored for Null storage.
         /// </summary>
         public IScheduler LogScheduler { get; set; }
-
-#if true
-        /// <summary>
-        /// Access the log entries stored in this.
-        /// </summary>
-        public IQbservable<ILogEntry> Entries =>
-            LogScheduler != null ?
-            logs.ToObservable(ObservableType.LiveUpdating, LogScheduler).AsQbservable() :
-            logs.ToObservable(ObservableType.LiveUpdating).AsQbservable();
-#else
+        
         /// <summary>
         /// Access the log entries stored in this.
         /// </summary>
@@ -126,7 +117,6 @@ namespace Stethoscope.Log.Internal.Storage
                 return logQbservable;
             }
         }
-#endif
 
         /// <summary>
         /// The number of logs stored.

@@ -25,12 +25,12 @@ namespace Stethoscope.Printers
         }
 
         /// <summary>
-        /// Create a printer factory.
+        /// Create a console-printer factory.
         /// </summary>
         /// <returns>Printer factory.</returns>
         public static IPrinterFactory CrateConsoleFactory()
         {
-            factoryCreationCounter.Increment();
+            factoryCreationCounter.Increment("console");
 
             return new ConsolePrinterFactory();
         }
@@ -39,9 +39,41 @@ namespace Stethoscope.Printers
         {
             public IPrinter Create(ILogRegistry registry, LogConfig config)
             {
-                creationCounter.Increment();
+                creationCounter.Increment("console");
 
                 var printer = new ConsolePrinter();
+                printer.SetRegistry(registry);
+                printer.SetConfig(config);
+                return printer;
+            }
+        }
+
+        /// <summary>
+        /// Create a file-printing factory.
+        /// </summary>
+        /// <param name="defaultPath">The default path to use if not specified in config</param>
+        /// <returns>Printer factory.</returns>
+        public static IPrinterFactory CrateFileFactory(string defaultPath = "")
+        {
+            factoryCreationCounter.Increment("file");
+
+            return new FilePrinterFactory(defaultPath);
+        }
+
+        private class FilePrinterFactory : IPrinterFactory
+        {
+            private string defaultPath;
+
+            public FilePrinterFactory(string def)
+            {
+                defaultPath = def;
+            }
+
+            public IPrinter Create(ILogRegistry registry, LogConfig config)
+            {
+                creationCounter.Increment("file");
+
+                var printer = new FilePrinter(defaultPath);
                 printer.SetRegistry(registry);
                 printer.SetConfig(config);
                 return printer;

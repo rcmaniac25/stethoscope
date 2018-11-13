@@ -73,6 +73,10 @@ namespace Stethoscope
         /// If the log data has a root element or not. Ex. <root><logdata/></root> vs. <logdata/>
         /// </summary>
         public bool LogHasRoot { get; set; }
+        /// <summary>
+        /// An assortment of user-provided configs.
+        /// </summary>
+        public Dictionary<string,string> UserConfigs { get; set; }
 
         // Req
         /// <summary>Path to use for getting <see cref="LogAttribute.Timestamp"/>. Will always be a <see cref="System.DateTime"/>.</summary>

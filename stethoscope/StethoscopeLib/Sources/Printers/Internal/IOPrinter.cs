@@ -119,7 +119,7 @@ namespace Stethoscope.Printers.Internal
         /// Set a config for the printer.
         /// </summary>
         /// <param name="config">The config for the printer.</param>
-        public void SetConfig(LogConfig config)
+        public virtual void SetConfig(LogConfig config)
         {
         }
 
