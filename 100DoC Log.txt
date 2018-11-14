@@ -1990,3 +1990,6 @@ void doSomethingCool(std::ifstream& input)
 - Instead, I opted to add a new Printer that could print to a file.
 - It can use some work, but otherwise works well.
 - I have it append, though I'm not sure if it needs to.
+
+#215.2. 11/13/2018:
+- Forgot to mention yesterday, I don't have the time today... tomorrow!
