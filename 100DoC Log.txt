@@ -1993,3 +1993,9 @@ void doSomethingCool(std::ifstream& input)
 
 #215.2. 11/13/2018:
 - Forgot to mention yesterday, I don't have the time today... tomorrow!
+
+#216.2. 11/14/2018:
+- Yea... so the reason I didn't have time yesterday... I ended up basically doing stuff from sundown to sunrise.
+- I was exhausted and had was going to push this work off...
+- Then a family emergency occured and I'm now quite some distance away... so I'm defenitly pushing things off
+- I'll post statuses, but I'm not sure when I'll get the time to do work on this for a bit.
