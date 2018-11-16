@@ -1999,3 +1999,8 @@ void doSomethingCool(std::ifstream& input)
 - I was exhausted and had was going to push this work off...
 - Then a family emergency occured and I'm now quite some distance away... so I'm defenitly pushing things off
 - I'll post statuses, but I'm not sure when I'll get the time to do work on this for a bit.
+
+#217.2. 11/15/2018:
+- Just so it's known, circumstances have basically prevented me from doing anything besides read articles off my phone.
+- I manage to get on long enough to write these statuses and then I'm done for the day.
+- Err...
