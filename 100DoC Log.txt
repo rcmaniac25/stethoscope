@@ -2004,3 +2004,8 @@ void doSomethingCool(std::ifstream& input)
 - Just so it's known, circumstances have basically prevented me from doing anything besides read articles off my phone.
 - I manage to get on long enough to write these statuses and then I'm done for the day.
 - Err...
+
+#218.2. 11/16/2018:
+- Ok, I have a end date for everything going on right now.
+- I'm "free" again in 2 days but I'm not sure I'll be able to work on this then.
+- But I'll figure that later.
