@@ -2029,3 +2029,12 @@ registry.Logs.AsInfinite().AsFiniteWhen(log => log.Message.Contains(": Shutdown 
 Middleman system for the DB IQbservable so that I can grab the variables I care about, modify the expression, then send a modified expression to the DB and/or have the DB's usual expression run while I modify/add to it's results.
 =======
 - Now, I need to do something with those notes... but that's for tomorrow :D
+
+#221.2. 11/19/2018:
+- I got to this too late, but I wanted to figure out if I could at least implement/plan SkipLast.
+- It's "a bit harder" because it means I would need to buffer results by N amount otherwise I never know if the source will end or not.
+- It's not "clean". If I know the source length, I can use that. But if not, then it's hoping I actually skip the remainder.
+- It could also be memory intensive because of the buffer, and I dislike the potential of time-delay on publication.
+- But... if you can tell, it's not simple, and I already said it's late.
+- Tomorrow (though it will be short, as every Tuesday is).
+- If I can't do this tomorrow, I may try to at least figure out what queries I want to write for actual execution.
