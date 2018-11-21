@@ -2038,3 +2038,12 @@ Middleman system for the DB IQbservable so that I can grab the variables I care 
 - But... if you can tell, it's not simple, and I already said it's late.
 - Tomorrow (though it will be short, as every Tuesday is).
 - If I can't do this tomorrow, I may try to at least figure out what queries I want to write for actual execution.
+
+#222.2. 11/20/2018:
+- Err...
+- I had plans to do work, then slept in (it's the first of multiple holidays here... staying up late and sleeping in the next day are normal)
+- ...then took a little longer then expected to do some tasks, missed a train, made an appoitment I realized I needed, and by the time I got to this, I would only have a few minutes...
+- So I pushed it off, thinking I could get to it later, but I want to break the "stay up late, sleep in" cycle for once as it's made up and it's not just a shift of a sleep schedule
+- You actually can't get as much done. Right up there with being able to drink and code... you're going to be asking yourself "what was I thinking" when you wake up
+- So... need to push off again.
+- Err...
