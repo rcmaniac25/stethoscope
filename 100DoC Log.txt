@@ -2047,3 +2047,38 @@ Middleman system for the DB IQbservable so that I can grab the variables I care 
 - You actually can't get as much done. Right up there with being able to drink and code... you're going to be asking yourself "what was I thinking" when you wake up
 - So... need to push off again.
 - Err...
+
+#223.2. 11/21/2018:
+- Stop me if you've heard this one before:
+- I wanted to code, but it's late and I need to go to bed...
+- Heard it before? Now for the twist...
+- I wanted to code, but it's late... so I couldn't do the SkipLast (#221.2, #220.2).
+- Then I thought "maybe define what expressions are needed to get the data I want", but... I don't even know what I want.
+- So, I daydreamed about how I would pitch this app (remember, I wanted to write this for work. So I imagined doing a tech talk about how to use this).
+- Part of the way through, I realized "I'm not trying to figure out everything about this program", I'm just trying to think of what expressions to write and "what's next".
+- I wrote this:
+=Notes=
+Stats on what functions are used in expression evaluation (so I know what I should focus on more for optimization)
+Update tracker to print async (print as it reads, perhaps a way to early out)
+Progression:
+1. Print the logs as recieved
+2. Print functions (only the first time...)
+3. Print functions (only when the known functions change, so when new branches are found, so we need to start a DB of functions)
+4. Print stack trace (try to determine when functions are called by other functions)
+Start to try and parse log values to better do #4 (define the "format" for a line to be parsed)
+Group together print functions/actions so that they can be used as needed and not just for a stream-print
+Paramaterize them... this way I can say "show me all calls to a specific function"
+Do some LINQ expression evaluation updates (see notes from #220.2). Possibly work on the infinite/finite switch mech (this way we can read a function, then say "this function is done" if all log lines are within a known function and only do the "new" notification when something isn't in it)
+Try to start cross referencing data between threads based on what is parsed in logs + known functions.
+As it's expected there's some system maintaining lists of functions, call stacks, and log-line specific parsing info... have some background processor that will retroactivly update stuff. This way if half a function gets parsed and returned while the first half is "too old" for the live observable, all log statements will be processed. Also possibly requires log registry to have user-data that can be applied for a log line (and maybe a way to say "this has been updated")
+Make all the collected/calculated info exportable so it can be re-loaded as needed.
+See if I can mark (manually for now) the start of an invocation (such as a user connecting to a server or application startup) and tracing it's entire execution between multiple threads
+Now try to do ^^ automatically (do the stack trace backwards, where does the first moment of invocation occur) and record starting points
+Additional grouping to do a histogram of how common an error/line/etc. is in for a specific file, function, program, log, etc.
+... (I'm not trying to writeup everything... just a "what to do next")
+Something something build a list of good executions and then when something deivates, point this out
+Also, any way to find all similar exections? Like, if a specific branch is hit, how many other times is this invoked? Also, if something goes wrong, how many others had the same issue?
+
+File browser (connect to multiple remote machines, then use a file browser to basically say "open this specific file" or "open this log within this timeframe")
+=======
+- Tomorrow will be tough, but I'll see if I can at least get expression stats written.
