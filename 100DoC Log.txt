@@ -2082,3 +2082,7 @@ Also, any way to find all similar exections? Like, if a specific branch is hit, 
 File browser (connect to multiple remote machines, then use a file browser to basically say "open this specific file" or "open this log within this timeframe")
 =======
 - Tomorrow will be tough, but I'll see if I can at least get expression stats written.
+
+#224.2. 11/22/2018:
+- So, I started working on the expression stat... and then got distracted and learned I needed to get up early. Joy.
+- I will finish it tomorrow.
