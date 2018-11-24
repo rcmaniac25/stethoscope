@@ -2086,3 +2086,22 @@ File browser (connect to multiple remote machines, then use a file browser to ba
 #224.2. 11/22/2018:
 - So, I started working on the expression stat... and then got distracted and learned I needed to get up early. Joy.
 - I will finish it tomorrow.
+
+#225.2. 11/23/2018:
+- Ok, I was able to finish the metric/stat collector.
+- Realized I was looking for "Counter" and not Histogram.
+- Also, seperated out the expression visior that has a callback instead of it being an embedded class for SkipProcessor.
+- ...that was the point yesterday when I went "I don't have the time..."
+- In the mean time, I got some nice stats for expression evaluation within the unit tests:
+    [<computer> - ListStorageEvaluator] Expression Methods
+             Count = 125 Commands
+       Total Items = 8
+            Item 0 = 01.60%     2 Commands [System.Reactive.Linq.IQbservable`1[TSource] LastOrDefaultAsync[TSource](System.Reactive.Linq.IQbservable`1[TSource])]
+            Item 1 = 03.20%     4 Commands [System.Reactive.Linq.IQbservable`1[TSource] SkipWhile[TSource](System.Reactive.Linq.IQbservable`1[TSource], System.Linq.Expressions.Expression`1[System.Func`2[TSource,System.Boolean]])]
+            Item 2 = 06.40%     8 Commands [System.Reactive.Linq.IQbservable`1[TSource] Skip[TSource](System.Reactive.Linq.IQbservable`1[TSource], System.TimeSpan)]
+            Item 3 = 09.60%    12 Commands [System.Reactive.Linq.IQbservable`1[TResult] Select[TSource,TResult](System.Reactive.Linq.IQbservable`1[TSource], System.Linq.Expressions.Expression`1[System.Func`2[TSource,TResult]])]
+            Item 4 = 13.60%    17 Commands [System.Reactive.Linq.IQbservable`1[System.Reactive.Linq.IGroupedObservable`2[TKey,TSource]] GroupBy[TSource,TKey](System.Reactive.Linq.IQbservable`1[TSource], System.Linq.Expressions.Expression`1[System.Func`2[TSource,TKey]])]
+            Item 5 = 19.20%    24 Commands [System.Reactive.Linq.IQbservable`1[TSource] Skip[TSource](System.Reactive.Linq.IQbservable`1[TSource], Int32)]
+            Item 6 = 21.60%    27 Commands [System.Reactive.Linq.IQbservable`1[TSource] Concat[TSource](System.Reactive.Linq.IQbservable`1[TSource], System.IObservable`1[TSource])]
+            Item 7 = 24.80%    31 Commands [System.Reactive.Linq.IQbservable`1[TSource] Where[TSource](System.Reactive.Linq.IQbservable`1[TSource], System.Linq.Expressions.Expression`1[System.Func`2[TSource,System.Boolean]])]
+- I will see if I have time to do anything tomorrow. Last event of the month.

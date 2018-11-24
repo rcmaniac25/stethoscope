@@ -9,45 +9,6 @@ namespace Stethoscope.Reactive.Linq.Internal
 {
     internal class SkipProcessor
     {
-        #region SkipVisitor
-
-        private class SkipVisitor<T> : ExpressionVisitor
-        {
-            private int depth = -1;
-            private T state;
-
-            public Func<MethodCallExpression, int, T, Func<Expression, Expression>, Expression> MethodVisitHandler { get; set; }
-
-            public Expression Visit(Expression node, T state)
-            {
-                if (depth >= 0)
-                {
-                    throw new InvalidOperationException("Visitor already in use");
-                }
-
-                this.state = state;
-                depth = -1;
-                var res = base.Visit(node);
-                depth = -1;
-
-                return res;
-            }
-
-            protected override Expression VisitMethodCall(MethodCallExpression expression)
-            {
-                Expression result = expression;
-                depth++;
-                if (MethodVisitHandler != null)
-                {
-                    result = MethodVisitHandler(expression, depth, state, base.Visit);
-                }
-                depth--;
-                return result;
-            }
-        }
-
-        #endregion
-
         #region SMState
 
         private struct SMState : ICloneable
@@ -59,7 +20,7 @@ namespace Stethoscope.Reactive.Linq.Internal
 
             public List<MethodCallExpression> MethodCalls { get; private set; }
             public State PriorState { get; private set; }
-            public SkipVisitor<List<MethodCallExpression>> SkipVisitor { get; private set; }
+            public ExpressionMethodVisitor<List<MethodCallExpression>> SkipVisitor { get; private set; }
 
             public StateMachine<State, Trigger> StateMachine { get; private set; }
             public Action<SMState> DoneHandler { get; private set; }
@@ -71,7 +32,7 @@ namespace Stethoscope.Reactive.Linq.Internal
 
                 MethodCalls = new List<MethodCallExpression>();
                 PriorState = State.Uninitialized;
-                SkipVisitor = new SkipVisitor<List<MethodCallExpression>>();
+                SkipVisitor = new ExpressionMethodVisitor<List<MethodCallExpression>>();
 
                 StateMachine = stateMachine;
                 DoneHandler = doneHandler;

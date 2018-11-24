@@ -1,4 +1,6 @@
-﻿using Stethoscope.Collections;
+﻿using Metrics;
+
+using Stethoscope.Collections;
 using Stethoscope.Common;
 using Stethoscope.Reactive;
 using Stethoscope.Reactive.Linq;
@@ -15,13 +17,28 @@ namespace Stethoscope.Log.Internal.Storage.Linq
     {
         private const ObservableType LiveObservableType = ObservableType.LiveUpdating;
 
+        private static readonly Counter expressionMethodCounter = Metric.Context("ListStorageEvaluator").Counter("Expression Methods", Unit.Commands, tags: "storage, expression, evaluator, list, method");
+
         private readonly IRegistryStorage dataRegistryStorage;
         private readonly IBaseListCollection<ILogEntry> data;
+        private readonly ExpressionMethodVisitor<int> metricCollector = new ExpressionMethodVisitor<int>(); // Can't be static in-case async operation is used. Hopefully evaluate is never invoked async.
 
         public ListStorageEvaluator(IRegistryStorage storage, IBaseListCollection<ILogEntry> data)
         {
             this.dataRegistryStorage = storage;
             this.data = data;
+
+            this.metricCollector.MethodVisitHandler = (mexp, d, unused, visit) =>
+            {
+                var method = mexp.Method;
+                if (method.IsGenericMethod)
+                {
+                    method = method.GetGenericMethodDefinition();
+                }
+                expressionMethodCounter.Increment(method.ToString());
+                visit(mexp.Arguments[0]);
+                return mexp;
+            };
         }
 
         private IScheduler DataScheduler { get { return dataRegistryStorage.LogScheduler; } }
@@ -30,7 +47,10 @@ namespace Stethoscope.Log.Internal.Storage.Linq
         {
             var schedulerToUse = DataScheduler ?? CurrentThreadScheduler.Instance;
             IObservable<ILogEntry> dataSourceObservable = new LiveListObservable<ILogEntry>(LiveObservableType, data, schedulerToUse);
-            
+
+            // Gather metrics on the expression being processed.
+            metricCollector.Visit(expression, 0);
+
             var expressionToEvaluate = expression;
 
             // The expression must represent a query over the data source.
