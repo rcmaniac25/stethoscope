@@ -2105,3 +2105,9 @@ File browser (connect to multiple remote machines, then use a file browser to ba
             Item 6 = 21.60%    27 Commands [System.Reactive.Linq.IQbservable`1[TSource] Concat[TSource](System.Reactive.Linq.IQbservable`1[TSource], System.IObservable`1[TSource])]
             Item 7 = 24.80%    31 Commands [System.Reactive.Linq.IQbservable`1[TSource] Where[TSource](System.Reactive.Linq.IQbservable`1[TSource], System.Linq.Expressions.Expression`1[System.Func`2[TSource,System.Boolean]])]
 - I will see if I have time to do anything tomorrow. Last event of the month.
+
+#226.2. 11/24/2018:
+- Plan: do some work
+- Reality: got back to my home late, pushed tasks from today to tomorrow morning, and thus need to end early
+- Result: I wasn't sure if I could do anything today, and while I planned to, turns out I couldn't.
+- Tomorrow
