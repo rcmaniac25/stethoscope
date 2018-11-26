@@ -5,6 +5,7 @@ using Stethoscope.Common;
 using System;
 using System.IO;
 using System.Reactive.Linq;
+using System.Threading.Tasks;
 
 namespace Stethoscope.Printers.Internal
 {
@@ -105,14 +106,23 @@ namespace Stethoscope.Printers.Internal
         }
 
         /// <summary>
-        /// Print the logs contained with the registry.
+        /// Print the logs contained with the registry (sync).
         /// </summary>
         /// <remarks>This is too simplistic and will be replaced or augmented at some point in the future. Don't build logic around a simple Print call.</remarks>
         public virtual void Print()
         {
+            PrintAsync().Wait();
+        }
+
+        /// <summary>
+        /// Print the logs contained with the registry (async).
+        /// </summary>
+        /// <remarks>This is too simplistic and will be replaced or augmented at some point in the future. Don't build logic around a simple Print call.</remarks>
+        public virtual Task PrintAsync()
+        {
             printCounter.Increment();
 
-            PrintThreadTraces();
+            return Task.Run(() => PrintThreadTraces()); //TODO
         }
 
         /// <summary>
@@ -121,6 +131,10 @@ namespace Stethoscope.Printers.Internal
         /// <param name="config">The config for the printer.</param>
         public virtual void SetConfig(LogConfig config)
         {
+            if (config.UserConfigs != null && config.UserConfigs.ContainsKey("PrintMode"))
+            {
+                //TODO
+            }
         }
 
         /// <summary>

@@ -12,6 +12,8 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Stethoscope
 {
@@ -76,7 +78,7 @@ namespace Stethoscope
 
         #endregion
 
-        public void Setup()
+        public void Init()
         {
             Metric.Config.WithHttpEndpoint("http://localhost:2581/").WithSystemCounters();
             
@@ -84,7 +86,17 @@ namespace Stethoscope
             var registryFactory = LogRegistryFactory.Create();
 
             var parserFactory = LogParserFactory.GetParserForFileExtension("xml");
-            var printerFactory = PrinterFactory.CrateConsoleFactory();
+
+            IPrinterFactory printerFactory;
+            if (config.UserConfigs != null && config.UserConfigs.ContainsKey("printToFile") && !string.IsNullOrWhiteSpace(config.UserConfigs["printToFile"]))
+            {
+                // Note: this just sets a default. Configs can change the file
+                printerFactory = PrinterFactory.CrateFileFactory(config.UserConfigs["printToFile"]);
+            }
+            else
+            {
+                printerFactory = PrinterFactory.CrateConsoleFactory();
+            }
 
             registry = registryFactory.Create();
 
@@ -92,15 +104,20 @@ namespace Stethoscope
             printer = printerFactory.Create(registry, config);
         }
 
-        public void Process()
+        public async Task Process()
         {
+            var printTask = printer.PrintAsync();
             logFileParser.Parse(extraParserArguments[0]);
+            await printTask;
         }
 
-        public void Print()
+        public void Start()
         {
             printer.Setup();
-            printer.Print();
+        }
+
+        public void Stop()
+        {
             printer.Teardown();
         }
 
@@ -110,9 +127,11 @@ namespace Stethoscope
 
             if (program.ParseArguments(args))
             {
-                program.Setup();
-                program.Process();
-                program.Print();
+                program.Init();
+
+                program.Start();
+                program.Process().Wait();
+                program.Stop();
             }
             if (System.Diagnostics.Debugger.IsAttached)
             {

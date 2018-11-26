@@ -2111,3 +2111,19 @@ File browser (connect to multiple remote machines, then use a file browser to ba
 - Reality: got back to my home late, pushed tasks from today to tomorrow morning, and thus need to end early
 - Result: I wasn't sure if I could do anything today, and while I planned to, turns out I couldn't.
 - Tomorrow
+
+#227.2. 11/25/2018:
+- Another day, another "I don't have time" day...
+- But I wanted to do something, so I checked #223.2 and saw "make Tracker async" and thought "that shouldn't be bad"
+- While doing that, I came to the realization that I haven't really done any async work and there are other small tasks todo.
+- So as an ammendment to #223.2
+=Notes=
+- Do more work on IOPrinter with async and print modes
+- Parser should also be async
+- Tests for async...
+- Need to change UserConfigs to AdditionalConfigs or something (needs a better name)
+- Need to formalize config values (will these be globals? I'm thinking yes because other configs can be created)
+- Need way to clone config (this way a master config can exist and extra configs can be added later without affecting the master config)
+- Need way to clone an ILogEntry to another registry (masterRegistry.Logs.<query>.Subscribe(log => queryRegistry.CloneLog(log));)
+=======
+- So I want to finish async code for IOPrinter tomorrow, then I'll move onto the other tasks.
