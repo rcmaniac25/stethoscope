@@ -2127,3 +2127,8 @@ File browser (connect to multiple remote machines, then use a file browser to ba
 - Need way to clone an ILogEntry to another registry (masterRegistry.Logs.<query>.Subscribe(log => queryRegistry.CloneLog(log));)
 =======
 - So I want to finish async code for IOPrinter tomorrow, then I'll move onto the other tasks.
+
+#228.2. 11/26/2018:
+- I got distracted by a lot of things today...
+- I went to add a method to change what print mode the IOPrinter would be in (maybe this should be generalized?), but I saw the time and went "not now"
+- So, I'll have to push stuff back to tomorrow... which will be busy, so if I can't do tomorrow, the standard push back until I can.

@@ -12,7 +12,7 @@ PoC:
 - Iteration through stats (ex. find ID = "steve") and then display results and possibly indicate where things deviated (such as the above "fun=d" example) and other IDs where the same thing happened
 
 What needs to get done. Should make some of them tickets... (some of these may be trains-of-thought)
-- "PoC proper" (see details above and from log #102.2. UPDATE: #223.2 and #227.2)
+- "PoC proper" (see details above and from log #102.2. UPDATE: #227.2)
 	- Initial Qbservable implementation
 		- NeverEndingLiveListObservable + method to switch between it and LiveListObservable before subscription (AsInfinite/AsFinite)
 	- Initial log analysis
