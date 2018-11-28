@@ -2132,3 +2132,6 @@ File browser (connect to multiple remote machines, then use a file browser to ba
 - I got distracted by a lot of things today...
 - I went to add a method to change what print mode the IOPrinter would be in (maybe this should be generalized?), but I saw the time and went "not now"
 - So, I'll have to push stuff back to tomorrow... which will be busy, so if I can't do tomorrow, the standard push back until I can.
+
+#229.2. 11/27/2018:
+- Yea... it's too late for me to do this work right now
