@@ -2135,3 +2135,39 @@ File browser (connect to multiple remote machines, then use a file browser to ba
 
 #229.2. 11/27/2018:
 - Yea... it's too late for me to do this work right now
+
+#230.2. 11/28/2018:
+- ...
+- So I finally get to this and I sit staring at the IOPrinter to-be-PrintMode and going "what the heck is this?"
+- So, here is/was my grand vision: I wanted to be able to say "I have these logs, I want to print them" and to not have to customize the printing
+- In other words, a IPrinter is an adapter between the log registry and whatever the dev/user wants.
+- This could be "print to the console", "write to an HTML email", "render to a texture"?, and "populate a UI element". Etc.
+- IOPrinter was one level down (or up...) from IPrinter where a text-based, one-way print would be performed but the printing functionality didn't need to be rewritten for each IO object.
+-- IO object is a TextWriter.
+- Then along came #223.2 and I said "in order for this to work as I want, I need to run the printing async"
+- But, I have a challenge: my test code is basically sequental and not really designed for a continious stream of log data.
+- This gave rise to PrintMode. The plan was simple: a generic guide/config for specifying what to print.
+-- Should we print colors?
+-- What colors go to what log attribute?
+-- What size is the font?
+-- What's the widest thing we should print?
+-- Just print the function names...
+-- Print the function names and timestamp...
+-- Now print it in the order: timestamp + function name...
+-- Etc.
+- Basically, I looked at PrintMode and went "what the heck is this?" because print formats are complex.
+- Thinging out loud (see above) basically tells me "this probably needs to be a string-based format string" but I need something higher level.
+- And... at the current time of the day, I'm not sure what it is. I just know "format will define the per-log prints, but not 'group logs by thread ID' or 'only print functions'"
+- Heck, this seems like I'm leading to the "grouping" stuff I mentioned in #223.2 where I group logs to define a "function" or "thread"
+- Maybe it means I'll have some higher-level "registry" of such things...
+- Now, again, time. It's late, and this tells me this is more work then what it needs to be at this point. I like the thoughts, but it's too soon.
+- Instead, I'll hack a simple list print of logs' function name (tomorrow work) and go back to async work.
+- If anything, having async in place will force my hand a bit to "when I go to do the work, I need to to work async"
+- The last thought for the night: I will make a small key/index in this log for the days to remember so I don't just creat a linked-list of design plans.
+
+==Design/Plan Days==
+- Observable/Qbservable summary: #220.2
+- Initial stages of program completion (plan): #223.2
+- Random Notes #1/Current(?): #227.2
+- Some thoughts on log-print formatting: #230.2
+==----------------==

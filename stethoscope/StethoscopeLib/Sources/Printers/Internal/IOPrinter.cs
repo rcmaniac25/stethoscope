@@ -5,12 +5,20 @@ using Stethoscope.Common;
 using System;
 using System.IO;
 using System.Reactive.Linq;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
 namespace Stethoscope.Printers.Internal
 {
+    [StructLayout(LayoutKind.Sequential)]
+    public struct PrintMode
+    {
+        public bool PrintFunctionNamesOnly;
+        //TODO: needs work
+    }
+
     /// <summary>
-    /// Log printer that prints to an IO object of type <see cref="TextReader"/>.
+    /// Log printer that prints to an I/O object of type <see cref="TextReader"/>.
     /// </summary>
     public abstract class IOPrinter : IPrinter
     {
