@@ -2156,7 +2156,7 @@ File browser (connect to multiple remote machines, then use a file browser to ba
 -- Now print it in the order: timestamp + function name...
 -- Etc.
 - Basically, I looked at PrintMode and went "what the heck is this?" because print formats are complex.
-- Thinging out loud (see above) basically tells me "this probably needs to be a string-based format string" but I need something higher level.
+- Thinking out loud (see above) basically tells me "this probably needs to be a string-based format string" but I need something higher level.
 - And... at the current time of the day, I'm not sure what it is. I just know "format will define the per-log prints, but not 'group logs by thread ID' or 'only print functions'"
 - Heck, this seems like I'm leading to the "grouping" stuff I mentioned in #223.2 where I group logs to define a "function" or "thread"
 - Maybe it means I'll have some higher-level "registry" of such things...
@@ -2164,6 +2164,13 @@ File browser (connect to multiple remote machines, then use a file browser to ba
 - Instead, I'll hack a simple list print of logs' function name (tomorrow work) and go back to async work.
 - If anything, having async in place will force my hand a bit to "when I go to do the work, I need to to work async"
 - The last thought for the night: I will make a small key/index in this log for the days to remember so I don't just creat a linked-list of design plans.
+
+#231.2. 11/29/2018:
+- Time strikes again...
+- I planned to do this earlier, but enough other things happened that I didn't get to it.
+- I started... but I'm tired and realized "even with just planning on printing function names, the async implementation is not easy"
+- Basically, when PrintAsync is called, the logs should be printed... and then I can await/Continue/etc. when it's done. Or, I can cancel it and it stops then and there.
+- Observables can be converted to Tasks, but I do want the cancelation to be cleanly done (and I'm not sure if it just calls the dispose on the subscribe and then calls it a day, or if something else happens)
 
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
