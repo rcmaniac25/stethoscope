@@ -2172,6 +2172,14 @@ File browser (connect to multiple remote machines, then use a file browser to ba
 - Basically, when PrintAsync is called, the logs should be printed... and then I can await/Continue/etc. when it's done. Or, I can cancel it and it stops then and there.
 - Observables can be converted to Tasks, but I do want the cancelation to be cleanly done (and I'm not sure if it just calls the dispose on the subscribe and then calls it a day, or if something else happens)
 
+#232.2. 11/30/2018:
+- Ok, I wrapped my head around some of the Task components (namely, there is no "stop" which I thought existed... and Cancel, which I too thought existed, is really the CancellationToken's Cancel function)
+- With that, I managed to write a basic async print and make it a little more formal so it can be canceled.
+- I gave it a couple tests (manual) and it worked just fine.
+- As for unit tests: as expected, everything passes except the ConsolePrinterTests. That will be the case for a bit... they will be outdated eventually and will need to be updated.
+- That's enough for today.
+- If anything happened, I need to make the parser async. I'll do/start that tomorrow.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2

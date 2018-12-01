@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 
 namespace Stethoscope.Common
 {
@@ -10,16 +11,23 @@ namespace Stethoscope.Common
         /// <summary>
         /// Invoke a print operation (sync)
         /// </summary>
-        void Print();
+        void Print(); //TODO: C# 8 default impl. for interfaces
 
         /// <summary>
         /// Invoke a print operation (async)
         /// </summary>
         /// <returns>Task for managing the print.</returns>
-        Task PrintAsync();
+        Task PrintAsync(); //TODO: C# 8 default impl. for interfaces
 
         /// <summary>
-        /// Setup the printer. Call before invoking <see cref="Print"/> or <see cref="PrintAsync"/>
+        /// Invoke a print operation (async)
+        /// </summary>
+        /// <param name="cancellationToken">A cancellation token that can be used to cancel the work</param>
+        /// <returns>Task for managing the print.</returns>
+        Task PrintAsync(CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Setup the printer. Call before invoking <see cref="Print"/> or <see cref="PrintAsync()"/>/<see cref="PrintAsync(CancellationToken)"/>
         /// </summary>
         void Setup();
         /// <summary>

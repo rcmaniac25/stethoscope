@@ -12,7 +12,6 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Stethoscope
@@ -106,9 +105,11 @@ namespace Stethoscope
 
         public async Task Process()
         {
+            var parseTask = Task.Run(() => logFileParser.Parse(extraParserArguments[0]));
+            System.Threading.Thread.Sleep(100);
             var printTask = printer.PrintAsync();
-            logFileParser.Parse(extraParserArguments[0]);
             await printTask;
+            await parseTask;
         }
 
         public void Start()
@@ -136,7 +137,7 @@ namespace Stethoscope
             if (System.Diagnostics.Debugger.IsAttached)
             {
                 Console.WriteLine("Press Any Key to Continue");
-                Console.In.Read();
+                Console.ReadKey();
             }
         }
     }

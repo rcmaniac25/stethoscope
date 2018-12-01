@@ -6,6 +6,7 @@ using System;
 using System.IO;
 using System.Reactive.Linq;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Stethoscope.Printers.Internal
@@ -113,6 +114,33 @@ namespace Stethoscope.Printers.Internal
             }
         }
 
+        private void TestPrintFunctionNamesUngrouped(CancellationToken taskCancelToken)
+        {
+            var observableRunningTokenSource = new CancellationTokenSource();
+            
+            var dis = logRegistry.Logs.TakeWhile(_ => !taskCancelToken.IsCancellationRequested).Subscribe(log =>
+            {
+                if (log.HasAttribute(LogAttribute.Function))
+                {
+                    TextWriter.WriteLine(log.GetAttribute<string>(LogAttribute.Function));
+                }
+                else
+                {
+                    TextWriter.WriteLine("No Function... Message: {0}", log.Message);
+                }
+            }, () =>
+            {
+                observableRunningTokenSource.Cancel();
+            });
+
+            while (!taskCancelToken.IsCancellationRequested && !observableRunningTokenSource.IsCancellationRequested)
+            {
+                Thread.Sleep(100);
+            }
+
+            dis.Dispose();
+        }
+
         /// <summary>
         /// Print the logs contained with the registry (sync).
         /// </summary>
@@ -126,11 +154,23 @@ namespace Stethoscope.Printers.Internal
         /// Print the logs contained with the registry (async).
         /// </summary>
         /// <remarks>This is too simplistic and will be replaced or augmented at some point in the future. Don't build logic around a simple Print call.</remarks>
-        public virtual Task PrintAsync()
+        public Task PrintAsync()
+        {
+            return PrintAsync(new CancellationToken());
+        }
+
+        /// <summary>
+        /// Print the logs contained with the registry (async).
+        /// </summary>
+        /// <param name="cancellationToken">A cancellation token that can be used to cancel the work</param>
+        /// <remarks>This is too simplistic and will be replaced or augmented at some point in the future. Don't build logic around a simple Print call.</remarks>
+        public virtual Task PrintAsync(CancellationToken cancellationToken)
         {
             printCounter.Increment();
 
-            return Task.Run(() => PrintThreadTraces()); //TODO
+            //return Task.Run(() => PrintThreadTraces()); //TODO
+            
+            return Task.Run(() => TestPrintFunctionNamesUngrouped(cancellationToken), cancellationToken);
         }
 
         /// <summary>
