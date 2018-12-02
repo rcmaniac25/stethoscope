@@ -2180,6 +2180,15 @@ File browser (connect to multiple remote machines, then use a file browser to ba
 - That's enough for today.
 - If anything happened, I need to make the parser async. I'll do/start that tomorrow.
 
+#233.2. 12/01/2018:
+- I took on too many tasks today
+- I will hope to get stuff done tomorrow...
+- No... this week.
+- I tend to take on too many tasks, and it gets late (that's why I keep pushing things off)
+- This week is a company event that I need to be mentally capable for, so I plan to go to bed early...
+- And if life and distractions suddenly make it late, I'm going to have to cut time from this.
+- It's not the lowest-rank item on my usual todo, but it's easy for "simple" stuff to suddenly take hours. Especially when it involves other people, where I can't time box it so easily.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
