@@ -105,7 +105,7 @@ namespace Stethoscope
 
         public async Task Process()
         {
-            var parseTask = Task.Run(() => logFileParser.Parse(extraParserArguments[0]));
+            var parseTask = logFileParser.ParseAsync(extraParserArguments[0]);
             System.Threading.Thread.Sleep(100);
             var printTask = printer.PrintAsync();
             await printTask;

@@ -21,7 +21,7 @@ namespace Stethoscope.Printers.Internal
     /// <summary>
     /// Log printer that prints to an I/O object of type <see cref="TextReader"/>.
     /// </summary>
-    public abstract class IOPrinter : IPrinter
+    public abstract class IOPrinter : BaseIPrinter
     {
         /// <summary>
         /// Metric counter for indicating every time <see cref="Print"/> is invoked.
@@ -37,15 +37,6 @@ namespace Stethoscope.Printers.Internal
         /// The TextWriter which will be printed to.
         /// </summary>
         protected TextWriter TextWriter { get; set; }
-
-        /// <summary>
-        /// Setup the printer.
-        /// </summary>
-        public abstract void Setup();
-        /// <summary>
-        /// Teardown the printer.
-        /// </summary>
-        public abstract void Teardown();
 
         /// <summary>
         /// Produce indentation for printing strings.
@@ -140,31 +131,13 @@ namespace Stethoscope.Printers.Internal
 
             dis.Dispose();
         }
-
-        /// <summary>
-        /// Print the logs contained with the registry (sync).
-        /// </summary>
-        /// <remarks>This is too simplistic and will be replaced or augmented at some point in the future. Don't build logic around a simple Print call.</remarks>
-        public virtual void Print()
-        {
-            PrintAsync().Wait();
-        }
-
-        /// <summary>
-        /// Print the logs contained with the registry (async).
-        /// </summary>
-        /// <remarks>This is too simplistic and will be replaced or augmented at some point in the future. Don't build logic around a simple Print call.</remarks>
-        public Task PrintAsync()
-        {
-            return PrintAsync(new CancellationToken());
-        }
-
+        
         /// <summary>
         /// Print the logs contained with the registry (async).
         /// </summary>
         /// <param name="cancellationToken">A cancellation token that can be used to cancel the work</param>
         /// <remarks>This is too simplistic and will be replaced or augmented at some point in the future. Don't build logic around a simple Print call.</remarks>
-        public virtual Task PrintAsync(CancellationToken cancellationToken)
+        public override Task PrintAsync(CancellationToken cancellationToken)
         {
             printCounter.Increment();
 

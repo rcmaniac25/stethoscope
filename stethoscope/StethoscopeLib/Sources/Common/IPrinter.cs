@@ -16,14 +16,14 @@ namespace Stethoscope.Common
         /// <summary>
         /// Invoke a print operation (async)
         /// </summary>
-        /// <returns>Task for managing the print.</returns>
+        /// <returns>Task representing the print operation.</returns>
         Task PrintAsync(); //TODO: C# 8 default impl. for interfaces
 
         /// <summary>
         /// Invoke a print operation (async)
         /// </summary>
         /// <param name="cancellationToken">A cancellation token that can be used to cancel the work</param>
-        /// <returns>Task for managing the print.</returns>
+        /// <returns>Task representing the print operation.</returns>
         Task PrintAsync(CancellationToken cancellationToken);
 
         /// <summary>

@@ -3,6 +3,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Stethoscope.Common
 {
@@ -38,6 +40,44 @@ namespace Stethoscope.Common
 
                 parser.Parse(fr);
             }
+        }
+
+        /// <summary>
+        /// Parse a log file.
+        /// </summary>
+        /// <param name="parser">The parser to use.</param>
+        /// <param name="logFile">Path to a log file.</param>
+        /// <returns>Task representing the parse operation.</returns>
+        public static Task ParseAsync(this ILogParser parser, string logFile)
+        {
+            parseCounter.Increment();
+
+            var fr = new FileStream(logFile, FileMode.Open);
+            parseFileSizeHistogram.Update(fr.Length, logFile);
+
+            return parser.ParseAsync(fr).ContinueWith(_ => fr.Dispose(), TaskContinuationOptions.ExecuteSynchronously);
+        }
+
+        /// <summary>
+        /// Parse a log file.
+        /// </summary>
+        /// <param name="parser">The parser to use.</param>
+        /// <param name="logFile">Path to a log file.</param>
+        /// <param name="cancellationToken">A cancellation token that can be used to cancel the work</param>
+        /// <returns>Task representing the parse operation.</returns>
+        public static Task ParseAsync(this ILogParser parser, string logFile, CancellationToken cancellationToken)
+        {
+            parseCounter.Increment();
+
+            if (cancellationToken.IsCancellationRequested)
+            {
+                return Task.FromCanceled(cancellationToken);
+            }
+
+            var fr = new FileStream(logFile, FileMode.Open);
+            parseFileSizeHistogram.Update(fr.Length, logFile);
+
+            return parser.ParseAsync(fr, cancellationToken).ContinueWith(_ => fr.Dispose(), TaskContinuationOptions.ExecuteSynchronously);
         }
 
         /// <summary>

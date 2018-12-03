@@ -2189,6 +2189,18 @@ File browser (connect to multiple remote machines, then use a file browser to ba
 - And if life and distractions suddenly make it late, I'm going to have to cut time from this.
 - It's not the lowest-rank item on my usual todo, but it's easy for "simple" stuff to suddenly take hours. Especially when it involves other people, where I can't time box it so easily.
 
+#234.2. 12/02/2018:
+- I wasn't sure if I would have the time, but I managed to implement async support for the XML Parser.
+- In addition, I made some temp classes fir handling sync/async calls for parser and printer.
+- They're temp because once C# 8 comes, and I can use default interface implementations, I don't need them.
+- Minor: an interface with an implementation in it is... weird.
+- Yet, what is an abstract class with no implemented functions? An interface.
+- So prior to C# 8, you could make an interface with an abstract class, but not the other way.
+- I haven't read the details, but I could see the compiler and runtime getting some extra work to provide only the type that's needed.
+- Bonus: it reduces some of the annoyances with abstract classes and interfaces (see the temp classes for an example... why do I have to implement an interface function for an abstract class? Why can't I just say "the extender of the abstract class has to implement it" and save me a few lines of code?)
+- Next up: tests. My favorite /s
+- It actually is good because, as stated, this week will be busy. Tests are annoying but generally can be done "I only got 2 done today" or similar.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2

@@ -7,6 +7,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
 
@@ -15,7 +17,7 @@ namespace Stethoscope.Parsers.Internal.XML
     /// <summary>
     /// Log parser for XML logs.
     /// </summary>
-    public class XMLLogParser : ILogParser
+    public class XMLLogParser : BaseILogParser
     {
         private struct TransientParserConfigs
         {
@@ -30,7 +32,7 @@ namespace Stethoscope.Parsers.Internal.XML
         private static readonly Counter failureToAddAttributeToLogCounter;
         private static readonly Histogram attributesParsedHistogram;
         private static readonly Counter processElementCounter;
-        private static readonly Timer processElementTimer;
+        private static readonly Metrics.Timer processElementTimer;
         private static readonly Counter xmlElementCounter;
         private static readonly Counter xmlCDATACounter;
         private static readonly Counter xmlTextCounter;
@@ -223,7 +225,7 @@ namespace Stethoscope.Parsers.Internal.XML
 
         #region ProcessElement
         
-        private static LogParserErrors ProcessCommonLogAttributes(XMLLogParser parser, ref TransientParserConfigs config, ILogEntry entry, XElement element)
+        private static LogParserErrors ProcessCommonLogAttributes(XMLLogParser parser, TransientParserConfigs config, ILogEntry entry, XElement element)
         {
             var attributesAdded = 0;
             foreach (var kv in parser.attributePaths)
@@ -266,7 +268,7 @@ namespace Stethoscope.Parsers.Internal.XML
             return LogParserErrors.OK;
         }
 
-        private static LogParserErrors ProcessValidElement(XMLLogParser parser, ref TransientParserConfigs config, XElement element)
+        private static LogParserErrors ProcessValidElement(XMLLogParser parser, TransientParserConfigs config, XElement element)
         {
             if (!parser.validConfigs)
             {
@@ -294,10 +296,10 @@ namespace Stethoscope.Parsers.Internal.XML
             }
 
             var entry = parser.registry.AddLog(timestamp, message);
-            return ProcessCommonLogAttributes(parser, ref config, entry, element);
+            return ProcessCommonLogAttributes(parser, config, entry, element);
         }
 
-        private static LogParserErrors ProcessInvalidElement(XMLLogParser parser, ref TransientParserConfigs config, XElement element)
+        private static LogParserErrors ProcessInvalidElement(XMLLogParser parser, TransientParserConfigs config, XElement element)
         {
             var entry = parser.registry.AddFailedLog();
 
@@ -313,17 +315,17 @@ namespace Stethoscope.Parsers.Internal.XML
                 parser.registry.AddValueToLog(entry, LogAttribute.Message, message);
             }
 
-            var result = ProcessCommonLogAttributes(parser, ref config, entry, element);
+            var result = ProcessCommonLogAttributes(parser, config, entry, element);
 
             parser.registry.NotifyFailedLogParsed(entry);
 
             return result;
         }
 
-        private static LogParserErrors ProcessElement(XMLLogParser parser, ref TransientParserConfigs config, XElement element)
+        private static LogParserErrors ProcessElement(XMLLogParser parser, TransientParserConfigs config, XElement element)
         {
             processElementCounter.Increment();
-            var result = ProcessValidElement(parser, ref config, element);
+            var result = ProcessValidElement(parser, config, element);
             if (result != LogParserErrors.OK && !ParserUtil.IsFatal(result))
             {
                 if (config.FailureHandling == LogParserFailureHandling.SkipEntries)
@@ -332,7 +334,7 @@ namespace Stethoscope.Parsers.Internal.XML
                 }
                 else if (config.FailureHandling == LogParserFailureHandling.MarkEntriesAsFailed)
                 {
-                    return ProcessInvalidElement(parser, ref config, element);
+                    return ProcessInvalidElement(parser, config, element);
                 }
             }
             return result;
@@ -342,7 +344,7 @@ namespace Stethoscope.Parsers.Internal.XML
 
         #region Parse Functions
 
-        private static void ParseLoop(XMLLogParser parser, ref TransientParserConfigs config, Stream input)
+        private static void ParseLoop(XMLLogParser parser, TransientParserConfigs config, Stream input, CancellationToken cancellationToken)
         {
             using (var xmlReader = XmlReader.Create(input))
             {
@@ -350,7 +352,7 @@ namespace Stethoscope.Parsers.Internal.XML
                 var elements = new Stack<XElement>();
                 bool exitLoop = false;
 
-                while (!exitLoop && xmlReader.Read())
+                while (!exitLoop && !cancellationToken.IsCancellationRequested && xmlReader.Read())
                 {
                     switch (xmlReader.NodeType)
                     {
@@ -382,7 +384,7 @@ namespace Stethoscope.Parsers.Internal.XML
                                 {
                                     using (processElementTimer.NewContext())
                                     {
-                                        if (ProcessElement(parser, ref config, finishedElement) != LogParserErrors.OK)
+                                        if (ProcessElement(parser, config, finishedElement) != LogParserErrors.OK)
                                         {
                                             exitLoop = true;
                                             break;
@@ -411,7 +413,8 @@ namespace Stethoscope.Parsers.Internal.XML
                     }
                 }
 
-                if (elements.Count != 0)
+                // Only do if cancellation wasn't requested because it means we ran to completion but never found root. Cancellation means we never will.
+                if (elements.Count != 0 && !cancellationToken.IsCancellationRequested)
                 {
                     xmlRootUnfinishedCounter.Increment();
                     Console.Error.WriteLine("Root element didn't end");
@@ -419,7 +422,7 @@ namespace Stethoscope.Parsers.Internal.XML
             }
         }
 
-        private static void InternalParse(XMLLogParser parser, ref TransientParserConfigs config, Stream logStream)
+        private static Task InternalParse(XMLLogParser parser, TransientParserConfigs config, Stream logStream, CancellationToken cancellationToken)
         {
             var parserStream = 
                 !config.LogHasRoot ? 
@@ -431,30 +434,36 @@ namespace Stethoscope.Parsers.Internal.XML
                 parserStream = parserStream.Append(Encoding.UTF8.GetBytes("</root>"));
             }
 
-            try
+            var parseTask = Task.Run(() =>
             {
-                ParseLoop(parser, ref config, parserStream);
-            }
-            catch
-            {
-                //XXX probably want to do something here...
-            }
+                try
+                {
+                    ParseLoop(parser, config, parserStream, cancellationToken);
+                }
+                catch
+                {
+                    //XXX probably want to do something here...
+                }
+            }, cancellationToken);
 
             if (!config.LogHasRoot)
             {
                 // If we didn't have the root, then we end up creating a Stream by appending streams together and need to dispose it
-                parserStream.Dispose();
+                return parseTask.ContinueWith(_ => parserStream.Dispose(), TaskContinuationOptions.ExecuteSynchronously);
             }
+            return parseTask;
         }
-
+        
         /// <summary>
-        /// Parse a stream of data to get applicable logs.
+        /// Parse (async) a stream of data to get applicable logs.
         /// </summary>
         /// <param name="logStream">The stream of log data.</param>
-        public void Parse(Stream logStream)
+        /// <param name="cancellationToken">A cancellation token that can be used to cancel the work</param>
+        /// <returns>Task representing the parse operation.</returns>
+        public override Task ParseAsync(Stream logStream, CancellationToken cancellationToken)
         {
             parseCounter.Increment();
-            XMLLogParser.InternalParse(this, ref defaultTransientConfig, logStream);
+            return XMLLogParser.InternalParse(this, defaultTransientConfig, logStream, cancellationToken);
         }
 
         #endregion
@@ -538,7 +547,7 @@ namespace Stethoscope.Parsers.Internal.XML
 
         #region XMLContextParser
 
-        private sealed class XMLContextParser : ILogParser
+        private sealed class XMLContextParser : BaseILogParser
         {
             private readonly XMLLogParser parser;
             private TransientParserConfigs config;
@@ -625,18 +634,18 @@ namespace Stethoscope.Parsers.Internal.XML
                 #endregion
             }
             
-            public void ApplyContextConfig(IDictionary<ContextConfigs, object> config, Action<ILogParser> context)
+            public override void ApplyContextConfig(IDictionary<ContextConfigs, object> config, Action<ILogParser> context)
             {
                 CheckUsability();
                 contextApplyContextConfigCounter.Increment();
                 XMLLogParser.InternalApplyContextConfig(parser, this.config, config, context);
             }
 
-            public void Parse(Stream logStream)
+            public override Task ParseAsync(Stream logStream, CancellationToken cancellationToken)
             {
                 CheckUsability();
                 contextParseCounter.Increment();
-                XMLLogParser.InternalParse(parser, ref config, logStream);
+                return XMLLogParser.InternalParse(parser, config, logStream, cancellationToken);
             }
         }
 
@@ -667,7 +676,7 @@ namespace Stethoscope.Parsers.Internal.XML
         /// </summary>
         /// <param name="config">A collection of configs to modify the parser with.</param>
         /// <param name="context">The context that the modified parser will execute in. If the scope of this parser is exited, as in the Action delegate finishes execution, then the modified parser becomes invalid and won't run.</param>
-        public void ApplyContextConfig(IDictionary<ContextConfigs, object> config, Action<ILogParser> context)
+        public override void ApplyContextConfig(IDictionary<ContextConfigs, object> config, Action<ILogParser> context)
         {
             applyContextConfigCounter.Increment();
             InternalApplyContextConfig(this, defaultTransientConfig, config, context);
