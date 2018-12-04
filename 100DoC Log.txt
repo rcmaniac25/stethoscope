@@ -2201,6 +2201,11 @@ File browser (connect to multiple remote machines, then use a file browser to ba
 - Next up: tests. My favorite /s
 - It actually is good because, as stated, this week will be busy. Tests are annoying but generally can be done "I only got 2 done today" or similar.
 
+#235.2. 12/03/2018:
+- Behind on time, so didn't really do too much besides look at the async imples that have been done
+- Using the diff, I figure out what I need to test... which is really just the Parse/PrintAsync functions themselves.
+- I plan to work on at least one of them tomorrow.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2

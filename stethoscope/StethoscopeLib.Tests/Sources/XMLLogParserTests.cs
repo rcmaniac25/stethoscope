@@ -101,6 +101,8 @@ namespace Stethoscope.Tests
             logRegistry.DidNotReceive().AddValueToLog(logEntry, Arg.Any<LogAttribute>(), Arg.Any<object>());
         }
 
+        //TODO: test ParseAsync functions
+
         [Test]
         public void MultipleBasicLogs()
         {

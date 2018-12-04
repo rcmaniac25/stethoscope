@@ -171,5 +171,7 @@ namespace Stethoscope.Tests
         }
 
         // Same sources is the same as SameThreads
+
+        //TODO: test PrintAsync functions
     }
 }
