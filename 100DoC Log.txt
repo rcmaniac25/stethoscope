@@ -2206,6 +2206,13 @@ File browser (connect to multiple remote machines, then use a file browser to ba
 - Using the diff, I figure out what I need to test... which is really just the Parse/PrintAsync functions themselves.
 - I plan to work on at least one of them tomorrow.
 
+#236.2. 12/04/2018:
+- NOOOOOO...
+- I forgot to commit this... and then I closed the window without saving...
+- Basically, I finished the async tests... they were easier then expected
+- All I have left is to do #227.2 tasks and then that set of tasks are done
+- I will commit with adjusted time since I had everything prepared to be commited and then didn't...
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2

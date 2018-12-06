@@ -101,7 +101,45 @@ namespace Stethoscope.Tests
             logRegistry.DidNotReceive().AddValueToLog(logEntry, Arg.Any<LogAttribute>(), Arg.Any<object>());
         }
 
-        //TODO: test ParseAsync functions
+        [Test]
+        public void BasicTestAsync()
+        {
+            var parser = new XMLLogParser();
+            parser.SetConfig(logConfig);
+            parser.SetRegistry(logRegistry);
+
+            logRegistry.AddLog("goodtime", "my log").Returns(logEntry);
+
+            var log = "<fakelog time=\"goodtime\" log=\"my log\"></fakelog>";
+            var ms = CreateStream(log);
+            var parseTask = parser.ParseAsync(ms);
+
+            parseTask.ContinueWith(_ => ms.Dispose(), System.Threading.Tasks.TaskContinuationOptions.ExecuteSynchronously).Wait();
+
+            logRegistry.Received().AddLog("goodtime", "my log");
+            logRegistry.DidNotReceive().AddValueToLog(logEntry, Arg.Any<LogAttribute>(), Arg.Any<object>());
+        }
+
+        [Test]
+        public void BasicTestAsyncCancelled()
+        {
+            var parser = new XMLLogParser();
+            parser.SetConfig(logConfig);
+            parser.SetRegistry(logRegistry);
+
+            logRegistry.AddLog("goodtime", "my log").Returns(logEntry);
+
+            var cancellationToken = new System.Threading.CancellationToken(true);
+
+            var log = "<fakelog time=\"goodtime\" log=\"my log\"></fakelog>";
+            var ms = CreateStream(log);
+            var parseTask = parser.ParseAsync(ms, cancellationToken);
+
+            parseTask.ContinueWith(_ => ms.Dispose(), System.Threading.Tasks.TaskContinuationOptions.ExecuteSynchronously).Wait();
+
+            logRegistry.DidNotReceive().AddLog(Arg.Any<string>(), Arg.Any<string>());
+            logRegistry.DidNotReceive().AddValueToLog(logEntry, Arg.Any<LogAttribute>(), Arg.Any<object>());
+        }
 
         [Test]
         public void MultipleBasicLogs()

@@ -17,7 +17,6 @@ namespace Stethoscope.Tests
         [SetUp]
         public virtual void Setup()
         {
-            //TODO
             logRegistry = new LogRegistry(new ListStorage());
             logConfig = new LogConfig()
             {
@@ -39,6 +38,27 @@ namespace Stethoscope.Tests
             printer.Teardown();
 
             return GetPrintedData();
+        }
+
+        private System.Threading.Tasks.Task<string> PrintDataAsync(System.Threading.CancellationToken? cancellationToken = null)
+        {
+            // Yes, this could be rewritten as an async/await but I wanted to be explcit and not let the compiler do things it's way... but my way
+
+            var printer = GetIOPrinter();
+            printer.Setup();
+
+            System.Threading.Tasks.Task printTask;
+            if (cancellationToken.HasValue)
+            {
+                printTask = printer.PrintAsync(cancellationToken.Value);
+            }
+            else
+            {
+                printTask = printer.PrintAsync();
+            }
+            
+            return printTask.ContinueWith(_ => printer.Teardown(), System.Threading.Tasks.TaskContinuationOptions.ExecuteSynchronously)
+                .ContinueWith(_ => GetPrintedData(), System.Threading.Tasks.TaskContinuationOptions.ExecuteSynchronously);
         }
 
         [Test]
@@ -172,6 +192,29 @@ namespace Stethoscope.Tests
 
         // Same sources is the same as SameThreads
 
-        //TODO: test PrintAsync functions
+        [Test]
+        public void PopulatedLogEntryAsync()
+        {
+            AddLog("testentry", 123, "myFunc", "path/to/location.cpp");
+
+            var expectedLogPrintout = "Thread 123\nStart myFunc // path/to/location.cpp\n  testentry\nEnd myFunc";
+
+            var dataTask = PrintDataAsync();
+
+            Assert.That(dataTask.Result, Is.EqualTo(expectedLogPrintout));
+            // Would like to check task state, but state is reset in continuations... so it will return the state of the continuation instead
+        }
+
+        [Test]
+        public void PopulatedLogEntryAsyncCancelled()
+        {
+            AddLog("testentry", 123, "myFunc", "path/to/location.cpp");
+            
+            var cancellationToken = new System.Threading.CancellationToken(true);
+            var dataTask = PrintDataAsync(cancellationToken);
+
+            Assert.That(dataTask.Result, Is.Empty);
+            // Would like to check task state, but state is reset in continuations... so it will return the state of the continuation instead
+        }
     }
 }
