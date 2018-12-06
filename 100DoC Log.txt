@@ -2213,6 +2213,14 @@ File browser (connect to multiple remote machines, then use a file browser to ba
 - All I have left is to do #227.2 tasks and then that set of tasks are done
 - I will commit with adjusted time since I had everything prepared to be commited and then didn't...
 
+#237.2. 12/05/2018:
+- Worked on finishing tasks from #227.2.
+-- LogConfig.UserConfigs -> LogConfig.ExtraConfigs
+-- Some docs about what LogConfig.ExtraConfigs are available
+-- Added ability to clone LogConfig
+- I was thinking of doing the final task, cloning log entries in the registry) but I still have a bunch of stuff to do and not a lot of time.
+- So, tomorrow.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2

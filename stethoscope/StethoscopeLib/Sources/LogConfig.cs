@@ -5,6 +5,7 @@ using Newtonsoft.Json.Converters;
 
 using Stethoscope.Common;
 
+using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
@@ -36,9 +37,11 @@ namespace Stethoscope
     /// <summary>
     /// Per-log/per-log type configuration.
     /// </summary>
-    public struct LogConfig
+    public struct LogConfig : ICloneable
     {
-        private static readonly Counter getAttributeCounter = Metric.Counter("Config Attribute Invocation", Unit.Calls, "config, reflection");
+        private static readonly MetricsContext logConfigContext = Metric.Context("LogConfig");
+        private static readonly Counter getAttributeCounter = logConfigContext.Counter("Attribute Invocation", Unit.Calls, "config, reflection");
+        private static readonly Counter cloneCounter = logConfigContext.Counter("Clone Invocation", Unit.Calls, "config, clone");
 
         // Opt
         /// <summary>Path to use for getting <see cref="LogAttribute.ThreadID"/></summary>
@@ -74,9 +77,9 @@ namespace Stethoscope
         /// </summary>
         public bool LogHasRoot { get; set; }
         /// <summary>
-        /// An assortment of user-provided configs.
+        /// Configs to use in addition to the existing configs.
         /// </summary>
-        public Dictionary<string,string> UserConfigs { get; set; }
+        public Dictionary<string, string> ExtraConfigs { get; set; }
 
         // Req
         /// <summary>Path to use for getting <see cref="LogAttribute.Timestamp"/>. Will always be a <see cref="System.DateTime"/>.</summary>
@@ -96,7 +99,38 @@ namespace Stethoscope
                     string.IsNullOrWhiteSpace(LogMessagePath));
             }
         }
-        
+
+        /// <summary>
+        /// Create a clone of the <see cref="LogConfig"/>.
+        /// </summary>
+        /// <returns>A clone of <see cref="LogConfig"/>.</returns>
+        public object Clone()
+        {
+            cloneCounter.Increment();
+
+            return new LogConfig()
+            {
+                ThreadIDPath = ThreadIDPath,
+                SourceFilePath = SourceFilePath,
+                FunctionPath = FunctionPath,
+                LogLinePath = LogLinePath,
+                LogLevelPath = LogLevelPath,
+                LogSequencePath = LogSequencePath,
+                ModulePath = ModulePath,
+                LogTypePath = LogTypePath,
+                SectionPath = SectionPath,
+                TraceIdPath = TraceIdPath,
+                ContextPath = ContextPath,
+
+                ParsingFailureHandling = ParsingFailureHandling,
+                LogHasRoot = LogHasRoot,
+                ExtraConfigs = new Dictionary<string, string>(ExtraConfigs),
+
+                TimestampPath = TimestampPath,
+                LogMessagePath = LogMessagePath
+            };
+        }
+
         /// <summary>
         /// Get all attributes and their associated variable names, for use by reflection.
         /// </summary>

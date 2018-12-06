@@ -87,10 +87,10 @@ namespace Stethoscope
             var parserFactory = LogParserFactory.GetParserForFileExtension("xml");
 
             IPrinterFactory printerFactory;
-            if (config.UserConfigs != null && config.UserConfigs.ContainsKey("printToFile") && !string.IsNullOrWhiteSpace(config.UserConfigs["printToFile"]))
+            if (config.ExtraConfigs != null && config.ExtraConfigs.ContainsKey("printToFile") && !string.IsNullOrWhiteSpace(config.ExtraConfigs["printToFile"]))
             {
                 // Note: this just sets a default. Configs can change the file
-                printerFactory = PrinterFactory.CrateFileFactory(config.UserConfigs["printToFile"]);
+                printerFactory = PrinterFactory.CrateFileFactory(config.ExtraConfigs["printToFile"]);
             }
             else
             {
@@ -106,8 +106,9 @@ namespace Stethoscope
         public async Task Process()
         {
             var parseTask = logFileParser.ParseAsync(extraParserArguments[0]);
-            System.Threading.Thread.Sleep(100);
+            System.Threading.Thread.Sleep(100); // Delay to prevent print from racing to the end of the logs before the parser can parse the first log
             var printTask = printer.PrintAsync();
+
             await printTask;
             await parseTask;
         }

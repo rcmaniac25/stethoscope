@@ -152,7 +152,7 @@ namespace Stethoscope.Printers.Internal
         /// <param name="config">The config for the printer.</param>
         public virtual void SetConfig(LogConfig config)
         {
-            if (config.UserConfigs != null && config.UserConfigs.ContainsKey("PrintMode"))
+            if (config.ExtraConfigs != null && config.ExtraConfigs.ContainsKey("printMode"))
             {
                 //TODO
             }
