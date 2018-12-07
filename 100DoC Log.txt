@@ -2221,6 +2221,11 @@ File browser (connect to multiple remote machines, then use a file browser to ba
 - I was thinking of doing the final task, cloning log entries in the registry) but I still have a bunch of stuff to do and not a lot of time.
 - So, tomorrow.
 
+#238.2. 12/06/2018:
+- I made the interface function for cloning a log in a registry...
+- ...and then I realized "test driven development" so I wrote what tests I needed and made the first base test
+- Tomorrow is an important day, so I want to get to bed early. I'm going to leave it at that one test and write the rest tomorrow.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2

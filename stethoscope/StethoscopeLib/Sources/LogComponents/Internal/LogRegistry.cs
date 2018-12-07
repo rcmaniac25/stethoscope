@@ -18,6 +18,7 @@ namespace Stethoscope.Log.Internal
         private static readonly Counter dateTimeParseFailureCounter;
         private static readonly Meter addLogMeter;
         private static readonly Meter addFailedLogMeter;
+        private static readonly Meter addCloneLogMeter;
         private static readonly Counter logsBeingProcessedCounter;
         private static readonly Counter notifyParsedInvalidLogTypeCounter;
         private static readonly Counter notifyParsedCounter;
@@ -33,6 +34,7 @@ namespace Stethoscope.Log.Internal
             dateTimeParseFailureCounter = logRegistryContext.Counter("AddLog DateTime Parse Failures", Unit.Errors, "log, registry, add, parse, failure");
             addLogMeter = logRegistryContext.Meter("AddLog", Unit.Calls, tags: "log, registry, add, log");
             addFailedLogMeter = logRegistryContext.Meter("AddFailedLog", Unit.Calls, tags: "log, registry, add, log, failed");
+            addCloneLogMeter = logRegistryContext.Meter("CloneLog", Unit.Calls, tags: "log, registry, add, log, clone");
             logsBeingProcessedCounter = logRegistryContext.Counter("Logs being Processed", Unit.Items, "log, registry, process, failed, items");
             notifyParsedInvalidLogTypeCounter = logRegistryContext.Counter("NotifyFailedLogParsed Invalid Log Type", Unit.Errors, "log, registry, notify, failed, invalid, type");
             notifyParsedCounter = logRegistryContext.Counter("NotifyFailedLogParsed", Unit.Calls, "log, registry, notify, failed");
@@ -139,6 +141,22 @@ namespace Stethoscope.Log.Internal
                 logsBeingProcessedCounter.Increment();
             }
             return entry;
+        }
+
+        /// <summary>
+        /// Clone a log entry into this log registry.
+        /// </summary>
+        /// <param name="entry">The log entry to clone.</param>
+        /// <returns>The cloned log entry.</returns>
+        public ILogEntry CloneLog(ILogEntry entry)
+        {
+            if (entry == null)
+            {
+                return null;
+            }
+
+            //TODO
+            return null;
         }
 
         private void ProcessingComplete(FailedLogEntry failedLog)

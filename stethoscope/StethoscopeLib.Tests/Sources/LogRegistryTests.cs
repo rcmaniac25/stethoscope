@@ -615,6 +615,25 @@ namespace Stethoscope.Tests
             Assert.That(registry.LogCount, Is.EqualTo(1));
         }
 
-        //XXX: is there a way to test registry.Logs, or just stick to the extension functions?
+        [Test]
+        public void CloneLogNull()
+        {
+            var registry = CreateLogRegistry();
+            Assert.That(registry.LogCount, Is.Zero);
+
+            var entry = registry.CloneLog(null);
+            Assert.That(entry, Is.Null);
+            Assert.That(registry.LogCount, Is.Zero);
+        }
+
+        //TODO: CloneLog: basic log (time and message)
+
+        //TODO: CloneLog: log with attributes
+
+        //TODO: CloneLog: failed log (blank)
+
+        //TODO: CloneLog: failed log (not-blank, but not notified to the original log)
+
+        //TODO: CloneLog: failed log (proper)
     }
 }

@@ -39,6 +39,13 @@ namespace Stethoscope.Common
         void NotifyFailedLogParsed(ILogEntry entry);
 
         /// <summary>
+        /// Clone a log entry into this log registry.
+        /// </summary>
+        /// <param name="entry">The log entry to clone.</param>
+        /// <returns>The cloned log entry.</returns>
+        ILogEntry CloneLog(ILogEntry entry);
+
+        /// <summary>
         /// Queriable log entries.
         /// </summary>
         IQbservable<ILogEntry> Logs { get; }
