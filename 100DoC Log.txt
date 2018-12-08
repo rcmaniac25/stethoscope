@@ -2226,6 +2226,11 @@ File browser (connect to multiple remote machines, then use a file browser to ba
 - ...and then I realized "test driven development" so I wrote what tests I needed and made the first base test
 - Tomorrow is an important day, so I want to get to bed early. I'm going to leave it at that one test and write the rest tomorrow.
 
+#239.2. 12/07/2018:
+- Plan: finish the unit tests for CloneLog, maybe start/do CloneLog.
+- Reality: this week was rough, and now that it's over, I crashed... so I only got the non-failed log CloneLog written.
+- I'll do the failed log CloneLog unit tests done and maybe start/do CloneLog itself
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2

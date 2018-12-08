@@ -626,10 +626,79 @@ namespace Stethoscope.Tests
             Assert.That(registry.LogCount, Is.Zero);
         }
 
-        //TODO: CloneLog: basic log (time and message)
+        [Test]
+        public void CloneLog()
+        {
+            var registry = CreateLogRegistry();
+            var entry = registry.AddLog(DateTime.Now.ToString(), "testmsg");
+            Assert.That(entry, Is.Not.Null);
 
-        //TODO: CloneLog: log with attributes
+            var cloneRegistry = CreateLogRegistry();
+            Assert.That(cloneRegistry.LogCount, Is.Zero);
 
+            var cloneEntry = cloneRegistry.CloneLog(entry);
+            Assert.That(cloneEntry, Is.Not.Null);
+            Assert.That(cloneRegistry.LogCount, Is.EqualTo(1));
+
+            Assert.That(cloneEntry.Message, Is.EqualTo(entry.Message));
+            Assert.That(cloneEntry.Timestamp, Is.EqualTo(entry.Timestamp));
+        }
+
+        [Test]
+        public void CloneLogDuplicate()
+        {
+            var registry = CreateLogRegistry();
+            var entry = registry.AddLog(DateTime.Now.ToString(), "testmsg");
+            Assert.That(entry, Is.Not.Null);
+
+            var cloneRegistry = CreateLogRegistry();
+            var cloneEntry = cloneRegistry.CloneLog(entry);
+            Assert.That(cloneEntry, Is.Not.Null);
+            Assert.That(cloneRegistry.LogCount, Is.EqualTo(1));
+
+            var cloneEntry2 = cloneRegistry.CloneLog(entry);
+            Assert.That(cloneEntry, Is.Not.Null);
+            Assert.That(cloneRegistry.LogCount, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void CloneLogSelf()
+        {
+            var registry = CreateLogRegistry();
+            var entry = registry.AddLog(DateTime.Now.ToString(), "testmsg");
+            Assert.That(entry, Is.Not.Null);
+            Assert.That(registry.LogCount, Is.EqualTo(1));
+            
+            var cloneEntry = registry.CloneLog(entry);
+            Assert.That(cloneEntry, Is.Not.Null);
+            Assert.That(registry.LogCount, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void CloneLogAttributes()
+        {
+            var registry = CreateLogRegistry();
+            var entry = registry.AddLog(DateTime.Now.ToString(), "testmsg");
+            Assert.That(entry, Is.Not.Null);
+
+            registry.AddValueToLog(entry, LogAttribute.SourceFile, "sourceFile");
+            registry.AddValueToLog(entry, LogAttribute.ThreadID, 20);
+            registry.AddValueToLog(entry, LogAttribute.Level, TypeCode.DateTime);
+
+            var cloneRegistry = CreateLogRegistry();
+            Assert.That(cloneRegistry.LogCount, Is.Zero);
+
+            var cloneEntry = cloneRegistry.CloneLog(entry);
+            Assert.That(cloneEntry, Is.Not.Null);
+
+            Assert.That(cloneEntry.HasAttribute(LogAttribute.SourceFile), Is.True);
+            Assert.That(cloneEntry.HasAttribute(LogAttribute.ThreadID), Is.True);
+            Assert.That(cloneEntry.HasAttribute(LogAttribute.Level), Is.True);
+            Assert.That(cloneEntry.GetAttribute<object>(LogAttribute.SourceFile), Is.EqualTo(entry.GetAttribute<object>(LogAttribute.SourceFile)));
+            Assert.That(cloneEntry.GetAttribute<object>(LogAttribute.ThreadID), Is.EqualTo(entry.GetAttribute<object>(LogAttribute.ThreadID)));
+            Assert.That(cloneEntry.GetAttribute<object>(LogAttribute.Level), Is.EqualTo(entry.GetAttribute<object>(LogAttribute.Level)));
+        }
+        
         //TODO: CloneLog: failed log (blank)
 
         //TODO: CloneLog: failed log (not-blank, but not notified to the original log)
