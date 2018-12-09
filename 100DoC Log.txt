@@ -2231,6 +2231,9 @@ File browser (connect to multiple remote machines, then use a file browser to ba
 - Reality: this week was rough, and now that it's over, I crashed... so I only got the non-failed log CloneLog written.
 - I'll do the failed log CloneLog unit tests done and maybe start/do CloneLog itself
 
+#240.2. 12/08/2018:
+- Ran out of time today... today ran longer then expected.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
