@@ -2234,6 +2234,14 @@ File browser (connect to multiple remote machines, then use a file browser to ba
 #240.2. 12/08/2018:
 - Ran out of time today... today ran longer then expected.
 
+#241.2. 12/09/2018:
+- Timing still isn't working out.
+- Now, I did spend about half an hour looking at the code...
+- ...my challenge is determining "what" I want the result to be in the test.
+- Again, TDD. Does a blank failed log clone to a blank failed log? Does the log have to be "notified"/done before it can be cloned?
+- So... those take a bit to think about and I really don't want to be excessivly late to bed again, so I would rather not go crazy trying to figure this out
+- Besides, the later it gets, the less I can thing straight anyway. So I probably wouldn't be able to do much anyway.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2

@@ -698,11 +698,13 @@ namespace Stethoscope.Tests
             Assert.That(cloneEntry.GetAttribute<object>(LogAttribute.ThreadID), Is.EqualTo(entry.GetAttribute<object>(LogAttribute.ThreadID)));
             Assert.That(cloneEntry.GetAttribute<object>(LogAttribute.Level), Is.EqualTo(entry.GetAttribute<object>(LogAttribute.Level)));
         }
-        
+
         //TODO: CloneLog: failed log (blank)
 
-        //TODO: CloneLog: failed log (not-blank, but not notified to the original log)
+        //TODO: CloneLog: failed log (blank, notified)
 
-        //TODO: CloneLog: failed log (proper)
+        //TODO: CloneLog: failed log (not-blank)
+
+        //TODO: CloneLog: failed log (not-blank, notified)
     }
 }
