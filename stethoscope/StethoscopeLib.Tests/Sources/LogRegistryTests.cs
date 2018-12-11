@@ -699,12 +699,96 @@ namespace Stethoscope.Tests
             Assert.That(cloneEntry.GetAttribute<object>(LogAttribute.Level), Is.EqualTo(entry.GetAttribute<object>(LogAttribute.Level)));
         }
 
-        //TODO: CloneLog: failed log (blank)
+        [Test]
+        public void CloneLogBlankFailedLog()
+        {
+            var registry = CreateLogRegistry();
+            var failedEntry = registry.AddFailedLog();
+            Assert.That(failedEntry, Is.Not.Null);
+            Assert.That(registry.LogCount, Is.EqualTo(1));
 
-        //TODO: CloneLog: failed log (blank, notified)
+            Assert.That(failedEntry.HasAttribute(LogAttribute.Timestamp), Is.False);
 
-        //TODO: CloneLog: failed log (not-blank)
+            var cloneRegistry = CreateLogRegistry();
+            var cloneEntry = cloneRegistry.CloneLog(failedEntry);
+            Assert.That(cloneEntry, Is.Not.Null);
+            Assert.That(cloneRegistry.LogCount, Is.EqualTo(1));
 
-        //TODO: CloneLog: failed log (not-blank, notified)
+            Assert.That(cloneEntry.HasAttribute(LogAttribute.Timestamp), Is.False);
+
+            Assert.That(failedEntry, Is.EqualTo(cloneEntry));
+            Assert.That(object.ReferenceEquals(failedEntry, cloneEntry), Is.False);
+        }
+
+        [Test]
+        public void CloneLogBlankFailedLogNotified()
+        {
+            var registry = CreateLogRegistry();
+            var failedEntry = registry.AddFailedLog();
+            Assert.That(failedEntry, Is.Not.Null);
+
+            registry.NotifyFailedLogParsed(failedEntry);
+            Assert.That(registry.LogCount, Is.EqualTo(1));
+
+            Assert.That(failedEntry.HasAttribute(LogAttribute.Timestamp), Is.False);
+
+            var cloneRegistry = CreateLogRegistry();
+            var cloneEntry = cloneRegistry.CloneLog(failedEntry);
+            Assert.That(cloneEntry, Is.Not.Null);
+            Assert.That(cloneRegistry.LogCount, Is.EqualTo(1));
+
+            Assert.That(cloneEntry.HasAttribute(LogAttribute.Timestamp), Is.False);
+
+            Assert.That(failedEntry, Is.EqualTo(cloneEntry));
+            Assert.That(object.ReferenceEquals(failedEntry, cloneEntry), Is.False);
+        }
+
+        [Test]
+        public void CloneLogFailedLog()
+        {
+            var registry = CreateLogRegistry();
+            var failedEntry = registry.AddFailedLog();
+            Assert.That(failedEntry, Is.Not.Null);
+            Assert.That(registry.LogCount, Is.EqualTo(1));
+
+            registry.AddValueToLog(failedEntry, LogAttribute.Message, "hello");
+
+            Assert.That(failedEntry.HasAttribute(LogAttribute.Message), Is.True);
+
+            var cloneRegistry = CreateLogRegistry();
+            var cloneEntry = cloneRegistry.CloneLog(failedEntry);
+            Assert.That(cloneEntry, Is.Not.Null);
+            Assert.That(cloneRegistry.LogCount, Is.EqualTo(1));
+
+            Assert.That(cloneEntry.HasAttribute(LogAttribute.Message), Is.True);
+
+            Assert.That(failedEntry, Is.EqualTo(cloneEntry));
+            Assert.That(object.ReferenceEquals(failedEntry, cloneEntry), Is.False);
+        }
+
+        [Test]
+        public void CloneLogFailedLogNotified()
+        {
+            var registry = CreateLogRegistry();
+            var failedEntry = registry.AddFailedLog();
+            Assert.That(failedEntry, Is.Not.Null);
+
+            registry.AddValueToLog(failedEntry, LogAttribute.Message, "hello");
+
+            registry.NotifyFailedLogParsed(failedEntry);
+            Assert.That(registry.LogCount, Is.EqualTo(1));
+
+            Assert.That(failedEntry.HasAttribute(LogAttribute.Message), Is.True);
+
+            var cloneRegistry = CreateLogRegistry();
+            var cloneEntry = cloneRegistry.CloneLog(failedEntry);
+            Assert.That(cloneEntry, Is.Not.Null);
+            Assert.That(cloneRegistry.LogCount, Is.EqualTo(1));
+
+            Assert.That(cloneEntry.HasAttribute(LogAttribute.Message), Is.True);
+
+            Assert.That(failedEntry, Is.EqualTo(cloneEntry));
+            Assert.That(object.ReferenceEquals(failedEntry, cloneEntry), Is.False);
+        }
     }
 }
