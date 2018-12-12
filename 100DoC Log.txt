@@ -2248,6 +2248,9 @@ File browser (connect to multiple remote machines, then use a file browser to ba
 - With that done, all that's left is to do the CloneLog.
 - ...which is for tomorrow
 
+#243.2. 12/11/2018:
+- ...and I poorly timed things. I have to skip today.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
