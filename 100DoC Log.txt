@@ -2251,6 +2251,14 @@ File browser (connect to multiple remote machines, then use a file browser to ba
 #243.2. 12/11/2018:
 - ...and I poorly timed things. I have to skip today.
 
+#244.2. 12/12/2018:
+- And... ran out of time. But I wanted to do something.
+- So I did a naive implementation of CloneLog.
+- My expectation is his is what most people would assume is what CloneLog would look like implemented.
+- Reality is, TDD. Of the tests I wrote, this implementation took me from 8 failing tests to... 6.
+- Yes, there is enough missing functionality that of the 9 tests I wrote, 6 still don't pass. 2/3.
+- I hope to be able to work tomorrow, but it will actually be a busy evening and I might have to push proper work to the next day.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2

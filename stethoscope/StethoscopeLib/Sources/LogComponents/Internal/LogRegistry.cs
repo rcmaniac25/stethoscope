@@ -4,6 +4,7 @@ using Stethoscope.Common;
 using Stethoscope.Reactive;
 
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
@@ -155,8 +156,49 @@ namespace Stethoscope.Log.Internal
                 return null;
             }
 
-            //TODO
-            return null;
+            bool addToRegistry = false;
+
+            IInternalLogEntry cloneEntry;
+            if (entry is LogEntry || (entry.IsValid && !(entry is FailedLogEntry)))
+            {
+                cloneEntry = new LogEntry(entry.Timestamp, entry.Message);
+                addToRegistry = true;
+            }
+            else
+            {
+                cloneEntry = new FailedLogEntry();
+                if (entry.HasAttribute(LogAttribute.Timestamp))
+                {
+                    cloneEntry.AddAttribute(LogAttribute.Timestamp, entry.GetAttribute<object>(LogAttribute.Timestamp));
+                    if (entry is IInternalLogEntry entryInternal && !entryInternal.HasTimestampChanged)
+                    {
+                        cloneEntry.ResetTimestampChanged();
+                    }
+                }
+                if (entry.HasAttribute(LogAttribute.Message))
+                {
+                    cloneEntry.AddAttribute(LogAttribute.Message, entry.GetAttribute<object>(LogAttribute.Message));
+                }
+                //TODO: how to determnine if the entry is or is not in it's owner registry
+            }
+
+            foreach (var attribute in Enum.GetValues(typeof(LogAttribute)).Cast<LogAttribute>())
+            {
+                if (attribute == LogAttribute.Timestamp || attribute == LogAttribute.Message)
+                {
+                    continue;
+                }
+                if (entry.HasAttribute(attribute))
+                {
+                    cloneEntry.AddAttribute(attribute, entry.GetAttribute<object>(attribute));
+                }
+            }
+
+            if (addToRegistry)
+            {
+                storage.AddLogSorted(cloneEntry);
+            }
+            return cloneEntry;
         }
 
         private void ProcessingComplete(FailedLogEntry failedLog)
