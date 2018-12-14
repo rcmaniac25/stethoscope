@@ -120,7 +120,10 @@ namespace Stethoscope.Log.Internal
                 dateTimeParseFailureCounter.Increment();
                 throw new ArgumentException("Could not parse timestamp", nameof(timestamp));
             }
-            var entry = new LogEntry(time, message);
+            var entry = new LogEntry(time, message)
+            {
+                Owner = this
+            };
             storage.AddLogSorted(entry);
             return entry;
         }
@@ -135,7 +138,10 @@ namespace Stethoscope.Log.Internal
         {
             addFailedLogMeter.Mark();
 
-            var entry = new FailedLogEntry();
+            var entry = new FailedLogEntry()
+            {
+                Owner = this
+            };
             lock (logsBeingProcessed)
             {
                 logsBeingProcessed.Add(entry);
@@ -156,7 +162,12 @@ namespace Stethoscope.Log.Internal
                 return null;
             }
 
-            bool addToRegistry = false;
+            var addToRegistry = false;
+
+            if (entry is IInternalLogEntry internalLogEntry && object.ReferenceEquals(internalLogEntry.Owner, this))
+            {
+                return entry;
+            }
 
             IInternalLogEntry cloneEntry;
             if (entry is LogEntry || (entry.IsValid && !(entry is FailedLogEntry)))
@@ -181,6 +192,7 @@ namespace Stethoscope.Log.Internal
                 }
                 //TODO: how to determnine if the entry is or is not in it's owner registry
             }
+            cloneEntry.Owner = this;
 
             foreach (var attribute in Enum.GetValues(typeof(LogAttribute)).Cast<LogAttribute>())
             {

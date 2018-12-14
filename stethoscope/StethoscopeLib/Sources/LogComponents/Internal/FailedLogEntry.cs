@@ -37,6 +37,10 @@ namespace Stethoscope.Log.Internal
         /// If the log entry doesn't have any attributes.
         /// </summary>
         public bool IsEmpty => attributes.Count == 0;
+        /// <summary>
+        /// Get or set the registry that owns the log entry.
+        /// </summary>
+        public ILogRegistry Owner { get; set; }
 
         /// <summary>
         /// Resets <see cref="HasTimestampChanged"/> to <c>false</c>.

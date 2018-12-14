@@ -2259,6 +2259,36 @@ File browser (connect to multiple remote machines, then use a file browser to ba
 - Yes, there is enough missing functionality that of the 9 tests I wrote, 6 still don't pass. 2/3.
 - I hope to be able to work tomorrow, but it will actually be a busy evening and I might have to push proper work to the next day.
 
+#245.2. 12/13/2018:
+- I had an event today. It was scheduled for 1 hour. It took 3.
+- As such, I'm very behind on everything and don't know why I'm still up.
+- To put it short, I fixed one more unit test... but I'm not sure if I like the solution.
+- How do we know if the log is from the same registry that is now being asked to clone it?
+-- Naive: add an owner field to the log
+-- Better, but more memory: have a owner UUID
+-- Better, but slower: search the the log's UUID in the registry storage. Do a binary search or something.
+- Wait... the storage is possibly going to be actively updated... which means the log may be in there, but the indicies may change before such a search could be done.
+- Well, darn.
+- I did the naive approach and, while some people would say "that's fine", I see this:
+-- Owner would be a reference
+-- Reference in .Net (or C++) is 8 bytes on 64 bit systems, 4 bytes on 32 but systems.
+-- Largest test log: ~9 million logs
+-- Total size of adding one reference to log files: ~68 mb
+- Is 68 mb large?
+- Alt: my computer has 64 gb of RAM. I did that just so I wouldn't have to go out and buy more RAM in a few years.
+- Nearly everyone else asked "why?"
+- After talking with people (and looking at Steam hardware stats), I learned the weird case that 8 gb is still vastly common.
+- I think 16 gb should be the min for many computers...
+- ...because websites/browsers use a lot of RAM and so many applications are poorly written from a memory usage perspective.
+- So a measly 0.8% of a common user RAM (and if you work in corp, your computer is probably about the same) is used by identifying "should I just return" in a clone function that isn't likely to be commonly used but is there for completeness sakes.
+- So, "Is 68 mb large?": yes
+- I would like to be better at memory usage and not fall for the modern stereoytype/status quo of "we have plenty of RAM".
+- "We" may have it, but not everyone does. Let's actually not use it all up.
+- Lastly, we still have the chance we'd need to serialize this to a DB. That's HDD/SSD storage... but it implies a UUID or similar will be needed.
+- That is usually 16 bytes.  So the end result is ~136 mb.
+- But wait, one more thing (while I go "oh snap" at looking at the clock): ~9 million is one test log. What about multiple of those size logs and potentially being used by people (*cough* my friends are interested *cough*) who I know have bare min machines in the first place.
+- But, I'm struggling to stay up (which is, of course, why I wrote a long writeup), so: night
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
