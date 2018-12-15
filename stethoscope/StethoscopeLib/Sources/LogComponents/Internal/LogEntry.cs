@@ -39,10 +39,6 @@ namespace Stethoscope.Log.Internal
         /// If the log entry doesn't have any attributes. Always returns <c>false</c>.
         /// </summary>
         public bool IsEmpty => false;
-        /// <summary>
-        /// Get or set the registry that owns the log entry.
-        /// </summary>
-        public ILogRegistry Owner { get; set; }
 
         internal LogEntry(DateTime timestamp, string logMessage)
         {

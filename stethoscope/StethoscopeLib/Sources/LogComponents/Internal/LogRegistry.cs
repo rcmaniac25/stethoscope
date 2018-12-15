@@ -120,10 +120,7 @@ namespace Stethoscope.Log.Internal
                 dateTimeParseFailureCounter.Increment();
                 throw new ArgumentException("Could not parse timestamp", nameof(timestamp));
             }
-            var entry = new LogEntry(time, message)
-            {
-                Owner = this
-            };
+            var entry = new LogEntry(time, message);
             storage.AddLogSorted(entry);
             return entry;
         }
@@ -138,10 +135,7 @@ namespace Stethoscope.Log.Internal
         {
             addFailedLogMeter.Mark();
 
-            var entry = new FailedLogEntry()
-            {
-                Owner = this
-            };
+            var entry = new FailedLogEntry();
             lock (logsBeingProcessed)
             {
                 logsBeingProcessed.Add(entry);
@@ -164,7 +158,7 @@ namespace Stethoscope.Log.Internal
 
             var addToRegistry = false;
 
-            if (entry is IInternalLogEntry internalLogEntry && object.ReferenceEquals(internalLogEntry.Owner, this))
+            if (ContainsLog(entry))
             {
                 return entry;
             }
@@ -192,7 +186,6 @@ namespace Stethoscope.Log.Internal
                 }
                 //TODO: how to determnine if the entry is or is not in it's owner registry
             }
-            cloneEntry.Owner = this;
 
             foreach (var attribute in Enum.GetValues(typeof(LogAttribute)).Cast<LogAttribute>())
             {
@@ -211,6 +204,28 @@ namespace Stethoscope.Log.Internal
                 storage.AddLogSorted(cloneEntry);
             }
             return cloneEntry;
+        }
+
+        // Get if the log entry is from this registry
+        private bool ContainsLog(ILogEntry entry)
+        {
+            if (entry is IInternalLogEntry internalLog)
+            {
+                if (!internalLog.IsValid)
+                {
+                    lock (logsBeingProcessed)
+                    {
+                        // Shouldn't be many failed logs
+                        if (logsBeingProcessed.Count(log => log.ID == internalLog.ID) >= 1)
+                        {
+                            return true;
+                        }
+                    }
+                }
+                return storage.Entries.TakeUntil(log => ((IInternalLogEntry)log).ID != internalLog.ID).Count(log => ((IInternalLogEntry)log).ID == internalLog.ID).Wait() >= 1; //XXX should we do "wait" or can we tie it into some other aspect of the program? We should at least not wait indefinitely
+            }
+            // LogEntry and FailedLogEntry are both IInternalLogEntry, so if it isn't one of those, then it's a 3rd party ILogEntry and wasn't created by this registry
+            return false; //XXX Should we check for timestamp or something so we don't clone a 3rd party log entry into storage that has the same timestamp?
         }
 
         private void ProcessingComplete(FailedLogEntry failedLog)

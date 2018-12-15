@@ -2289,6 +2289,21 @@ File browser (connect to multiple remote machines, then use a file browser to ba
 - But wait, one more thing (while I go "oh snap" at looking at the clock): ~9 million is one test log. What about multiple of those size logs and potentially being used by people (*cough* my friends are interested *cough*) who I know have bare min machines in the first place.
 - But, I'm struggling to stay up (which is, of course, why I wrote a long writeup), so: night
 
+#246.2. 12/14/2018:
+- Trying to improve sleep schedule
+- Instead of doing more, I will do "enough"
+- Today's enough was fixing the cause of the rant from yesterday: no more owner variable
+- I spent some time learnined multiple programming languages for fun. One of them was Dart.
+- Dart's language guide has the following: AVOID storing what you can calculate (https://www.dartlang.org/guides/language/effective-dart/usage#avoid-storing-what-you-can-calculate)
+- I like it. Part of why I like it is because code processing and development improve, while developers understanding how to keep memory usage down does not.
+- The other part of why I like it is because we can optimize it ourselves if we need to.
+- Imagine our list storage. Do a TakeUntil/count operation... optimize that internally to a binary search. Suddenly, finding an element becomes O(log n) instead of O(n) of a raw search, or wasting 68 mb of RAM.
+- Before I was doing a ReferenceEquals. In C/C++, this would just be a comparison between pointers. I would like to believe that ReferenceEquals was fast, but as it's a generic value, it may do a little more then that. Like many managed lanuages, generic comparision functions tend to be slower then specialized ones.
+- For now, O(n) isn't a problem because: nobody uses CloneLog. I'm adding it because I thought of a reason it would be used (namely, making specialized log groups for doing calculations on), but am still many days away from even starting that.
+- By the time I get to it, I can probably go "time to optimize it" or at least I should see some stats of slowdowns from doing O(n).
+- "Yo, the prior operation was O(1)" well... ok, I'm monologuing too much. Basically: I prefer to save memory over CPU usage.
+- Tomorrow I'll try to work on the other CloneLog tests: I think the hard one for me will be "how do I know if a failed log entry has notifed? As that will decide between which storage to add it to.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
