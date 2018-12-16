@@ -155,14 +155,14 @@ namespace Stethoscope.Log.Internal
             {
                 return null;
             }
-
-            var addToRegistry = false;
-
+            
             if (ContainsLog(entry))
             {
                 return entry;
             }
 
+            var addToRegistry = false;
+            var addToProcessing = false;
             IInternalLogEntry cloneEntry;
             if (entry is LogEntry || (entry.IsValid && !(entry is FailedLogEntry)))
             {
@@ -175,16 +175,30 @@ namespace Stethoscope.Log.Internal
                 if (entry.HasAttribute(LogAttribute.Timestamp))
                 {
                     cloneEntry.AddAttribute(LogAttribute.Timestamp, entry.GetAttribute<object>(LogAttribute.Timestamp));
-                    if (entry is IInternalLogEntry entryInternal && !entryInternal.HasTimestampChanged)
+
+                    if (entry is IInternalLogEntry entryInternal)
                     {
-                        cloneEntry.ResetTimestampChanged();
+                        if (entryInternal.HasTimestampChanged)
+                        {
+                            // there's a timestamp, but it's still marked as changed. We get an exception if add gets invoked again, so it has only been added once and hasn't been notifed, which means it's still in processing
+                            addToProcessing = true;
+                        }
+                        else
+                        {
+                            // there's a timestamp, but it hasn't been marked as changed. It means the timestamp change has been reset which only happens in notify
+                            cloneEntry.ResetTimestampChanged();
+                            addToRegistry = true;
+                        }
                     }
                 }
                 if (entry.HasAttribute(LogAttribute.Message))
                 {
                     cloneEntry.AddAttribute(LogAttribute.Message, entry.GetAttribute<object>(LogAttribute.Message));
                 }
-                //TODO: how to determnine if the entry is or is not in it's owner registry
+
+                // Edge cases
+                // - no timestamp, not empty : it's not empty, but it lacks a timestamp. It may or may not have been processed
+                // - no timestamp, empty : empty doesn't mean it hasn't been processed (which means it's not in the process list) but also doesn't mean it has been processed (which means it can be discarded)
             }
 
             foreach (var attribute in Enum.GetValues(typeof(LogAttribute)).Cast<LogAttribute>())
@@ -202,6 +216,14 @@ namespace Stethoscope.Log.Internal
             if (addToRegistry)
             {
                 storage.AddLogSorted(cloneEntry);
+            }
+            else if (addToProcessing)
+            {
+                lock (logsBeingProcessed)
+                {
+                    logsBeingProcessed.Add(cloneEntry);
+                    logsBeingProcessedCounter.Increment();
+                }
             }
             return cloneEntry;
         }
@@ -265,7 +287,7 @@ namespace Stethoscope.Log.Internal
             notifyParsedCounter.Increment();
 
             var failedLog = (FailedLogEntry)entry;
-            if (failedLog.HasTimestampChanged || failedLog.IsEmpty)
+            if (failedLog.HasTimestampChanged || failedLog.IsEmpty) //As we sort by timestamp, we either want a timestamp to be set or for it to be empty (so it can be ignored and removed from the processing list)
             {
                 notifyParsedProcessingCounter.Increment();
                 ProcessingComplete(failedLog);

@@ -2304,6 +2304,23 @@ File browser (connect to multiple remote machines, then use a file browser to ba
 - "Yo, the prior operation was O(1)" well... ok, I'm monologuing too much. Basically: I prefer to save memory over CPU usage.
 - Tomorrow I'll try to work on the other CloneLog tests: I think the hard one for me will be "how do I know if a failed log entry has notifed? As that will decide between which storage to add it to.
 
+#247.2. 12/15/2018:
+- First: I failed to get more unit tests working. There's a reason for this...
+- Second: I have a small moto: use cases are bad. They force a design based on an expectation, and it breaks/needs to be rewritten when someone goes outside of that expectation.
+- I firmly believe that many problems in many industries would be fixed if they didn't design for a use case.
+- With that in mind, I designed CloneLog with a use case in mind.
+- Doh! - Homer Simpson
+- The reason use cases are popular is that it provides a boundary that a design or plan can fit into. It makes life easier.
+- In my case, I had this expectation that a user would go through a set of logs in another registry and try to clone some of them.
+- The logs in another registry would either be "being processed" or "published". If they're being processed, it means that this is either happening in a parser or the registry is not very large/being manually used.
+- Thus, I shouldn't need to worry about the 3rd case where the log has no info that would indicate it is or is-not inside of a registry.
+- Huh? Yea, 1.) what if someone makes their own log entry? 2.) If an empty log or one not using the sort attribute (which is timestamp) is cloned, there's no way to know if it has been processed (for both those cases, it would basically no longer be owned by the registry) or not (would be "in processing").
+- As such, I wrote a truth table and defined the cases where the edge case would occur (see the CloneLog function).
+- So, with the good use cases (determining if we add to storage or to "in processing") done, some of the unit tests should be working now?
+- Wrong... because I wrote those exact use cases for the tests.
+- I don't have the time tonight, but I'll need to figure out: do I want to change the tests to not do those use cases, add tests to test the good uses cases too, actually figure out how to determine if in-processing or not
+- But, that's for tomorrow.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
