@@ -2321,6 +2321,10 @@ File browser (connect to multiple remote machines, then use a file browser to ba
 - I don't have the time tonight, but I'll need to figure out: do I want to change the tests to not do those use cases, add tests to test the good uses cases too, actually figure out how to determine if in-processing or not
 - But, that's for tomorrow.
 
+#248.2. 12/16/2018:
+- And tomorrow never came.
+- Ran around a bunch today and ran out of time...
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
