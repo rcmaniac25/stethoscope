@@ -2325,6 +2325,19 @@ File browser (connect to multiple remote machines, then use a file browser to ba
 - And tomorrow never came.
 - Ran around a bunch today and ran out of time...
 
+#249.2. 12/17/2018:
+- I put in some thought, and am now late to sleep, so I'll keep this short
+- I didn't want to add memory usage, and realized that the only difficult spot I was having was with failed logs.
+- Failed logs have one stored value (that isn't an attribute). I co-opted the attribute in an effort to solve my problem.
+- I wanted a notification that a log has been processed. If I know what state it's in, I know where it sits inside whatever registry it's a part of.
+- In addition, I looked over the logic a bit and did a small change.
+- It's a bit weird, but I just let a log sit... fester? in the registry if it has no Timestamp, but is notified. Maybe I shouldn't, but it's not... bad.
+- I also wanted to make sure that if someone tries to do stuff with failed logs that aren't in the registry, the metrics don't count it as a success action.
+- Lastly, a small log to ensure that the rest of the logic is maintained.
+- Now, all but one unit test passes. I had to change one test as my testing logic wasn't correct for how things happen (um, TDD? Yea yea... but I want the logic to work this way)
+- That last one will be interesting: how to ensure a registry doesn't duplicate a log. We check for our own logs, but not for another log for a nth time (where n > 1).
+- Tomorrow will be short... good chance it will be pushed off. I didn't accomplish some things tonight, so I need to do them tomorrow.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2

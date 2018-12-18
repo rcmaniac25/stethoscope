@@ -171,10 +171,10 @@ namespace Stethoscope.Log.Internal
             }
             else
             {
-                cloneEntry = new FailedLogEntry();
+                var failedCloneEntry = new FailedLogEntry();
                 if (entry.HasAttribute(LogAttribute.Timestamp))
                 {
-                    cloneEntry.AddAttribute(LogAttribute.Timestamp, entry.GetAttribute<object>(LogAttribute.Timestamp));
+                    failedCloneEntry.AddAttribute(LogAttribute.Timestamp, entry.GetAttribute<object>(LogAttribute.Timestamp));
 
                     if (entry is IInternalLogEntry entryInternal)
                     {
@@ -186,19 +186,39 @@ namespace Stethoscope.Log.Internal
                         else
                         {
                             // there's a timestamp, but it hasn't been marked as changed. It means the timestamp change has been reset which only happens in notify
-                            cloneEntry.ResetTimestampChanged();
+                            failedCloneEntry.ResetTimestampChanged();
                             addToRegistry = true;
                         }
                     }
                 }
-                if (entry.HasAttribute(LogAttribute.Message))
+                else if (entry is FailedLogEntry failedLog)
                 {
-                    cloneEntry.AddAttribute(LogAttribute.Message, entry.GetAttribute<object>(LogAttribute.Message));
+                    // Edge cases
+                    // - no timestamp, not empty : it's not empty, but it lacks a timestamp. It may or may not have been processed
+                    // - no timestamp, empty : empty doesn't mean it hasn't been processed (which means it's not in the process list) but also doesn't mean it has been processed (which means it can be discarded)
+
+                    if (failedLog.IsRegistryNotified)
+                    {
+                        // It it has been processed, then it remains in processing unless it's empty.
+                        failedCloneEntry.LogRegistryNotified();
+                        if (!failedLog.IsEmpty)
+                        {
+                            addToProcessing = true;
+                        }
+                    }
+                    else
+                    {
+                        // If it hasn't been processed, then add it to processing
+                        addToProcessing = true;
+                    }
                 }
 
-                // Edge cases
-                // - no timestamp, not empty : it's not empty, but it lacks a timestamp. It may or may not have been processed
-                // - no timestamp, empty : empty doesn't mean it hasn't been processed (which means it's not in the process list) but also doesn't mean it has been processed (which means it can be discarded)
+                if (entry.HasAttribute(LogAttribute.Message))
+                {
+                    failedCloneEntry.AddAttribute(LogAttribute.Message, entry.GetAttribute<object>(LogAttribute.Message));
+                }
+
+                cloneEntry = failedCloneEntry;
             }
 
             foreach (var attribute in Enum.GetValues(typeof(LogAttribute)).Cast<LogAttribute>())
@@ -261,6 +281,7 @@ namespace Stethoscope.Log.Internal
                 }
                 logsBeingProcessed.RemoveAt(index);
                 logsBeingProcessedCounter.Decrement();
+                failedLog.LogRegistryNotified();
                 if (!failedLog.IsEmpty)
                 {
                     storage.AddLogSorted(failedLog);
@@ -286,11 +307,13 @@ namespace Stethoscope.Log.Internal
 
             notifyParsedCounter.Increment();
 
+            // For future devs: update CloneLog based on what changes here (and in sub-functions)
+
             var failedLog = (FailedLogEntry)entry;
             if (failedLog.HasTimestampChanged || failedLog.IsEmpty) //As we sort by timestamp, we either want a timestamp to be set or for it to be empty (so it can be ignored and removed from the processing list)
             {
-                notifyParsedProcessingCounter.Increment();
                 ProcessingComplete(failedLog);
+                notifyParsedProcessingCounter.Increment(); // Put this after so as not to be counted if an exception is to be thrown
             }
             failedLog.ResetTimestampChanged();
         }

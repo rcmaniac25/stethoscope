@@ -11,7 +11,17 @@ namespace Stethoscope.Log.Internal
     /// </summary>
     public class FailedLogEntry : IInternalLogEntry, IEquatable<FailedLogEntry>
     {
+        [Flags]
+        private enum StatusFlags : byte
+        {
+            Unknown = 0,
+
+            TimestampSet = 1 << 0,
+            HasBeenNotified = 1 << 1
+        }
+
         private Dictionary<LogAttribute, object> attributes = new Dictionary<LogAttribute, object>();
+        private StatusFlags flags;
 
         /// <summary>
         /// Timestamp of the log entry.
@@ -28,7 +38,45 @@ namespace Stethoscope.Log.Internal
         /// <summary>
         /// If the timestamp of the log entry changed.
         /// </summary>
-        public bool HasTimestampChanged { get; private set; }
+        public bool HasTimestampChanged
+        {
+            get
+            {
+                return (flags & StatusFlags.TimestampSet) == StatusFlags.TimestampSet;
+            }
+            private set
+            {
+                if (value)
+                {
+                    flags |= StatusFlags.TimestampSet;
+                }
+                else
+                {
+                    flags &= ~StatusFlags.TimestampSet;
+                }
+            }
+        }
+        /// <summary>
+        /// If the log registry was notified for this log. Can alternativly be seen as "is log done being processed"
+        /// </summary>
+        public bool IsRegistryNotified
+        {
+            get
+            {
+                return (flags & StatusFlags.HasBeenNotified) == StatusFlags.HasBeenNotified;
+            }
+            private set
+            {
+                if (value)
+                {
+                    flags |= StatusFlags.HasBeenNotified;
+                }
+                else
+                {
+                    flags &= ~StatusFlags.HasBeenNotified;
+                }
+            }
+        }
         /// <summary>
         /// The unique ID of the log entry.
         /// </summary>
@@ -44,6 +92,15 @@ namespace Stethoscope.Log.Internal
         public void ResetTimestampChanged()
         {
             HasTimestampChanged = false;
+        }
+
+        /// <summary>
+        /// Specify that the log registry was notified for this log..
+        /// </summary>
+        /// <seealso cref="IsRegistryNotified"/>
+        public void LogRegistryNotified()
+        {
+            IsRegistryNotified = true;
         }
 
         /// <summary>

@@ -726,16 +726,19 @@ namespace Stethoscope.Tests
             var registry = CreateLogRegistry();
             var failedEntry = registry.AddFailedLog();
             Assert.That(failedEntry, Is.Not.Null);
+            Assert.That(registry.LogCount, Is.EqualTo(1));
 
             registry.NotifyFailedLogParsed(failedEntry);
-            Assert.That(registry.LogCount, Is.EqualTo(1));
+            Assert.That(registry.LogCount, Is.Zero);
 
             Assert.That(failedEntry.HasAttribute(LogAttribute.Timestamp), Is.False);
 
             var cloneRegistry = CreateLogRegistry();
+            Assert.That(cloneRegistry.LogCount, Is.Zero);
+
             var cloneEntry = cloneRegistry.CloneLog(failedEntry);
             Assert.That(cloneEntry, Is.Not.Null);
-            Assert.That(cloneRegistry.LogCount, Is.EqualTo(1));
+            Assert.That(cloneRegistry.LogCount, Is.Zero);
 
             Assert.That(cloneEntry.HasAttribute(LogAttribute.Timestamp), Is.False);
 
