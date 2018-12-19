@@ -2338,6 +2338,30 @@ File browser (connect to multiple remote machines, then use a file browser to ba
 - That last one will be interesting: how to ensure a registry doesn't duplicate a log. We check for our own logs, but not for another log for a nth time (where n > 1).
 - Tomorrow will be short... good chance it will be pushed off. I didn't accomplish some things tonight, so I need to do them tomorrow.
 
+#250.2. 12/18/2018:
+- So plans actually changed and I have time...
+- And then I took advantage of that time to do other required tasks, one of which went about an hour longer then expected.
+- To top it off, all that "I need sleep" posts? I was informed today that lack of sleep was affecting my work.
+- I was worried before... but that's a big red flag that I need to make some changes to plans and schedules.
+- As such, I need to time box this work and actually be strict on it.
+- I already failed.
+- But I will be stopping work on this tonight.
+- The main issue I have right now is that I need to ensure I don't produce a duplicate entry that has already been cloned.
+- I bade a base function, but realized that the implementation is questionable.
+- What I'd really like is to either combine the "contains" and "find" functions or to store a list.
+- I'm leaning towards the storing of a list because I can actually start to play around with machine learning (to a very minor extent).
+- Think: one log is cloned... just do a iteration through the values and call it a day.
+- Now, hundreds of thousands of logs are cloned... make a list of IDs that have already been cloned.
+- Wait, now I have a hundred thousand item set that I have to iterate through.
+- So maybe a timed cache of sorts? Or expiring values? If something has been around for more then a second or so, perhaps it's not worth it to hold on to because nobody is looking them up.
+- Maybe it's overcomplicating it. But a goal is to balance memory and performance.
+- I managed to save a small amount of data by having that search to determine if the registry already contains the log.
+- I do worry it's slow. There are probably solutions for this (start searching, save the IDs we've touched and if the next search doesn't find it's item inside that log, then start iterating through the main list again)
+- Again, the dreaded use case: how often will this be used? Bonus: how often are the edge cases we hit going to happen?
+- Even better bonus, and an example why use cases aren't always good: what if someone wants duplicates?
+- But, again, I'm late and need to stop.
+- For tomorrow.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2

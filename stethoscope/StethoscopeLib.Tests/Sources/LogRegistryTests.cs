@@ -655,10 +655,12 @@ namespace Stethoscope.Tests
             var cloneEntry = cloneRegistry.CloneLog(entry);
             Assert.That(cloneEntry, Is.Not.Null);
             Assert.That(cloneRegistry.LogCount, Is.EqualTo(1));
+            Assert.That(object.ReferenceEquals(entry, cloneEntry), Is.False);
 
             var cloneEntry2 = cloneRegistry.CloneLog(entry);
-            Assert.That(cloneEntry, Is.Not.Null);
+            Assert.That(cloneEntry2, Is.Not.Null);
             Assert.That(cloneRegistry.LogCount, Is.EqualTo(1));
+            Assert.That(object.ReferenceEquals(cloneEntry, cloneEntry2), Is.True);
         }
 
         [Test]

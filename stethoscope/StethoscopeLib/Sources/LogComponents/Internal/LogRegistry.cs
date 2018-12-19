@@ -160,6 +160,11 @@ namespace Stethoscope.Log.Internal
             {
                 return entry;
             }
+            var existingClone = FindClone(entry);
+            if (existingClone != null)
+            {
+                return existingClone;
+            }
 
             var addToRegistry = false;
             var addToProcessing = false;
@@ -267,7 +272,14 @@ namespace Stethoscope.Log.Internal
                 return storage.Entries.TakeUntil(log => ((IInternalLogEntry)log).ID != internalLog.ID).Count(log => ((IInternalLogEntry)log).ID == internalLog.ID).Wait() >= 1; //XXX should we do "wait" or can we tie it into some other aspect of the program? We should at least not wait indefinitely
             }
             // LogEntry and FailedLogEntry are both IInternalLogEntry, so if it isn't one of those, then it's a 3rd party ILogEntry and wasn't created by this registry
-            return false; //XXX Should we check for timestamp or something so we don't clone a 3rd party log entry into storage that has the same timestamp?
+            return false;
+        }
+
+        private ILogEntry FindClone(ILogEntry entry)
+        {
+            var checkProcessed = !entry.IsValid || (entry is FailedLogEntry failedLog && !failedLog.IsRegistryNotified);
+            //TODO
+            return null;
         }
 
         private void ProcessingComplete(FailedLogEntry failedLog)
