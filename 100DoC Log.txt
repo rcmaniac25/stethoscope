@@ -2362,9 +2362,21 @@ File browser (connect to multiple remote machines, then use a file browser to ba
 - But, again, I'm late and need to stop.
 - For tomorrow.
 
+#251.2. 12/19/2018:
+- At the end of yesterday, the thought running through my head was "those are all cool ideas... but it's premature optimization"
+- I brought in an outside opinion on the matter... and they agreed.
+- I proposed to just do a basic iteration through elements and will do optimizations later.
+- They liked the LINQ-level optmizations over doing it in-registry, which I agreed with.
+- They also recommended a Bloom filter. I stopped at that point as I had the answer I was wondering about :P
+- It's confirmation bias, but it's also true.
+- The LogRegistry is fully operational again.
+- I'm calling it quits for now.
+- The following days might be a bit short, with Christmas and whatnot almost here. We'll take it day by day.
+- Ah, that means that #227.2 is done! This means the next fun steps are to do #223.2.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
-- Random Notes #1/Current(?): #227.2
+- Random Notes #1/Current(?): #223.2
 - Some thoughts on log-print formatting: #230.2
 ==----------------==

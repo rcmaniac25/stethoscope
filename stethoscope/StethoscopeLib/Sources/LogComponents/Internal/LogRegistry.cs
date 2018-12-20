@@ -144,6 +144,8 @@ namespace Stethoscope.Log.Internal
             return entry;
         }
 
+        #region CloneLog
+
         /// <summary>
         /// Clone a log entry into this log registry.
         /// </summary>
@@ -275,12 +277,77 @@ namespace Stethoscope.Log.Internal
             return false;
         }
 
+        #region FindClone
+
+        private enum AttributeMatch
+        {
+            Mismatch,
+            MatchButMissing,
+            Match
+        }
+
+        private static AttributeMatch CheckLogAttributes(ILogEntry x, ILogEntry y, LogAttribute attribute)
+        {
+            var match = AttributeMatch.Mismatch;
+            if (x.HasAttribute(attribute) == y.HasAttribute(attribute))
+            {
+                match = AttributeMatch.MatchButMissing;
+                if (x.HasAttribute(attribute))
+                {
+                    match = AttributeMatch.Match;
+                }
+            }
+            return match;
+        }
+
+        private static bool PotentialInvalidCheckLogMatch(ILogEntry testLog, ILogEntry baseLog)
+        {
+            var timestampMatch = CheckLogAttributes(testLog, baseLog, LogAttribute.Timestamp);
+            var messageMatch = CheckLogAttributes(testLog, baseLog, LogAttribute.Timestamp);
+            if (timestampMatch != AttributeMatch.Mismatch && messageMatch != AttributeMatch.Mismatch)
+            {
+                return !(timestampMatch == AttributeMatch.Match && testLog.Timestamp != baseLog.Timestamp) &&
+                    !(messageMatch == AttributeMatch.Match && testLog.Message != baseLog.Message);
+            }
+            return false;
+        }
+
+        private static bool ValidCheckLogMatch(ILogEntry testLog, ILogEntry baseLog)
+        {
+            return testLog.Timestamp == baseLog.Timestamp && testLog.Message == baseLog.Message;
+        }
+
         private ILogEntry FindClone(ILogEntry entry)
         {
+            // We don't check ID because that's done by ContainsLog before us
+            //XXX We only check timestamp and message... might want to test other values
+            //XXX do optimizations later
+
             var checkProcessed = !entry.IsValid || (entry is FailedLogEntry failedLog && !failedLog.IsRegistryNotified);
-            //TODO
-            return null;
+            if (checkProcessed)
+            {
+                lock (logsBeingProcessed)
+                {
+                    var processedLog = logsBeingProcessed.FirstOrDefault(log => PotentialInvalidCheckLogMatch(log, entry));
+                    if (processedLog != null)
+                    {
+                        return processedLog;
+                    }
+                }
+            }
+            return storage.Entries.FirstOrDefaultAsync(new Func<ILogEntry, bool>(log =>
+            {
+                if (log.IsValid == entry.IsValid && log.IsValid)
+                {
+                    return ValidCheckLogMatch(log, entry);
+                }
+                return PotentialInvalidCheckLogMatch(log, entry);
+            })).Wait(); //XXX should we do "wait" or can we tie it into some other aspect of the program? We should at least not wait indefinitely
         }
+
+        #endregion
+
+        #endregion
 
         private void ProcessingComplete(FailedLogEntry failedLog)
         {
