@@ -2374,6 +2374,9 @@ File browser (connect to multiple remote machines, then use a file browser to ba
 - The following days might be a bit short, with Christmas and whatnot almost here. We'll take it day by day.
 - Ah, that means that #227.2 is done! This means the next fun steps are to do #223.2.
 
+#252.2. 12/20/2018:
+- Timing just isn't working today. Tomorrow...
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
