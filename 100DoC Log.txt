@@ -2377,6 +2377,10 @@ File browser (connect to multiple remote machines, then use a file browser to ba
 #252.2. 12/20/2018:
 - Timing just isn't working today. Tomorrow...
 
+#253.2. 12/21/2018:
+- Yea, bout that. I can tell you now, tomorrow... isn't going to be better.
+- We'll see about the day after.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
