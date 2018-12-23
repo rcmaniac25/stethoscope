@@ -2381,6 +2381,9 @@ File browser (connect to multiple remote machines, then use a file browser to ba
 - Yea, bout that. I can tell you now, tomorrow... isn't going to be better.
 - We'll see about the day after.
 
+#254.2. 12/22/2018:
+- Yep, not happening today.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
