@@ -2384,6 +2384,11 @@ File browser (connect to multiple remote machines, then use a file browser to ba
 #254.2. 12/22/2018:
 - Yep, not happening today.
 
+#255.2. 12/23/2018:
+- Ok, so the past couple days have been hectic.
+- Now... the main holiday for me is here, so I'm still not ready to do work.
+- I'll see if timing is nicer, but I doubt it
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
