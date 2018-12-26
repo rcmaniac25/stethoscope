@@ -2389,6 +2389,10 @@ File browser (connect to multiple remote machines, then use a file browser to ba
 - Now... the main holiday for me is here, so I'm still not ready to do work.
 - I'll see if timing is nicer, but I doubt it
 
+#256.2. 12/24/2018:
+- I actually wasn't able to login to the computer (which was remote) the bast couple days.
+- So I'm just recording a status
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
