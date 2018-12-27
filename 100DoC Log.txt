@@ -2393,6 +2393,9 @@ File browser (connect to multiple remote machines, then use a file browser to ba
 - I actually wasn't able to login to the computer (which was remote) the bast couple days.
 - So I'm just recording a status
 
+#257.2. 12/25/2018:
+- Again, catch up
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
