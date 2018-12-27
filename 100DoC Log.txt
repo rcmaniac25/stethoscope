@@ -2396,6 +2396,10 @@ File browser (connect to multiple remote machines, then use a file browser to ba
 #257.2. 12/25/2018:
 - Again, catch up
 
+#258.2. 12/26/2018:
+- Ok, I can't do today as I was trying to get everything else in life straightened out.
+- Hopefully tomorrow I will get back to this.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
