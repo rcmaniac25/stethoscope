@@ -2400,6 +2400,17 @@ File browser (connect to multiple remote machines, then use a file browser to ba
 - Ok, I can't do today as I was trying to get everything else in life straightened out.
 - Hopefully tomorrow I will get back to this.
 
+#259.2. 12/27/2018:
+- So I didn't get any code done today, but I at least gathered that the next thing to work on is logging.
+- Specifically, a combination of #223.2 and #230.2
+- The description of #223.2 has that the "progression" needs to first print the logs as they are recieved.
+- Now, initially I thought "this is what is parsed" but I'm thinking I may have meant the raw log line, unparsed.
+- The only problem with that is, due to the fact that the lines are parsed, I don't know if the parsed log element is a single line or multi-line.
+- What's to stop someone from producing an XML-based log where each value is it's own XML element? <log><time>now</time>...</log>?
+- Printing that raw is not ideal. Instead, I will print just the attributes it contains.
+- Then, over time, I'll print more and more.
+- How? That darn'd printmode config. I'll define something for it and see how it goes.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
