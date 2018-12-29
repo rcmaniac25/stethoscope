@@ -2411,6 +2411,10 @@ File browser (connect to multiple remote machines, then use a file browser to ba
 - Then, over time, I'll print more and more.
 - How? That darn'd printmode config. I'll define something for it and see how it goes.
 
+#260.2. 12/28/2018:
+- Guess who realized they were missing something... me.
+- Need to push off this work because I forgot to write it in my daily TODO.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
