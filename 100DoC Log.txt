@@ -2415,6 +2415,18 @@ File browser (connect to multiple remote machines, then use a file browser to ba
 - Guess who realized they were missing something... me.
 - Need to push off this work because I forgot to write it in my daily TODO.
 
+#261.2. 12/29/2018:
+- Looks like I won't have the time tonight.
+- I Needed to get some things done before tomorrow, and, well I got them done at the cost of not having this done.
+- The other part of it is that I did some tests and, as I stated #256.2, I wasn't able to login remotely to my computer (luckily, I'm not remote for these tests)
+- I attributed it to the software and will have to contact support about it.
+- In the mean time, I am using a different program (temp) to access my computer but... it runs off temp passwords/codes.
+- This means that if I'm lucky, I can continue working on this. If I'm unlucky, I won't be able to contact through that program and I'm stuck.
+- "yo, git is decentralized" yea, and I have a bunch of extra notes and whatnot that I don't commit to the published code.
+- The only thing I'd be able to do is say "Status" and say I can't do the work or it's untested/I want to rewrite/replace it
+- Or, I can just do the "set author date" when making the commits once I arrive back to my computer
+- It buys me a bit more time to do other tasks...
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
