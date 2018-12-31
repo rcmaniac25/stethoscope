@@ -2427,6 +2427,23 @@ File browser (connect to multiple remote machines, then use a file browser to ba
 - Or, I can just do the "set author date" when making the commits once I arrive back to my computer
 - It buys me a bit more time to do other tasks...
 
+#262.2. 12/30/2018:
+- I was able to get in today...
+- For sanity and time, I decided to define the printMode in documentation.
+- I will write the code later (starting with predefined modes, then defining the custom modes)
+- Ironically, I have experience with this. (https://bitbucket.org/rcmaniac25/blackberry-10-extensions/src/b6a36515c733ee8465b9b831e6cf30106c60fa4d/BBX/src/rebuild/util/text/StringUtilities.java#StringUtilities.java-773)
+-- The real meat of that is https://bitbucket.org/rcmaniac25/blackberry-10-extensions/src/b6a36515c733ee8465b9b831e6cf30106c60fa4d/BBX/src/rebuild/util/text/PrintUtility.java
+- I won't go into detail, just know in the past I did BlackBerry development (I enjoyed it!) and was a bit more naive on code licensing...
+- ...but one thing that was vast-majority/entierly written by me was a near-standard implementation of printf (spec version in the PrintUtility code) written in Java 1.4
+- You know the point where Java stopped being difficult to use? That was Java 1.5 (it got bad again later, but that's another topic).
+- I am very proud of what I did, especially for the time.
+- The last element worked on was how to properly format floating point numbers. I utilized an arbitary number system, also written by me, just to do that.
+- Efficent? Doubtful at best. Effective? Yes.
+- To the point, I've done this before. I will write this on my own because I want to and can use some "modern shortcuts" to speed things up.
+- For now: I have written the documentation for the work, though I'm missing some details on the pre-defined formats.
+- Finishing the formats will be the last work I do tomorrow, and maybe starting on code.
+- A key is to not go too nuts with coding this, as it's just a starting point. I can always do a full implementation later on when it's more needed.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
