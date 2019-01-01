@@ -2444,6 +2444,13 @@ File browser (connect to multiple remote machines, then use a file browser to ba
 - Finishing the formats will be the last work I do tomorrow, and maybe starting on code.
 - A key is to not go too nuts with coding this, as it's just a starting point. I can always do a full implementation later on when it's more needed.
 
+#263.2. 12/31/2018:
+- I expanded the formatting some more
+- It's a little larger then originially planned, but hopefully is still generally easy to implement.
+- But, I just want to write out the one format for my sanity and then I'll start on code.
+- The temptation to go write to format parsing is strong... I must resist...
+- See you all next year
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2

@@ -27,17 +27,21 @@ The idea behind a print mode is similar to a string format (C#'s composite forma
 Custom modes can be defined with a "format" while pre-defined modes can be used, simply referred to as "mode".
 
 - "mode":
--- General = TODO
--- FunctionOnly = @{Function} ```Error condition TODO```
--- FirstFunctionOnly = @{Function}$ ```Error condition TODO```
+-- General = @!"Problem parsing log. Timestamp=^{Timestamp}, Message=^{Message}"TODO
+-- FunctionOnly = @{Function}!"@+Log is missing Function attribute: {Timestamp} -- {Message}"
+-- FirstFunctionOnly = @{Function}!"@+Log is missing Function attribute: {Timestamp} -- {Message}"
 
 - "format"
--- format = @<part>[<part>...] | <mode>
+-- format = @[<modifier>...]<part>[<part>...] | <mode>
 -- <part> = <raw> | <attribute>
--- <raw> = "any charecter except ^,$,{,}. Special chars need to be duplicated to print
--- <attribute> = [<conditional>]{attribute name}[<modifier>]
+-- <raw> = "any charecter except + - ^ $ ! { }. Special chars need to be duplicated to print"
+-- <attribute> = [<conditional>]<attribute reference>[<modifier>]
 -- <conditional> - ^ (only print if it exists)
 -- <modifier>
---- $ (print only when the value changes from the last log. So a,a,a,b,a,b,b,a -> a,b,a,b,a)
+--- $ (print only when the value changes from the last log. Not applicable per-log.. So a,a,a,b,a,b,b,a -> a,b,a,b,a)
 --- !"<format>" (if an error occurs with this log, print the following error message. Limitations: must be contained within quotes)
--- {attribute name} - (any of the LogAttribute enum value names, surrounded by {})
+--- + (only print if a valid log)
+--- - (only print if an invalid log)
+-- <attribute reference> - {<attribute name>[<attribute format>]}
+-- <attribute name> - (any of the LogAttribute enum value names)
+-- <attribute format> - |<raw> (inside <raw>, any "{}" will be replaced with the value from the attribute)
