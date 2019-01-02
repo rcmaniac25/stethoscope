@@ -24,7 +24,7 @@ namespace Stethoscope.Printers.Internal
     public abstract class IOPrinter : BaseIPrinter
     {
         /// <summary>
-        /// Metric counter for indicating every time <see cref="Print"/> is invoked.
+        /// Metric counter for indicating every time <see cref="PrintAsync"/> is invoked.
         /// </summary>
         protected static readonly Counter printCounter = Metric.Counter("IO Printer Print", Unit.Calls, "IO, printer");
 
@@ -37,6 +37,11 @@ namespace Stethoscope.Printers.Internal
         /// The TextWriter which will be printed to.
         /// </summary>
         protected TextWriter TextWriter { get; set; }
+
+        /// <summary>
+        /// Cancellable print function invoked by <see cref="IPrinter.Print"/> or <see cref="IPrinter.PrintAsync()"/> or <see cref="IPrinter.PrintAsync(CancellationToken)"/>.
+        /// </summary>
+        protected Action<CancellationToken> LogPrintHandler { get; set; }
 
         /// <summary>
         /// Produce indentation for printing strings.
@@ -104,27 +109,36 @@ namespace Stethoscope.Printers.Internal
                 TextWriter.WriteLine();
             }
         }
+        
+        private void PrintModeFunctionOnly(ILogEntry log)
+        {
+            // Equiv: @{Function}!"@+Log is missing Function attribute: {Timestamp} -- {Message}"
+            
+            if (log.HasAttribute(LogAttribute.Function))
+            {
+                TextWriter.WriteLine(log.GetAttribute<string>(LogAttribute.Function));
+            }
+            else if (log.IsValid)
+            {
+                TextWriter.WriteLine("Log is missing Function attribute: {0} -- {1}", log.Timestamp, log.Message);
+            }
+        }
 
-        private void TestPrintFunctionNamesUngrouped(CancellationToken taskCancelToken)
+        /// <summary>
+        /// Helper function that prints each log until done or canceled.
+        /// </summary>
+        /// <param name="printer">The log printer.</param>
+        /// <param name="cancellationToken">Print-process cancellation token.</param>
+        protected void PrintHelper(Action<ILogEntry> printer, CancellationToken cancellationToken)
         {
             var observableRunningTokenSource = new CancellationTokenSource();
-            
-            var dis = logRegistry.Logs.TakeWhile(_ => !taskCancelToken.IsCancellationRequested).Subscribe(log =>
-            {
-                if (log.HasAttribute(LogAttribute.Function))
-                {
-                    TextWriter.WriteLine(log.GetAttribute<string>(LogAttribute.Function));
-                }
-                else
-                {
-                    TextWriter.WriteLine("No Function... Message: {0}", log.Message);
-                }
-            }, () =>
+
+            var dis = logRegistry.Logs.TakeWhile(_ => !cancellationToken.IsCancellationRequested).Subscribe(printer, () =>
             {
                 observableRunningTokenSource.Cancel();
             });
 
-            while (!taskCancelToken.IsCancellationRequested && !observableRunningTokenSource.IsCancellationRequested)
+            while (!cancellationToken.IsCancellationRequested && !observableRunningTokenSource.IsCancellationRequested)
             {
                 Thread.Sleep(100);
             }
@@ -142,8 +156,30 @@ namespace Stethoscope.Printers.Internal
             printCounter.Increment();
 
             //return Task.Run(() => PrintThreadTraces()); //TODO
-            
-            return Task.Run(() => TestPrintFunctionNamesUngrouped(cancellationToken), cancellationToken);
+
+            return Task.Run(() => LogPrintHandler?.Invoke(cancellationToken), cancellationToken);
+        }
+
+        private void ParsePrintMode(string mode)
+        {
+            //XXX should an error be printed if something here is wrong?
+            if (!string.IsNullOrWhiteSpace(mode) && (char.IsLetter(mode[0]) || mode[0] == '@'))
+            {
+                if (mode[0] == '@')
+                {
+                    //TODO
+                }
+                else
+                {
+                    switch (mode.ToLower())
+                    {
+                        case "functiononly":
+                            LogPrintHandler = ct => PrintHelper(PrintModeFunctionOnly, ct);
+                            break;
+                        //TODO
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -154,7 +190,11 @@ namespace Stethoscope.Printers.Internal
         {
             if (config.ExtraConfigs != null && config.ExtraConfigs.ContainsKey("printMode"))
             {
-                //TODO
+                ParsePrintMode(config.ExtraConfigs["printMode"]);
+            }
+            if (LogPrintHandler == null)
+            {
+                LogPrintHandler = ct => PrintHelper(PrintModeFunctionOnly, ct); //TODO: default printer
             }
         }
 

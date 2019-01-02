@@ -2451,6 +2451,17 @@ File browser (connect to multiple remote machines, then use a file browser to ba
 - The temptation to go write to format parsing is strong... I must resist...
 - See you all next year
 
+#264.2. 01/01/2019:
+- Happy New Year!
+- I have to ensure I time-box my work so I'm not always late.
+- I finished the formatting (and hopefully corrected the markdown while at it).
+- Not 100% sure if there's anything else I want to do with it.
+- I'm concerned that with how I'm using it, the changes I'd want to do will turn it into a Turing-complete language and, well, it's a formatting language and shouldn't be Turing-complete.
+- The end result may be that some formats aren't "perfect" unless it's a predefined format.
+- I started working on the code, with the most just being what exists already but now "proper".
+- I'm not sure if I want to throw an exception if the format is invalid/unknown, or if I should just eat it and use a default.
+- Gut is saying "exception".
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
