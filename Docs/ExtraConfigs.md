@@ -33,16 +33,16 @@ Custom modes can be defined with a "format" while pre-defined modes can be used,
     - FirstFunctionOnly = @{Function}!"@+Log is missing Function attribute: {Timestamp} -- {Message}"
 
 - "format"
-    - format = @[<modifier>...]<part>[<part>...] | <mode>
-    - <part> = <raw> | <attribute>
-    - <raw> = "any charecter except + - ^ $ ! { }. Special chars need to be duplicated to print"
-    - <attribute> = [<conditional>]<attribute reference>[<modifier>]
-    - <conditional> - ^ (only print if it exists)
-    - <modifier>
-        - $ (print only when the value changes from the last log. Not applicable per-log.. So a,a,a,b,a,b,b,a -> a,b,a,b,a)
-        - !"<format>" (if an error occurs with this log, print the following error message. Limitations: must be contained within quotes)
-        - + (only print if a valid log)
-        - - (only print if an invalid log)
-    - <attribute reference> - {<attribute name>[<attribute format>]}
-    - <attribute name> - (any of the LogAttribute enum value names)
-    - <attribute format> - |<raw> (inside <raw>, any "{}" will be replaced with the value from the attribute)
+    - format = `@[<modifier>...]<part>[<part>...] | <mode>`
+    - `<part>` = `<raw>` | `<attribute>`
+    - `<raw>` = (any charecter except `+ - ^ $ ! { }`. Special chars need to be duplicated to print)
+    - `<attribute>` = `[<conditional>]<attribute reference>[<modifier>]`
+    - `<conditional>` - ^ (only print if it exists)
+    - `<modifier>`
+        - `$` (print only when the value changes from the last log. Not applicable per-log.. So a,a,a,b,a,b,b,a -> a,b,a,b,a)
+        - `!"<format>"` (if an error occurs with this log, print the following error message. Limitations: must be contained within quotes, single quotes needs to be escaped `\"`)
+        - `+` (only print if a valid log)
+        - `-` (only print if an invalid log)
+    - `<attribute reference>` - `{<attribute name>[<attribute format>]}`
+    - `<attribute name>` - (any of the LogAttribute enum value names)
+    - `<attribute format>` - `|<raw>` (inside `<raw>`, any "{}" will be replaced with the value from the attribute)
