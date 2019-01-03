@@ -33,7 +33,7 @@ Custom modes can be defined with a "format" while pre-defined modes can be used,
     - FirstFunctionOnly = @{Function}!"@+Log is missing Function attribute: {Timestamp} -- {Message}"
 
 - "format"
-    - format = `@[<modifier>...]<part>[<part>...] | <mode>`
+    - format = `@[<modifier>...]<part>[<part>...]` | `<mode>`
     - `<part>` = `<raw>` | `<attribute>`
     - `<raw>` = (any charecter except `+ - ^ $ ! { }`. Special chars need to be duplicated to print)
     - `<attribute>` = `[<conditional>]<attribute reference>[<modifier>]`

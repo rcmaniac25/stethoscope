@@ -2462,6 +2462,9 @@ File browser (connect to multiple remote machines, then use a file browser to ba
 - I'm not sure if I want to throw an exception if the format is invalid/unknown, or if I should just eat it and use a default.
 - Gut is saying "exception".
 
+#265.2. 01/02/2019:
+- Event today ran long today... so I need to skip.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
