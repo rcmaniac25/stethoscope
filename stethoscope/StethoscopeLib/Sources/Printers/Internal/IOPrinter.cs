@@ -4,20 +4,15 @@ using Stethoscope.Common;
 
 using System;
 using System.IO;
+using System.Linq;
 using System.Reactive.Linq;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Stethoscope.Printers.Internal
 {
-    [StructLayout(LayoutKind.Sequential)]
-    public struct PrintMode
-    {
-        public bool PrintFunctionNamesOnly;
-        //TODO: needs work
-    }
-
     /// <summary>
     /// Log printer that prints to an I/O object of type <see cref="TextReader"/>.
     /// </summary>
@@ -27,6 +22,8 @@ namespace Stethoscope.Printers.Internal
         /// Metric counter for indicating every time <see cref="PrintAsync"/> is invoked.
         /// </summary>
         protected static readonly Counter printCounter = Metric.Counter("IO Printer Print", Unit.Calls, "IO, printer");
+
+        private static readonly LogAttribute[] knownAttributes = Enum.GetValues(typeof(LogAttribute)).Cast<LogAttribute>().Where(att => att != LogAttribute.Timestamp && att != LogAttribute.Message).ToArray();
 
         /// <summary>
         /// The log registry that logs will be retrieved from.
@@ -109,7 +106,54 @@ namespace Stethoscope.Printers.Internal
                 TextWriter.WriteLine();
             }
         }
-        
+
+        private void PrintModeDefault(ILogEntry log)
+        {
+            // Equiv: @!"Problem printing log. Timestamp=^{Timestamp}, Message=^{Message}"[{Timestamp}] -- {Message}^{LogSource|, LogSource="{}"}^{ThreadID|, ThreadID="{}"}...^{Context|, Context="{}"}
+            // printing every attribute
+
+            try
+            {
+                var sb = new StringBuilder();
+                sb.AppendFormat("[{0}] - {1}", log.Timestamp, log.Message);
+                foreach (var att in knownAttributes)
+                {
+                    if (log.HasAttribute(att))
+                    {
+                        sb.AppendFormat(", {0}=\"{1}\"", att, log.GetAttribute<object>(att));
+                    }
+                }
+                TextWriter.WriteLine(sb.ToString());
+            }
+            catch
+            {
+                object timestamp;
+                string message = string.Empty;
+                if (log.IsValid)
+                {
+                    timestamp = log.Timestamp;
+                    message = log.Message;
+                }
+                else
+                {
+                    if (log.HasAttribute(LogAttribute.Timestamp))
+                    {
+                        timestamp = log.Timestamp;
+                    }
+                    else
+                    {
+                        timestamp = string.Empty;
+                    }
+                    if (log.HasAttribute(LogAttribute.Message))
+                    {
+                        message = log.Message;
+                    }
+                }
+
+                TextWriter.WriteLine("Problem printing log. Timestamp={0}, Message={1}", timestamp, message);
+            }
+        }
+
         private void PrintModeFunctionOnly(ILogEntry log)
         {
             // Equiv: @{Function}!"@+Log is missing Function attribute: {Timestamp} -- {Message}"
@@ -173,6 +217,9 @@ namespace Stethoscope.Printers.Internal
                 {
                     switch (mode.ToLower())
                     {
+                        case "general":
+                            LogPrintHandler = ct => PrintHelper(PrintModeDefault, ct);
+                            break;
                         case "functiononly":
                             LogPrintHandler = ct => PrintHelper(PrintModeFunctionOnly, ct);
                             break;
@@ -194,7 +241,7 @@ namespace Stethoscope.Printers.Internal
             }
             if (LogPrintHandler == null)
             {
-                LogPrintHandler = ct => PrintHelper(PrintModeFunctionOnly, ct); //TODO: default printer
+                LogPrintHandler = ct => PrintHelper(PrintModeDefault, ct);
             }
         }
 

@@ -2465,6 +2465,14 @@ File browser (connect to multiple remote machines, then use a file browser to ba
 #265.2. 01/02/2019:
 - Event today ran long today... so I need to skip.
 
+#266.2. 01/03/2019:
+- I don't have a lot of time...
+- But I managed to get the "general" format and add a forgotten pre-defined format
+- So: general format is implemented. The catch block might be a little more then I want, but it's fine. Should still be plenty fast.
+- Looking at what I planned for pre-defined formats, I realized I had "general", "functions only when they appear for the first time", and "functions only when they change"
+- ...yet, the function I implemented was "always print out the function". So I added the missing one ("print only when hasn't been printed before") and a way to use that in the format.
+- Tomorrow I'll need to do an update to the delegate becuase a couple some of the values requires state, and the delegates don't handle that right now.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
