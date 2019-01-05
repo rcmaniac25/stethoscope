@@ -2473,6 +2473,18 @@ File browser (connect to multiple remote machines, then use a file browser to ba
 - ...yet, the function I implemented was "always print out the function". So I added the missing one ("print only when hasn't been printed before") and a way to use that in the format.
 - Tomorrow I'll need to do an update to the delegate becuase a couple some of the values requires state, and the delegates don't handle that right now.
 
+#267.2. 01/04/2019:
+- All pre-defined functions implemented, delegate updated, and a simple lookup added.
+- Next up: error handling for "you specified an invalid format", unit tests for the formats, maybe an update for the existing console unit tests, ...
+- ...and lastly: start work on the print mode format.
+- Stretch goal (and not likely to happen): see if I can implement PrintThreadTraces in this new format AND can I move the format printing out of IOPrinter?
+- What do I mean by that last one? I've seen it before: customeWriterClass.startWrite(...); cwc.writeText("hello"); cwc.changeColor(Blue); cwc.writeText("world"); cwc.endWrite();
+- So now put all format handling and printing in one spot, and then an interface for handling the writing.
+- IOPrinter will wrap the write operations into something for TextWriter.
+- A GUI could ignore the write operations and just put into an existing GUI element.
+- Sub-classes could swap out the writer and result in "IOPrinter simply writes" while ConsolePrinter replaces the writer so colors and other elements can be handled.
+- It's past when I should be thinking about this, so this all sounds nice now, but my concious is saying "stop doing scope creep" and I'll give it some time before going "yay or neh"
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2

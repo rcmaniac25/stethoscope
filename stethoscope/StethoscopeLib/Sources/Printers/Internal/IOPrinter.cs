@@ -3,10 +3,10 @@
 using Stethoscope.Common;
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,12 +18,20 @@ namespace Stethoscope.Printers.Internal
     /// </summary>
     public abstract class IOPrinter : BaseIPrinter
     {
+        private const string DefaultPrinterName = "General";
+
         /// <summary>
         /// Metric counter for indicating every time <see cref="PrintAsync"/> is invoked.
         /// </summary>
         protected static readonly Counter printCounter = Metric.Counter("IO Printer Print", Unit.Calls, "IO, printer");
 
         private static readonly LogAttribute[] knownAttributes = Enum.GetValues(typeof(LogAttribute)).Cast<LogAttribute>().Where(att => att != LogAttribute.Timestamp && att != LogAttribute.Message).ToArray();
+        private static readonly IDictionary<string, (Action<TextWriter, ILogEntry, object> printer, Func<object> printerStateGen)> PrintHandlers = new Dictionary<string, (Action<TextWriter, ILogEntry, object>, Func<object>)>();
+
+        static IOPrinter()
+        {
+            InitializePrintHandlers();
+        }
 
         /// <summary>
         /// The log registry that logs will be retrieved from.
@@ -107,7 +115,21 @@ namespace Stethoscope.Printers.Internal
             }
         }
 
-        private void PrintModeDefault(ILogEntry log)
+        #region PrintMode Handlers
+
+        private static void InitializePrintHandlers()
+        {
+            PrintHandlers.Clear();
+
+            PrintHandlers.Add(DefaultPrinterName.ToLower(), (PrintModeDefault, PrintModeStateGenNone));
+            PrintHandlers.Add("FunctionOnly".ToLower(), (PrintModeFunctionOnly, PrintModeStateGenNone));
+            PrintHandlers.Add("FirstFunctionOnly".ToLower(), (PrintModeFirstFunctionOnly, PrintModeStateGenFirstFunctionOnly));
+            PrintHandlers.Add("DifferentFunctionOnly".ToLower(), (PrintModeDifferentFunctionOnly, PrintModeStateGenDifferentFunctionOnly));
+        }
+
+        private static object PrintModeStateGenNone() => null;
+
+        private static void PrintModeDefault(TextWriter textWriter, ILogEntry log, object state)
         {
             // Equiv: @!"Problem printing log. Timestamp=^{Timestamp}, Message=^{Message}"[{Timestamp}] -- {Message}^{LogSource|, LogSource="{}"}^{ThreadID|, ThreadID="{}"}...^{Context|, Context="{}"}
             // printing every attribute
@@ -123,7 +145,7 @@ namespace Stethoscope.Printers.Internal
                         sb.AppendFormat(", {0}=\"{1}\"", att, log.GetAttribute<object>(att));
                     }
                 }
-                TextWriter.WriteLine(sb.ToString());
+                textWriter.WriteLine(sb.ToString());
             }
             catch
             {
@@ -150,34 +172,83 @@ namespace Stethoscope.Printers.Internal
                     }
                 }
 
-                TextWriter.WriteLine("Problem printing log. Timestamp={0}, Message={1}", timestamp, message);
+                textWriter.WriteLine("Problem printing log. Timestamp={0}, Message={1}", timestamp, message);
             }
         }
 
-        private void PrintModeFunctionOnly(ILogEntry log)
+        private static void PrintModeFunctionOnly(TextWriter textWriter, ILogEntry log, object state)
         {
             // Equiv: @{Function}!"@+Log is missing Function attribute: {Timestamp} -- {Message}"
             
             if (log.HasAttribute(LogAttribute.Function))
             {
-                TextWriter.WriteLine(log.GetAttribute<string>(LogAttribute.Function));
+                textWriter.WriteLine(log.GetAttribute<object>(LogAttribute.Function));
             }
             else if (log.IsValid)
             {
-                TextWriter.WriteLine("Log is missing Function attribute: {0} -- {1}", log.Timestamp, log.Message);
+                textWriter.WriteLine("Log is missing Function attribute: {0} -- {1}", log.Timestamp, log.Message);
             }
         }
+
+        private static object PrintModeStateGenFirstFunctionOnly() => new HashSet<object>();
+
+        private static void PrintModeFirstFunctionOnly(TextWriter textWriter, ILogEntry log, object state)
+        {
+            // Equiv: @{Function}~!"@+Log is missing Function attribute: {Timestamp} -- {Message}"
+
+            if (log.HasAttribute(LogAttribute.Function))
+            {
+                var function = log.GetAttribute<object>(LogAttribute.Function);
+
+                var printedFunctions = (HashSet<object>)state;
+                if (printedFunctions.Add(function))
+                {
+                    textWriter.WriteLine(function);
+                }
+            }
+            else if (log.IsValid)
+            {
+                textWriter.WriteLine("Log is missing Function attribute: {0} -- {1}", log.Timestamp, log.Message);
+            }
+        }
+
+        private static object PrintModeStateGenDifferentFunctionOnly() => new object[1];
+
+        private static void PrintModeDifferentFunctionOnly(TextWriter textWriter, ILogEntry log, object state)
+        {
+            // Equiv: @{Function}$!"@+Log is missing Function attribute: {Timestamp} -- {Message}"
+
+            if (log.HasAttribute(LogAttribute.Function))
+            {
+                var function = log.GetAttribute<object>(LogAttribute.Function);
+
+                var lastFunction = (object[])state;
+                if (lastFunction[0] == null || !lastFunction[0].Equals(function))
+                {
+                    textWriter.WriteLine(function);
+                    lastFunction[0] = function;
+                }
+            }
+            else if (log.IsValid)
+            {
+                textWriter.WriteLine("Log is missing Function attribute: {0} -- {1}", log.Timestamp, log.Message);
+            }
+        }
+
+        #endregion
 
         /// <summary>
         /// Helper function that prints each log until done or canceled.
         /// </summary>
-        /// <param name="printer">The log printer.</param>
+        /// <param name="printer">The log printer. First is the text writer, second parameter is the log, the third is a state object</param>
+        /// <param name="printerStateGenerator">State generator.</param>
         /// <param name="cancellationToken">Print-process cancellation token.</param>
-        protected void PrintHelper(Action<ILogEntry> printer, CancellationToken cancellationToken)
+        protected void PrintHelper(Action<TextWriter, ILogEntry, object> printer, Func<object> printerStateGenerator, CancellationToken cancellationToken)
         {
             var observableRunningTokenSource = new CancellationTokenSource();
 
-            var dis = logRegistry.Logs.TakeWhile(_ => !cancellationToken.IsCancellationRequested).Subscribe(printer, () =>
+            var state = printerStateGenerator();
+            var dis = logRegistry.Logs.TakeWhile(_ => !cancellationToken.IsCancellationRequested).Subscribe(log => printer(TextWriter, log, state), () =>
             {
                 observableRunningTokenSource.Cancel();
             });
@@ -204,6 +275,11 @@ namespace Stethoscope.Printers.Internal
             return Task.Run(() => LogPrintHandler?.Invoke(cancellationToken), cancellationToken);
         }
 
+        private void SetPrintHandler(Action<TextWriter, ILogEntry, object> printer, Func<object> printerStateGenerator)
+        {
+            LogPrintHandler = ct => PrintHelper(printer, printerStateGenerator, ct);
+        }
+
         private void ParsePrintMode(string mode)
         {
             //XXX should an error be printed if something here is wrong?
@@ -215,15 +291,10 @@ namespace Stethoscope.Printers.Internal
                 }
                 else
                 {
-                    switch (mode.ToLower())
+                    if (PrintHandlers.ContainsKey(mode.ToLower()))
                     {
-                        case "general":
-                            LogPrintHandler = ct => PrintHelper(PrintModeDefault, ct);
-                            break;
-                        case "functiononly":
-                            LogPrintHandler = ct => PrintHelper(PrintModeFunctionOnly, ct);
-                            break;
-                        //TODO
+                        var (printFunc, printFuncStateGen) = PrintHandlers[mode.ToLower()];
+                        SetPrintHandler(printFunc, printFuncStateGen);
                     }
                 }
             }
@@ -241,7 +312,7 @@ namespace Stethoscope.Printers.Internal
             }
             if (LogPrintHandler == null)
             {
-                LogPrintHandler = ct => PrintHelper(PrintModeDefault, ct);
+                ParsePrintMode(DefaultPrinterName);
             }
         }
 
