@@ -2485,6 +2485,13 @@ File browser (connect to multiple remote machines, then use a file browser to ba
 - Sub-classes could swap out the writer and result in "IOPrinter simply writes" while ConsolePrinter replaces the writer so colors and other elements can be handled.
 - It's past when I should be thinking about this, so this all sounds nice now, but my concious is saying "stop doing scope creep" and I'll give it some time before going "yay or neh"
 
+#268.2. 01/05/2019:
+- I had a bit of a wacky moment today, so I kinda lost some urge to do work today.
+- I at least made the decision that "if your config is bad, throw an exception"
+- Why? Because it's a library. If you used a specific class and used a config value wrong, it would throw an exception.
+- For the actual program, a try/catch around SetConfig could result in "load config. Popup: Config is invalid for X"
+- But, that's it for now.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2

@@ -296,6 +296,10 @@ namespace Stethoscope.Printers.Internal
                         var (printFunc, printFuncStateGen) = PrintHandlers[mode.ToLower()];
                         SetPrintHandler(printFunc, printFuncStateGen);
                     }
+                    else
+                    {
+                        throw new ArgumentException($"Unknwon printMode: {mode}");
+                    }
                 }
             }
         }

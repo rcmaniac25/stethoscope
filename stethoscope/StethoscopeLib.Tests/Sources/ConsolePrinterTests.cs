@@ -19,8 +19,10 @@ namespace Stethoscope.Tests
         {
             _originalStdOut = Console.Out;
 
-            _fakeStdOut = new StringWriter();
-            _fakeStdOut.NewLine = "\n";
+            _fakeStdOut = new StringWriter
+            {
+                NewLine = "\n"
+            };
             Console.SetOut(_fakeStdOut);
 
             base.Setup();
