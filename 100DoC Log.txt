@@ -2492,6 +2492,9 @@ File browser (connect to multiple remote machines, then use a file browser to ba
 - For the actual program, a try/catch around SetConfig could result in "load config. Popup: Config is invalid for X"
 - But, that's it for now.
 
+#269.2. 01/06/2019:
+- Timing isn't working out today. Will do stuff tomorrow.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
