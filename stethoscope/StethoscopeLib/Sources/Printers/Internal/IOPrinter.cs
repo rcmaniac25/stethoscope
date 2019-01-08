@@ -289,17 +289,14 @@ namespace Stethoscope.Printers.Internal
                 {
                     //TODO
                 }
+                else if (PrintHandlers.ContainsKey(mode.ToLower()))
+                {
+                    var (printFunc, printFuncStateGen) = PrintHandlers[mode.ToLower()];
+                    SetPrintHandler(printFunc, printFuncStateGen);
+                }
                 else
                 {
-                    if (PrintHandlers.ContainsKey(mode.ToLower()))
-                    {
-                        var (printFunc, printFuncStateGen) = PrintHandlers[mode.ToLower()];
-                        SetPrintHandler(printFunc, printFuncStateGen);
-                    }
-                    else
-                    {
-                        throw new ArgumentException($"Unknwon printMode: {mode}");
-                    }
+                    throw new ArgumentException($"Unknwon printMode: {mode}");
                 }
             }
         }

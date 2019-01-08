@@ -216,5 +216,57 @@ namespace Stethoscope.Tests
             Assert.That(dataTask.Result, Is.Empty);
             // Would like to check task state, but state is reset in continuations... so it will return the state of the continuation instead
         }
+        
+        [Test]
+        public void PrintModeGeneral()
+        {
+            logConfig.ExtraConfigs = new System.Collections.Generic.Dictionary<string, string>()
+            {
+                {"printMode" , "General" }
+            };
+
+            var now = DateTime.Now;
+            AddLog("testentry1", 123, "myFunc", "path/to/location.cpp");
+
+            //@!"Problem printing log. Timestamp=^{Timestamp}, Message=^{Message}"[{Timestamp}] -- {Message}^{LogSource|, LogSource="{}"}^{ThreadID|, ThreadID="{}"}...^{Context|, Context="{}"}
+            var expectedLogPrintout = " - testentry1, ThreadID=\"123\", SourceFile=\"path/to/location.cpp\", Function=\"myFunc\"";
+
+            var data = PrintData();
+
+            Assert.That(data.StartsWith('['), Is.True);
+            Assert.That(data.IndexOf(']'), Is.GreaterThan(0));
+
+            var dtString = data.Substring(1, data.IndexOf(']') - 1);
+            Assert.That(DateTime.TryParse(dtString, out DateTime date), Is.True);
+            Assert.That(date, Is.EqualTo(now).Within(TimeSpan.FromSeconds(1)));
+
+            var logPrint = data.Substring(data.IndexOf(']') + 1);
+
+            Assert.That(logPrint, Is.EqualTo(expectedLogPrintout));
+        }
+
+        [Test]
+        public void PrintModeGeneralFailure()
+        {
+            logConfig.ExtraConfigs = new System.Collections.Generic.Dictionary<string, string>()
+            {
+                {"printMode" , "General" }
+            };
+
+            var now = DateTime.Now;
+            var failedLog = logRegistry.AddFailedLog();
+            logRegistry.AddValueToLog(failedLog, Common.LogAttribute.Timestamp, now);
+            logRegistry.NotifyFailedLogParsed(failedLog);
+            
+            var expectedLogPrintout = $"Problem printing log. Timestamp={now}, Message=";
+
+            var data = PrintData();
+            
+            Assert.That(data, Is.EqualTo(expectedLogPrintout));
+        }
+
+        //TODO: FunctionOnly
+        //TODO: FirstFunctionOnly
+        //TODO: DifferentFunctionOnly
     }
 }

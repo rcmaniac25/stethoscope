@@ -2495,6 +2495,13 @@ File browser (connect to multiple remote machines, then use a file browser to ba
 #269.2. 01/06/2019:
 - Timing isn't working out today. Will do stuff tomorrow.
 
+#270.2. 01/07/2019:
+- I managed to write unit tests for the "General" printMode and it's failure case.
+- I'll do others another time.
+- It's something...
+- If I seem "meh" in writing, imagine having a bad sleep schedule. Making it worse. And then work starts after the new year... so I'm tired, trying to fix my sleep schedule, and the rest of the world keeps going on and I am determined to go on with it.
+- Basically, I'm tired and will be for a bit until I fix my sleep schedule.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
