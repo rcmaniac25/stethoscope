@@ -2502,6 +2502,12 @@ File browser (connect to multiple remote machines, then use a file browser to ba
 - If I seem "meh" in writing, imagine having a bad sleep schedule. Making it worse. And then work starts after the new year... so I'm tired, trying to fix my sleep schedule, and the rest of the world keeps going on and I am determined to go on with it.
 - Basically, I'm tired and will be for a bit until I fix my sleep schedule.
 
+#271.2. 01/08/2019:
+- Finished pre-defined printMode tests.
+- It actually uncovered a bug in the generated strings.
+- That's the point! So it's good I did this.
+- Tomorrow I start on the fun part: custom print formats
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2

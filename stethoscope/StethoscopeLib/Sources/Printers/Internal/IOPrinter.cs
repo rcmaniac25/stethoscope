@@ -186,7 +186,7 @@ namespace Stethoscope.Printers.Internal
             }
             else if (log.IsValid)
             {
-                textWriter.WriteLine("Log is missing Function attribute: {0} -- {1}", log.Timestamp, log.Message);
+                textWriter.WriteLine("Log is missing Function attribute: {0} - {1}", log.Timestamp, log.Message);
             }
         }
 
@@ -208,7 +208,7 @@ namespace Stethoscope.Printers.Internal
             }
             else if (log.IsValid)
             {
-                textWriter.WriteLine("Log is missing Function attribute: {0} -- {1}", log.Timestamp, log.Message);
+                textWriter.WriteLine("Log is missing Function attribute: {0} - {1}", log.Timestamp, log.Message);
             }
         }
 
@@ -231,7 +231,7 @@ namespace Stethoscope.Printers.Internal
             }
             else if (log.IsValid)
             {
-                textWriter.WriteLine("Log is missing Function attribute: {0} -- {1}", log.Timestamp, log.Message);
+                textWriter.WriteLine("Log is missing Function attribute: {0} - {1}", log.Timestamp, log.Message);
             }
         }
 

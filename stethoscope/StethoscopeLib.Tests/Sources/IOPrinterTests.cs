@@ -216,7 +216,11 @@ namespace Stethoscope.Tests
             Assert.That(dataTask.Result, Is.Empty);
             // Would like to check task state, but state is reset in continuations... so it will return the state of the continuation instead
         }
-        
+
+        #region PrintMode
+
+        #region General
+
         [Test]
         public void PrintModeGeneral()
         {
@@ -257,7 +261,8 @@ namespace Stethoscope.Tests
             var failedLog = logRegistry.AddFailedLog();
             logRegistry.AddValueToLog(failedLog, Common.LogAttribute.Timestamp, now);
             logRegistry.NotifyFailedLogParsed(failedLog);
-            
+
+            //@!"Problem printing log. Timestamp=^{Timestamp}, Message=^{Message}"[{Timestamp}] -- {Message}^{LogSource|, LogSource="{}"}^{ThreadID|, ThreadID="{}"}...^{Context|, Context="{}"}
             var expectedLogPrintout = $"Problem printing log. Timestamp={now}, Message=";
 
             var data = PrintData();
@@ -265,8 +270,296 @@ namespace Stethoscope.Tests
             Assert.That(data, Is.EqualTo(expectedLogPrintout));
         }
 
-        //TODO: FunctionOnly
-        //TODO: FirstFunctionOnly
-        //TODO: DifferentFunctionOnly
+        #endregion
+
+        #region FunctionOnly
+
+        [Test]
+        public void PrintModeFunctionOnly()
+        {
+            logConfig.ExtraConfigs = new System.Collections.Generic.Dictionary<string, string>()
+            {
+                {"printMode" , "FunctionOnly" }
+            };
+            
+            AddLog("testentry1", 123, "myFunc", "path/to/location.cpp");
+
+            //@{Function}!"@+Log is missing Function attribute: {Timestamp} -- {Message}"
+            var expectedLogPrintout = "myFunc";
+
+            var data = PrintData();
+            
+            Assert.That(data, Is.EqualTo(expectedLogPrintout));
+        }
+
+        [Test]
+        public void PrintModeFunctionOnlyMulti()
+        {
+            logConfig.ExtraConfigs = new System.Collections.Generic.Dictionary<string, string>()
+            {
+                {"printMode" , "FunctionOnly" }
+            };
+
+            AddLog("testentry1", 123, "myFunc", "path/to/location.cpp");
+            AddLog("testentry2", 321, "myFunc2", "path/to/location.cpp");
+
+            //@{Function}!"@+Log is missing Function attribute: {Timestamp} -- {Message}"
+            var expectedLogPrintout = "myFunc\nmyFunc2";
+
+            var data = PrintData();
+
+            Assert.That(data, Is.EqualTo(expectedLogPrintout));
+        }
+
+        [Test]
+        public void PrintModeFunctionOnlyFailure()
+        {
+            logConfig.ExtraConfigs = new System.Collections.Generic.Dictionary<string, string>()
+            {
+                {"printMode" , "FunctionOnly" }
+            };
+
+            var nowString = DateTime.Now.ToString();
+            logRegistry.AddLog(nowString, "testentry1");
+
+            //@{Function}!"@+Log is missing Function attribute: {Timestamp} -- {Message}"
+            var expectedLogPrintout = $"Log is missing Function attribute: {nowString} - testentry1";
+
+            var data = PrintData();
+
+            Assert.That(data, Is.EqualTo(expectedLogPrintout));
+        }
+
+        [Test]
+        public void PrintModeFunctionOnlyFailureInvalidLog()
+        {
+            logConfig.ExtraConfigs = new System.Collections.Generic.Dictionary<string, string>()
+            {
+                {"printMode" , "FunctionOnly" }
+            };
+
+            var now = DateTime.Now;
+            var failedLog = logRegistry.AddFailedLog();
+            logRegistry.AddValueToLog(failedLog, Common.LogAttribute.Timestamp, DateTime.Now);
+            logRegistry.NotifyFailedLogParsed(failedLog);
+
+            //@{Function}!"@+Log is missing Function attribute: {Timestamp} -- {Message}"
+            var expectedLogPrintout = string.Empty;
+
+            var data = PrintData();
+
+            Assert.That(data, Is.EqualTo(expectedLogPrintout));
+        }
+
+        #endregion
+
+        #region FirstFunctionOnly
+
+        [Test]
+        public void PrintModeFirstFunctionOnly()
+        {
+            logConfig.ExtraConfigs = new System.Collections.Generic.Dictionary<string, string>()
+            {
+                {"printMode" , "FirstFunctionOnly" }
+            };
+
+            AddLog("testentry1", 123, "myFunc", "path/to/location.cpp");
+
+            //@{Function}~!"@+Log is missing Function attribute: {Timestamp} -- {Message}"
+            var expectedLogPrintout = "myFunc";
+
+            var data = PrintData();
+
+            Assert.That(data, Is.EqualTo(expectedLogPrintout));
+        }
+
+        [Test]
+        public void PrintModeFirstFunctionOnlyMultiDiff()
+        {
+            logConfig.ExtraConfigs = new System.Collections.Generic.Dictionary<string, string>()
+            {
+                {"printMode" , "FirstFunctionOnly" }
+            };
+
+            AddLog("testentry1", 123, "myFunc", "path/to/location.cpp");
+            AddLog("testentry2", 321, "myFunc2", "path/to/location.cpp");
+
+            //@{Function}~!"@+Log is missing Function attribute: {Timestamp} -- {Message}"
+            var expectedLogPrintout = "myFunc\nmyFunc2";
+
+            var data = PrintData();
+
+            Assert.That(data, Is.EqualTo(expectedLogPrintout));
+        }
+
+        [Test]
+        public void PrintModeFirstFunctionOnlyMultiSame()
+        {
+            logConfig.ExtraConfigs = new System.Collections.Generic.Dictionary<string, string>()
+            {
+                {"printMode" , "FirstFunctionOnly" }
+            };
+
+            AddLog("testentry1", 123, "myFunc", "path/to/location.cpp");
+            AddLog("testentry2", 321, "myFunc", "path/to/location.cpp");
+
+            //@{Function}~!"@+Log is missing Function attribute: {Timestamp} -- {Message}"
+            var expectedLogPrintout = "myFunc";
+
+            var data = PrintData();
+
+            Assert.That(data, Is.EqualTo(expectedLogPrintout));
+        }
+
+        [Test]
+        public void PrintModeFirstFunctionOnlyMulti()
+        {
+            logConfig.ExtraConfigs = new System.Collections.Generic.Dictionary<string, string>()
+            {
+                {"printMode" , "FirstFunctionOnly" }
+            };
+
+            AddLog("testentry1", 123, "myFunc", "path/to/location.cpp");
+            AddLog("testentry2", 321, "myFunc2", "path/to/location.cpp");
+            AddLog("testentry3", 312, "myFunc", "path/to/location.cpp");
+
+            //@{Function}~!"@+Log is missing Function attribute: {Timestamp} -- {Message}"
+            var expectedLogPrintout = "myFunc\nmyFunc2";
+
+            var data = PrintData();
+
+            Assert.That(data, Is.EqualTo(expectedLogPrintout));
+        }
+
+        //FirstFunctionOnly uses the same format as FunctionOnly, but just when it prints results
+
+        #endregion
+
+        #region DifferentFunctionOnly
+
+        [Test]
+        public void PrintModeDifferentFunctionOnly()
+        {
+            logConfig.ExtraConfigs = new System.Collections.Generic.Dictionary<string, string>()
+            {
+                {"printMode" , "DifferentFunctionOnly" }
+            };
+
+            AddLog("testentry1", 123, "myFunc", "path/to/location.cpp");
+
+            //@{Function}$!"@+Log is missing Function attribute: {Timestamp} -- {Message}"
+            var expectedLogPrintout = "myFunc";
+
+            var data = PrintData();
+
+            Assert.That(data, Is.EqualTo(expectedLogPrintout));
+        }
+
+        [Test]
+        public void PrintModeDifferentFunctionOnlyDiff()
+        {
+            logConfig.ExtraConfigs = new System.Collections.Generic.Dictionary<string, string>()
+            {
+                {"printMode" , "DifferentFunctionOnly" }
+            };
+
+            AddLog("testentry1", 123, "myFunc", "path/to/location.cpp");
+            AddLog("testentry2", 321, "myFunc2", "path/to/location.cpp");
+
+            //@{Function}$!"@+Log is missing Function attribute: {Timestamp} -- {Message}"
+            var expectedLogPrintout = "myFunc\nmyFunc2";
+
+            var data = PrintData();
+
+            Assert.That(data, Is.EqualTo(expectedLogPrintout));
+        }
+
+        [Test]
+        public void PrintModeDifferentFunctionOnlySame()
+        {
+            logConfig.ExtraConfigs = new System.Collections.Generic.Dictionary<string, string>()
+            {
+                {"printMode" , "DifferentFunctionOnly" }
+            };
+
+            AddLog("testentry1", 123, "myFunc", "path/to/location.cpp");
+            AddLog("testentry2", 321, "myFunc", "path/to/location.cpp");
+
+            //@{Function}$!"@+Log is missing Function attribute: {Timestamp} -- {Message}"
+            var expectedLogPrintout = "myFunc";
+
+            var data = PrintData();
+
+            Assert.That(data, Is.EqualTo(expectedLogPrintout));
+        }
+
+        [Test]
+        public void PrintModeDifferentFunctionOnlySequence1()
+        {
+            logConfig.ExtraConfigs = new System.Collections.Generic.Dictionary<string, string>()
+            {
+                {"printMode" , "DifferentFunctionOnly" }
+            };
+
+            AddLog("testentry1", 123, "myFunc", "path/to/location.cpp");
+            AddLog("testentry2", 321, "myFunc2", "path/to/location.cpp");
+            AddLog("testentry3", 456, "myFunc", "path/to/location.cpp");
+            AddLog("testentry4", 654, "myFunc2", "path/to/location.cpp");
+
+            //@{Function}$!"@+Log is missing Function attribute: {Timestamp} -- {Message}"
+            var expectedLogPrintout = "myFunc\nmyFunc2\nmyFunc\nmyFunc2";
+
+            var data = PrintData();
+
+            Assert.That(data, Is.EqualTo(expectedLogPrintout));
+        }
+
+        [Test]
+        public void PrintModeDifferentFunctionOnlySequence2()
+        {
+            logConfig.ExtraConfigs = new System.Collections.Generic.Dictionary<string, string>()
+            {
+                {"printMode" , "DifferentFunctionOnly" }
+            };
+
+            AddLog("testentry1", 123, "myFunc", "path/to/location.cpp");
+            AddLog("testentry2", 321, "myFunc", "path/to/location.cpp");
+            AddLog("testentry3", 456, "myFunc2", "path/to/location.cpp");
+            AddLog("testentry4", 654, "myFunc2", "path/to/location.cpp");
+
+            //@{Function}$!"@+Log is missing Function attribute: {Timestamp} -- {Message}"
+            var expectedLogPrintout = "myFunc\nmyFunc2";
+
+            var data = PrintData();
+
+            Assert.That(data, Is.EqualTo(expectedLogPrintout));
+        }
+
+        [Test]
+        public void PrintModeDifferentFunctionOnlySequence3()
+        {
+            logConfig.ExtraConfigs = new System.Collections.Generic.Dictionary<string, string>()
+            {
+                {"printMode" , "DifferentFunctionOnly" }
+            };
+            
+            AddLog("testentry1", 123, "myFunc2", "path/to/location.cpp");
+            AddLog("testentry2", 321, "myFunc", "path/to/location.cpp");
+            AddLog("testentry3", 456, "myFunc", "path/to/location.cpp");
+            AddLog("testentry4", 654, "myFunc2", "path/to/location.cpp");
+
+            //@{Function}$!"@+Log is missing Function attribute: {Timestamp} -- {Message}"
+            var expectedLogPrintout = "myFunc2\nmyFunc\nmyFunc2";
+
+            var data = PrintData();
+
+            Assert.That(data, Is.EqualTo(expectedLogPrintout));
+        }
+
+        //DifferentFunctionOnly uses the same format as FunctionOnly, but just when it prints results
+
+        #endregion
+
+        #endregion
     }
 }
