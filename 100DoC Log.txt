@@ -2508,6 +2508,19 @@ File browser (connect to multiple remote machines, then use a file browser to ba
 - That's the point! So it's good I did this.
 - Tomorrow I start on the fun part: custom print formats
 
+#272.2. 01/09/2019:
+- Things got late, so I wanted this to be quick
+- I realized "this should have tests before it has code"
+- I actually started writing the tests... and then realized "wait, I need edge cases"
+- Edge cases: null print mode, empty string, etc.
+- I wrote these, start working on other tests before going "It's late. Let me stop"
+- But then... doubt. I Looked at the tests I wrote and said "I'm just doing random tests. There is no progression where I can use a prior test to write a new one"
+- In addition, I realized "do I really want the edge case to do that?" Like, I originally wrote that a null printMode should throw an exception. But should it? What if I want default and want to check for that "printMode" exists?
+- Random text should provide an error, because if we don't have the printMode format indicator (@) then we expect a pre-defined printMode. But random text would never exist as a printMode... so, exception.
+- Deleted everything, made a couple comments... but I'm done now.
+- I'll try to implement those tomorrow, but I'm sleep deprived and feel a little funny (I think sleep deprivation finally kicked in and I feel tired at a good time instead of really late at night)
+- In addition, I may have a wacky schedule coming up (not sure yet). In one case, work will continue. In another, I won't be able to do anything for a few days. I'll need to see.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2

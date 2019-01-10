@@ -219,6 +219,16 @@ namespace Stethoscope.Tests
 
         #region PrintMode
 
+        #region "Special Cases"
+
+        //TODO: printMode null
+
+        //TODO: printMode empty string
+
+        //TODO: printMode random text
+
+        #endregion
+
         #region General
 
         [Test]
@@ -557,6 +567,38 @@ namespace Stethoscope.Tests
         }
 
         //DifferentFunctionOnly uses the same format as FunctionOnly, but just when it prints results
+
+        #endregion
+
+        #region Custom
+
+#if false
+        [Test]
+        public void PrintModeNull()
+        {
+            logConfig.ExtraConfigs = new System.Collections.Generic.Dictionary<string, string>()
+            {
+                {"printMode" , null }
+            };
+
+            AddLog("testentry1", 123, "myFunc", "path/to/location.cpp");
+
+            //@{Function}!"@+Log is missing Function attribute: {Timestamp} -- {Message}"
+            var expectedLogPrintout = "myFunc";
+
+            var data = PrintData();
+
+            Assert.That(data, Is.EqualTo(expectedLogPrintout));
+        }
+#endif
+
+        //TODO: printMode @
+
+        //TODO: printMode @text
+
+        //TODO: printMode @<special char>
+
+        //TODO: ...the many possibilities with formats
 
         #endregion
 
