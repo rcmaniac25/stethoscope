@@ -224,8 +224,19 @@ namespace Stethoscope.Tests
         //TODO: printMode null
 
         //TODO: printMode empty string
+        
+        [Test]
+        public void PrintModeRandomText()
+        {
+            logConfig.ExtraConfigs = new System.Collections.Generic.Dictionary<string, string>()
+            {
+                {"printMode" , "hjfjhkfdjadf" }
+            };
 
-        //TODO: printMode random text
+            AddLog("testentry1", 123, "myFunc", "path/to/location.cpp");
+
+            Assert.Throws<ArgumentException>(() => PrintData());
+        }
 
         #endregion
 

@@ -2521,6 +2521,10 @@ File browser (connect to multiple remote machines, then use a file browser to ba
 - I'll try to implement those tomorrow, but I'm sleep deprived and feel a little funny (I think sleep deprivation finally kicked in and I feel tired at a good time instead of really late at night)
 - In addition, I may have a wacky schedule coming up (not sure yet). In one case, work will continue. In another, I won't be able to do anything for a few days. I'll need to see.
 
+#273.2. 01/10/2019:
+- Ok, so my schedule will continue.
+- But today, I got home too late and could only do one test (that I decided on the result after yesterday)
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
