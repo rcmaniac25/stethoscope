@@ -2525,6 +2525,11 @@ File browser (connect to multiple remote machines, then use a file browser to ba
 - Ok, so my schedule will continue.
 - But today, I got home too late and could only do one test (that I decided on the result after yesterday)
 
+#274.2. 01/11/2019:
+- Planned to work on this
+- Lots of distractions today... and just needed to relax a bit
+- Tomorrow
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
