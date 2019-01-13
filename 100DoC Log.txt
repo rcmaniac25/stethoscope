@@ -2530,6 +2530,12 @@ File browser (connect to multiple remote machines, then use a file browser to ba
 - Lots of distractions today... and just needed to relax a bit
 - Tomorrow
 
+#275.2. 01/12/2019:
+- Finally got to finish the "special case" tests.
+- That's all I could do today...
+- I wasn't sure how I wanted to handle the configs, then realized they should handle the same as the log attribute paths.
+- In those cases, we just skip all null, empty, or whitespace strings.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2

@@ -219,12 +219,63 @@ namespace Stethoscope.Tests
 
         #region PrintMode
 
+        private void InternalPrintModeGeneralTest()
+        {
+            var now = DateTime.Now;
+            AddLog("testentry1", 123, "myFunc", "path/to/location.cpp");
+
+            //@!"Problem printing log. Timestamp=^{Timestamp}, Message=^{Message}"[{Timestamp}] -- {Message}^{LogSource|, LogSource="{}"}^{ThreadID|, ThreadID="{}"}...^{Context|, Context="{}"}
+            var expectedLogPrintout = " - testentry1, ThreadID=\"123\", SourceFile=\"path/to/location.cpp\", Function=\"myFunc\"";
+
+            var data = PrintData();
+
+            Assert.That(data.StartsWith('['), Is.True);
+            Assert.That(data.IndexOf(']'), Is.GreaterThan(0));
+
+            var dtString = data.Substring(1, data.IndexOf(']') - 1);
+            Assert.That(DateTime.TryParse(dtString, out DateTime date), Is.True);
+            Assert.That(date, Is.EqualTo(now).Within(TimeSpan.FromSeconds(1)));
+
+            var logPrint = data.Substring(data.IndexOf(']') + 1);
+
+            Assert.That(logPrint, Is.EqualTo(expectedLogPrintout));
+        }
+
         #region "Special Cases"
 
-        //TODO: printMode null
+        [Test]
+        public void PrintModeNullNext()
+        {
+            logConfig.ExtraConfigs = new System.Collections.Generic.Dictionary<string, string>()
+            {
+                {"printMode" , null }
+            };
 
-        //TODO: printMode empty string
-        
+            InternalPrintModeGeneralTest();
+        }
+
+        [Test]
+        public void PrintModeEmptyText()
+        {
+            logConfig.ExtraConfigs = new System.Collections.Generic.Dictionary<string, string>()
+            {
+                {"printMode" , string.Empty }
+            };
+
+            InternalPrintModeGeneralTest();
+        }
+
+        [Test]
+        public void PrintModeWhitespaceText()
+        {
+            logConfig.ExtraConfigs = new System.Collections.Generic.Dictionary<string, string>()
+            {
+                {"printMode" , "    " }
+            };
+
+            InternalPrintModeGeneralTest();
+        }
+
         [Test]
         public void PrintModeRandomText()
         {
@@ -250,24 +301,7 @@ namespace Stethoscope.Tests
                 {"printMode" , "General" }
             };
 
-            var now = DateTime.Now;
-            AddLog("testentry1", 123, "myFunc", "path/to/location.cpp");
-
-            //@!"Problem printing log. Timestamp=^{Timestamp}, Message=^{Message}"[{Timestamp}] -- {Message}^{LogSource|, LogSource="{}"}^{ThreadID|, ThreadID="{}"}...^{Context|, Context="{}"}
-            var expectedLogPrintout = " - testentry1, ThreadID=\"123\", SourceFile=\"path/to/location.cpp\", Function=\"myFunc\"";
-
-            var data = PrintData();
-
-            Assert.That(data.StartsWith('['), Is.True);
-            Assert.That(data.IndexOf(']'), Is.GreaterThan(0));
-
-            var dtString = data.Substring(1, data.IndexOf(']') - 1);
-            Assert.That(DateTime.TryParse(dtString, out DateTime date), Is.True);
-            Assert.That(date, Is.EqualTo(now).Within(TimeSpan.FromSeconds(1)));
-
-            var logPrint = data.Substring(data.IndexOf(']') + 1);
-
-            Assert.That(logPrint, Is.EqualTo(expectedLogPrintout));
+            InternalPrintModeGeneralTest();
         }
 
         [Test]
