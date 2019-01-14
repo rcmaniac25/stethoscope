@@ -2536,6 +2536,9 @@ File browser (connect to multiple remote machines, then use a file browser to ba
 - I wasn't sure how I wanted to handle the configs, then realized they should handle the same as the log attribute paths.
 - In those cases, we just skip all null, empty, or whitespace strings.
 
+#276.2. 01/13/2019:
+- Late start, need to end early today + some unexpected plans and one longer-then-expected project = no time today
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
