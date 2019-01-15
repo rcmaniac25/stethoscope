@@ -617,31 +617,69 @@ namespace Stethoscope.Tests
 
         #region Custom
 
-#if false
         [Test]
-        public void PrintModeNull()
+        public void PrintModeCustomEmpty()
         {
             logConfig.ExtraConfigs = new System.Collections.Generic.Dictionary<string, string>()
             {
-                {"printMode" , null }
+                {"printMode" , "@" }
             };
 
             AddLog("testentry1", 123, "myFunc", "path/to/location.cpp");
-
-            //@{Function}!"@+Log is missing Function attribute: {Timestamp} -- {Message}"
-            var expectedLogPrintout = "myFunc";
+            
+            var expectedLogPrintout = string.Empty;
 
             var data = PrintData();
 
             Assert.That(data, Is.EqualTo(expectedLogPrintout));
         }
-#endif
 
-        //TODO: printMode @
+        [Test]
+        public void PrintModeCustomRaw()
+        {
+            logConfig.ExtraConfigs = new System.Collections.Generic.Dictionary<string, string>()
+            {
+                {"printMode" , "@hello world" }
+            };
 
-        //TODO: printMode @text
+            AddLog("testentry1", 123, "myFunc", "path/to/location.cpp");
 
-        //TODO: printMode @<special char>
+            var expectedLogPrintout = "hello world";
+
+            var data = PrintData();
+
+            Assert.That(data, Is.EqualTo(expectedLogPrintout));
+        }
+
+        [Test]
+        public void PrintModeCustomRawSpecialChar()
+        {
+            logConfig.ExtraConfigs = new System.Collections.Generic.Dictionary<string, string>()
+            {
+                {"printMode" , "@@++--^^$$~~!!{{}}" } // @ isn't considered a special char, but because it is a marker, we'll test it
+            };
+
+            AddLog("testentry1", 123, "myFunc", "path/to/location.cpp");
+
+            var expectedLogPrintout = "@+-^$~!{}";
+
+            var data = PrintData();
+
+            Assert.That(data, Is.EqualTo(expectedLogPrintout));
+        }
+
+        [Test]
+        public void PrintModeCustomRawSpecialCharInvalid()
+        {
+            logConfig.ExtraConfigs = new System.Collections.Generic.Dictionary<string, string>()
+            {
+                {"printMode" , "@+-^$~!{}" }
+            };
+
+            AddLog("testentry1", 123, "myFunc", "path/to/location.cpp");
+
+            Assert.Throws<ArgumentException>(() => PrintData());
+        }
 
         //TODO: ...the many possibilities with formats
 

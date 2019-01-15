@@ -2539,6 +2539,10 @@ File browser (connect to multiple remote machines, then use a file browser to ba
 #276.2. 01/13/2019:
 - Late start, need to end early today + some unexpected plans and one longer-then-expected project = no time today
 
+#277.2. 01/14/2019:
+- Initial tests for custom formats
+- That's all for now
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
