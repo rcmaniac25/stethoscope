@@ -2546,6 +2546,10 @@ File browser (connect to multiple remote machines, then use a file browser to ba
 #278.2. 01/15/2019:
 - Err... important day at work tomorrow, so I need to skip tonight...
 
+#279.2. 01/16/2019:
+- Wrote the first attribute test...
+- Then decided not to do the others today, and instead enumerated all the tests to implement
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2

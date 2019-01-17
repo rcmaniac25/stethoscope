@@ -681,7 +681,56 @@ namespace Stethoscope.Tests
             Assert.Throws<ArgumentException>(() => PrintData());
         }
 
-        //TODO: ...the many possibilities with formats
+        [Test]
+        public void PrintModeCustomAttribute()
+        {
+            logConfig.ExtraConfigs = new System.Collections.Generic.Dictionary<string, string>()
+            {
+                {"printMode" , "@{Message}" }
+            };
+
+            AddLog("testentry1", 123, "myFunc", "path/to/location.cpp");
+
+            var expectedLogPrintout = "testentry1";
+
+            var data = PrintData();
+
+            Assert.That(data, Is.EqualTo(expectedLogPrintout));
+        }
+
+        //TODO: attribute - conditional - exists
+
+        //TODO: attribute - modifier - value changes
+
+        //TODO: attribute - modifier - value new
+
+        //TODO: attribute - modifier - error handler
+
+        //TODO: attribute - modifier - error handler w/inner quotes
+
+        //TODO: attribute - modifier - valid log only
+
+        //TODO: attribute - modifier - invalid log only
+
+        //TODO: attribute - modifier - <multiple>
+
+        //TODO: attribute - conditional + modifier (exists + value changes)
+
+        //TODO: attribute + raw
+
+        //TODO: raw + attribute
+
+        //TODO: raw + attribute + raw
+
+        //TODO: attribute - attribute format (no text)
+
+        //TODO: attribute - attribute format (text)
+
+        //TODO: attribute - attribute format (text + 1 format marker {})
+
+        //TODO: attribute - attribute format (text + 2 format marker {})
+
+        //TODO: test pre-defined formats against the format they're supposed to represent
 
         #endregion
 
