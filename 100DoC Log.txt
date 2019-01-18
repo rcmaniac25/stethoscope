@@ -2550,6 +2550,9 @@ File browser (connect to multiple remote machines, then use a file browser to ba
 - Wrote the first attribute test...
 - Then decided not to do the others today, and instead enumerated all the tests to implement
 
+#280.2. 01/17/2019:
+- Something I expected to take 15 min took 1.5h, so no time today... err
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
