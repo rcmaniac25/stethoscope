@@ -698,8 +698,24 @@ namespace Stethoscope.Tests
             Assert.That(data, Is.EqualTo(expectedLogPrintout));
         }
 
-        //TODO: attribute - conditional - exists
+        [Test]
+        public void PrintModeCustomAttributeConditionExists()
+        {
+            logConfig.ExtraConfigs = new System.Collections.Generic.Dictionary<string, string>()
+            {
+                {"printMode" , "@^{Message}^{Function}" }
+            };
 
+            AddLog("testentry1", 123, "myFunc", "path/to/location.cpp");
+            AddLog("testentry2", 321, null, "path/to/location.cpp");
+
+            var expectedLogPrintout = "testentry1myFunc\ntestentry2";
+
+            var data = PrintData();
+
+            Assert.That(data, Is.EqualTo(expectedLogPrintout));
+        }
+        
         //TODO: attribute - modifier - value changes
 
         //TODO: attribute - modifier - value new
