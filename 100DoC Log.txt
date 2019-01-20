@@ -2557,6 +2557,11 @@ File browser (connect to multiple remote machines, then use a file browser to ba
 - This seems to be a trend... It's late, so I only did a little work (at some point, I won't be late, and suddenly I'll get a bunch done)
 - So one more test... done
 
+#282.2. 01/19/2019:
+- I finished all non-combination attribute modifier tests
+- AKA: all the ones I could go "this modifier does X" and not need to combine mods or conditions or "raw" or... you get the point
+- I'll try to finish or get further tomorrow
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2

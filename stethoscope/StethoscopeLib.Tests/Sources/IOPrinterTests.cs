@@ -715,19 +715,130 @@ namespace Stethoscope.Tests
 
             Assert.That(data, Is.EqualTo(expectedLogPrintout));
         }
+
+        [Test]
+        public void PrintModeCustomAttributeModifierValueChange()
+        {
+            logConfig.ExtraConfigs = new System.Collections.Generic.Dictionary<string, string>()
+            {
+                {"printMode" , "@{Function}$" }
+            };
+
+            AddLog("testentry1", 123, "myFunc2", "path/to/location.cpp");
+            AddLog("testentry2", 321, "myFunc", "path/to/location.cpp");
+            AddLog("testentry3", 456, "myFunc", "path/to/location.cpp");
+            AddLog("testentry4", 654, "myFunc2", "path/to/location.cpp");
+
+            var expectedLogPrintout = "myFunc2\nmyFunc\nmyFunc2";
+
+            var data = PrintData();
+
+            Assert.That(data, Is.EqualTo(expectedLogPrintout));
+        }
+
+        [Test]
+        public void PrintModeCustomAttributeModifierValueNew()
+        {
+            logConfig.ExtraConfigs = new System.Collections.Generic.Dictionary<string, string>()
+            {
+                {"printMode" , "@{Function}~" }
+            };
+
+            AddLog("testentry1", 123, "myFunc", "path/to/location.cpp");
+            AddLog("testentry2", 321, "myFunc2", "path/to/location.cpp");
+            AddLog("testentry3", 312, "myFunc", "path/to/location.cpp");
+
+            var expectedLogPrintout = "myFunc\nmyFunc2";
+
+            var data = PrintData();
+
+            Assert.That(data, Is.EqualTo(expectedLogPrintout));
+        }
+
+        [Test]
+        public void PrintModeCustomAttributeModifierErrorHandler()
+        {
+            logConfig.ExtraConfigs = new System.Collections.Generic.Dictionary<string, string>()
+            {
+                {"printMode" , "@{Function}!\"Oh hai\"" }
+            };
+
+            AddLog("testentry1", 123, null, "path/to/location.cpp");
+
+            var expectedLogPrintout = "Oh hai";
+
+            var data = PrintData();
+
+            Assert.That(data, Is.EqualTo(expectedLogPrintout));
+        }
+
+        [Test]
+        public void PrintModeCustomAttributeModifierErrorHandlerInnerQuotes()
+        {
+            logConfig.ExtraConfigs = new System.Collections.Generic.Dictionary<string, string>()
+            {
+                {"printMode" , "@{Function}!\"Oh hai \"steve\"\"" }
+            };
+
+            AddLog("testentry1", 123, null, "path/to/location.cpp");
+
+            var expectedLogPrintout = "Oh hai \"steve\"";
+
+            var data = PrintData();
+
+            Assert.That(data, Is.EqualTo(expectedLogPrintout));
+        }
+
+        [Test]
+        public void PrintModeCustomAttributeModifierValidOnly()
+        {
+            logConfig.ExtraConfigs = new System.Collections.Generic.Dictionary<string, string>()
+            {
+                {"printMode" , "@{Message}+" }
+            };
+
+            AddLog("testentry1", 123, "myFunc", "path/to/location.cpp");
+
+            var failedLog = logRegistry.AddFailedLog();
+            logRegistry.AddValueToLog(failedLog, Common.LogAttribute.Timestamp, DateTime.Now);
+            logRegistry.AddValueToLog(failedLog, Common.LogAttribute.Message, "testentry2");
+            logRegistry.AddValueToLog(failedLog, Common.LogAttribute.ThreadID, 456);
+            logRegistry.AddValueToLog(failedLog, Common.LogAttribute.Function, "myFunc2");
+            logRegistry.AddValueToLog(failedLog, Common.LogAttribute.SourceFile, "path/to/location.cpp");
+            logRegistry.NotifyFailedLogParsed(failedLog);
+
+            var expectedLogPrintout = "testentry1";
+
+            var data = PrintData();
+
+            Assert.That(data, Is.EqualTo(expectedLogPrintout));
+        }
+
+        [Test]
+        public void PrintModeCustomAttributeModifierInvalidOnly()
+        {
+            logConfig.ExtraConfigs = new System.Collections.Generic.Dictionary<string, string>()
+            {
+                {"printMode" , "@{Message}-" }
+            };
+
+            AddLog("testentry1", 123, "myFunc", "path/to/location.cpp");
+
+            var failedLog = logRegistry.AddFailedLog();
+            logRegistry.AddValueToLog(failedLog, Common.LogAttribute.Timestamp, DateTime.Now);
+            logRegistry.AddValueToLog(failedLog, Common.LogAttribute.Message, "testentry2");
+            logRegistry.AddValueToLog(failedLog, Common.LogAttribute.ThreadID, 456);
+            logRegistry.AddValueToLog(failedLog, Common.LogAttribute.Function, "myFunc2");
+            logRegistry.AddValueToLog(failedLog, Common.LogAttribute.SourceFile, "path/to/location.cpp");
+            logRegistry.NotifyFailedLogParsed(failedLog);
+
+            var expectedLogPrintout = "testentry2";
+
+            var data = PrintData();
+
+            Assert.That(data, Is.EqualTo(expectedLogPrintout));
+        }
         
-        //TODO: attribute - modifier - value changes
-
-        //TODO: attribute - modifier - value new
-
-        //TODO: attribute - modifier - error handler
-
-        //TODO: attribute - modifier - error handler w/inner quotes
-
-        //TODO: attribute - modifier - valid log only
-
-        //TODO: attribute - modifier - invalid log only
-
         //TODO: attribute - modifier - <multiple>
 
         //TODO: attribute - conditional + modifier (exists + value changes)
