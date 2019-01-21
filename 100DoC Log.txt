@@ -2562,6 +2562,11 @@ File browser (connect to multiple remote machines, then use a file browser to ba
 - AKA: all the ones I could go "this modifier does X" and not need to combine mods or conditions or "raw" or... you get the point
 - I'll try to finish or get further tomorrow
 
+#283.2. 01/20/2019:
+- Ok... not "this" tomorrow, tomorrow's tomorrow.
+- I'm trying something out, and need to have stricter deadlines on some of the things I do...
+- So this ended up getting the short straw
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
