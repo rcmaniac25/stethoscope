@@ -2567,6 +2567,21 @@ File browser (connect to multiple remote machines, then use a file browser to ba
 - I'm trying something out, and need to have stricter deadlines on some of the things I do...
 - So this ended up getting the short straw
 
+#284.2. 01/21/2019:
+- Ok, almost done.
+- So the only tests that need to be written are testing pre-defined formats against the format they're supposed to represent, and using multiple modifiers.
+- The reason those two aren't done are this:
+-- Compare formats: the test class wasn't written with the expectation that multiple formats would get used in the same test. So I need to do a few changes so it does work
+-- Multiple modifiers: honestly, I have this idea in my head to have a whole mess of logs... then for the printed out log to say "the quick brown fox jumps over the laxy dog". But to figure out what the logs to add to test all the modifiers at least once is... not easy.
+- Cont. Doing an exhaustive test shouldn't be needed, and doing a random test could result in some combo being skipped. It's lose-lose.
+- That's why I have the "quick fox" example stuck in my head. I figure I may not hit every case, but it will show off that all modifiers have an effect.
+- ...and a thought that just came to mind: should order of the operators matter?
+- My gut feeling says "yes" because it makes it both easier to code (I can just make an ordered list/array when parsing) but also because it offers the user more control over what happens.
+- Maybe only valid logs is more important then if the value changed. Or maybe the value change is more important.
+- Someone else can come up with "why", but it gives the dev more control and makes my code easier to write.
+- So... yes, order matters.
+- Next couple days may be short (again, trying something out) but if I get the time, I'll ry to get at least one of the two additional tests done.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2

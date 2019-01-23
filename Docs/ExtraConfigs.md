@@ -37,7 +37,7 @@ Custom modes can be defined with a "format" while pre-defined modes can be used,
     - format = `@[<modifier>...]<part>[<part>...]` | `<mode>`
     - `<part>` = `<raw>` | `<attribute>`
     - `<raw>` = (any charecter except `+ - ^ $ ~ ! { }`. Special chars need to be duplicated to print)
-    - `<attribute>` = `[<conditional>]<attribute reference>[<modifier>]`
+    - `<attribute>` = `[<conditional>]<attribute reference>[<modifier>]` (note: order matters for evaluation purposes. So a condition will always be evaluated before a modifier, while which modifier gets tested first will depend on where it is in the format)
     - `<conditional>` - ^ (only print if it exists)
     - `<modifier>`
         - `$` (print only when the value changes from the last log. Not applicable per-log.. So a,a,a,b,a,b,b,a -> a,b,a,b,a)

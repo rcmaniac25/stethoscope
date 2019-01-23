@@ -841,22 +841,57 @@ namespace Stethoscope.Tests
         
         //TODO: attribute - modifier - <multiple>
 
-        //TODO: attribute - conditional + modifier (exists + value changes)
+        [Test]
+        public void PrintModeCustomAttributeConditionAndModifier()
+        {
+            logConfig.ExtraConfigs = new System.Collections.Generic.Dictionary<string, string>()
+            {
+                {"printMode" , "@^{Function}$" }
+            };
 
-        //TODO: attribute + raw
+            AddLog("testentry1", 123, "myFunc2", "path/to/location.cpp");
+            AddLog("testentry2", 321, null, "path/to/location.cpp");
+            AddLog("testentry3", 456, null, "path/to/location.cpp");
+            AddLog("testentry4", 654, "myFunc2", "path/to/location.cpp");
 
-        //TODO: raw + attribute
+            var expectedLogPrintout = "myFunc2";
 
-        //TODO: raw + attribute + raw
+            var data = PrintData();
 
-        //TODO: attribute - attribute format (no text)
+            Assert.That(data, Is.EqualTo(expectedLogPrintout));
+        }
 
-        //TODO: attribute - attribute format (text)
+        [TestCase("@{Message} hello", ExpectedResult = "testentry1 hello")]
+        [TestCase("@hello {Message}", ExpectedResult = "hello testentry1")]
+        [TestCase("@hello {Message} stranger", ExpectedResult = "hello testentry1 stranger")]
+        public string PrintModeCustomAttributeAndRaw(string format)
+        {
+            logConfig.ExtraConfigs = new System.Collections.Generic.Dictionary<string, string>()
+            {
+                {"printMode" , format }
+            };
 
-        //TODO: attribute - attribute format (text + 1 format marker {})
+            AddLog("testentry1", 123, "myFunc", "path/to/location.cpp");
+            
+            return PrintData();
+        }
 
-        //TODO: attribute - attribute format (text + 2 format marker {})
+        [TestCase("@{Message|}", ExpectedResult = "")]
+        [TestCase("@{Message|hello world}", ExpectedResult = "hello world")]
+        [TestCase("@{Message|hello {}}", ExpectedResult = "hello testentry1")]
+        [TestCase("@{Message|hello {} and {}}", ExpectedResult = "hello testentry1 and testentry1")]
+        public string PrintModeCustomAttributeFormat(string format)
+        {
+            logConfig.ExtraConfigs = new System.Collections.Generic.Dictionary<string, string>()
+            {
+                {"printMode" , format }
+            };
 
+            AddLog("testentry1", 123, "myFunc", "path/to/location.cpp");
+
+            return PrintData();
+        }
+        
         //TODO: test pre-defined formats against the format they're supposed to represent
 
         #endregion
