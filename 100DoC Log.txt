@@ -2582,6 +2582,9 @@ File browser (connect to multiple remote machines, then use a file browser to ba
 - So... yes, order matters.
 - Next couple days may be short (again, trying something out) but if I get the time, I'll ry to get at least one of the two additional tests done.
 
+#285.2. 01/22/2019:
+- As expected, I don't have time tonight. Maybe tomorrow.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
