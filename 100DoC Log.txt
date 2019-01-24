@@ -2585,6 +2585,10 @@ File browser (connect to multiple remote machines, then use a file browser to ba
 #285.2. 01/22/2019:
 - As expected, I don't have time tonight. Maybe tomorrow.
 
+#286.2. 01/23/2019:
+- Ok, I'm earlier... but I have people who are expecting stuff from me, so that takes priority.
+- Maybe tomorrow.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
