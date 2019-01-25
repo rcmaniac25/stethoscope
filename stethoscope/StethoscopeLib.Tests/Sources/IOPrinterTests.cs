@@ -1,11 +1,12 @@
 ﻿using Stethoscope.Log.Internal;
 using Stethoscope.Printers.Internal;
+using Stethoscope.Log.Internal.Storage;
 
 using NUnit.Framework;
 
 using System;
-
-using Stethoscope.Log.Internal.Storage;
+using System.Linq;
+using System.Text;
 
 namespace Stethoscope.Tests
 {
@@ -27,6 +28,7 @@ namespace Stethoscope.Tests
 
         protected abstract string PrintedDataNewLine { get; }
 
+        protected abstract void ResetPrintedData();
         protected abstract string GetPrintedData();
         protected abstract IOPrinter GetIOPrinter();
 
@@ -891,9 +893,67 @@ namespace Stethoscope.Tests
 
             return PrintData();
         }
-        
-        //TODO: test pre-defined formats against the format they're supposed to represent
 
+        private void CompareFormats(string format1, string format2)
+        {
+            logConfig.ExtraConfigs = new System.Collections.Generic.Dictionary<string, string>()
+            {
+                {"printMode" , format1 }
+            };
+
+            AddLog("testentry1", 123, "myFunc2", "path/to/location.cpp");
+            AddLog("testentry2", 321, "myFunc", "path/to/location.cpp");
+            AddLog("testentry3", 456, "myFunc", "path/to/location.cpp");
+            AddLog("testentry4", 654, "myFunc2", "path/to/location.cpp");
+            AddLog("testentry6", 123, "myFunc", "path/to/location.cpp");
+            AddLog("testentry7", 321, "myFunc2", "path/to/location.cpp");
+            AddLog("testentry8", 312, "myFunc", "path/to/location.cpp");
+
+            var str1 = PrintData();
+
+            ResetPrintedData();
+
+            logConfig.ExtraConfigs["printMode"] = format2;
+
+            var str2 = PrintData();
+
+            Assert.That(str1, Is.EqualTo(str2));
+        }
+
+        [Test]
+        public void PrintModeCompareGeneral()
+        {
+            var sb = new StringBuilder("@!\"Problem printing log. Timestamp=^{Timestamp}, Message=^{Message}\"[{Timestamp}] -- {Message}");
+            foreach (var e in Enum.GetValues(typeof(Common.LogAttribute)).Cast<Common.LogAttribute>())
+            {
+                if (e == Common.LogAttribute.Timestamp || e == Common.LogAttribute.Message)
+                {
+                    continue;
+                }
+                sb.AppendFormat("^{{{0}|, {0}=\"{{}}\"}}", e);
+            }
+
+            CompareFormats("General", sb.ToString());
+        }
+
+        [Test]
+        public void PrintModeCompareFunctionOnly()
+        {
+            CompareFormats("FunctionOnly", "@{Function}!\"@+Log is missing Function attribute: {Timestamp} -- {Message}\"");
+        }
+
+        [Test]
+        public void PrintModeCompareFirstFunctionOnly()
+        {
+            CompareFormats("FirstFunctionOnly", "@{Function}~!\"@+Log is missing Function attribute: {Timestamp} -- {Message}\"");
+        }
+
+        [Test]
+        public void PrintModeCompareDifferentFunctionOnly()
+        {
+            CompareFormats("DifferentFunctionOnly", "@{Function}$!\"@+Log is missing Function attribute: {Timestamp} -- {Message}\"");
+        }
+        
         #endregion
 
         #endregion

@@ -34,6 +34,11 @@ namespace Stethoscope.Tests
             Console.SetOut(_originalStdOut);
         }
 
+        protected override void ResetPrintedData()
+        {
+            _fakeStdOut.GetStringBuilder().Clear();
+        }
+
         private string GetConsoleOutput(bool stripEndingNewline = true)
         {
             var str = _fakeStdOut.ToString();
