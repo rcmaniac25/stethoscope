@@ -2593,6 +2593,9 @@ File browser (connect to multiple remote machines, then use a file browser to ba
 - I made the comparison tests.
 - Now, I haven't tested the tests... but that's for once I have an impl.
 
+#288.2. 01/25/2019:
+- Poor timing today. Will do stuff tomorrow
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
