@@ -2596,6 +2596,12 @@ File browser (connect to multiple remote machines, then use a file browser to ba
 #288.2. 01/25/2019:
 - Poor timing today. Will do stuff tomorrow
 
+#289.2. 01/26/2019:
+- Yesterday: dah! I didn't plan well and now it's late and I still haven't done anything
+- Now: dah! I didn't plan well and now it's late and I still haven't done anything
+- I need to skip again. I didn't get as much sleep as I'd like, got a late start, procrastinated, had a few unexpected moments, and I'm still going...
+- ...but I haven't gotten to this. I'm ending everything else and then going to bed.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
