@@ -2602,6 +2602,13 @@ File browser (connect to multiple remote machines, then use a file browser to ba
 - I need to skip again. I didn't get as much sleep as I'd like, got a late start, procrastinated, had a few unexpected moments, and I'm still going...
 - ...but I haven't gotten to this. I'm ending everything else and then going to bed.
 
+#290.2. 01/27/2019:
+- I tried... but the most I got was "I need to test ordering of modifiers" as well.
+- See, I could automate generation... but I don't know if I could come up with an easy set of rules for how to create the "expected" values.
+- I don't want to implement the parser twice, one to run and one to generate a test result... as they'd be doing the same thing.
+- I'd rather create the expected value by hand but also don't want an exhaustive set of tests, especially since some combos are invalid (will only print valid or invalid values...)
+- Also, maybe "modifier" is the wrong term... but I need to check that another time.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2

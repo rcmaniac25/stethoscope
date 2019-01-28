@@ -840,8 +840,8 @@ namespace Stethoscope.Tests
 
             Assert.That(data, Is.EqualTo(expectedLogPrintout));
         }
-        
-        //TODO: attribute - modifier - <multiple>
+
+        //TODO: attribute - modifier - <multiple> (don't forget to test order)
 
         [Test]
         public void PrintModeCustomAttributeConditionAndModifier()
