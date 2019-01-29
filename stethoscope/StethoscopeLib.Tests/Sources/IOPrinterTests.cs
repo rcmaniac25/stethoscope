@@ -758,40 +758,6 @@ namespace Stethoscope.Tests
         }
 
         [Test]
-        public void PrintModeCustomAttributeModifierErrorHandler()
-        {
-            logConfig.ExtraConfigs = new System.Collections.Generic.Dictionary<string, string>()
-            {
-                {"printMode" , "@{Function}!\"Oh hai\"" }
-            };
-
-            AddLog("testentry1", 123, null, "path/to/location.cpp");
-
-            var expectedLogPrintout = "Oh hai";
-
-            var data = PrintData();
-
-            Assert.That(data, Is.EqualTo(expectedLogPrintout));
-        }
-
-        [Test]
-        public void PrintModeCustomAttributeModifierErrorHandlerInnerQuotes()
-        {
-            logConfig.ExtraConfigs = new System.Collections.Generic.Dictionary<string, string>()
-            {
-                {"printMode" , "@{Function}!\"Oh hai \"steve\"\"" }
-            };
-
-            AddLog("testentry1", 123, null, "path/to/location.cpp");
-
-            var expectedLogPrintout = "Oh hai \"steve\"";
-
-            var data = PrintData();
-
-            Assert.That(data, Is.EqualTo(expectedLogPrintout));
-        }
-
-        [Test]
         public void PrintModeCustomAttributeModifierValidOnly()
         {
             logConfig.ExtraConfigs = new System.Collections.Generic.Dictionary<string, string>()
@@ -841,10 +807,46 @@ namespace Stethoscope.Tests
             Assert.That(data, Is.EqualTo(expectedLogPrintout));
         }
 
-        //TODO: attribute - modifier - <multiple> (don't forget to test order)
+        //TODO: attribute - conditional - <multiple> (don't forget to test order)
+
+
 
         [Test]
-        public void PrintModeCustomAttributeConditionAndModifier()
+        public void PrintModeCustomAttributeModifierErrorHandler()
+        {
+            logConfig.ExtraConfigs = new System.Collections.Generic.Dictionary<string, string>()
+            {
+                {"printMode" , "@{Function}!\"Oh hai\"" }
+            };
+
+            AddLog("testentry1", 123, null, "path/to/location.cpp");
+
+            var expectedLogPrintout = "Oh hai";
+
+            var data = PrintData();
+
+            Assert.That(data, Is.EqualTo(expectedLogPrintout));
+        }
+
+        [Test]
+        public void PrintModeCustomAttributeModifierErrorHandlerInnerQuotes()
+        {
+            logConfig.ExtraConfigs = new System.Collections.Generic.Dictionary<string, string>()
+            {
+                {"printMode" , "@{Function}!\"Oh hai \"steve\"\"" }
+            };
+
+            AddLog("testentry1", 123, null, "path/to/location.cpp");
+
+            var expectedLogPrintout = "Oh hai \"steve\"";
+
+            var data = PrintData();
+
+            Assert.That(data, Is.EqualTo(expectedLogPrintout));
+        }
+
+        [Test]
+        public void PrintModeCustomAttributeConditionAndModifier() //XXX
         {
             logConfig.ExtraConfigs = new System.Collections.Generic.Dictionary<string, string>()
             {

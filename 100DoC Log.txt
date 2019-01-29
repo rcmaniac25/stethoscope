@@ -2609,6 +2609,15 @@ File browser (connect to multiple remote machines, then use a file browser to ba
 - I'd rather create the expected value by hand but also don't want an exhaustive set of tests, especially since some combos are invalid (will only print valid or invalid values...)
 - Also, maybe "modifier" is the wrong term... but I need to check that another time.
 
+#291.2. 01/28/2019:
+- I'm late again, but I wanted to stop pushing things off...
+- I finally came to a mental conclusion, and realized a bunch of my "modifiers" were actually "conditionals"
+- I started doing the change, but need to do the following still:
+-- Modify test names
+-- Modify actual char. location within formats.
+-- Modify PrintModeCustomAttributeConditionAndModifier (do an error handler and conditional, while taking the existing test and (see below))
+-- Work on actual conditional tests
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
