@@ -2618,6 +2618,28 @@ File browser (connect to multiple remote machines, then use a file browser to ba
 -- Modify PrintModeCustomAttributeConditionAndModifier (do an error handler and conditional, while taking the existing test and (see below))
 -- Work on actual conditional tests
 
+#292.2. 01/29/2019:
+- I thought I might skip today, but wanted to at least put the little re-factor behind me.
+- I did everything _but_ doing the mixed-conditional tests.
+- One interesting question that came to mind while doing this: I had added the ability to apply a modifer to an entire log, or to a specific attribute...
+- ...but since those are now conditionals, they are in front of the attribute. So now... "@+{Message}"
+-- Does this print the message only if it's the attribute is part of a valid log?
+-- Does this do anything unless it's a valid log?
+- Those two questions may sound similar, but they aren't. If I changed it to "@+{Message} World", the following would occur for Message="Hello":
+-- Does this print the message only if it's the attribute is part of a valid log?
+--- Valid log: "Hello World"
+--- Invalid log: " World"
+-- Does this do anything unless it's a valid log?
+--- Valid log: "Hello World"
+--- Invalid log: ""
+- While updating everything, and writing the above, the thought "how do I determine the correct answer to the question... or do I try and be smart when picking"
+- That told me enough. A professor once told my class "Work smarter, not harder" and a coworker became well known to me for saying "You're trying to be smart in this function. Be similar"
+- The point I took from the two is similar: Don't do more work then you have to.
+- In this case, I am writing a string format. There is no reason for me to go and do deductive reasoning or something to determine the most-likely case of what they meant.
+- Why? Because if someone else (or myself) ever went "hey, I only want this to apply to my attribute... but it's applying to the log line" then I now need to edit the format/logic/etc.
+- Instead, I want to be verbose and deterministic. I will add a seperator between the conditionl for a log line, and the conditional for an attribute.
+- But that's for tomorrow-me to figure out.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2

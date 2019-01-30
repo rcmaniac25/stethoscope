@@ -719,11 +719,11 @@ namespace Stethoscope.Tests
         }
 
         [Test]
-        public void PrintModeCustomAttributeModifierValueChange()
+        public void PrintModeCustomAttributeConditionValueChange()
         {
             logConfig.ExtraConfigs = new System.Collections.Generic.Dictionary<string, string>()
             {
-                {"printMode" , "@{Function}$" }
+                {"printMode" , "@${Function}" }
             };
 
             AddLog("testentry1", 123, "myFunc2", "path/to/location.cpp");
@@ -739,11 +739,11 @@ namespace Stethoscope.Tests
         }
 
         [Test]
-        public void PrintModeCustomAttributeModifierValueNew()
+        public void PrintModeCustomAttributeConditionValueNew()
         {
             logConfig.ExtraConfigs = new System.Collections.Generic.Dictionary<string, string>()
             {
-                {"printMode" , "@{Function}~" }
+                {"printMode" , "@~{Function}" }
             };
 
             AddLog("testentry1", 123, "myFunc", "path/to/location.cpp");
@@ -758,11 +758,11 @@ namespace Stethoscope.Tests
         }
 
         [Test]
-        public void PrintModeCustomAttributeModifierValidOnly()
+        public void PrintModeCustomAttributeConditionValidOnly()
         {
             logConfig.ExtraConfigs = new System.Collections.Generic.Dictionary<string, string>()
             {
-                {"printMode" , "@{Message}+" }
+                {"printMode" , "@+{Message}" }
             };
 
             AddLog("testentry1", 123, "myFunc", "path/to/location.cpp");
@@ -783,11 +783,11 @@ namespace Stethoscope.Tests
         }
 
         [Test]
-        public void PrintModeCustomAttributeModifierInvalidOnly()
+        public void PrintModeCustomAttributeConditionInvalidOnly()
         {
             logConfig.ExtraConfigs = new System.Collections.Generic.Dictionary<string, string>()
             {
-                {"printMode" , "@{Message}-" }
+                {"printMode" , "@-{Message}" }
             };
 
             AddLog("testentry1", 123, "myFunc", "path/to/location.cpp");
@@ -808,8 +808,25 @@ namespace Stethoscope.Tests
         }
 
         //TODO: attribute - conditional - <multiple> (don't forget to test order)
+#if false
+        {
+            logConfig.ExtraConfigs = new System.Collections.Generic.Dictionary<string, string>()
+            {
+                {"printMode" , "@^{Function}$" }
+            };
 
+            AddLog("testentry1", 123, "myFunc2", "path/to/location.cpp");
+            AddLog("testentry2", 321, null, "path/to/location.cpp");
+            AddLog("testentry3", 456, null, "path/to/location.cpp");
+            AddLog("testentry4", 654, "myFunc2", "path/to/location.cpp");
 
+            var expectedLogPrintout = "myFunc2";
+
+            var data = PrintData();
+
+            Assert.That(data, Is.EqualTo(expectedLogPrintout));
+        }
+#endif
 
         [Test]
         public void PrintModeCustomAttributeModifierErrorHandler()
@@ -846,11 +863,11 @@ namespace Stethoscope.Tests
         }
 
         [Test]
-        public void PrintModeCustomAttributeConditionAndModifier() //XXX
+        public void PrintModeCustomAttributeConditionAndModifier()
         {
             logConfig.ExtraConfigs = new System.Collections.Generic.Dictionary<string, string>()
             {
-                {"printMode" , "@^{Function}$" }
+                {"printMode" , "@~{Function}!\"Ahhh\"" }
             };
 
             AddLog("testentry1", 123, "myFunc2", "path/to/location.cpp");
@@ -858,7 +875,7 @@ namespace Stethoscope.Tests
             AddLog("testentry3", 456, null, "path/to/location.cpp");
             AddLog("testentry4", 654, "myFunc2", "path/to/location.cpp");
 
-            var expectedLogPrintout = "myFunc2";
+            var expectedLogPrintout = "myFunc2\nAhhh\nAhhh";
 
             var data = PrintData();
 
@@ -947,17 +964,17 @@ namespace Stethoscope.Tests
         [Test]
         public void PrintModeCompareFirstFunctionOnly()
         {
-            CompareFormats("FirstFunctionOnly", "@{Function}~!\"@+Log is missing Function attribute: {Timestamp} -- {Message}\"");
+            CompareFormats("FirstFunctionOnly", "@~{Function}!\"@+Log is missing Function attribute: {Timestamp} -- {Message}\"");
         }
 
         [Test]
         public void PrintModeCompareDifferentFunctionOnly()
         {
-            CompareFormats("DifferentFunctionOnly", "@{Function}$!\"@+Log is missing Function attribute: {Timestamp} -- {Message}\"");
+            CompareFormats("DifferentFunctionOnly", "@${Function}!\"@+Log is missing Function attribute: {Timestamp} -- {Message}\"");
         }
         
-        #endregion
+#endregion
 
-        #endregion
+#endregion
     }
 }

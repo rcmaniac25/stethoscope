@@ -30,18 +30,18 @@ Custom modes can be defined with a "format" while pre-defined modes can be used,
     - General = @!"Problem printing log. Timestamp=^{Timestamp}, Message=^{Message}"[{Timestamp}] -- {Message}^{LogSource|, LogSource="{}"}^{ThreadID|, ThreadID="{}"}...^{Context|, Context="{}"}
 	    - Every attribute is printed
     - FunctionOnly = @{Function}!"@+Log is missing Function attribute: {Timestamp} -- {Message}"
-    - FirstFunctionOnly = @{Function}~!"@+Log is missing Function attribute: {Timestamp} -- {Message}"
-	- DifferentFunctionOnly = @{Function}$!"@+Log is missing Function attribute: {Timestamp} -- {Message}"
+    - FirstFunctionOnly = @~{Function}!"@+Log is missing Function attribute: {Timestamp} -- {Message}"
+	- DifferentFunctionOnly = @${Function}!"@+Log is missing Function attribute: {Timestamp} -- {Message}"
 
 - "format"
-    - format = `@[<modifier>...]<part>[<part>...]` | `<mode>`
+    - format = `@[<conditional>...]<part>[<part>...]` | `<mode>`
     - `<part>` = `<raw>` | `<attribute>`
     - `<raw>` = (any charecter except `+ - ^ $ ~ ! { }`. Special chars need to be duplicated to print)
     - `<attribute>` = `[<conditional>]<attribute reference>[<modifier>]` (note: order matters for evaluation purposes. So a condition will always be evaluated before a modifier, while which modifier gets tested first will depend on where it is in the format)
     - `<conditional>`
-		- `^` (only print if field exists)
-        - `$` (print only when the value changes from the last log entry. Not applicable per-log. So a,a,a,b,a,b,b,a -> a,b,a,b,a)
-		- `~` (print only if the value hasn't been printed before)
+		- `^` (only print if attribute exists. Only applies to attributes)
+        - `$` (print only when the value changes from the last log entry. Not applicable per-log. So a,a,a,b,a,b,b,a -> a,b,a,b,a. Only applies to attributes)
+		- `~` (print only if the value hasn't been printed before. Only applies to attributes)
         - `+` (only print if a valid log)
         - `-` (only print if an invalid log)
     - `<modifier>` - `!"<format>"` (if an error occurs with this log, print the following error message. Limitations: must be contained within quotes, single quotes needs to be escaped `\"`)
