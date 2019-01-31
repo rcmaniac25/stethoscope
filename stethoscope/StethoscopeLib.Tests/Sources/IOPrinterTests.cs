@@ -806,8 +806,17 @@ namespace Stethoscope.Tests
 
             Assert.That(data, Is.EqualTo(expectedLogPrintout));
         }
-
-        //TODO: attribute - conditional - <multiple> (don't forget to test order)
+        
+        /* TODO: attribute - conditional - <multiple> (don't forget to test order)
+            exists + value change
+            exists + new
+            exists + valid
+            exists + invalid
+            change + valid
+            change + invalid
+            new + valid
+            new + invalid
+         */
 #if false
         {
             logConfig.ExtraConfigs = new System.Collections.Generic.Dictionary<string, string>()

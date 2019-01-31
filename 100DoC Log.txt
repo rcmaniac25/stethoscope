@@ -2640,6 +2640,13 @@ File browser (connect to multiple remote machines, then use a file browser to ba
 - Instead, I want to be verbose and deterministic. I will add a seperator between the conditionl for a log line, and the conditional for an attribute.
 - But that's for tomorrow-me to figure out.
 
+#293.2. 01/30/2019:
+- I didn't figure out the seperator yet...
+- But I finally bit the bullet and wrote up the list of comparision tests I "can" do.
+- Not every modifier can be combined (ex. only print if it's from both a valid and invalid log), which reminded me I need to test invalid combos (and what they'd do)
+- So... yay. That's a step towards finishing this.
+- The bad news: tomorrow's a busy day, so I'm probably not doing/going to do much tomorrow.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
