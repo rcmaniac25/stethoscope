@@ -807,7 +807,7 @@ namespace Stethoscope.Tests
             Assert.That(data, Is.EqualTo(expectedLogPrintout));
         }
         
-        /* TODO: attribute - conditional - <multiple> (don't forget to test order)
+        /* TODO: attribute - conditional - <multiple> (don't forget to test order and invalid combos)
             exists + value change
             exists + new
             exists + valid
