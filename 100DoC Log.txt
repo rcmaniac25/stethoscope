@@ -2650,6 +2650,9 @@ File browser (connect to multiple remote machines, then use a file browser to ba
 #294.2. 01/31/2019:
 - Yep... no time today
 
+#295.2. 02/01/2019:
+- Crashed... not doing things tonight.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
