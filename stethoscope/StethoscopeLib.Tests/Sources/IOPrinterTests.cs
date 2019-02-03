@@ -806,16 +806,20 @@ namespace Stethoscope.Tests
 
             Assert.That(data, Is.EqualTo(expectedLogPrintout));
         }
-        
-        /* TODO: attribute - conditional - <multiple> (don't forget to test order and invalid combos)
-            exists + value change
-            exists + new
+
+        // Only test a couple combos as all combos are a non-repetitious permutation (5 fields, in different orders, could result in as many as 5! = 120 combos. Not writing 120 tests...)
+
+        /* TODO: attribute - conditional - <multiple>
+            exists + change (normal + reverse order)
+            exists + new (normal + reverse order)
             exists + valid
             exists + invalid
             change + valid
             change + invalid
             new + valid
             new + invalid
+
+            valid + invalid (invalid combo)
          */
 #if false
         {

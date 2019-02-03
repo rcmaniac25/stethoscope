@@ -2653,6 +2653,15 @@ File browser (connect to multiple remote machines, then use a file browser to ba
 #295.2. 02/01/2019:
 - Crashed... not doing things tonight.
 
+#296.2. 02/02/2019:
+- Ok, so after yesterday, I'd like to try and not fall back to old habits again.
+- So I wanted to end the cerebral + lazy + poorly timed case of these last unit tests.
+- ...and I did.
+- So everything is now all "TODO"s are written out which means...
+- Tomorrow I start to code the tests.
+- Woot! Once that's done, I can do the actual format code and move on to... it's been so long, I don't know what my plan was after this.
+- (Good thing it was written down at the bottom of this page)
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
