@@ -2662,6 +2662,9 @@ File browser (connect to multiple remote machines, then use a file browser to ba
 - Woot! Once that's done, I can do the actual format code and move on to... it's been so long, I don't know what my plan was after this.
 - (Good thing it was written down at the bottom of this page)
 
+#297.2. 02/03/2019:
+- There was an event today... and I ran out of time. :(
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
