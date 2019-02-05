@@ -2665,6 +2665,14 @@ File browser (connect to multiple remote machines, then use a file browser to ba
 #297.2. 02/03/2019:
 - There was an event today... and I ran out of time. :(
 
+#298.2. 02/04/2019:
+- I managed to get a good amount done today...
+- So I got to the tests, and... lost track of time.
+- I still got a few tests done, but I had a thought: how can I make it apparent that the combos do something different?
+- So it will take a couple iterations as I write the tests, but I hope to end with all the tests for combos being the same, with only the format being different.
+- In-fact, now that I wrote that. I'm going to take the couple tests I have for (valid) combos and turn it into test cases to enforce the point.
+- Tomorrow may be a day I miss, just a thing that happens...
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2

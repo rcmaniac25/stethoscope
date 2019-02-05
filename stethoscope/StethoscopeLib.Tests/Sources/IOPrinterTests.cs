@@ -816,10 +816,6 @@ namespace Stethoscope.Tests
             exists + invalid
             change + valid
             change + invalid
-            new + valid
-            new + invalid
-
-            valid + invalid (invalid combo)
          */
 #if false
         {
@@ -840,6 +836,54 @@ namespace Stethoscope.Tests
             Assert.That(data, Is.EqualTo(expectedLogPrintout));
         }
 #endif
+
+        [TestCase("@~+{Message}", ExpectedResult = "testentry1")]
+        [TestCase("@~-{Message}", ExpectedResult = "testentry2")]
+        public string PrintModeCustomAttributeConditionCombo(string format)
+        {
+            logConfig.ExtraConfigs = new System.Collections.Generic.Dictionary<string, string>()
+            {
+                {"printMode" , format }
+            };
+
+            AddLog("testentry1", 123, "myFunc", "path/to/location.cpp");
+            AddLog("testentry1", 345, "myFunc2", "path/to/location.cpp");
+
+            var failedLog = logRegistry.AddFailedLog();
+            logRegistry.AddValueToLog(failedLog, Common.LogAttribute.Timestamp, DateTime.Now);
+            logRegistry.AddValueToLog(failedLog, Common.LogAttribute.Message, "testentry2");
+            logRegistry.AddValueToLog(failedLog, Common.LogAttribute.ThreadID, 456);
+            logRegistry.AddValueToLog(failedLog, Common.LogAttribute.Function, "myFunc2");
+            logRegistry.AddValueToLog(failedLog, Common.LogAttribute.SourceFile, "path/to/location.cpp");
+            logRegistry.NotifyFailedLogParsed(failedLog);
+
+            failedLog = logRegistry.AddFailedLog();
+            logRegistry.AddValueToLog(failedLog, Common.LogAttribute.Timestamp, DateTime.Now);
+            logRegistry.AddValueToLog(failedLog, Common.LogAttribute.Message, "testentry2");
+            logRegistry.AddValueToLog(failedLog, Common.LogAttribute.ThreadID, 456);
+            logRegistry.AddValueToLog(failedLog, Common.LogAttribute.Function, "myFunc");
+            logRegistry.AddValueToLog(failedLog, Common.LogAttribute.SourceFile, "path/to/location.cpp");
+            logRegistry.NotifyFailedLogParsed(failedLog);
+            
+            return PrintData();
+        }
+        
+        [Test]
+        public void PrintModeCustomAttributeConditionComboInvalid()
+        {
+            logConfig.ExtraConfigs = new System.Collections.Generic.Dictionary<string, string>()
+            {
+                {"printMode" , "@+-{Message}" }
+            };
+
+            AddLog("testentry1", 123, "myFunc", "path/to/location.cpp");
+            
+            var expectedLogPrintout = "testentry1";
+
+            var data = PrintData();
+
+            Assert.That(data, Is.Not.EqualTo(expectedLogPrintout));
+        }
 
         [Test]
         public void PrintModeCustomAttributeModifierErrorHandler()
