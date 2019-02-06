@@ -624,7 +624,7 @@ namespace Stethoscope.Tests
         {
             logConfig.ExtraConfigs = new System.Collections.Generic.Dictionary<string, string>()
             {
-                {"printMode" , "@" }
+                { "printMode" , "@" }
             };
 
             AddLog("testentry1", 123, "myFunc", "path/to/location.cpp");
@@ -641,7 +641,7 @@ namespace Stethoscope.Tests
         {
             logConfig.ExtraConfigs = new System.Collections.Generic.Dictionary<string, string>()
             {
-                {"printMode" , "@hello world" }
+                { "printMode" , "@hello world" }
             };
 
             AddLog("testentry1", 123, "myFunc", "path/to/location.cpp");
@@ -658,7 +658,7 @@ namespace Stethoscope.Tests
         {
             logConfig.ExtraConfigs = new System.Collections.Generic.Dictionary<string, string>()
             {
-                {"printMode" , "@@++--^^$$~~!!{{}}" } // @ isn't considered a special char, but because it is a marker, we'll test it
+                { "printMode" , "@@++--^^$$~~!!{{}}" } // @ isn't considered a special char, but because it is a marker, we'll test it
             };
 
             AddLog("testentry1", 123, "myFunc", "path/to/location.cpp");
@@ -675,7 +675,7 @@ namespace Stethoscope.Tests
         {
             logConfig.ExtraConfigs = new System.Collections.Generic.Dictionary<string, string>()
             {
-                {"printMode" , "@+-^$~!{}" }
+                { "printMode" , "@+-^$~!{}" }
             };
 
             AddLog("testentry1", 123, "myFunc", "path/to/location.cpp");
@@ -688,7 +688,7 @@ namespace Stethoscope.Tests
         {
             logConfig.ExtraConfigs = new System.Collections.Generic.Dictionary<string, string>()
             {
-                {"printMode" , "@{Message}" }
+                { "printMode" , "@{Message}" }
             };
 
             AddLog("testentry1", 123, "myFunc", "path/to/location.cpp");
@@ -705,7 +705,7 @@ namespace Stethoscope.Tests
         {
             logConfig.ExtraConfigs = new System.Collections.Generic.Dictionary<string, string>()
             {
-                {"printMode" , "@^{Message}^{Function}" }
+                { "printMode" , "@^{Message}^{Function}" }
             };
 
             AddLog("testentry1", 123, "myFunc", "path/to/location.cpp");
@@ -723,7 +723,7 @@ namespace Stethoscope.Tests
         {
             logConfig.ExtraConfigs = new System.Collections.Generic.Dictionary<string, string>()
             {
-                {"printMode" , "@${Function}" }
+                { "printMode" , "@${Function}" }
             };
 
             AddLog("testentry1", 123, "myFunc2", "path/to/location.cpp");
@@ -743,7 +743,7 @@ namespace Stethoscope.Tests
         {
             logConfig.ExtraConfigs = new System.Collections.Generic.Dictionary<string, string>()
             {
-                {"printMode" , "@~{Function}" }
+                { "printMode" , "@~{Function}" }
             };
 
             AddLog("testentry1", 123, "myFunc", "path/to/location.cpp");
@@ -762,7 +762,7 @@ namespace Stethoscope.Tests
         {
             logConfig.ExtraConfigs = new System.Collections.Generic.Dictionary<string, string>()
             {
-                {"printMode" , "@+{Message}" }
+                { "printMode" , "@+{Message}" }
             };
 
             AddLog("testentry1", 123, "myFunc", "path/to/location.cpp");
@@ -787,7 +787,7 @@ namespace Stethoscope.Tests
         {
             logConfig.ExtraConfigs = new System.Collections.Generic.Dictionary<string, string>()
             {
-                {"printMode" , "@-{Message}" }
+                { "printMode" , "@-{Message}" }
             };
 
             AddLog("testentry1", 123, "myFunc", "path/to/location.cpp");
@@ -824,7 +824,7 @@ namespace Stethoscope.Tests
         {
             logConfig.ExtraConfigs = new System.Collections.Generic.Dictionary<string, string>()
             {
-                {"printMode" , format }
+                { "printMode" , format }
             };
 
             AddLog("testentry1", 123, "myFunc", "path/to/location.cpp");
@@ -863,7 +863,7 @@ namespace Stethoscope.Tests
         {
             logConfig.ExtraConfigs = new System.Collections.Generic.Dictionary<string, string>()
             {
-                {"printMode" , "@+-{Message}" }
+                { "printMode" , "@+-{Message}" }
             };
 
             AddLog("testentry1", 123, "myFunc", "path/to/location.cpp");
@@ -880,7 +880,7 @@ namespace Stethoscope.Tests
         {
             logConfig.ExtraConfigs = new System.Collections.Generic.Dictionary<string, string>()
             {
-                {"printMode" , "@{Function}!\"Oh hai\"" }
+                { "printMode" , "@{Function}!\"Oh hai\"" }
             };
 
             AddLog("testentry1", 123, null, "path/to/location.cpp");
@@ -897,7 +897,7 @@ namespace Stethoscope.Tests
         {
             logConfig.ExtraConfigs = new System.Collections.Generic.Dictionary<string, string>()
             {
-                {"printMode" , "@{Function}!\"Oh hai \"steve\"\"" }
+                { "printMode" , "@{Function}!\"Oh hai \"steve\"\"" }
             };
 
             AddLog("testentry1", 123, null, "path/to/location.cpp");
@@ -914,7 +914,7 @@ namespace Stethoscope.Tests
         {
             logConfig.ExtraConfigs = new System.Collections.Generic.Dictionary<string, string>()
             {
-                {"printMode" , "@~{Function}!\"Ahhh\"" }
+                { "printMode" , "@~{Function}!\"Ahhh\"" }
             };
 
             AddLog("testentry1", 123, "myFunc2", "path/to/location.cpp");
@@ -936,7 +936,7 @@ namespace Stethoscope.Tests
         {
             logConfig.ExtraConfigs = new System.Collections.Generic.Dictionary<string, string>()
             {
-                {"printMode" , format }
+                { "printMode" , format }
             };
 
             AddLog("testentry1", 123, "myFunc", "path/to/location.cpp");
@@ -952,7 +952,7 @@ namespace Stethoscope.Tests
         {
             logConfig.ExtraConfigs = new System.Collections.Generic.Dictionary<string, string>()
             {
-                {"printMode" , format }
+                { "printMode" , format }
             };
 
             AddLog("testentry1", 123, "myFunc", "path/to/location.cpp");
@@ -964,7 +964,7 @@ namespace Stethoscope.Tests
         {
             logConfig.ExtraConfigs = new System.Collections.Generic.Dictionary<string, string>()
             {
-                {"printMode" , format1 }
+                { "printMode" , format1 }
             };
 
             AddLog("testentry1", 123, "myFunc2", "path/to/location.cpp");
