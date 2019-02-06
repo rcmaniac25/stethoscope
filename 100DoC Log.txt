@@ -2673,6 +2673,9 @@ File browser (connect to multiple remote machines, then use a file browser to ba
 - In-fact, now that I wrote that. I'm going to take the couple tests I have for (valid) combos and turn it into test cases to enforce the point.
 - Tomorrow may be a day I miss, just a thing that happens...
 
+#299.2. 02/05/2019:
+- Actually had some time. Almost finished the tests (yay!)
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2

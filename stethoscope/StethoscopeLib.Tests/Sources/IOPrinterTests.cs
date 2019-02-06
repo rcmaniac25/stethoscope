@@ -812,31 +812,12 @@ namespace Stethoscope.Tests
         /* TODO: attribute - conditional - <multiple>
             exists + change (normal + reverse order)
             exists + new (normal + reverse order)
-            exists + valid
-            exists + invalid
-            change + valid
-            change + invalid
          */
-#if false
-        {
-            logConfig.ExtraConfigs = new System.Collections.Generic.Dictionary<string, string>()
-            {
-                {"printMode" , "@^{Function}$" }
-            };
-
-            AddLog("testentry1", 123, "myFunc2", "path/to/location.cpp");
-            AddLog("testentry2", 321, null, "path/to/location.cpp");
-            AddLog("testentry3", 456, null, "path/to/location.cpp");
-            AddLog("testentry4", 654, "myFunc2", "path/to/location.cpp");
-
-            var expectedLogPrintout = "myFunc2";
-
-            var data = PrintData();
-
-            Assert.That(data, Is.EqualTo(expectedLogPrintout));
-        }
-#endif
-
+        
+        [TestCase("@^+{ThreadID}", ExpectedResult = "123\n345")]
+        [TestCase("@^-{ThreadID}", ExpectedResult = "456\n112")]
+        [TestCase("@$+{Function}", ExpectedResult = "myFunc\nmyFunc2\nmyFunc")]
+        [TestCase("@$-{Function}", ExpectedResult = "myFunc2\nmyFunc\nmyFunc2")]
         [TestCase("@~+{Message}", ExpectedResult = "testentry1")]
         [TestCase("@~-{Message}", ExpectedResult = "testentry2")]
         public string PrintModeCustomAttributeConditionCombo(string format)
@@ -848,6 +829,7 @@ namespace Stethoscope.Tests
 
             AddLog("testentry1", 123, "myFunc", "path/to/location.cpp");
             AddLog("testentry1", 345, "myFunc2", "path/to/location.cpp");
+            AddLog("testentry1", null, "myFunc", "path/to/location.cpp");
 
             var failedLog = logRegistry.AddFailedLog();
             logRegistry.AddValueToLog(failedLog, Common.LogAttribute.Timestamp, DateTime.Now);
@@ -860,11 +842,19 @@ namespace Stethoscope.Tests
             failedLog = logRegistry.AddFailedLog();
             logRegistry.AddValueToLog(failedLog, Common.LogAttribute.Timestamp, DateTime.Now);
             logRegistry.AddValueToLog(failedLog, Common.LogAttribute.Message, "testentry2");
-            logRegistry.AddValueToLog(failedLog, Common.LogAttribute.ThreadID, 456);
+            logRegistry.AddValueToLog(failedLog, Common.LogAttribute.ThreadID, null);
             logRegistry.AddValueToLog(failedLog, Common.LogAttribute.Function, "myFunc");
             logRegistry.AddValueToLog(failedLog, Common.LogAttribute.SourceFile, "path/to/location.cpp");
             logRegistry.NotifyFailedLogParsed(failedLog);
-            
+
+            failedLog = logRegistry.AddFailedLog();
+            logRegistry.AddValueToLog(failedLog, Common.LogAttribute.Timestamp, DateTime.Now);
+            logRegistry.AddValueToLog(failedLog, Common.LogAttribute.Message, "testentry2");
+            logRegistry.AddValueToLog(failedLog, Common.LogAttribute.ThreadID, 112);
+            logRegistry.AddValueToLog(failedLog, Common.LogAttribute.Function, "myFunc2");
+            logRegistry.AddValueToLog(failedLog, Common.LogAttribute.SourceFile, "path/to/location.cpp");
+            logRegistry.NotifyFailedLogParsed(failedLog);
+
             return PrintData();
         }
         
