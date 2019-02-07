@@ -2676,6 +2676,17 @@ File browser (connect to multiple remote machines, then use a file browser to ba
 #299.2. 02/05/2019:
 - Actually had some time. Almost finished the tests (yay!)
 
+#300.2. 02/06/2019:
+- In celebration of 300 days of... making a log, I finished the unit tests
+- That means tomorrow* I can start working on implmentation.
+- But while working on a couple tests I realized "what if a value doesn't exist?"
+- "Um, you have a conditional and tests for this" Um, yes... but I don't have "use non-existing value in custom format"
+- I thought about it (aka, I got distracted for about 2 hours) and came to the conclusion: error handler
+- Basically, if a custom format tries to use a format that doesn't exist, it will throw an exception. So what's a default handler?
+- ... why not something that everyone go "that shouldn't be there"
+- So I wrote a test for that :D
+- * by tomorrow I mean "I'm busy, again, so may have time"
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
