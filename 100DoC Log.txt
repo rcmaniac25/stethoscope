@@ -2687,6 +2687,17 @@ File browser (connect to multiple remote machines, then use a file browser to ba
 - So I wrote a test for that :D
 - * by tomorrow I mean "I'm busy, again, so may have time"
 
+#301.2. 02/07/2019:
+- So after additional conversations with work, I'm going to try and better orginize my time.
+- As such, while I have/had the time today to do a bunch of work on this, I decided to just get some basic components written out.
+- Namely, I wanted to make a wrapper around the visitor pattern I'm going to implement for printing formats.
+- I opted to put the parser (just an empty function right now) into the wrapper.
+- If I don't do that, I'll have to implement the parsing elsewhere. Ideally, in it's own function/class.
+- It brings me to "OrderedPrintMode"... I don't like the name entierly, as it implies there is an unordered version. But it's the best I could come up with.
+- Also, I mean, it's essentially a glorified List<T> with a few extra functions. It's ordered. It contains the values needed to define a custom print mode.
+- Hence: ordered print mode.
+- Tomorrow I hope to start coding the elements and then (maybe) start doing the parsing.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2

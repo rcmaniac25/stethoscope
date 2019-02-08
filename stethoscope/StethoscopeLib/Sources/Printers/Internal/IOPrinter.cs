@@ -1,6 +1,7 @@
 ﻿using Metrics;
 
 using Stethoscope.Common;
+using Stethoscope.Printers.Internal.PrintMode;
 
 using System;
 using System.Collections.Generic;
@@ -287,7 +288,9 @@ namespace Stethoscope.Printers.Internal
             {
                 if (mode[0] == '@')
                 {
-                    //TODO
+                    var printMode = new OrderedPrintMode();
+                    printMode.SetMode(mode);
+                    SetPrintHandler(printMode.ProcessLog, printMode.GenerateStateObject);
                 }
                 else if (PrintHandlers.ContainsKey(mode.ToLower()))
                 {

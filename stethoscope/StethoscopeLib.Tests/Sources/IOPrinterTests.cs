@@ -138,7 +138,7 @@ namespace Stethoscope.Tests
             Assert.That(data, Is.EqualTo(expectedLogPrintout));
         }
 
-        [Test]
+        [Test, Explicit]
         public void DifferentThreads()
         {
             AddLog("testentry1", 123, "myFunc", "path/to/location.cpp");
@@ -151,7 +151,7 @@ namespace Stethoscope.Tests
             Assert.That(data, Is.EqualTo(expectedLogPrintout));
         }
 
-        [Test]
+        [Test, Explicit]
         public void SameThreads()
         {
             AddLog("testentry1", 123, "myFunc", "path/to/location.cpp");
@@ -164,7 +164,7 @@ namespace Stethoscope.Tests
             Assert.That(data, Is.EqualTo(expectedLogPrintout));
         }
 
-        [Test]
+        [Test, Explicit]
         public void DifferentFunctions()
         {
             AddLog("testentry1", 123, "myFunc", "path/to/location.cpp");
@@ -179,7 +179,7 @@ namespace Stethoscope.Tests
 
         // Same functions is the same as SameThreads
 
-        [Test]
+        [Test, Explicit]
         public void SameSources()
         {
             AddLog("testentry1", 123, "myFunc", "path/to/location.cpp");
