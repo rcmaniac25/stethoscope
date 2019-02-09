@@ -2698,6 +2698,11 @@ File browser (connect to multiple remote machines, then use a file browser to ba
 - Hence: ordered print mode.
 - Tomorrow I hope to start coding the elements and then (maybe) start doing the parsing.
 
+#302.2. 02/08/2019:
+- So I was a bit stumped on how to start this...
+- I opted for a simple conditional interface.
+- ...yea. I'm not sure if it will stick, but I've ran out of time today and can't really focus on what to do for it.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2

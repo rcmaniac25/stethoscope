@@ -44,7 +44,7 @@ Custom modes can be defined with a "format" while pre-defined modes can be used,
 		- `~` (print only if the value hasn't been printed before. Only applies to attributes)
         - `+` (only print if a valid log)
         - `-` (only print if an invalid log)
-    - `<modifier>` - `!"<format>"` (if an error occurs with this log, print the following error message. Limitations: must be contained within quotes, single quotes needs to be escaped `\"`)
+    - `<modifier>` - `!"<format>"` (if an error occurs with this log, print the following error message. Limitations: must be contained within quotes, double quotes needs to be escaped `\"`)
     - `<attribute reference>` - `{<attribute name>[<attribute format>]}`
     - `<attribute name>` - (any of the LogAttribute enum value names)
     - `<attribute format>` - `|<raw>` (inside `<raw>`, any "{}" will be replaced with the value from the attribute)
