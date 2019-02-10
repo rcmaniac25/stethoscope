@@ -7,7 +7,7 @@ namespace Stethoscope.Printers.Internal.PrintMode
     /// <summary>
     /// Ordered list of processaable print mode values.
     /// </summary>
-    public class OrderedPrintMode
+    public class PrintModeFormat
     {
         //TODO
 
@@ -29,6 +29,15 @@ namespace Stethoscope.Printers.Internal.PrintMode
         public void ProcessLog(TextWriter writer, ILogEntry log, object state)
         {
             //TODO
+            /*
+             * 1. evaluate log-level conditional
+             * 2. Iterate over all format parts
+             * 3. Execute part
+             *     a. If raw, print. If not raw, evaluate conditional
+             *     b. if conditional passes, print value (using modifiers if need-be) and notify conditional
+             *     c. FUTURE-TODO: if conditional fails, and a failed conditional modifier exists, invoke it
+             *     d. if exception occurs, invoke failure handler modifier if it exists
+             */
         }
 
         /// <summary>

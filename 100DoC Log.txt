@@ -2703,6 +2703,33 @@ File browser (connect to multiple remote machines, then use a file browser to ba
 - I opted for a simple conditional interface.
 - ...yea. I'm not sure if it will stick, but I've ran out of time today and can't really focus on what to do for it.
 
+#303.2. 02/09/2019:
+- Ok, I wrote a few execution steps (docs) because...
+- ...I ran out of time.
+- I started early, but didn't have enough time to do everything I wanted today. Then planned to do more work later... and never got there.
+- So... tomorrow.
+- Oh, also: thought of a better name then OrderedPrintMode -> PrintModeFormat. I'm going to try and name classes after the component they represent/documented as.
+- In addition, I thought of another modifier: something todo if a conditional failed.
+- I'm thinking along the lines of print "value" if it's a new log but if it's not new, print "..."
+- This would allow for doing something similar to what normal debuggers do where a value is deemed unimportant because it's already seen/used.
+```
+This is a test; user=John Jacob Jingleheimer Schmidt
+Also a test; user=John Jacob Jingleheimer Schmidt
+Still a test; user=John Jacob Jingleheimer Schmidt
+Maybe a test?; user=John Jacob Jingleheimer Schmidt
+Nah; user=Steve
+Ah, ok; user=John Jacob Jingleheimer Schmidt
+
+<<becomes>>
+
+This is a test; user=John Jacob Jingleheimer Schmidt
+Also a test; user=...
+Still a test; user=...
+Maybe a test?; user=...
+Nah; user=Steve
+Ah, ok; user=John Jacob Jingleheimer Schmidt
+```
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
