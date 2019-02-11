@@ -7,6 +7,8 @@ namespace Stethoscope.Printers.Internal.PrintMode
     /// </summary>
     public interface IConditional
     {
+        //TODO generate state
+
         /// <summary>
         /// Determine if a log should be processed.
         /// </summary>

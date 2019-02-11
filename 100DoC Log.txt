@@ -2730,6 +2730,16 @@ Nah; user=Steve
 Ah, ok; user=John Jacob Jingleheimer Schmidt
 ```
 
+#304.2. 02/10/2019:
+- So I'm a bit stumped on how modifiers should be implemented.
+- I decided to chat with a friend on the topic.
+- In the end, we were both kind-of stumped. But we did get one idea out of it...
+- ...basically, IPrinter should also have a factory element to it, and the modifiers should be generic/for just plane text.
+- The result is a simple implementation that a IPrinter's factory could then be retrieved and printer-specific modifiers could be retrieved.
+- This would solve the issue of "you can't realistically write a single API that would work for every possible scenario/implementation.
+- I'm not trying to develop the perfect API. I'm trying to write one that works for the ideas/goals I have with the hope I won't have to rewrite the API.
+- I still plan to work on it in a iterative fashion, so the API I wrote is certainly not staying. But for this commit, it is.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2

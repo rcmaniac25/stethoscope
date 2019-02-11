@@ -47,6 +47,7 @@ Custom modes can be defined with a "format" while pre-defined modes can be used,
     - `<modifier>`
 		- `!"<format>"` (if an error occurs with this log, print the following error message. Limitations: must be contained within quotes, double quotes needs to be escaped `\"`)
 		- //FUTURE-TODO (something to do if it fails the conditional check)
+		- //FUTURE-TODO (failure handler: on error, don't print attribute; on error, don't print log; on error, print attribute error handler; on error, log-format error handler; on error, throw exception/error; on error, report error [Default])
     - `<attribute reference>` - `{<attribute name>[<attribute format>]}`
     - `<attribute name>` - (any of the LogAttribute enum value names)
     - `<attribute format>` - `|<raw>` (inside `<raw>`, any "{}" will be replaced with the value from the attribute)
