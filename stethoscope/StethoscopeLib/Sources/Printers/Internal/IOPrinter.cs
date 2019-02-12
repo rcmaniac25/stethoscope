@@ -289,7 +289,7 @@ namespace Stethoscope.Printers.Internal
                 if (mode[0] == '@')
                 {
                     var printMode = new PrintModeFormat();
-                    printMode.SetMode(mode);
+                    printMode.SetMode(mode, this);
                     SetPrintHandler(printMode.ProcessLog, printMode.GenerateStateObject);
                 }
                 else if (PrintHandlers.ContainsKey(mode.ToLower()))

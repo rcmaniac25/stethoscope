@@ -1,6 +1,8 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 
+using Stethoscope.Printers.Internal;
+
 namespace Stethoscope.Common
 {
     /// <summary>
@@ -34,5 +36,10 @@ namespace Stethoscope.Common
         /// Teardown the printer. Call once all printing is complete.
         /// </summary>
         void Teardown();
+
+        /// <summary>
+        /// (Mostly for Internal use) Factory for specialized print mode format elements. Return <c>null</c> to use default factory.
+        /// </summary>
+        IPrinterElementFactory ElementFactory { get; }
     }
 }

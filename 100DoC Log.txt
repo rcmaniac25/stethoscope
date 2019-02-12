@@ -2740,6 +2740,18 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - I'm not trying to develop the perfect API. I'm trying to write one that works for the ideas/goals I have with the hope I won't have to rewrite the API.
 - I still plan to work on it in a iterative fashion, so the API I wrote is certainly not staying. But for this commit, it is.
 
+#305.2. 02/11/2019:
+- Instead of getting stuck on modifiers and conditionals, I decided to grab onto the component mentioned yesterday: a factory.
+- I implemented the interfaces for said factory and will be implementing some of the other necessary types next.
+- The sequence I expect to implement:
+-- 1. types needed to "build" a print mode format.
+-- 2. Put the components together.
+-- 3. Implement the parser.
+-- 4. Actually implement the modifiers and conditionals.
+- Now, why not swap 3 and 4? Because... just gut feeling tells me that if I do it the other way, I'll be spending so much time trying to design a perfect interface for the modifiers and conditionals.
+- I expect coming up with something that works, even if sans-modifiers and conditionals, will be more valuable and easier to answer the question that's been dogging me of "how should it (the interfaces) look?"
+- As typical, tomorrow I may not have too much time. If any.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2

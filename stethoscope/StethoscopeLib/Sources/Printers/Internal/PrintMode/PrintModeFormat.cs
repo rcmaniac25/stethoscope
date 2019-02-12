@@ -15,7 +15,8 @@ namespace Stethoscope.Printers.Internal.PrintMode
         /// Set the print mode value to use. This will reset any existing print mode values.
         /// </summary>
         /// <param name="mode">The print mode to use.</param>
-        public void SetMode(string mode)
+        /// <param name="printer">The printer that will be using the print mode.</param>
+        public void SetMode(string mode, IPrinter printer)
         {
             //TODO
         }
