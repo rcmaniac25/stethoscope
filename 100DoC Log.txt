@@ -2752,6 +2752,11 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - I expect coming up with something that works, even if sans-modifiers and conditionals, will be more valuable and easier to answer the question that's been dogging me of "how should it (the interfaces) look?"
 - As typical, tomorrow I may not have too much time. If any.
 
+#306.2. 02/12/2019:
+- My plans for today were actually canceled...
+- ...and then I fell asleep and didn't get anything done. Not on this project, not on anything else.
+- Joy :P
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
