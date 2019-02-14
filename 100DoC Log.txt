@@ -2757,6 +2757,11 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - ...and then I fell asleep and didn't get anything done. Not on this project, not on anything else.
 - Joy :P
 
+#307.2. 02/13/2019:
+- Wrote (but didn't implement) the default factory.
+- Started writing the ProcessLog portion of the PrintModeFormat.
+- Tomorrow I should be able to start combining/implementing the factory and the actual ProcessLog function and the data-types needed betweent them.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2

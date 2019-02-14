@@ -290,6 +290,7 @@ namespace Stethoscope.Printers.Internal
                 {
                     var printMode = new PrintModeFormat();
                     printMode.SetMode(mode, this);
+                    printMode.UpdateDirectWrite();
                     SetPrintHandler(printMode.ProcessLog, printMode.GenerateStateObject);
                 }
                 else if (PrintHandlers.ContainsKey(mode.ToLower()))
