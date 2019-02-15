@@ -2762,6 +2762,10 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - Started writing the ProcessLog portion of the PrintModeFormat.
 - Tomorrow I should be able to start combining/implementing the factory and the actual ProcessLog function and the data-types needed betweent them.
 
+#308.2. 02/14/2019:
+- Simply: the high level components needed for printing are done.
+- Next is the individual elements that will be processed, and parsing the format.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2

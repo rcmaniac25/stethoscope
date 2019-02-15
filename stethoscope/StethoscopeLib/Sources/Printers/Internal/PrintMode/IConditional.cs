@@ -7,7 +7,11 @@ namespace Stethoscope.Printers.Internal.PrintMode
     /// </summary>
     public interface IConditional
     {
-        //TODO generate state
+        /// <summary>
+        /// Generate a state for use.
+        /// </summary>
+        /// <returns>The generated state.</returns>
+        object GenerateState();
 
         /// <summary>
         /// Determine if a log should be processed.
@@ -21,8 +25,8 @@ namespace Stethoscope.Printers.Internal.PrintMode
         /// The log has been processed, update state if needed.
         /// </summary>
         /// <param name="log">The log that was processed.</param>
-        /// <param name="initState">The initial version of the state.</param>
+        /// <param name="priorState">The prior version of the state.</param>
         /// <returns>The updated state, if updated.</returns>
-        object Processed(ILogEntry log, object initState);
+        object Processed(ILogEntry log, object priorState);
     }
 }
