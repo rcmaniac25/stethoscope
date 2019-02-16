@@ -5,8 +5,26 @@ namespace Stethoscope.Printers.Internal.PrintMode
     /// <summary>
     /// Default print mode element factory.
     /// </summary>
-    public class ElementFactor : IPrinterElementFactory
+    public class ElementFactory : IPrinterElementFactory
     {
+        /// <summary>
+        /// Create a "raw" print element.
+        /// </summary>
+        /// <param name="text">The text that will be printed when the element is processed.</param>
+        /// <returns>The created element.</returns>
+        public virtual IElement CreateRaw(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+            {
+                if (text == null)
+                {
+                    throw new ArgumentNullException(nameof(text));
+                }
+                throw new ArgumentException("text cannot be empty", nameof(text));
+            }
+            return new RawElement(text);
+        }
+
         /// <summary>
         /// Create a print mode conditional element.
         /// </summary>

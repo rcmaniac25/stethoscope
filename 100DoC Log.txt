@@ -2766,6 +2766,9 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - Simply: the high level components needed for printing are done.
 - Next is the individual elements that will be processed, and parsing the format.
 
+#309.2. 02/15/2019:
+- Implemented "Raw" and ensured that there was an exception handler... thing.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2

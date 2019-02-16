@@ -9,7 +9,7 @@ namespace Stethoscope.Printers.Internal.PrintMode
     /// <summary>
     /// Ordered list of processaable print mode values.
     /// </summary>
-    public class PrintModeFormat : IElement
+    public class PrintModeFormat
     {
         private IConditional logConditional;
 
@@ -38,7 +38,7 @@ namespace Stethoscope.Printers.Internal.PrintMode
             logConditional = null;
             elements.Clear();
 
-            var factory = printer.ElementFactory ?? new ElementFactor();
+            var factory = printer.ElementFactory ?? new ElementFactory();
             //TODO
         }
 
@@ -107,8 +107,20 @@ namespace Stethoscope.Printers.Internal.PrintMode
             foreach (var element in elements)
             {
                 // #3
-                //XXX error handling?
-                element.Process(logWriter, log, innerState[innerStateCurrentIndex++]);
+                try
+                {
+                    element.Process(logWriter, log, innerState[innerStateCurrentIndex++]);
+                }
+                catch (Exception e)
+                {
+                    var handler = element.ExceptionHandler ?? throw e; //TODO: should print the exception?
+                    handler.HandleException(e, log, element);
+                }
+            }
+
+            if (logConditional != null)
+            {
+                innerState[0] = logConditional.Processed(log, innerState[0]);
             }
 
             // #4

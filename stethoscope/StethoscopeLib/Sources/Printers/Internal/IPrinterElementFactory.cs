@@ -46,6 +46,13 @@ namespace Stethoscope.Printers.Internal
     public interface IPrinterElementFactory
     {
         /// <summary>
+        /// Create a "raw" print element.
+        /// </summary>
+        /// <param name="text">The text that will be printed when the element is processed.</param>
+        /// <returns>The created element.</returns>
+        IElement CreateRaw(string text);
+
+        /// <summary>
         /// Create a print mode modifier element.
         /// </summary>
         /// <param name="element">The element to create.</param>
