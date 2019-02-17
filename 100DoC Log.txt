@@ -2769,6 +2769,13 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 #309.2. 02/15/2019:
 - Implemented "Raw" and ensured that there was an exception handler... thing.
 
+#310.2. 02/16/2019:
+- Ok, this is a weird one.
+- I have the time to do this work and an idea of what to do (for a printable element) but I have many projects. I have many things I want to do.
+- And today, I need to stop putting off something that's been egging me on as something I "can't" do, and want to try and do it.
+- This means I either stay up late, or I push Steth off until tomorrow.
+- Well... you can probably guess which one I'm going for... tomorrow
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
