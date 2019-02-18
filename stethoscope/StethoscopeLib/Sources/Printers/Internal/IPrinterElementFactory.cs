@@ -1,4 +1,5 @@
-﻿using Stethoscope.Printers.Internal.PrintMode;
+﻿using Stethoscope.Common;
+using Stethoscope.Printers.Internal.PrintMode;
 
 namespace Stethoscope.Printers.Internal
 {
@@ -31,11 +32,11 @@ namespace Stethoscope.Printers.Internal
         /// </summary>
         AttributeValueNew,
         /// <summary>
-        /// Process only if the log is valid. <see cref="Stethoscope.Common.ILogEntry.IsValid"/> = <c>true</c>
+        /// Process only if the log is valid. <see cref="ILogEntry.IsValid"/> = <c>true</c>
         /// </summary>
         ValidLog,
         /// <summary>
-        /// Process only if the log is invalid. <see cref="Stethoscope.Common.ILogEntry.IsValid"/> = <c>false</c>
+        /// Process only if the log is invalid. <see cref="ILogEntry.IsValid"/> = <c>false</c>
         /// </summary>
         InvalidLog
     }
@@ -51,6 +52,16 @@ namespace Stethoscope.Printers.Internal
         /// <param name="text">The text that will be printed when the element is processed.</param>
         /// <returns>The created element.</returns>
         IElement CreateRaw(string text);
+
+        /// <summary>
+        /// Create an "attribute" print element.
+        /// </summary>
+        /// <param name="attribute">The element that will be printed.</param>
+        /// <param name="attributeFormat">The <see cref="string.Format(string, object)"/> style print to print the attribute out with. Default value only prints the attribute.</param>
+        /// <param name="conditionals">All conditions used to determine if the element should be printed.</param>
+        /// <param name="modifiers">All modifiers to apply to the printed element.</param>
+        /// <returns>The created element.</returns>
+        IElement CreateElement(LogAttribute attribute, string attributeFormat = "{0}", IConditional[] conditionals = null, IModifier[] modifiers = null);
 
         /// <summary>
         /// Create a print mode modifier element.

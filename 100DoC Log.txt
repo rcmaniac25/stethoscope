@@ -2776,6 +2776,21 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - This means I either stay up late, or I push Steth off until tomorrow.
 - Well... you can probably guess which one I'm going for... tomorrow
 
+#311.2. 02/17/2019:
+- Today was a very lazy day... so when it came time to work on this, I was conflicted.
+- "Oh, here we go again" well, I should be sleeping (as usual). I should be doing some other tasks.
+- I should be finishing the print code.
+- I didn't, as that's not that simple.
+- The big part for today was at least putting in "StandardElement" which is a normal print element.
+- I didn't do much work on it, but at least wrote a bit of base code. I realized: this is kinda useless until I have parsing.
+- So, I stopped. I think I'll try doing some parsing tomorrow so I can actually run unit tests against this code and get things to pass.
+- I was also conflicted, but decided to add it as a function in the element factory.
+- Why was that conflicted? Because I want the factory, but I thought about it for conditionals and modifiers. I didn't think of it for "raw" and "attribute"
+- I'm just not sure if it's the way to go... but, one upside is I now get to think of more unnecessary ways to utilize it.
+- Example: I can now say "if you only use defaults, I can used a SimpleElement" that simply prints an attribute. Everything else can use StandardElement...
+- Or maybe I should have one that does attributes + conditionals, as that will probably be common. But many (default) types have error handlers... so maybe
+- ...<gets yanked off the keyboard before explaining one of the downside of factory types: complexity and ambiguity>
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
