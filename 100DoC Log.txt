@@ -2791,6 +2791,17 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - Or maybe I should have one that does attributes + conditionals, as that will probably be common. But many (default) types have error handlers... so maybe
 - ...<gets yanked off the keyboard before explaining one of the downside of factory types: complexity and ambiguity>
 
+#312.2. 02/18/2019:
+- So, I went "let me see how quick I can write a parser, since it's late"
+- That was the first red flag.
+- Then was the second red flag, seeing the things I "needed" to do tonight.
+- The third and final red flag was when my mind went "wait, state machines are useful for parsing"
+- I agree, but there's no way I'm going to get anything going in the time I have.
+- I instead did a bunch of stuff that I marked as needing work (but didn't do). Ex. "wait, after each log print, it should print a newline" so I implemented a new line.
+- Tomorrow I may or may not have time to do stuff.
+- Regardless, the next task is to do is make a parsing class for the state machine to exist in (I'd rather not clutter up PrintModeFormat, which isn't for parsing)
+- Random: I changed from "if(!init) init = true;" to "init |= true;" so there wouldn't need to be a branch statement, and the same goal is accomplished.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2

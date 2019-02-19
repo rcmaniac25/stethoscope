@@ -24,6 +24,12 @@ namespace Stethoscope.Printers.Internal.PrintMode
         public bool DirectWrite { get; set; }
 
         /// <summary>
+        /// The newline to use at the end of each <see cref="Process(TextWriter, ILogEntry, object)"/>.
+        /// <c>null</c> uses the standard newline operator as the <see cref="TextWriter"/> specifies. Anything else, including "", will be printed at the end of the process.
+        /// </summary>
+        public string NewLine { get; set; }
+
+        /// <summary>
         /// Set the print mode value to use. This will reset any existing print mode values.
         /// </summary>
         /// <param name="mode">The print mode to use.</param>
@@ -47,8 +53,8 @@ namespace Stethoscope.Printers.Internal.PrintMode
         /// </summary>
         public void UpdateDirectWrite()
         {
+            DirectWrite = true; //XXX until we can distinguish elements, we won't know if direct write is possible or not. Until then, it's fine (as nothing's implemented that would make direct write problematic)
 #if false
-            DirectWrite = true;
             foreach (var element in elements)
             {
                 //TODO: check for failure handlers and what might happen
@@ -113,14 +119,32 @@ namespace Stethoscope.Printers.Internal.PrintMode
                 }
                 catch (Exception e)
                 {
-                    var handler = element.ExceptionHandler ?? throw e; //TODO: should print the exception?
-                    handler.HandleException(e, log, element);
+                    if (element.ExceptionHandler == null)
+                    {
+                        if (e is PrintException pe)
+                        {
+                            // Default exception handler
+                            logWriter.Write("{{{0}}}", e.Message);
+                            continue;
+                        }
+                        throw e;
+                    }
+                    element.ExceptionHandler.HandleException(e, log, element); //XXX needs modifications (um, what would it print to?)
                 }
             }
 
             if (logConditional != null)
             {
                 innerState[0] = logConditional.Processed(log, innerState[0]);
+            }
+
+            if (NewLine != null)
+            {
+                logWriter.Write(NewLine);
+            }
+            else
+            {
+                logWriter.WriteLine();
             }
 
             // #4
