@@ -2802,6 +2802,9 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - Regardless, the next task is to do is make a parsing class for the state machine to exist in (I'd rather not clutter up PrintModeFormat, which isn't for parsing)
 - Random: I changed from "if(!init) init = true;" to "init |= true;" so there wouldn't need to be a branch statement, and the same goal is accomplished.
 
+#313.2. 02/19/2019:
+- And, as expected, no time... tomorrow
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
