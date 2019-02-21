@@ -2805,6 +2805,13 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 #313.2. 02/19/2019:
 - And, as expected, no time... tomorrow
 
+#314.2. 02/20/2019:
+- Ok, wanted to do something quick.
+- Result: I wrote an empty-implementation of the parser class.
+- The idea I went with is that the parser is the container of elements. An IList, basically.
+- I'm too lazy (and short on time) to do that now (though it's not necessarily hard. Just time consuming).
+- But, that's it for tonight. Hope to actually start the state machine tomorrow.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
