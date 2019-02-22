@@ -12,7 +12,7 @@ namespace Stethoscope.Printers.Internal.PrintMode
     public class PrintModeFormat
     {
         private IConditional logConditional;
-        private IList<IElement> elements;
+        private ICollection<IElement> elements;
 
         /// <summary>
         /// When processing a log, write directly to the specified writer.
@@ -45,7 +45,7 @@ namespace Stethoscope.Printers.Internal.PrintMode
             var parser = PrintModeParser.Parse(mode, factory);
 
             logConditional = parser.GlobalConditional;
-            elements = parser.TempInternalElements; //XXX temp. Future: elements = parser;
+            elements = parser;
         }
 
         /// <summary>
