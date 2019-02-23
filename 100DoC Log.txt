@@ -2817,6 +2817,9 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - I did start the state machine... as in, I made a function called CreateStateMachine which returns null.
 - I need to figure out the states and triggers... which is the point I went "I'm not staying up _that_ late"
 
+#316.2. 02/22/2019:
+- Got distracted... no time tonight
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
