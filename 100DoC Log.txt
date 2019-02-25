@@ -2825,6 +2825,9 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - Also, doesn't help that I woke up today when I would usually be eating dinner. >:(
 - I don't have the time tonight... :(
 
+#318.2. 02/24/2019:
+- ... the past couple days have been a mess for me..
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
