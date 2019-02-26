@@ -1,0 +1,47 @@
+@startuml
+
+title Print Mode Format
+
+[*] --> Uninitialized
+Uninitialized --> LogConditional
+Uninitialized --> Part
+
+LogConditional --> LogConditional
+Part --> Part
+
+LogConditional --> Part
+
+Part --> DoneParsing
+
+Part --> Raw
+Raw --> Part
+
+Part --> Attribute
+Attribute --> Part
+
+Attribute --> Conditional
+Attribute --> AttributeReference
+Conditional --> Conditional
+Conditional --> AttributeReference
+AttributeReference --> Modifier
+AttributeReference --> Part
+Modifier --> Modifier
+Modifier --> Part
+
+AttributeReference --> AttributeFormat
+AttributeFormat --> AttributeReference
+
+AttributeFormat --> StringQuote : Found a quote in string\nis this the end or a sub-string/random quote
+StringQuote --> AttributeFormat : Done processing attribute format
+
+LogConditional --> ErrorHandlerCondition : Log-level Conditional
+ErrorHandlerCondition --> LogConditional : Log-level Conditional
+Conditional --> ErrorHandlerCondition : Attribute Conditional
+ErrorHandlerCondition --> Conditional : Attribute Conditional
+
+ErrorHandlerCondition --> StringQuote : Found a quote in string\nis this the end or a sub-string/random quote
+StringQuote --> ErrorHandlerCondition : Done processing error handler
+
+DoneParsing --> [*]
+
+@enduml
