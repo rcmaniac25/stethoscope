@@ -2833,6 +2833,9 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - Most I can really do tonight... but it's at least a useful step.
 - Standard "might not be able to do anything tomorrow"
 
+#320.2. 02/26/2019:
+- As expected, no time tonight
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
