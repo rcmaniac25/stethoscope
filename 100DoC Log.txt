@@ -2836,6 +2836,11 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 #320.2. 02/26/2019:
 - As expected, no time tonight
 
+#321.2. 02/27/2019:
+- Not expected, no time tonight.
+- Short explanation for the past couple days: "despretly" trying to get something done at work -> work a little later then desired -> tax season + some personal projects that are just so engrossing that I loose time + "oh shoot, I need to get <life task> done" -> it's late and I still haven't done this codebase... err, hopefully tomorrow will be better -> it isn't...
+- Also, one of my engrossing projects has gained enough interest that people have actually paid me to do some things for them. That automatically puts it at a much higher importance then non-paying endevours (my personal projects are not cheap...)
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
