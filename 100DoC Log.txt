@@ -2846,6 +2846,11 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - So... tax day
 - Tomorrow may be delayed again because I also "need" to do the project I'm being paid for...
 
+#323.2. 03/01/2019:
+- Turns out I had an issue with taxes, so needed to fix that and OOOO did you see the rocket launch?
+- Wait, what was I doing again? Ah yes... oh, look at the time.
+- Yea, I hoped to get stuff done today and ended up just getting distracted by everything else.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
