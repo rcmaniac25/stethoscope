@@ -17,12 +17,25 @@ namespace Stethoscope.Printers.Internal.PrintMode
         private enum State
         {
             Uninitialized,
-            Setup,
-            MethodCollection,
-            FindProcessingRange,
-            VisitExpressionTree,
-            CountAndRemoveSkips,
-            Done
+            Done,
+
+            // Main sections
+            LogConditional,
+            Raw,
+            Part,
+
+            // Part sections
+            Attribute,
+            Conditional,
+            Modifier,
+            AttributeReference,
+            AttributeFormat,
+
+            // Utility
+            StringQuote,
+
+            // Conditionals
+            ErrorHandlerConditional
         }
 
         private enum Trigger
@@ -30,8 +43,7 @@ namespace Stethoscope.Printers.Internal.PrintMode
             Done,
             Invoke,
 
-            HasMethods,
-            NoMethods
+            FoundQuote
         }
 
         #endregion

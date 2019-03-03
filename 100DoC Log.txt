@@ -2851,6 +2851,12 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - Wait, what was I doing again? Ah yes... oh, look at the time.
 - Yea, I hoped to get stuff done today and ended up just getting distracted by everything else.
 
+#324.2. 03/02/2019:
+- My daily planner, I wrote "Do something!" and I did
+- Well... "Do something!" was supposed to imply "do more then just say that I ran out of times"
+- Instead, I at least updated the State and Trigger.
+- Hopefully, I'll time things better tomorrow and do and actually start writing the state machine.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
