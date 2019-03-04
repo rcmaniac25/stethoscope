@@ -12,11 +12,81 @@ namespace Stethoscope.Printers.Internal.PrintMode
     /// </summary>
     public class PrintModeParser : ICollection<IElement>
     {
+        #region SMState
+
+        private struct SMState : ICloneable
+        {
+            private IList<IElement> elements;
+
+            public static SMState InvalidState = new SMState() { ErrorMessage = "Invalid Internal State" };
+
+            public string Format { get; private set; }
+            public IPrinterElementFactory ElementFactory { get; private set; }
+            public int ParsingIndex { get; private set; }
+
+            public string ErrorMessage { get; private set; }
+            //TODO: log-level conditional
+
+            public StateMachine<State, Trigger> StateMachine { get; private set; }
+            public Action<SMState> DoneHandler { get; private set; }
+
+            public SMState(string format, IPrinterElementFactory factory, IList<IElement> elements, StateMachine<State, Trigger> stateMachine, Action<SMState> doneHandler)
+            {
+                Format = format;
+                ElementFactory = factory;
+                this.elements = elements;
+                ParsingIndex = 0;
+
+                ErrorMessage = null;
+
+                StateMachine = stateMachine;
+                DoneHandler = doneHandler;
+            }
+
+            public SMState IncrementIndex(int charCount)
+            {
+                var clone = (SMState)Clone();
+                clone.ParsingIndex += charCount;
+                return clone;
+            }
+
+            public SMState SetError(string errorMessage)
+            {
+                var clone = (SMState)Clone();
+                clone.ErrorMessage = errorMessage;
+                return clone;
+            }
+
+            public void AddElement(IElement element) //XXX don't like making this a mutible variable... other option is to store everything in SMState and then set the external elements list
+            {
+                elements.Add(element);
+            }
+
+            public object Clone()
+            {
+                return new SMState()
+                {
+                    Format = Format,
+                    ElementFactory = ElementFactory,
+                    elements = elements,
+                    ParsingIndex = ParsingIndex,
+
+                    ErrorMessage = ErrorMessage,
+
+                    StateMachine = StateMachine,
+                    DoneHandler = DoneHandler
+                };
+            }
+        }
+
+        #endregion
+
         #region States and Triggers
 
         private enum State
         {
             Uninitialized,
+            Setup,
             Done,
 
             // Main sections
@@ -42,7 +112,11 @@ namespace Stethoscope.Printers.Internal.PrintMode
         {
             Done,
             Invoke,
+            Error,
 
+            FoundConditional,
+            FoundFormat,
+            FoundPart,
             FoundQuote
         }
 
@@ -146,14 +220,75 @@ namespace Stethoscope.Printers.Internal.PrintMode
         /// <returns>The parsed format.</returns>
         public static PrintModeParser Parse(string format, IPrinterElementFactory factory)
         {
-            //TODO
-            return new PrintModeParser(); //XXX
+            var parser = new PrintModeParser();
+            parser.InternalProcess(format, factory);
+            return parser;
         }
+
+        private void InternalProcess(string format, IPrinterElementFactory factory)
+        {
+            var finishedState = SMState.InvalidState;
+            void ProcessIsComplete(SMState state)
+            {
+                finishedState = state;
+            }
+
+            var stateMachine = CreateStateMachine();
+            stateMachine.Fire(processTrigger, (format, factory, elements, ProcessIsComplete));
+
+            if (finishedState.ErrorMessage != null)
+            {
+                throw new ArgumentException(finishedState.ErrorMessage);
+            }
+            //TODO: get/update variables based on state
+        }
+
+        #region Create State Machine
+
+        private readonly StateMachine<State, Trigger>.TriggerWithParameters<(string, IPrinterElementFactory, IList<IElement>, Action<SMState>)> processTrigger = new StateMachine<State, Trigger>.TriggerWithParameters<(string, IPrinterElementFactory, IList<IElement>, Action<SMState>)>(Trigger.Invoke);
+        private readonly StateMachine<State, Trigger>.TriggerWithParameters<SMState> invokeTrigger = new StateMachine<State, Trigger>.TriggerWithParameters<SMState>(Trigger.Invoke);
+        private readonly StateMachine<State, Trigger>.TriggerWithParameters<SMState> doneTrigger = new StateMachine<State, Trigger>.TriggerWithParameters<SMState>(Trigger.Done);
+        private readonly StateMachine<State, Trigger>.TriggerWithParameters<SMState> errorTrigger = new StateMachine<State, Trigger>.TriggerWithParameters<SMState>(Trigger.Error);
 
         private StateMachine<State, Trigger> CreateStateMachine()
         {
+            var machine = new StateMachine<State, Trigger>(State.Uninitialized);
+
+            machine.Configure(State.Uninitialized)
+                .Permit(Trigger.Invoke, State.Setup);
+
+            machine.Configure(State.Setup)
+                .OnEntryFrom(processTrigger, ((string format, IPrinterElementFactory factory, IList<IElement> elements, Action<SMState> doneHandler) processParameters) =>
+                {
+                    var internalState = new SMState(processParameters.format, processParameters.factory, processParameters.elements, machine, processParameters.doneHandler);
+                    if (internalState.Format.Length > 0 && internalState.Format[0] == '@')
+                    {
+                        internalState = internalState.IncrementIndex(1);
+                    }
+                    machine.Fire(doneTrigger, internalState);
+                })
+                .PermitReentry(Trigger.Invoke)
+                .Permit(Trigger.Done, State.LogConditional);
+
+            machine.Configure(State.LogConditional)
+                .OnEntryFrom(doneTrigger, (state, transition) =>
+                {
+                    //TODO: check for format to determine if it's a conditional or a part
+                })
+                .PermitReentry(Trigger.FoundConditional)
+                .Permit(Trigger.Done, State.Part)
+                .Permit(Trigger.Error, State.Done);
+
             //TODO
-            return null;
+
+            machine.Configure(State.Done)
+                .OnEntryFrom(doneTrigger, state => state.DoneHandler(state))
+                .OnEntryFrom(errorTrigger, state => state.DoneHandler(state))
+                .PermitIf(processTrigger, State.Setup);
+
+            return machine;
         }
+
+        #endregion
     }
 }

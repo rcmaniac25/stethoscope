@@ -2857,6 +2857,14 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - Instead, I at least updated the State and Trigger.
 - Hopefully, I'll time things better tomorrow and do and actually start writing the state machine.
 
+#325.2. 03/03/2019:
+- <spits out drink> Oh snap! I actually did something!
+- I wanted to at least have _something_ for the state machine...
+- ...instead, I wrote the first couple states, some triggers, the state that gets passed around, and the (outer) parsing function.
+- Now... with that said, the next 2 days will be hectic because: tomorrow I have a random event, the day after is a reoccuring event that makes me go "might not get anything done"
+- I hope to get the parser done this week because... the upcoming weekend will be weird. Big family event, and due to a different issue I have, I'm not always able to get into this system to do any work.
+- But that's for later.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
