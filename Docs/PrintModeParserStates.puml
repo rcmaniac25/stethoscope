@@ -3,8 +3,9 @@
 title Print Mode Format
 
 [*] --> Uninitialized
-Uninitialized --> LogConditional
-Uninitialized --> Part
+Uninitialized --> Setup
+
+Setup --> LogConditional
 
 LogConditional --> LogConditional
 Part --> Part

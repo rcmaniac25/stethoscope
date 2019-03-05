@@ -16,8 +16,6 @@ namespace Stethoscope.Printers.Internal.PrintMode
 
         private struct SMState : ICloneable
         {
-            private IList<IElement> elements;
-
             public static SMState InvalidState = new SMState() { ErrorMessage = "Invalid Internal State" };
 
             public string Format { get; private set; }
@@ -25,19 +23,23 @@ namespace Stethoscope.Printers.Internal.PrintMode
             public int ParsingIndex { get; private set; }
 
             public string ErrorMessage { get; private set; }
-            //TODO: log-level conditional
+
+            public List<IElement> Elements { get; private set; }
+            public List<IConditional> LogConditionals { get; private set; }
 
             public StateMachine<State, Trigger> StateMachine { get; private set; }
             public Action<SMState> DoneHandler { get; private set; }
 
-            public SMState(string format, IPrinterElementFactory factory, IList<IElement> elements, StateMachine<State, Trigger> stateMachine, Action<SMState> doneHandler)
+            public SMState(string format, IPrinterElementFactory factory, StateMachine<State, Trigger> stateMachine, Action<SMState> doneHandler)
             {
                 Format = format;
                 ElementFactory = factory;
-                this.elements = elements;
                 ParsingIndex = 0;
 
                 ErrorMessage = null;
+
+                Elements = null;
+                LogConditionals = null;
 
                 StateMachine = stateMachine;
                 DoneHandler = doneHandler;
@@ -57,21 +59,48 @@ namespace Stethoscope.Printers.Internal.PrintMode
                 return clone;
             }
 
-            public void AddElement(IElement element) //XXX don't like making this a mutible variable... other option is to store everything in SMState and then set the external elements list
+            public SMState AddElement(IElement element)
             {
-                elements.Add(element);
+                var clone = (SMState)Clone();
+                if (clone.Elements == null)
+                {
+                    clone.Elements = new List<IElement>();
+                }
+                clone.Elements.Add(element);
+                return clone;
+            }
+
+            public SMState AddLogConditional(IConditional conditional)
+            {
+                var clone = (SMState)Clone();
+                if (clone.LogConditionals == null)
+                {
+                    clone.LogConditionals = new List<IConditional>();
+                }
+                clone.LogConditionals.Add(conditional);
+                return clone;
+            }
+
+            public bool TestCharLength(int charCount)
+            {
+                return (ParsingIndex + charCount) <= Format.Length;
             }
 
             public object Clone()
             {
+                var cloneElements = Elements != null ? new List<IElement>(Elements) : null;
+                var cloneLogConditionals = Elements != null ? new List<IConditional>(LogConditionals) : null;
+
                 return new SMState()
                 {
                     Format = Format,
                     ElementFactory = ElementFactory,
-                    elements = elements,
                     ParsingIndex = ParsingIndex,
 
                     ErrorMessage = ErrorMessage,
+
+                    Elements = cloneElements,
+                    LogConditionals = cloneLogConditionals,
 
                     StateMachine = StateMachine,
                     DoneHandler = DoneHandler
@@ -122,7 +151,7 @@ namespace Stethoscope.Printers.Internal.PrintMode
 
         #endregion
 
-        private readonly List<IElement> elements = new List<IElement>();
+        private List<IElement> elements;
 
         private PrintModeParser()
         {
@@ -131,7 +160,7 @@ namespace Stethoscope.Printers.Internal.PrintMode
         /// <summary>
         /// Get any conditional that applies to the entire parsed string.
         /// </summary>
-        public IConditional GlobalConditional => null; //TODO
+        public IConditional GlobalConditional { get; private set; }
 
         #region ICollection impl
 
@@ -234,21 +263,26 @@ namespace Stethoscope.Printers.Internal.PrintMode
             }
 
             var stateMachine = CreateStateMachine();
-            stateMachine.Fire(processTrigger, (format, factory, elements, ProcessIsComplete));
+            stateMachine.Fire(processTrigger, (format, factory, ProcessIsComplete));
 
             if (finishedState.ErrorMessage != null)
             {
                 throw new ArgumentException(finishedState.ErrorMessage);
             }
-            //TODO: get/update variables based on state
+            elements = finishedState.Elements;
+            if (finishedState.LogConditionals?.Count > 0)
+            {
+                GlobalConditional = finishedState.LogConditionals[0];
+            }
         }
 
         #region Create State Machine
 
-        private readonly StateMachine<State, Trigger>.TriggerWithParameters<(string, IPrinterElementFactory, IList<IElement>, Action<SMState>)> processTrigger = new StateMachine<State, Trigger>.TriggerWithParameters<(string, IPrinterElementFactory, IList<IElement>, Action<SMState>)>(Trigger.Invoke);
+        private readonly StateMachine<State, Trigger>.TriggerWithParameters<(string, IPrinterElementFactory, Action<SMState>)> processTrigger = new StateMachine<State, Trigger>.TriggerWithParameters<(string, IPrinterElementFactory, Action<SMState>)>(Trigger.Invoke);
         private readonly StateMachine<State, Trigger>.TriggerWithParameters<SMState> invokeTrigger = new StateMachine<State, Trigger>.TriggerWithParameters<SMState>(Trigger.Invoke);
         private readonly StateMachine<State, Trigger>.TriggerWithParameters<SMState> doneTrigger = new StateMachine<State, Trigger>.TriggerWithParameters<SMState>(Trigger.Done);
         private readonly StateMachine<State, Trigger>.TriggerWithParameters<SMState> errorTrigger = new StateMachine<State, Trigger>.TriggerWithParameters<SMState>(Trigger.Error);
+        private readonly StateMachine<State, Trigger>.TriggerWithParameters<SMState> foundConditionalTrigger = new StateMachine<State, Trigger>.TriggerWithParameters<SMState>(Trigger.FoundConditional);
 
         private StateMachine<State, Trigger> CreateStateMachine()
         {
@@ -258,9 +292,9 @@ namespace Stethoscope.Printers.Internal.PrintMode
                 .Permit(Trigger.Invoke, State.Setup);
 
             machine.Configure(State.Setup)
-                .OnEntryFrom(processTrigger, ((string format, IPrinterElementFactory factory, IList<IElement> elements, Action<SMState> doneHandler) processParameters) =>
+                .OnEntryFrom(processTrigger, ((string format, IPrinterElementFactory factory, Action<SMState> doneHandler) processParameters) =>
                 {
-                    var internalState = new SMState(processParameters.format, processParameters.factory, processParameters.elements, machine, processParameters.doneHandler);
+                    var internalState = new SMState(processParameters.format, processParameters.factory, machine, processParameters.doneHandler);
                     if (internalState.Format.Length > 0 && internalState.Format[0] == '@')
                     {
                         internalState = internalState.IncrementIndex(1);
@@ -271,10 +305,7 @@ namespace Stethoscope.Printers.Internal.PrintMode
                 .Permit(Trigger.Done, State.LogConditional);
 
             machine.Configure(State.LogConditional)
-                .OnEntryFrom(doneTrigger, (state, transition) =>
-                {
-                    //TODO: check for format to determine if it's a conditional or a part
-                })
+                .OnEntryFrom(doneTrigger, HandleLogConditional)
                 .PermitReentry(Trigger.FoundConditional)
                 .Permit(Trigger.Done, State.Part)
                 .Permit(Trigger.Error, State.Done);
@@ -287,6 +318,37 @@ namespace Stethoscope.Printers.Internal.PrintMode
                 .PermitIf(processTrigger, State.Setup);
 
             return machine;
+        }
+
+        #endregion
+
+        #region State Entry Operations
+
+        private void HandleLogConditional(SMState state)
+        {
+            if (state.TestCharLength(1))
+            {
+                var type = state.Format[state.ParsingIndex];
+                //XXX the following should be more of a loop that only passes if an odd number of chars match. + = conditional, ++ = raw, +++ = conditional + raw, ++++ = 2x raw, etc.
+                if (!state.TestCharLength(2) || state.Format[state.ParsingIndex + 1] != type) // Need to test that we're not looking at a raw that is using the special chars (+ means conditional, ++ means it's a raw char of '+')
+                {
+                    switch (type)
+                    {
+                        //XXX these should be consts
+                        case '+':
+                        case '-':
+                            if (state.LogConditionals?.Count != 0)
+                            {
+                                state.StateMachine.Fire(errorTrigger, state.SetError("Only one log-level conditional is allowed"));
+                                return;
+                            }
+                            var conditional = state.ElementFactory.CreateConditional(type == '+' ? ConditionalElement.ValidLog : ConditionalElement.InvalidLog);
+                            state.StateMachine.Fire(foundConditionalTrigger, state.AddLogConditional(conditional).IncrementIndex(1));
+                            return;
+                    }
+                }
+            }
+            state.StateMachine.Fire(doneTrigger, state);
         }
 
         #endregion

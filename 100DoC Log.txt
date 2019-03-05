@@ -2865,6 +2865,15 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - I hope to get the parser done this week because... the upcoming weekend will be weird. Big family event, and due to a different issue I have, I'm not always able to get into this system to do any work.
 - But that's for later.
 
+#326.2. 03/04/2019:
+- I shouldn't be up right now...
+- Be happy, I managed to write the log conditional parsing element.
+- Took a little longer to get through it because I was basically defining the format of these states.
+- So that's the general format of each state... but I'm happy with it. Could probably do with a bit of consolidation (once more states are written).
+- Imagine having one giant code block, with for loops and if statements and switch statements and "bla".
+- That would be unreadable, unable to update and maintain.
+- But that's all for now. Usual "tomorrow might not get anything done"
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
