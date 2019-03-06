@@ -146,7 +146,10 @@ namespace Stethoscope.Printers.Internal.PrintMode
             FoundConditional,
             FoundFormat,
             FoundPart,
-            FoundQuote
+            FoundQuote,
+
+            ProcessRaw,
+            ProcessAttribute
         }
 
         #endregion
@@ -156,7 +159,7 @@ namespace Stethoscope.Printers.Internal.PrintMode
         private PrintModeParser()
         {
         }
-        
+
         /// <summary>
         /// Get any conditional that applies to the entire parsed string.
         /// </summary>
@@ -282,6 +285,7 @@ namespace Stethoscope.Printers.Internal.PrintMode
         private readonly StateMachine<State, Trigger>.TriggerWithParameters<SMState> invokeTrigger = new StateMachine<State, Trigger>.TriggerWithParameters<SMState>(Trigger.Invoke);
         private readonly StateMachine<State, Trigger>.TriggerWithParameters<SMState> doneTrigger = new StateMachine<State, Trigger>.TriggerWithParameters<SMState>(Trigger.Done);
         private readonly StateMachine<State, Trigger>.TriggerWithParameters<SMState> errorTrigger = new StateMachine<State, Trigger>.TriggerWithParameters<SMState>(Trigger.Error);
+        private readonly StateMachine<State, Trigger>.TriggerWithParameters<SMState> processRawTrigger = new StateMachine<State, Trigger>.TriggerWithParameters<SMState>(Trigger.ProcessRaw);
         private readonly StateMachine<State, Trigger>.TriggerWithParameters<SMState> foundConditionalTrigger = new StateMachine<State, Trigger>.TriggerWithParameters<SMState>(Trigger.FoundConditional);
 
         private StateMachine<State, Trigger> CreateStateMachine()
@@ -310,6 +314,14 @@ namespace Stethoscope.Printers.Internal.PrintMode
                 .Permit(Trigger.Done, State.Part)
                 .Permit(Trigger.Error, State.Done);
 
+            machine.Configure(State.Part)
+                .OnEntryFrom(doneTrigger, HandlePart)
+                .PermitReentry(Trigger.FoundPart)
+                .Permit(Trigger.ProcessRaw, State.Raw)
+                .Permit(Trigger.ProcessAttribute, State.Attribute)
+                .Permit(Trigger.Done, State.Done)
+                .Permit(Trigger.Error, State.Done);
+
             //TODO
 
             machine.Configure(State.Done)
@@ -322,6 +334,28 @@ namespace Stethoscope.Printers.Internal.PrintMode
 
         #endregion
 
+        #region Parser Components
+
+        private static readonly Dictionary<char, ConditionalElement> LogConditionalFormatElements = new Dictionary<char, ConditionalElement>()
+        {
+            { '+', ConditionalElement.ValidLog },
+            { '-', ConditionalElement.InvalidLog }
+        };
+
+        private static readonly Dictionary<char, ConditionalElement> AttributeConditionalFormatElements = new Dictionary<char, ConditionalElement>(LogConditionalFormatElements)
+        {
+            { '^', ConditionalElement.AttributeExists },
+            { '$', ConditionalElement.AttributeValueChanged },
+            { '~', ConditionalElement.AttributeValueNew }
+        };
+
+        private static readonly Dictionary<char, ModifierElement> AttributeModiferFormatElements = new Dictionary<char, ModifierElement>()
+        {
+            { '!', ModifierElement.ErrorHandler }
+        };
+
+        #endregion
+
         #region State Entry Operations
 
         private void HandleLogConditional(SMState state)
@@ -329,26 +363,33 @@ namespace Stethoscope.Printers.Internal.PrintMode
             if (state.TestCharLength(1))
             {
                 var type = state.Format[state.ParsingIndex];
-                //XXX the following should be more of a loop that only passes if an odd number of chars match. + = conditional, ++ = raw, +++ = conditional + raw, ++++ = 2x raw, etc.
-                if (!state.TestCharLength(2) || state.Format[state.ParsingIndex + 1] != type) // Need to test that we're not looking at a raw that is using the special chars (+ means conditional, ++ means it's a raw char of '+')
+
+                // Need to test that we're not looking at a raw that is using the special chars (+ means conditional, ++ means it's a raw char of '+')
+                // As such, only passes if an odd number of chars match. + = conditional, ++ = raw, +++ = conditional + raw, ++++ = 2x raw, etc.
+                var count = 1;
+                while (state.TestCharLength(count + 1) && state.Format[state.ParsingIndex + count] == type)
                 {
-                    switch (type)
+                    count++;
+                }
+                if (count % 2 == 1 && LogConditionalFormatElements.ContainsKey(type))
+                {
+                    if (state.LogConditionals?.Count != 0)
                     {
-                        //XXX these should be consts
-                        case '+':
-                        case '-':
-                            if (state.LogConditionals?.Count != 0)
-                            {
-                                state.StateMachine.Fire(errorTrigger, state.SetError("Only one log-level conditional is allowed"));
-                                return;
-                            }
-                            var conditional = state.ElementFactory.CreateConditional(type == '+' ? ConditionalElement.ValidLog : ConditionalElement.InvalidLog);
-                            state.StateMachine.Fire(foundConditionalTrigger, state.AddLogConditional(conditional).IncrementIndex(1));
-                            return;
+                        state.StateMachine.Fire(errorTrigger, state.SetError("Only one log-level conditional is allowed"));
+                        return;
                     }
+                    var conditional = state.ElementFactory.CreateConditional(LogConditionalFormatElements[type]);
+                    state.StateMachine.Fire(foundConditionalTrigger, state.AddLogConditional(conditional).IncrementIndex(1));
+                    return;
                 }
             }
             state.StateMachine.Fire(doneTrigger, state);
+        }
+
+        private void HandlePart(SMState state)
+        {
+            // FoundPart, ProcessRaw, ProcessAttribute, Done, Error
+            //TODO
         }
 
         #endregion

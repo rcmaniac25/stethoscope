@@ -2874,6 +2874,24 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - That would be unreadable, unable to update and maintain.
 - But that's all for now. Usual "tomorrow might not get anything done"
 
+#327.2. 03/05/2019:
+- Ok, I did a bit of cleanup for the most part.
+- I wrote the state machine configuration for "Part", though the implementation is not there.
+- Main cleanup aspects I did:
+-- consts for parser components (what char = a specific conditional, etc.)
+-- handling multi-concurrent chars of the same type. Basically: + is conditional, ++ is raw, +++ is conditional and a raw, etc.
+- The only issue I can see happening is when someone tries to do Ex. "@++{Message}". Is that:
+-- +, +{Message}
+-- "+", {Message}
+- What about "@+++{Message}". Is that:
+-- "+", +{Message}
+-- +, "+", {Message}
+- What about "@++++{Message}". Is that:
+-- +, "+", +{Message}
+-- "++", {Message}
+- Yea... so I didn't think of that until I was doing the cleanup. I'm not sure if I want to swap Attribute Conditional and Modifier, throw an error, default to Attribute before Log format, add a divider
+- That's for tomorrow or later. For now, I hope nobody needs that.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
