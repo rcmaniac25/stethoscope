@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 
 namespace Stethoscope.Printers.Internal.PrintMode
 {
@@ -353,6 +354,8 @@ namespace Stethoscope.Printers.Internal.PrintMode
         {
             { '!', ModifierElement.ErrorHandler }
         };
+
+        private static readonly char[] PartAttributeIdentifiers = AttributeConditionalFormatElements.Select(x => x.Key).Concat(new char[] { '{' }).ToArray();
 
         #endregion
 

@@ -2892,6 +2892,12 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - Yea... so I didn't think of that until I was doing the cleanup. I'm not sure if I want to swap Attribute Conditional and Modifier, throw an error, default to Attribute before Log format, add a divider
 - That's for tomorrow or later. For now, I hope nobody needs that.
 
+#328.2. 03/06/2019:
+- Ok, ran out of time tonight. Have to be up very early.
+- One thought that came yesterday was that I have this lookup for conditional and modifiers... but what about for "parts"?
+- Turns out it's possible, so I wrote the variable for that.
+- ...but that's about the extent of what I did. Hopefully I'll have time tomorrow to do more.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
