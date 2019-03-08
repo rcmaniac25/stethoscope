@@ -2898,6 +2898,11 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - Turns out it's possible, so I wrote the variable for that.
 - ...but that's about the extent of what I did. Hopefully I'll have time tomorrow to do more.
 
+#329.2. 03/07/2019:
+- Ok, I ran out of time and have to get something done before hand.
+- Yes, I've used that line a bunch, but when 40 people show up at my door and I don't have it done, it's not going to end up well for me
+- So it's more important.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
