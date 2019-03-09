@@ -2903,6 +2903,11 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - Yes, I've used that line a bunch, but when 40 people show up at my door and I don't have it done, it's not going to end up well for me
 - So it's more important.
 
+#330.2. 03/08/2019:
+- Plan: do work
+- Reality: computer crashed while away... so I spent the time I would've done code, trying to fix it.
+- I failed...
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
