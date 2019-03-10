@@ -132,6 +132,7 @@ namespace Stethoscope.Printers.Internal.PrintMode
             AttributeFormat,
 
             // Utility
+            CountTillMarker,
             StringQuote,
 
             // Conditionals
@@ -267,7 +268,7 @@ namespace Stethoscope.Printers.Internal.PrintMode
             }
 
             var stateMachine = CreateStateMachine();
-            stateMachine.Fire(processTrigger, (format, factory, ProcessIsComplete));
+            stateMachine.Fire(processTrigger, format, factory, ProcessIsComplete);
 
             if (finishedState.ErrorMessage != null)
             {
@@ -282,9 +283,11 @@ namespace Stethoscope.Printers.Internal.PrintMode
 
         #region Create State Machine
 
-        private readonly StateMachine<State, Trigger>.TriggerWithParameters<(string, IPrinterElementFactory, Action<SMState>)> processTrigger = new StateMachine<State, Trigger>.TriggerWithParameters<(string, IPrinterElementFactory, Action<SMState>)>(Trigger.Invoke);
+        private readonly StateMachine<State, Trigger>.TriggerWithParameters<string, IPrinterElementFactory, Action<SMState>> processTrigger = new StateMachine<State, Trigger>.TriggerWithParameters<string, IPrinterElementFactory, Action<SMState>>(Trigger.Invoke);
         private readonly StateMachine<State, Trigger>.TriggerWithParameters<SMState> invokeTrigger = new StateMachine<State, Trigger>.TriggerWithParameters<SMState>(Trigger.Invoke);
+        private readonly StateMachine<State, Trigger>.TriggerWithParameters<SMState, char[]> countTillMarkerTrigger = new StateMachine<State, Trigger>.TriggerWithParameters<SMState, char[]>(Trigger.Invoke);
         private readonly StateMachine<State, Trigger>.TriggerWithParameters<SMState> doneTrigger = new StateMachine<State, Trigger>.TriggerWithParameters<SMState>(Trigger.Done);
+        private readonly StateMachine<State, Trigger>.TriggerWithParameters<SMState, int> doneIntTrigger = new StateMachine<State, Trigger>.TriggerWithParameters<SMState, int>(Trigger.Done);
         private readonly StateMachine<State, Trigger>.TriggerWithParameters<SMState> errorTrigger = new StateMachine<State, Trigger>.TriggerWithParameters<SMState>(Trigger.Error);
         private readonly StateMachine<State, Trigger>.TriggerWithParameters<SMState> processRawTrigger = new StateMachine<State, Trigger>.TriggerWithParameters<SMState>(Trigger.ProcessRaw);
         private readonly StateMachine<State, Trigger>.TriggerWithParameters<SMState> foundConditionalTrigger = new StateMachine<State, Trigger>.TriggerWithParameters<SMState>(Trigger.FoundConditional);
@@ -297,9 +300,9 @@ namespace Stethoscope.Printers.Internal.PrintMode
                 .Permit(Trigger.Invoke, State.Setup);
 
             machine.Configure(State.Setup)
-                .OnEntryFrom(processTrigger, ((string format, IPrinterElementFactory factory, Action<SMState> doneHandler) processParameters) =>
+                .OnEntryFrom(processTrigger, (string format, IPrinterElementFactory factory, Action<SMState> doneHandler) =>
                 {
-                    var internalState = new SMState(processParameters.format, processParameters.factory, machine, processParameters.doneHandler);
+                    var internalState = new SMState(format, factory, machine, doneHandler);
                     if (internalState.Format.Length > 0 && internalState.Format[0] == '@')
                     {
                         internalState = internalState.IncrementIndex(1);
@@ -316,11 +319,17 @@ namespace Stethoscope.Printers.Internal.PrintMode
                 .Permit(Trigger.Error, State.Done);
 
             machine.Configure(State.Part)
-                .OnEntryFrom(doneTrigger, HandlePart)
-                .PermitReentry(Trigger.FoundPart)
+                .OnEntryFrom(doneTrigger, state => state.StateMachine.Fire(countTillMarkerTrigger, state, PartAttributeIdentifiers))
+                .OnEntryFrom(doneIntTrigger, HandlePart)
+                .Permit(Trigger.Invoke, State.CountTillMarker)
                 .Permit(Trigger.ProcessRaw, State.Raw)
                 .Permit(Trigger.ProcessAttribute, State.Attribute)
                 .Permit(Trigger.Done, State.Done)
+                .Permit(Trigger.Error, State.Done);
+
+            machine.Configure(State.CountTillMarker)
+                .OnEntryFrom(countTillMarkerTrigger, CountTillMarker)
+                .Permit(Trigger.Done, State.Part)
                 .Permit(Trigger.Error, State.Done);
 
             //TODO
@@ -389,9 +398,21 @@ namespace Stethoscope.Printers.Internal.PrintMode
             state.StateMachine.Fire(doneTrigger, state);
         }
 
-        private void HandlePart(SMState state)
+        private void CountTillMarker(SMState state, char[] termChars)
         {
-            // FoundPart, ProcessRaw, ProcessAttribute, Done, Error
+            //TODO
+        }
+
+        private void HandlePart(SMState state, int partLength)
+        {
+            /* 1. Search for the start of a new part/end of string
+             * 2. If distance == 0, goto step 4
+             * 3. ProcessRaw (length of raw section)
+             * 4. If index == end of string, Done
+             * 5. ProcessAttribute
+             */
+
+            // ProcessRaw, ProcessAttribute, Done, Error
             //TODO
         }
 

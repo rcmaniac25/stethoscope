@@ -2908,6 +2908,13 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - Reality: computer crashed while away... so I spent the time I would've done code, trying to fix it.
 - I failed...
 
+#331.2. 03/09/2019:
+- Oh look, the time changed
+- I started with "let me just define the steps needed to do things with 'part'"
+- It then went to "I got a few min"
+- Now it's DAH!
+- As such, the code is there... but it's oddly "sparse" and I didn't update the graph that describes the state machine
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
