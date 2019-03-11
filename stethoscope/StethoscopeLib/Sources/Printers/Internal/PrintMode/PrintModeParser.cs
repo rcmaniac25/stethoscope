@@ -56,7 +56,7 @@ namespace Stethoscope.Printers.Internal.PrintMode
             public SMState SetError(string errorMessage)
             {
                 var clone = (SMState)Clone();
-                clone.ErrorMessage = errorMessage;
+                clone.ErrorMessage = $"ERROR: Index {ParsingIndex}. Message: {errorMessage}";
                 return clone;
             }
 
@@ -289,7 +289,8 @@ namespace Stethoscope.Printers.Internal.PrintMode
         private readonly StateMachine<State, Trigger>.TriggerWithParameters<SMState> doneTrigger = new StateMachine<State, Trigger>.TriggerWithParameters<SMState>(Trigger.Done);
         private readonly StateMachine<State, Trigger>.TriggerWithParameters<SMState, int> doneIntTrigger = new StateMachine<State, Trigger>.TriggerWithParameters<SMState, int>(Trigger.Done);
         private readonly StateMachine<State, Trigger>.TriggerWithParameters<SMState> errorTrigger = new StateMachine<State, Trigger>.TriggerWithParameters<SMState>(Trigger.Error);
-        private readonly StateMachine<State, Trigger>.TriggerWithParameters<SMState> processRawTrigger = new StateMachine<State, Trigger>.TriggerWithParameters<SMState>(Trigger.ProcessRaw);
+        private readonly StateMachine<State, Trigger>.TriggerWithParameters<SMState, int> processRawTrigger = new StateMachine<State, Trigger>.TriggerWithParameters<SMState, int>(Trigger.ProcessRaw);
+        private readonly StateMachine<State, Trigger>.TriggerWithParameters<SMState> processAttributeTrigger = new StateMachine<State, Trigger>.TriggerWithParameters<SMState>(Trigger.ProcessAttribute);
         private readonly StateMachine<State, Trigger>.TriggerWithParameters<SMState> foundConditionalTrigger = new StateMachine<State, Trigger>.TriggerWithParameters<SMState>(Trigger.FoundConditional);
 
         private StateMachine<State, Trigger> CreateStateMachine()
@@ -329,6 +330,10 @@ namespace Stethoscope.Printers.Internal.PrintMode
 
             machine.Configure(State.CountTillMarker)
                 .OnEntryFrom(countTillMarkerTrigger, CountTillMarker)
+                .Permit(Trigger.Done, State.Part);
+
+            machine.Configure(State.Raw)
+                .OnEntryFrom(processRawTrigger, ProcessRaw)
                 .Permit(Trigger.Done, State.Part)
                 .Permit(Trigger.Error, State.Done);
 
@@ -365,6 +370,8 @@ namespace Stethoscope.Printers.Internal.PrintMode
         };
 
         private static readonly char[] PartAttributeIdentifiers = AttributeConditionalFormatElements.Select(x => x.Key).Concat(new char[] { '{' }).ToArray();
+        private static readonly char[] PartAttributeEndIdentifiers = new char[] { '}' };
+        private static readonly char[] PartAttributeModifierIdentifiers= AttributeModiferFormatElements.Select(x => x.Key).ToArray();
 
         #endregion
 
@@ -400,7 +407,18 @@ namespace Stethoscope.Printers.Internal.PrintMode
 
         private void CountTillMarker(SMState state, char[] termChars)
         {
-            //TODO
+            var len = 0;
+            var testLen = 1;
+            while (state.TestCharLength(testLen))
+            {
+                len = testLen++;
+                var c = state.Format[state.ParsingIndex + len - 1];
+                if (termChars.Contains(c))
+                {
+                    break;
+                }
+            }
+            state.StateMachine.Fire(doneIntTrigger, state, len);
         }
 
         private void HandlePart(SMState state, int partLength)
@@ -412,8 +430,47 @@ namespace Stethoscope.Printers.Internal.PrintMode
              * 5. ProcessAttribute
              */
 
-            // ProcessRaw, ProcessAttribute, Done, Error
-            //TODO
+            if (partLength <= 0)
+            {
+                if (partLength < 0)
+                {
+                    state.StateMachine.Fire(errorTrigger, state.SetError($"Part length cannot be less then 0. Was {partLength}"));
+                }
+                else if (state.ParsingIndex == state.Format.Length)
+                {
+                    state.StateMachine.Fire(doneTrigger, state);
+                }
+                else
+                {
+                    state.StateMachine.Fire(processAttributeTrigger, state);
+                }
+            }
+            else
+            {
+                state.StateMachine.Fire(processRawTrigger, state, partLength);
+            }
+        }
+
+        private void ProcessRaw(SMState state, int partLength)
+        {
+            if (partLength <= 0)
+            {
+                if (partLength == 0)
+                {
+                    // Not sure what this happened
+                    //XXX add stat counter for this
+                    state.StateMachine.Fire(doneTrigger, state);
+                }
+                else
+                {
+                    state.StateMachine.Fire(errorTrigger, state.SetError($"Raw element length cannot be less then 0. Was {partLength}"));
+                }
+            }
+            else
+            {
+                var rawElement = state.ElementFactory.CreateRaw(state.Format.Substring(state.ParsingIndex, partLength));
+                state.StateMachine.Fire(doneTrigger, state.AddElement(rawElement).IncrementIndex(partLength));
+            }
         }
 
         #endregion

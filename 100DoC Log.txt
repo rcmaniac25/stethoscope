@@ -2915,6 +2915,13 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - Now it's DAH!
 - As such, the code is there... but it's oddly "sparse" and I didn't update the graph that describes the state machine
 
+#332.2. 03/10/2019:
+- Finished: counter, raw processing, part handling, and a bit of error handling
+- :D
+- Next up with be attribute parsing.
+- That + error handler (modifier) and parsing will be done.
+- Final piece to the print component would be an implementation of the factory elements.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
