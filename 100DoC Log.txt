@@ -2922,6 +2922,16 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - That + error handler (modifier) and parsing will be done.
 - Final piece to the print component would be an implementation of the factory elements.
 
+#333.2. 03/11/2019:
+- Wanted to do something quick: wrote the decision logic for picking what to do about "attributes"
+- It's a bit interesting... the decision to use a state machine for this means the indvidiual actions are compact and generally easy to read.
+- I realized one issue I could hit with attribute parsing ({ vs {{, etc.) but I simply made a todo for another time.
+- One other aspect to think about is if I should move that logic to CountTillMarker.
+- Actually... yes. Yes I should. Tomorrow(?)
+- If I do the work in CountTillMarker, not only do I prevent having multiple RAW objects, but I can natually say "here's new chars"
+- Though, one issue I realized: how do I know for sure? Like, if I say "test for '{'" and I get '^', which is a special char, do I now need to know that too?
+- I will think about this another time...
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2

@@ -337,6 +337,14 @@ namespace Stethoscope.Printers.Internal.PrintMode
                 .Permit(Trigger.Done, State.Part)
                 .Permit(Trigger.Error, State.Done);
 
+            machine.Configure(State.Attribute)
+                .OnEntryFrom(processAttributeTrigger, ProcessAttribute)
+                .Permit(Trigger.FoundConditional, State.Conditional)
+                .Permit(Trigger.Invoke, State.AttributeReference)
+                .Permit(Trigger.Error, State.Done);
+
+            //XXX: reread #333.2 before continuing
+
             //TODO
 
             machine.Configure(State.Done)
@@ -369,8 +377,10 @@ namespace Stethoscope.Printers.Internal.PrintMode
             { '!', ModifierElement.ErrorHandler }
         };
 
-        private static readonly char[] PartAttributeIdentifiers = AttributeConditionalFormatElements.Select(x => x.Key).Concat(new char[] { '{' }).ToArray();
+        private static readonly char[] PartAttributeStartIdentifiers = new char[] { '{' };
         private static readonly char[] PartAttributeEndIdentifiers = new char[] { '}' };
+        private static readonly char[] PartAttributeConditionalIdentifiers = AttributeConditionalFormatElements.Select(x => x.Key).ToArray();
+        private static readonly char[] PartAttributeIdentifiers = PartAttributeConditionalIdentifiers.Concat(PartAttributeStartIdentifiers).ToArray();
         private static readonly char[] PartAttributeModifierIdentifiers= AttributeModiferFormatElements.Select(x => x.Key).ToArray();
 
         #endregion
@@ -407,6 +417,8 @@ namespace Stethoscope.Printers.Internal.PrintMode
 
         private void CountTillMarker(SMState state, char[] termChars)
         {
+            //TODO: test chars to make sure we didn't get a raw without knowing (see HandleLogConditional)
+
             var len = 0;
             var testLen = 1;
             while (state.TestCharLength(testLen))
@@ -468,10 +480,37 @@ namespace Stethoscope.Printers.Internal.PrintMode
             }
             else
             {
-                var rawElement = state.ElementFactory.CreateRaw(state.Format.Substring(state.ParsingIndex, partLength));
+                var rawElement = state.ElementFactory.CreateRaw(state.Format.Substring(state.ParsingIndex, partLength)); //XXX do we need to handle special chars outside of the create raw function?
                 state.StateMachine.Fire(doneTrigger, state.AddElement(rawElement).IncrementIndex(partLength));
             }
         }
+
+        private void ProcessAttribute(SMState state)
+        {
+            if (state.TestCharLength(1))
+            {
+                var c = state.Format[state.ParsingIndex];
+
+                if (AttributeConditionalFormatElements.ContainsKey(c))
+                {
+                    state.StateMachine.Fire(foundConditionalTrigger, state);
+                }
+                else if(PartAttributeStartIdentifiers.Contains(c))
+                {
+                    state.StateMachine.Fire(invokeTrigger, state);
+                }
+                else
+                {
+                    state.StateMachine.Fire(errorTrigger, state.SetError($"Unknown marker: {c}"));
+                }
+            }
+            else
+            {
+                state.StateMachine.Fire(errorTrigger, state.SetError("End of format reached unexpectedly"));
+            }
+        }
+
+        //XXX: reread #333.2 before continuing
 
         #endregion
     }

@@ -8,7 +8,6 @@ Uninitialized --> Setup
 Setup --> LogConditional
 
 LogConditional --> LogConditional
-Part --> Part
 
 LogConditional --> Part
 
