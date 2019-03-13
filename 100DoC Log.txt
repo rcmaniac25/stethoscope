@@ -2932,6 +2932,9 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - Though, one issue I realized: how do I know for sure? Like, if I say "test for '{'" and I get '^', which is a special char, do I now need to know that too?
 - I will think about this another time...
 
+#334.2. 03/12/2019:
+- Unexpected mental "crash". Went to bed very early... so nothing happened today
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
