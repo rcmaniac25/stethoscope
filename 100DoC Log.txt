@@ -2935,6 +2935,10 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 #334.2. 03/12/2019:
 - Unexpected mental "crash". Went to bed very early... so nothing happened today
 
+#335.2. 03/13/2019:
+- Wow, so... it happened again.
+- Note to self: bed = sleep. Stop laying in bed when one feels tired with the expectation of getting up in a few min, and instead go to bed.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
