@@ -2939,6 +2939,11 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - Wow, so... it happened again.
 - Note to self: bed = sleep. Stop laying in bed when one feels tired with the expectation of getting up in a few min, and instead go to bed.
 
+#336.2. 03/14/2019:
+- I didn't fall asleep this time, but I did realize that I'm getting into a "I have all these things that _must_ be done and I haven't done any of them" moment (again)
+- As such, I focused on those today.
+- I do plan to work on this tomorrow.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
