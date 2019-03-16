@@ -2944,6 +2944,12 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - As such, I focused on those today.
 - I do plan to work on this tomorrow.
 
+#337.2. 03/15/2019:
+- ... ****
+- So, I'll put it this way. I planned to do stuff today. I was all setup... then "all these things that _must_ be done" crept in and said "hey, remember you were gonna writeup a biz plan for starting your own company? You have others who want in... might want to do it"
+- So I did that instead...
+- I plan to do it tomorrow...
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
