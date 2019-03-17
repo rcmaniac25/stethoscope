@@ -2950,6 +2950,14 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - So I did that instead...
 - I plan to do it tomorrow...
 
+#338.2. 03/16/2019:
+- I did something!
+- So I did a bit of refactoring so instead of a whole bunch of dictionaries for attribute, modifier, conditional, etc. there's one table of special chars with a set of flags.
+- This should make it easier to add or change flags.
+- It also means I get to resolve the issue proposed in #333.2.
+- With a single dictionary of special chars, CountTillMarker can operate and simply do a lookup of special chars and, if one is found, then do the same operation as HandleLogConditional and only indicate it's a special char if there's an odd number of the special chars.
+- But... it's late, so that's work for tomorrow.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2

@@ -156,6 +156,76 @@ namespace Stethoscope.Printers.Internal.PrintMode
 
         #endregion
 
+        #region Special Chars
+
+        [Flags]
+        private enum SpecialCharFlags
+        {
+            None = 0,
+
+            // Location for attribute
+            StartAttribute = 1 << 0,
+            EndAttribute = 1 << 1,
+
+            // Type
+            Conditional = 1 << 2,
+            Modifier = 1 << 3,
+            Attribute = 1 << 4,
+
+            // Where it can be used
+            ForLog = 1 << 5,
+            ForAttribute = 1 << 6
+        }
+
+        private struct SpecialCharValues
+        {
+            public SpecialCharFlags Flags { get; set; }
+            public ConditionalElement ConditionalElement { get; set; }
+            public ModifierElement ModifierElement { get; set; }
+
+            public static SpecialCharValues Create(SpecialCharFlags flags)
+            {
+                return new SpecialCharValues
+                {
+                    Flags = flags
+                };
+            }
+
+            public static SpecialCharValues Create(SpecialCharFlags flags, ConditionalElement conditional)
+            {
+                return new SpecialCharValues
+                {
+                    Flags = flags,
+                    ConditionalElement = conditional
+                };
+            }
+
+            public static SpecialCharValues Create(SpecialCharFlags flags, ModifierElement modifier)
+            {
+                return new SpecialCharValues
+                {
+                    Flags = flags,
+                    ModifierElement = modifier
+                };
+            }
+        }
+
+        private static readonly Dictionary<char, SpecialCharValues> SpecialChars = new Dictionary<char, SpecialCharValues>()
+        {
+            { '+', SpecialCharValues.Create(SpecialCharFlags.Conditional | SpecialCharFlags.ForLog | SpecialCharFlags.ForAttribute | SpecialCharFlags.StartAttribute, ConditionalElement.ValidLog) },
+            { '-', SpecialCharValues.Create(SpecialCharFlags.Conditional | SpecialCharFlags.ForLog | SpecialCharFlags.ForAttribute | SpecialCharFlags.StartAttribute, ConditionalElement.InvalidLog) },
+            { '^', SpecialCharValues.Create(SpecialCharFlags.Conditional | SpecialCharFlags.ForAttribute | SpecialCharFlags.StartAttribute, ConditionalElement.AttributeExists) },
+            { '$', SpecialCharValues.Create(SpecialCharFlags.Conditional | SpecialCharFlags.ForAttribute | SpecialCharFlags.StartAttribute, ConditionalElement.AttributeValueChanged) },
+            { '~', SpecialCharValues.Create(SpecialCharFlags.Conditional | SpecialCharFlags.ForAttribute | SpecialCharFlags.StartAttribute, ConditionalElement.AttributeValueNew) },
+
+            { '!', SpecialCharValues.Create(SpecialCharFlags.Modifier | SpecialCharFlags.ForAttribute, ModifierElement.ErrorHandler) },
+
+            { '{', SpecialCharValues.Create(SpecialCharFlags.Attribute | SpecialCharFlags.StartAttribute) },
+            { '}', SpecialCharValues.Create(SpecialCharFlags.Attribute | SpecialCharFlags.EndAttribute) }
+        };
+
+        #endregion
+
         private List<IElement> elements;
 
         private PrintModeParser()
@@ -281,6 +351,23 @@ namespace Stethoscope.Printers.Internal.PrintMode
             }
         }
 
+        //XXX replace GetSpecialCharsForFlags with this function eventually (if possible)
+        private static IEnumerable<char> GetSpecialCharsForFlagsEn(SpecialCharFlags flags)
+        {
+            foreach (var schar in SpecialChars)
+            {
+                if ((schar.Value.Flags & flags) == flags)
+                {
+                    yield return schar.Key;
+                }
+            }
+        }
+
+        private static char[] GetSpecialCharsForFlags(SpecialCharFlags flags)
+        {
+            return GetSpecialCharsForFlagsEn(flags).ToArray();
+        }
+
         #region Create State Machine
 
         private readonly StateMachine<State, Trigger>.TriggerWithParameters<string, IPrinterElementFactory, Action<SMState>> processTrigger = new StateMachine<State, Trigger>.TriggerWithParameters<string, IPrinterElementFactory, Action<SMState>>(Trigger.Invoke);
@@ -320,7 +407,7 @@ namespace Stethoscope.Printers.Internal.PrintMode
                 .Permit(Trigger.Error, State.Done);
 
             machine.Configure(State.Part)
-                .OnEntryFrom(doneTrigger, state => state.StateMachine.Fire(countTillMarkerTrigger, state, PartAttributeIdentifiers))
+                .OnEntryFrom(doneTrigger, state => state.StateMachine.Fire(countTillMarkerTrigger, state, GetSpecialCharsForFlags(SpecialCharFlags.StartAttribute)))
                 .OnEntryFrom(doneIntTrigger, HandlePart)
                 .Permit(Trigger.Invoke, State.CountTillMarker)
                 .Permit(Trigger.ProcessRaw, State.Raw)
@@ -342,9 +429,7 @@ namespace Stethoscope.Printers.Internal.PrintMode
                 .Permit(Trigger.FoundConditional, State.Conditional)
                 .Permit(Trigger.Invoke, State.AttributeReference)
                 .Permit(Trigger.Error, State.Done);
-
-            //XXX: reread #333.2 before continuing
-
+            
             //TODO
 
             machine.Configure(State.Done)
@@ -356,35 +441,7 @@ namespace Stethoscope.Printers.Internal.PrintMode
         }
 
         #endregion
-
-        #region Parser Components
-
-        private static readonly Dictionary<char, ConditionalElement> LogConditionalFormatElements = new Dictionary<char, ConditionalElement>()
-        {
-            { '+', ConditionalElement.ValidLog },
-            { '-', ConditionalElement.InvalidLog }
-        };
-
-        private static readonly Dictionary<char, ConditionalElement> AttributeConditionalFormatElements = new Dictionary<char, ConditionalElement>(LogConditionalFormatElements)
-        {
-            { '^', ConditionalElement.AttributeExists },
-            { '$', ConditionalElement.AttributeValueChanged },
-            { '~', ConditionalElement.AttributeValueNew }
-        };
-
-        private static readonly Dictionary<char, ModifierElement> AttributeModiferFormatElements = new Dictionary<char, ModifierElement>()
-        {
-            { '!', ModifierElement.ErrorHandler }
-        };
-
-        private static readonly char[] PartAttributeStartIdentifiers = new char[] { '{' };
-        private static readonly char[] PartAttributeEndIdentifiers = new char[] { '}' };
-        private static readonly char[] PartAttributeConditionalIdentifiers = AttributeConditionalFormatElements.Select(x => x.Key).ToArray();
-        private static readonly char[] PartAttributeIdentifiers = PartAttributeConditionalIdentifiers.Concat(PartAttributeStartIdentifiers).ToArray();
-        private static readonly char[] PartAttributeModifierIdentifiers= AttributeModiferFormatElements.Select(x => x.Key).ToArray();
-
-        #endregion
-
+        
         #region State Entry Operations
 
         private void HandleLogConditional(SMState state)
@@ -400,14 +457,14 @@ namespace Stethoscope.Printers.Internal.PrintMode
                 {
                     count++;
                 }
-                if (count % 2 == 1 && LogConditionalFormatElements.ContainsKey(type))
+                if (count % 2 == 1 && GetSpecialCharsForFlagsEn(SpecialCharFlags.Conditional | SpecialCharFlags.ForLog).Contains(type))
                 {
                     if (state.LogConditionals?.Count != 0)
                     {
                         state.StateMachine.Fire(errorTrigger, state.SetError("Only one log-level conditional is allowed"));
                         return;
                     }
-                    var conditional = state.ElementFactory.CreateConditional(LogConditionalFormatElements[type]);
+                    var conditional = state.ElementFactory.CreateConditional(SpecialChars[type].ConditionalElement);
                     state.StateMachine.Fire(foundConditionalTrigger, state.AddLogConditional(conditional).IncrementIndex(1));
                     return;
                 }
@@ -491,11 +548,11 @@ namespace Stethoscope.Printers.Internal.PrintMode
             {
                 var c = state.Format[state.ParsingIndex];
 
-                if (AttributeConditionalFormatElements.ContainsKey(c))
+                if (GetSpecialCharsForFlagsEn(SpecialCharFlags.Conditional | SpecialCharFlags.ForAttribute).Contains(c))
                 {
                     state.StateMachine.Fire(foundConditionalTrigger, state);
                 }
-                else if(PartAttributeStartIdentifiers.Contains(c))
+                else if (GetSpecialCharsForFlagsEn(SpecialCharFlags.Attribute | SpecialCharFlags.StartAttribute).Contains(c))
                 {
                     state.StateMachine.Fire(invokeTrigger, state);
                 }
