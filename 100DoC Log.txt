@@ -2958,6 +2958,17 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - With a single dictionary of special chars, CountTillMarker can operate and simply do a lookup of special chars and, if one is found, then do the same operation as HandleLogConditional and only indicate it's a special char if there's an odd number of the special chars.
 - But... it's late, so that's work for tomorrow.
 
+#339.2. 03/17/2019:
+- I wanted to get the CountTillMarker updated but need to re-evaluate the logic a bit.
+- At re-reading the code (admittedly, while half alseep), I tink there's a logic error with the existing impl.
+- Outputs should be the number of chars. till a terminating char (exclusive).
+- 0 is a return if we are at the end of a string or the terminating char is the char at the current parsing index.
+- Current implementation will only return 0 when we're at the end of the string.
+- It seems to give an extra char in general... I realized "ah, I'm using length for char testing instead of testLen"...
+- ...then I went through the logic again and while I fixed the extra char issue, it didn't give me 0 when the term. char. was the first char. again.
+- Ok... that's not a hard fix, but it also means my compact logic isn't going to be as compact... let me rethink this.
+- Err... let me rethink this when I'm not half asleep so I don't make mistakes.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
