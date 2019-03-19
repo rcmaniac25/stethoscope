@@ -372,7 +372,7 @@ namespace Stethoscope.Printers.Internal.PrintMode
 
         private readonly StateMachine<State, Trigger>.TriggerWithParameters<string, IPrinterElementFactory, Action<SMState>> processTrigger = new StateMachine<State, Trigger>.TriggerWithParameters<string, IPrinterElementFactory, Action<SMState>>(Trigger.Invoke);
         private readonly StateMachine<State, Trigger>.TriggerWithParameters<SMState> invokeTrigger = new StateMachine<State, Trigger>.TriggerWithParameters<SMState>(Trigger.Invoke);
-        private readonly StateMachine<State, Trigger>.TriggerWithParameters<SMState, char[]> countTillMarkerTrigger = new StateMachine<State, Trigger>.TriggerWithParameters<SMState, char[]>(Trigger.Invoke);
+        private readonly StateMachine<State, Trigger>.TriggerWithParameters<SMState, char[], CountTillFlag> countTillMarkerTrigger = new StateMachine<State, Trigger>.TriggerWithParameters<SMState, char[], CountTillFlag>(Trigger.Invoke);
         private readonly StateMachine<State, Trigger>.TriggerWithParameters<SMState> doneTrigger = new StateMachine<State, Trigger>.TriggerWithParameters<SMState>(Trigger.Done);
         private readonly StateMachine<State, Trigger>.TriggerWithParameters<SMState, int> doneIntTrigger = new StateMachine<State, Trigger>.TriggerWithParameters<SMState, int>(Trigger.Done);
         private readonly StateMachine<State, Trigger>.TriggerWithParameters<SMState> errorTrigger = new StateMachine<State, Trigger>.TriggerWithParameters<SMState>(Trigger.Error);
@@ -407,7 +407,7 @@ namespace Stethoscope.Printers.Internal.PrintMode
                 .Permit(Trigger.Error, State.Done);
 
             machine.Configure(State.Part)
-                .OnEntryFrom(doneTrigger, state => state.StateMachine.Fire(countTillMarkerTrigger, state, GetSpecialCharsForFlags(SpecialCharFlags.StartAttribute)))
+                .OnEntryFrom(doneTrigger, state => state.StateMachine.Fire(countTillMarkerTrigger, state, GetSpecialCharsForFlags(SpecialCharFlags.StartAttribute), CountTillFlag.LastMarker))
                 .OnEntryFrom(doneIntTrigger, HandlePart)
                 .Permit(Trigger.Invoke, State.CountTillMarker)
                 .Permit(Trigger.ProcessRaw, State.Raw)
@@ -472,20 +472,60 @@ namespace Stethoscope.Printers.Internal.PrintMode
             state.StateMachine.Fire(doneTrigger, state);
         }
 
-        private void CountTillMarker(SMState state, char[] termChars)
+        private enum CountTillFlag
         {
-            //TODO: test chars to make sure we didn't get a raw without knowing (see HandleLogConditional)
+            /// <summary>
+            /// Stop at the first marker. So ^ (raw = ^^) of "abc^^^" would return 3
+            /// </summary>
+            FirstMarker,
+            /// <summary>
+            /// Stop at the last marker. So ^ (raw = ^^) of "abc^^^" would return 5
+            /// </summary>
+            LastMarker
+        }
 
+        private static int? CountTillMarkerCalculateLength(SMState state, int testLen, char c, CountTillFlag flag)
+        {
+            var notRaw = true;
+            if (SpecialChars.ContainsKey(c))
+            {
+                var innerCount = 1;
+                while (state.TestCharLength(innerCount + testLen) && state.Format[state.ParsingIndex + innerCount + testLen - 1] == c)
+                {
+                    innerCount++;
+                }
+                if (innerCount % 2 == 0 ||
+                    flag == CountTillFlag.LastMarker)
+                {
+                    notRaw = false;
+                    testLen += innerCount - 1;
+                }
+            }
+
+            if (notRaw)
+            {
+                return testLen - 1;
+            }
+            return null;
+        }
+
+        private void CountTillMarker(SMState state, char[] termChars, CountTillFlag flag)
+        {
             var len = 0;
             var testLen = 1;
             while (state.TestCharLength(testLen))
             {
-                len = testLen++;
-                var c = state.Format[state.ParsingIndex + len - 1];
+                var c = state.Format[state.ParsingIndex + testLen - 1];
                 if (termChars.Contains(c))
                 {
-                    break;
+                    var finalLen = CountTillMarkerCalculateLength(state, testLen, c, flag);
+                    if (finalLen.HasValue)
+                    {
+                        len = finalLen.Value;
+                        break;
+                    }
                 }
+                testLen++;
             }
             state.StateMachine.Fire(doneIntTrigger, state, len);
         }
@@ -520,13 +560,39 @@ namespace Stethoscope.Printers.Internal.PrintMode
             }
         }
 
+        private static string CollapseSpecialCharsInRaw(string str)
+        {
+            if (!str.Any(SpecialChars.ContainsKey))
+            {
+                return str;
+            }
+
+            var sb = new StringBuilder();
+            for (var i = 0; i < str.Length; i++)
+            {
+                var c = str[i];
+                if (SpecialChars.ContainsKey(c))
+                {
+                    // Skip chars
+                    var k = i + 1;
+                    while (k < str.Length && str[k] == c)
+                    {
+                        k++;
+                    }
+                    i = k - 1;
+                }
+                sb.Append(c);
+            }
+            return sb.ToString();
+        }
+
         private void ProcessRaw(SMState state, int partLength)
         {
             if (partLength <= 0)
             {
                 if (partLength == 0)
                 {
-                    // Not sure what this happened
+                    // Not sure why this would happened
                     //XXX add stat counter for this
                     state.StateMachine.Fire(doneTrigger, state);
                 }
@@ -537,7 +603,8 @@ namespace Stethoscope.Printers.Internal.PrintMode
             }
             else
             {
-                var rawElement = state.ElementFactory.CreateRaw(state.Format.Substring(state.ParsingIndex, partLength)); //XXX do we need to handle special chars outside of the create raw function?
+                var str = CollapseSpecialCharsInRaw(state.Format.Substring(state.ParsingIndex, partLength));
+                var rawElement = state.ElementFactory.CreateRaw(str);
                 state.StateMachine.Fire(doneTrigger, state.AddElement(rawElement).IncrementIndex(partLength));
             }
         }
@@ -567,8 +634,6 @@ namespace Stethoscope.Printers.Internal.PrintMode
             }
         }
 
-        //XXX: reread #333.2 before continuing
-
-        #endregion
+#endregion
     }
 }

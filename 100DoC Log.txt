@@ -2969,6 +2969,19 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - Ok... that's not a hard fix, but it also means my compact logic isn't going to be as compact... let me rethink this.
 - Err... let me rethink this when I'm not half asleep so I don't make mistakes.
 
+#340.2. 03/18/2019:
+- That was annoying...
+- Regardless, I rewrote CountTillMarker twice.
+- Once to fix the issue.
+- Once more to refactor it so it didn't "staircase" too much.
+- In between, I realized where a marker was when it was a special char was repeated, not obvious.
+- Was it at the beginning or the end of a repeated special char?
+- I added a flag... and then moved on, never implementing the flag.
+- I implemented it and also wrote a small helper function so that raw strings didn't have to be "converted" inside an element factory.
+- This means that the element factory doesn't have to know about the special chars when it gets a raw... it just has to know it's a raw (string).
+- So, that it all done.
+- I may not have a lot of time tomorrow... we'll see how cognative and overscheduled I am...
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
