@@ -2982,6 +2982,13 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - So, that it all done.
 - I may not have a lot of time tomorrow... we'll see how cognative and overscheduled I am...
 
+#341.2. 03/19/2019:
+- Ok, yet another new state... ok, I just copy and pasted one as it did the work
+- Well, attrubute conditional parsing was supposed to be that easy...
+- ...but then I remembered that conditionals are part of IElement creation.
+- So... store the parts of an element and then create at the end?
+- Probably would be good to have a "create element" step that gathers the parts and actually creates the element.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2

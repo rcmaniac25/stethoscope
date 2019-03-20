@@ -25,6 +25,8 @@ namespace Stethoscope.Printers.Internal.PrintMode
 
             public string ErrorMessage { get; private set; }
 
+            public List<IConditional> CurrentElementConditionals { get; private set; }
+
             public List<IElement> Elements { get; private set; }
             public List<IConditional> LogConditionals { get; private set; }
 
@@ -38,6 +40,8 @@ namespace Stethoscope.Printers.Internal.PrintMode
                 ParsingIndex = 0;
 
                 ErrorMessage = null;
+
+                CurrentElementConditionals = null;
 
                 Elements = null;
                 LogConditionals = null;
@@ -82,6 +86,17 @@ namespace Stethoscope.Printers.Internal.PrintMode
                 return clone;
             }
 
+            public SMState AddConditionalForCurrentElement(IConditional conditional)
+            {
+                var clone = (SMState)Clone();
+                if (clone.CurrentElementConditionals == null)
+                {
+                    clone.CurrentElementConditionals = new List<IConditional>();
+                }
+                clone.CurrentElementConditionals.Add(conditional);
+                return clone;
+            }
+
             public bool TestCharLength(int charCount)
             {
                 return (ParsingIndex + charCount) <= Format.Length;
@@ -89,6 +104,7 @@ namespace Stethoscope.Printers.Internal.PrintMode
 
             public object Clone()
             {
+                var cloneCurrentElementConditionals = CurrentElementConditionals != null ? new List<IConditional>(CurrentElementConditionals) : null;
                 var cloneElements = Elements != null ? new List<IElement>(Elements) : null;
                 var cloneLogConditionals = Elements != null ? new List<IConditional>(LogConditionals) : null;
 
@@ -99,6 +115,8 @@ namespace Stethoscope.Printers.Internal.PrintMode
                     ParsingIndex = ParsingIndex,
 
                     ErrorMessage = ErrorMessage,
+
+                    CurrentElementConditionals = cloneCurrentElementConditionals,
 
                     Elements = cloneElements,
                     LogConditionals = cloneLogConditionals,
@@ -338,6 +356,10 @@ namespace Stethoscope.Printers.Internal.PrintMode
             }
 
             var stateMachine = CreateStateMachine();
+#if DEBUG
+            //XXX temp while developing
+            string s = Stateless.Graph.UmlDotGraph.Format(stateMachine.GetInfo());
+#endif
             stateMachine.Fire(processTrigger, format, factory, ProcessIsComplete);
 
             if (finishedState.ErrorMessage != null)
@@ -429,7 +451,12 @@ namespace Stethoscope.Printers.Internal.PrintMode
                 .Permit(Trigger.FoundConditional, State.Conditional)
                 .Permit(Trigger.Invoke, State.AttributeReference)
                 .Permit(Trigger.Error, State.Done);
-            
+
+            machine.Configure(State.Conditional)
+                .OnEntryFrom(foundConditionalTrigger, HandleConditional)
+                .PermitReentry(Trigger.FoundConditional)
+                .Permit(Trigger.Done, State.AttributeReference);
+
             //TODO
 
             machine.Configure(State.Done)
@@ -446,6 +473,7 @@ namespace Stethoscope.Printers.Internal.PrintMode
 
         private void HandleLogConditional(SMState state)
         {
+            //XXX need to support error handler conditional
             if (state.TestCharLength(1))
             {
                 var type = state.Format[state.ParsingIndex];
@@ -634,6 +662,30 @@ namespace Stethoscope.Printers.Internal.PrintMode
             }
         }
 
-#endregion
+        private void HandleConditional(SMState state)
+        {
+            //XXX need to support error handler conditional
+            if (state.TestCharLength(1))
+            {
+                var type = state.Format[state.ParsingIndex];
+
+                // Need to test that we're not looking at a raw that is using the special chars (+ means conditional, ++ means it's a raw char of '+')
+                // As such, only passes if an odd number of chars match. + = conditional, ++ = raw, +++ = conditional + raw, ++++ = 2x raw, etc.
+                var count = 1;
+                while (state.TestCharLength(count + 1) && state.Format[state.ParsingIndex + count] == type)
+                {
+                    count++;
+                }
+                if (count % 2 == 1 && GetSpecialCharsForFlagsEn(SpecialCharFlags.Conditional | SpecialCharFlags.ForAttribute).Contains(type))
+                {
+                    var conditional = state.ElementFactory.CreateConditional(SpecialChars[type].ConditionalElement);
+                    state.StateMachine.Fire(foundConditionalTrigger, state.AddConditionalForCurrentElement(conditional).IncrementIndex(1));
+                    return;
+                }
+            }
+            state.StateMachine.Fire(doneTrigger, state);
+        }
+
+        #endregion
     }
 }
