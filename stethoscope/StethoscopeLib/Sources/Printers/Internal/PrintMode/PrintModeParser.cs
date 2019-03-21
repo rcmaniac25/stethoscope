@@ -148,6 +148,7 @@ namespace Stethoscope.Printers.Internal.PrintMode
             Modifier,
             AttributeReference,
             AttributeFormat,
+            FinalizePart,
 
             // Utility
             CountTillMarker,

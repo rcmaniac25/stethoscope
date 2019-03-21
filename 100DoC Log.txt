@@ -2989,6 +2989,11 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - So... store the parts of an element and then create at the end?
 - Probably would be good to have a "create element" step that gathers the parts and actually creates the element.
 
+#342.2. 03/20/2019:
+- So, this one is boring...
+- I didn't really have time today, so I simply added "FinalizePart" as a state to be done after parsing an attribute-part.
+- This step will let us assemble/create an element after modifiers or attribute-references are processed.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
