@@ -2994,6 +2994,9 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - I didn't really have time today, so I simply added "FinalizePart" as a state to be done after parsing an attribute-part.
 - This step will let us assemble/create an element after modifiers or attribute-references are processed.
 
+#343.2. 03/21/2019:
+- I crashed today... so nothing happened
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
