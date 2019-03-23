@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
+using Stethoscope.Common;
 
 namespace Stethoscope.Printers.Internal.PrintMode
 {
@@ -18,6 +19,7 @@ namespace Stethoscope.Printers.Internal.PrintMode
         private struct SMState : ICloneable
         {
             public static SMState InvalidState = new SMState() { ErrorMessage = "Invalid Internal State" };
+            public static LogAttribute InvalidLogAttribute = LogAttribute.Timestamp - 1;
 
             public string Format { get; private set; }
             public IPrinterElementFactory ElementFactory { get; private set; }
@@ -26,6 +28,7 @@ namespace Stethoscope.Printers.Internal.PrintMode
             public string ErrorMessage { get; private set; }
 
             public List<IConditional> CurrentElementConditionals { get; private set; }
+            public LogAttribute CurrentLogAttribute { get; private set; }
 
             public List<IElement> Elements { get; private set; }
             public List<IConditional> LogConditionals { get; private set; }
@@ -42,6 +45,7 @@ namespace Stethoscope.Printers.Internal.PrintMode
                 ErrorMessage = null;
 
                 CurrentElementConditionals = null;
+                CurrentLogAttribute = InvalidLogAttribute;
 
                 Elements = null;
                 LogConditionals = null;
@@ -97,6 +101,13 @@ namespace Stethoscope.Printers.Internal.PrintMode
                 return clone;
             }
 
+            public SMState SetAttributeForCurrentElement(LogAttribute attribute)
+            {
+                var clone = (SMState)Clone();
+                clone.CurrentLogAttribute = attribute;
+                return clone;
+            }
+
             public bool TestCharLength(int charCount)
             {
                 return (ParsingIndex + charCount) <= Format.Length;
@@ -117,6 +128,7 @@ namespace Stethoscope.Printers.Internal.PrintMode
                     ErrorMessage = ErrorMessage,
 
                     CurrentElementConditionals = cloneCurrentElementConditionals,
+                    CurrentLogAttribute = CurrentLogAttribute,
 
                     Elements = cloneElements,
                     LogConditionals = cloneLogConditionals,
@@ -448,15 +460,22 @@ namespace Stethoscope.Printers.Internal.PrintMode
                 .Permit(Trigger.Error, State.Done);
 
             machine.Configure(State.Attribute)
-                .OnEntryFrom(processAttributeTrigger, ProcessAttribute)
+                .OnEntryFrom(processAttributeTrigger, HandleAttribute)
                 .Permit(Trigger.FoundConditional, State.Conditional)
-                .Permit(Trigger.Invoke, State.AttributeReference)
+                .Permit(Trigger.Done, State.AttributeReference)
                 .Permit(Trigger.Error, State.Done);
 
             machine.Configure(State.Conditional)
                 .OnEntryFrom(foundConditionalTrigger, HandleConditional)
                 .PermitReentry(Trigger.FoundConditional)
                 .Permit(Trigger.Done, State.AttributeReference);
+
+            machine.Configure(State.AttributeReference)
+                .OnEntryFrom(doneTrigger, state => state.StateMachine.Fire(countTillMarkerTrigger, state, GetSpecialCharsForFlagsEn(SpecialCharFlags.EndAttribute).Concat(new char[] { '|' }).ToArray(), CountTillFlag.FirstMarker))
+                .OnEntryFrom(doneIntTrigger, HandleAttributeReference)
+                .Permit(Trigger.Done, State.Modifier)
+                .Permit(Trigger.Invoke, State.AttributeFormat)
+                .Permit(Trigger.Error, State.Done);
 
             //TODO
 
@@ -638,7 +657,7 @@ namespace Stethoscope.Printers.Internal.PrintMode
             }
         }
 
-        private void ProcessAttribute(SMState state)
+        private void HandleAttribute(SMState state)
         {
             if (state.TestCharLength(1))
             {
@@ -650,7 +669,7 @@ namespace Stethoscope.Printers.Internal.PrintMode
                 }
                 else if (GetSpecialCharsForFlagsEn(SpecialCharFlags.Attribute | SpecialCharFlags.StartAttribute).Contains(c))
                 {
-                    state.StateMachine.Fire(invokeTrigger, state);
+                    state.StateMachine.Fire(doneTrigger, state);
                 }
                 else
                 {
@@ -685,6 +704,38 @@ namespace Stethoscope.Printers.Internal.PrintMode
                 }
             }
             state.StateMachine.Fire(doneTrigger, state);
+        }
+
+        private void HandleAttributeReference(SMState state, int partLength)
+        {
+            if (partLength <= 0)
+            {
+                state.StateMachine.Fire(errorTrigger, state.SetError("Attribute reference is empty and doesn't exist"));
+                return;
+            }
+            else if (state.Format[state.ParsingIndex] != '{')
+            {
+                state.StateMachine.Fire(errorTrigger, state.SetError("Attribute reference has no starting '{'"));
+                return;
+            }
+
+            var attRefStr = state.Format.Substring(state.ParsingIndex + 1, partLength - 1);
+            if (!Enum.TryParse(attRefStr, out LogAttribute attRef))
+            {
+                state.StateMachine.Fire(errorTrigger, state.SetError($"Unknown attribute {attRefStr}"));
+                return;
+            }
+
+            var newState = state.SetAttributeForCurrentElement(attRef).IncrementIndex(partLength);
+            if (newState.TestCharLength(1))
+            {
+                // Invoke = Attribute Format, Done = Done with reference
+                newState.StateMachine.Fire(newState.Format[newState.ParsingIndex] == '|' ? invokeTrigger : doneTrigger, newState.IncrementIndex(1));
+            }
+            else
+            {
+                newState.StateMachine.Fire(errorTrigger, newState.SetError("Unexpected end of attribute. Expected '}'"));
+            }
         }
 
         #endregion

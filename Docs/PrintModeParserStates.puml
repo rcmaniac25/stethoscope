@@ -17,16 +17,16 @@ Part --> Raw
 Raw --> Part
 
 Part --> Attribute
-Attribute --> Part
 
 Attribute --> Conditional
 Attribute --> AttributeReference
 Conditional --> Conditional
 Conditional --> AttributeReference
 AttributeReference --> Modifier
-AttributeReference --> Part
 Modifier --> Modifier
-Modifier --> Part
+Modifier --> FinalizePart
+
+FinalizePart --> Part
 
 AttributeReference --> AttributeFormat
 AttributeFormat --> AttributeReference

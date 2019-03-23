@@ -2997,6 +2997,12 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 #343.2. 03/21/2019:
 - I crashed today... so nothing happened
 
+#344.2. 03/22/2019:
+- Ok, so I spent more time then expected on this, but I got the attribute reference part done.
+- It was a little weird because it works like Part, but if the format "finished" it was an error.
+- So I needed to get the couple edge cases, some general error handling, then choose a branch for a success case, along with a late failure case.
+- I was thinking of trying to write the attribute format handling, but didn't want to do that at this very moment (it's a bit late)
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
