@@ -29,6 +29,7 @@ namespace Stethoscope.Printers.Internal.PrintMode
 
             public List<IConditional> CurrentElementConditionals { get; private set; }
             public LogAttribute CurrentLogAttribute { get; private set; }
+            public string CurrentLogFormat { get; private set; }
 
             public List<IElement> Elements { get; private set; }
             public List<IConditional> LogConditionals { get; private set; }
@@ -46,6 +47,7 @@ namespace Stethoscope.Printers.Internal.PrintMode
 
                 CurrentElementConditionals = null;
                 CurrentLogAttribute = InvalidLogAttribute;
+                CurrentLogFormat = null;
 
                 Elements = null;
                 LogConditionals = null;
@@ -108,9 +110,34 @@ namespace Stethoscope.Printers.Internal.PrintMode
                 return clone;
             }
 
+            public SMState SetFormatForCurrentElement(string format)
+            {
+                var clone = (SMState)Clone();
+                clone.CurrentLogFormat = format;
+                return clone;
+            }
+
             public bool TestCharLength(int charCount)
             {
                 return (ParsingIndex + charCount) <= Format.Length;
+            }
+
+            public string FormatSubstring(int length)
+            {
+                return FormatSubstring(0, length);
+            }
+
+            public string FormatSubstring(int startIndex, int length)
+            {
+                return Format.Substring(ParsingIndex + startIndex, length);
+            }
+
+            public char CurrentFormatChar
+            {
+                get
+                {
+                    return Format[ParsingIndex];
+                }
             }
 
             public object Clone()
@@ -129,6 +156,7 @@ namespace Stethoscope.Printers.Internal.PrintMode
 
                     CurrentElementConditionals = cloneCurrentElementConditionals,
                     CurrentLogAttribute = CurrentLogAttribute,
+                    CurrentLogFormat = CurrentLogFormat,
 
                     Elements = cloneElements,
                     LogConditionals = cloneLogConditionals,
@@ -148,6 +176,7 @@ namespace Stethoscope.Printers.Internal.PrintMode
             Uninitialized,
             Setup,
             Done,
+            Error,
 
             // Main sections
             LogConditional,
@@ -439,7 +468,7 @@ namespace Stethoscope.Printers.Internal.PrintMode
                 .OnEntryFrom(doneTrigger, HandleLogConditional)
                 .PermitReentry(Trigger.FoundConditional)
                 .Permit(Trigger.Done, State.Part)
-                .Permit(Trigger.Error, State.Done);
+                .Permit(Trigger.Error, State.Error);
 
             machine.Configure(State.Part)
                 .OnEntryFrom(doneTrigger, state => state.StateMachine.Fire(countTillMarkerTrigger, state, GetSpecialCharsForFlags(SpecialCharFlags.StartAttribute), CountTillFlag.LastMarker))
@@ -448,7 +477,7 @@ namespace Stethoscope.Printers.Internal.PrintMode
                 .Permit(Trigger.ProcessRaw, State.Raw)
                 .Permit(Trigger.ProcessAttribute, State.Attribute)
                 .Permit(Trigger.Done, State.Done)
-                .Permit(Trigger.Error, State.Done);
+                .Permit(Trigger.Error, State.Error);
 
             machine.Configure(State.CountTillMarker)
                 .OnEntryFrom(countTillMarkerTrigger, CountTillMarker)
@@ -457,13 +486,13 @@ namespace Stethoscope.Printers.Internal.PrintMode
             machine.Configure(State.Raw)
                 .OnEntryFrom(processRawTrigger, ProcessRaw)
                 .Permit(Trigger.Done, State.Part)
-                .Permit(Trigger.Error, State.Done);
+                .Permit(Trigger.Error, State.Error);
 
             machine.Configure(State.Attribute)
                 .OnEntryFrom(processAttributeTrigger, HandleAttribute)
                 .Permit(Trigger.FoundConditional, State.Conditional)
                 .Permit(Trigger.Done, State.AttributeReference)
-                .Permit(Trigger.Error, State.Done);
+                .Permit(Trigger.Error, State.Error);
 
             machine.Configure(State.Conditional)
                 .OnEntryFrom(foundConditionalTrigger, HandleConditional)
@@ -473,16 +502,36 @@ namespace Stethoscope.Printers.Internal.PrintMode
             machine.Configure(State.AttributeReference)
                 .OnEntryFrom(doneTrigger, state => state.StateMachine.Fire(countTillMarkerTrigger, state, GetSpecialCharsForFlagsEn(SpecialCharFlags.EndAttribute).Concat(new char[] { '|' }).ToArray(), CountTillFlag.FirstMarker))
                 .OnEntryFrom(doneIntTrigger, HandleAttributeReference)
+                .Permit(Trigger.Invoke, State.CountTillMarker)
                 .Permit(Trigger.Done, State.Modifier)
                 .Permit(Trigger.Invoke, State.AttributeFormat)
-                .Permit(Trigger.Error, State.Done);
+                .Permit(Trigger.Error, State.Error);
+
+            machine.Configure(State.AttributeFormat)
+                .OnEntryFrom(invokeTrigger, state => state.StateMachine.Fire(countTillMarkerTrigger, state, GetSpecialCharsForFlags(SpecialCharFlags.EndAttribute), CountTillFlag.LastMarker))
+                .OnEntryFrom(doneIntTrigger, HandleAttributeFormat)
+                .Permit(Trigger.Invoke, State.CountTillMarker)
+                .Permit(Trigger.Done, State.Modifier)
+                .Permit(Trigger.Error, State.Error);
 
             //TODO
 
             machine.Configure(State.Done)
                 .OnEntryFrom(doneTrigger, state => state.DoneHandler(state))
-                .OnEntryFrom(errorTrigger, state => state.DoneHandler(state))
                 .PermitIf(processTrigger, State.Setup);
+
+            machine.Configure(State.Error)
+                .OnEntryFrom(errorTrigger, state =>
+                {
+                    if (string.IsNullOrWhiteSpace(state.ErrorMessage))
+                    {
+                        state.DoneHandler(state.SetError("Unknown error occured"));
+                    }
+                    else
+                    {
+                        state.DoneHandler(state);
+                    }
+                }).PermitIf(processTrigger, State.Setup);
 
             return machine;
         }
@@ -496,7 +545,7 @@ namespace Stethoscope.Printers.Internal.PrintMode
             //XXX need to support error handler conditional
             if (state.TestCharLength(1))
             {
-                var type = state.Format[state.ParsingIndex];
+                var type = state.CurrentFormatChar;
 
                 // Need to test that we're not looking at a raw that is using the special chars (+ means conditional, ++ means it's a raw char of '+')
                 // As such, only passes if an odd number of chars match. + = conditional, ++ = raw, +++ = conditional + raw, ++++ = 2x raw, etc.
@@ -651,7 +700,7 @@ namespace Stethoscope.Printers.Internal.PrintMode
             }
             else
             {
-                var str = CollapseSpecialCharsInRaw(state.Format.Substring(state.ParsingIndex, partLength));
+                var str = CollapseSpecialCharsInRaw(state.FormatSubstring(partLength));
                 var rawElement = state.ElementFactory.CreateRaw(str);
                 state.StateMachine.Fire(doneTrigger, state.AddElement(rawElement).IncrementIndex(partLength));
             }
@@ -661,7 +710,7 @@ namespace Stethoscope.Printers.Internal.PrintMode
         {
             if (state.TestCharLength(1))
             {
-                var c = state.Format[state.ParsingIndex];
+                var c = state.CurrentFormatChar;
 
                 if (GetSpecialCharsForFlagsEn(SpecialCharFlags.Conditional | SpecialCharFlags.ForAttribute).Contains(c))
                 {
@@ -687,7 +736,7 @@ namespace Stethoscope.Printers.Internal.PrintMode
             //XXX need to support error handler conditional
             if (state.TestCharLength(1))
             {
-                var type = state.Format[state.ParsingIndex];
+                var type = state.CurrentFormatChar;
 
                 // Need to test that we're not looking at a raw that is using the special chars (+ means conditional, ++ means it's a raw char of '+')
                 // As such, only passes if an odd number of chars match. + = conditional, ++ = raw, +++ = conditional + raw, ++++ = 2x raw, etc.
@@ -713,13 +762,13 @@ namespace Stethoscope.Printers.Internal.PrintMode
                 state.StateMachine.Fire(errorTrigger, state.SetError("Attribute reference is empty and doesn't exist"));
                 return;
             }
-            else if (state.Format[state.ParsingIndex] != '{')
+            else if (state.CurrentFormatChar != '{')
             {
                 state.StateMachine.Fire(errorTrigger, state.SetError("Attribute reference has no starting '{'"));
                 return;
             }
 
-            var attRefStr = state.Format.Substring(state.ParsingIndex + 1, partLength - 1);
+            var attRefStr = state.FormatSubstring(1, partLength - 1);
             if (!Enum.TryParse(attRefStr, out LogAttribute attRef))
             {
                 state.StateMachine.Fire(errorTrigger, state.SetError($"Unknown attribute {attRefStr}"));
@@ -730,11 +779,53 @@ namespace Stethoscope.Printers.Internal.PrintMode
             if (newState.TestCharLength(1))
             {
                 // Invoke = Attribute Format, Done = Done with reference
-                newState.StateMachine.Fire(newState.Format[newState.ParsingIndex] == '|' ? invokeTrigger : doneTrigger, newState.IncrementIndex(1));
+                newState.StateMachine.Fire(newState.CurrentFormatChar == '|' ? invokeTrigger : doneTrigger, newState.IncrementIndex(1));
             }
             else
             {
                 newState.StateMachine.Fire(errorTrigger, newState.SetError("Unexpected end of attribute. Expected '}'"));
+            }
+        }
+        
+        private void HandleAttributeFormat(SMState state, int partLength)
+        {
+            if (partLength <= 0)
+            {
+                if (partLength < 0)
+                {
+                    state.StateMachine.Fire(errorTrigger, state.SetError("Invalid attribute format length"));
+                }
+                else
+                {
+                    if (state.TestCharLength(1))
+                    {
+                        if (state.CurrentFormatChar == '}')
+                        {
+                            state.StateMachine.Fire(doneTrigger, state.SetFormatForCurrentElement(string.Empty).IncrementIndex(1));
+                        }
+                        else
+                        {
+                            state.StateMachine.Fire(errorTrigger, state.SetError($"Unknown end of attribute format: {state.CurrentFormatChar}"));
+                        }
+                    }
+                    else
+                    {
+                        state.StateMachine.Fire(errorTrigger, state.SetError("Unexpected end of attribute format. Expected '}'"));
+                    }
+                }
+                return;
+            }
+
+            var format = state.FormatSubstring(partLength);
+
+            var newState = state.SetFormatForCurrentElement(format.Replace("{}", "{0}")).IncrementIndex(partLength);
+            if (newState.TestCharLength(1) && newState.CurrentFormatChar == '}')
+            {
+                newState.StateMachine.Fire(doneTrigger, newState.IncrementIndex(1));
+            }
+            else
+            {
+                newState.StateMachine.Fire(errorTrigger, newState.SetError("Unexpected end of attribute format. Expected '}'"));
             }
         }
 

@@ -3003,6 +3003,14 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - So I needed to get the couple edge cases, some general error handling, then choose a branch for a success case, along with a late failure case.
 - I was thinking of trying to write the attribute format handling, but didn't want to do that at this very moment (it's a bit late)
 
+#345.2. 03/23/2019:
+- So... close...
+- I got distracted half-way through working on this and finished attribute format support, and probably could've done modifier and finalize part.
+- But... that distraction has caused it to now be late, and my focus is getting pulled to other subjects.
+- Tomorrow I'd like to finish the "parts" and see just how far the tests get.
+- After doing some fixes so tests pass*, I still need to support the erorr handler conditional.
+- *I typed this but realized: I don't have any elements in the factory created, so all tests will fail... but I can probably fake it a bit to test parsing.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
