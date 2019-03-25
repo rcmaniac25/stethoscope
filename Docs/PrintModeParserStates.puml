@@ -5,41 +5,45 @@ title Print Mode Format
 [*] --> Uninitialized
 Uninitialized --> Setup
 
+Setup --> Setup
 Setup --> LogConditional
 
 LogConditional --> LogConditional
-
 LogConditional --> Part
 
+Part --> Raw
+Part --> Attribute
 Part --> DoneParsing
 
-Part --> Raw
 Raw --> Part
-
-Part --> Attribute
 
 Attribute --> Conditional
 Attribute --> AttributeReference
+
 Conditional --> Conditional
 Conditional --> AttributeReference
+
+AttributeReference --> AttributeFormat
 AttributeReference --> Modifier
+
+AttributeFormat --> Modifier
+' is this needed?
+AttributeFormat --> StringQuote : Found a quote in string\nis this the end or a sub-string/random quote
+
 Modifier --> Modifier
 Modifier --> FinalizePart
 
 FinalizePart --> Part
 
-AttributeReference --> AttributeFormat
-AttributeFormat --> AttributeReference
-
-AttributeFormat --> StringQuote : Found a quote in string\nis this the end or a sub-string/random quote
-StringQuote --> AttributeFormat : Done processing attribute format
-
+' TODO
 LogConditional --> ErrorHandlerCondition : Log-level Conditional
 ErrorHandlerCondition --> LogConditional : Log-level Conditional
 Conditional --> ErrorHandlerCondition : Attribute Conditional
 ErrorHandlerCondition --> Conditional : Attribute Conditional
 
 ErrorHandlerCondition --> StringQuote : Found a quote in string\nis this the end or a sub-string/random quote
+
+StringQuote --> AttributeFormat : Done processing attribute format
 StringQuote --> ErrorHandlerCondition : Done processing error handler
 
 DoneParsing --> [*]

@@ -3008,8 +3008,16 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - I got distracted half-way through working on this and finished attribute format support, and probably could've done modifier and finalize part.
 - But... that distraction has caused it to now be late, and my focus is getting pulled to other subjects.
 - Tomorrow I'd like to finish the "parts" and see just how far the tests get.
-- After doing some fixes so tests pass*, I still need to support the erorr handler conditional.
+- After doing some fixes so tests pass*, I still need to support the error handler conditional.
 - *I typed this but realized: I don't have any elements in the factory created, so all tests will fail... but I can probably fake it a bit to test parsing.
+
+#346.2. 03/24/2019:
+- Boom! Parsing is done... well, kinda.
+- As noted yesterday, the factory isn't implemented... so I can't test it.
+- Also, the error handler conditional is still needed.
+- ...and the perpetual "string quote" challenge. That's like a state machine in and of itself.
+- How do I know {!"hello \" world"} is complete or not? (using {} instead of '"')
+- But that's for another time... for now, the main parsing body is done.
 
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2

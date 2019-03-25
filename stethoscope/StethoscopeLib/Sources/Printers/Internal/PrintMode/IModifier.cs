@@ -8,6 +8,11 @@ namespace Stethoscope.Printers.Internal.PrintMode
     public interface IModifier
     {
         /// <summary>
+        /// Get the type of modifier.
+        /// </summary>
+        ModifierElement Type { get; }
+
+        /// <summary>
         /// Setup a state for applying the modifier. This will generate values that are needed in order to apply the modifier.
         /// </summary>
         /// <param name="message">The message that will be written.</param>

@@ -8,6 +8,11 @@ namespace Stethoscope.Printers.Internal.PrintMode
     public interface IConditional
     {
         /// <summary>
+        /// Get the type of conditional.
+        /// </summary>
+        ConditionalElement Type { get; }
+
+        /// <summary>
         /// Generate a state for use.
         /// </summary>
         /// <returns>The generated state.</returns>
