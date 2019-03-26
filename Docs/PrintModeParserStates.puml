@@ -36,15 +36,13 @@ Modifier --> FinalizePart
 FinalizePart --> Part
 
 ' TODO
-LogConditional --> ErrorHandlerCondition : Log-level Conditional
-ErrorHandlerCondition --> LogConditional : Log-level Conditional
-Conditional --> ErrorHandlerCondition : Attribute Conditional
-ErrorHandlerCondition --> Conditional : Attribute Conditional
+Modifier --> ErrorHandlerModifier : Attribute Conditional
+ErrorHandlerModifier --> Modifier : Attribute Conditional
 
-ErrorHandlerCondition --> StringQuote : Found a quote in string\nis this the end or a sub-string/random quote
+ErrorHandlerModifier --> StringQuote : Found a quote in string\nis this the end or a sub-string/random quote
 
 StringQuote --> AttributeFormat : Done processing attribute format
-StringQuote --> ErrorHandlerCondition : Done processing error handler
+StringQuote --> ErrorHandlerModifier : Done processing error handler
 
 DoneParsing --> [*]
 

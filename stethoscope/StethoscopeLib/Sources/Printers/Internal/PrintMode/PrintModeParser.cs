@@ -220,8 +220,8 @@ namespace Stethoscope.Printers.Internal.PrintMode
             CountTillMarker,
             StringQuote,
 
-            // Conditionals
-            ErrorHandlerConditional
+            // Modifiers
+            ErrorHandlerModifier
         }
 
         private enum Trigger
@@ -296,6 +296,11 @@ namespace Stethoscope.Printers.Internal.PrintMode
             }
         }
 
+        private const char SPECIAL_CHAR_MOD_ERROR_HANDLER = '!';
+        private const char SPECIAL_CHAR_ATT_FORMAT = '|';
+        private const char SPECIAL_CHAR_ATT_START = '{';
+        private const char SPECIAL_CHAR_ATT_END = '}';
+
         private static readonly Dictionary<char, SpecialCharValues> SpecialChars = new Dictionary<char, SpecialCharValues>()
         {
             { '+', SpecialCharValues.Create(SpecialCharFlags.Conditional | SpecialCharFlags.ForLog | SpecialCharFlags.ForAttribute | SpecialCharFlags.StartAttribute, ConditionalElement.ValidLog) },
@@ -304,10 +309,10 @@ namespace Stethoscope.Printers.Internal.PrintMode
             { '$', SpecialCharValues.Create(SpecialCharFlags.Conditional | SpecialCharFlags.ForAttribute | SpecialCharFlags.StartAttribute, ConditionalElement.AttributeValueChanged) },
             { '~', SpecialCharValues.Create(SpecialCharFlags.Conditional | SpecialCharFlags.ForAttribute | SpecialCharFlags.StartAttribute, ConditionalElement.AttributeValueNew) },
 
-            { '!', SpecialCharValues.Create(SpecialCharFlags.Modifier | SpecialCharFlags.ForAttribute, ModifierElement.ErrorHandler) },
+            { SPECIAL_CHAR_MOD_ERROR_HANDLER, SpecialCharValues.Create(SpecialCharFlags.Modifier | SpecialCharFlags.ForAttribute | SpecialCharFlags.EndAttribute, ModifierElement.ErrorHandler) },
 
-            { '{', SpecialCharValues.Create(SpecialCharFlags.Attribute | SpecialCharFlags.StartAttribute) },
-            { '}', SpecialCharValues.Create(SpecialCharFlags.Attribute | SpecialCharFlags.EndAttribute) }
+            { SPECIAL_CHAR_ATT_START, SpecialCharValues.Create(SpecialCharFlags.Attribute | SpecialCharFlags.StartAttribute) },
+            { SPECIAL_CHAR_ATT_END, SpecialCharValues.Create(SpecialCharFlags.Attribute | SpecialCharFlags.EndAttribute) }
         };
 
         #endregion
@@ -528,7 +533,7 @@ namespace Stethoscope.Printers.Internal.PrintMode
                 .Permit(Trigger.Error, State.Error);
 
             machine.Configure(State.AttributeReference)
-                .OnEntryFrom(doneTrigger, state => state.StateMachine.Fire(countTillMarkerTrigger, state, GetSpecialCharsForFlagsEn(SpecialCharFlags.EndAttribute).Concat(new char[] { '|' }).ToArray(), CountTillFlag.FirstMarker))
+                .OnEntryFrom(doneTrigger, state => state.StateMachine.Fire(countTillMarkerTrigger, state, GetSpecialCharsForFlagsEn(SpecialCharFlags.EndAttribute).Concat(new char[] { SPECIAL_CHAR_ATT_FORMAT }).ToArray(), CountTillFlag.FirstMarker))
                 .OnEntryFrom(doneIntTrigger, HandleAttributeReference)
                 .Permit(Trigger.Invoke, State.CountTillMarker)
                 .Permit(Trigger.Done, State.Modifier)
@@ -545,6 +550,7 @@ namespace Stethoscope.Printers.Internal.PrintMode
             machine.Configure(State.Modifier)
                 .OnEntryFrom(doneTrigger, HandleModifer)
                 .PermitReentry(Trigger.FoundModifier)
+                .Permit(Trigger.Invoke, State.ErrorHandlerModifier)
                 .Permit(Trigger.Done, State.FinalizePart)
                 .Permit(Trigger.Error, State.Error);
 
@@ -569,6 +575,13 @@ namespace Stethoscope.Printers.Internal.PrintMode
                         state.DoneHandler(state);
                     }
                 }).PermitIf(processTrigger, State.Setup);
+
+            machine.Configure(State.ErrorHandlerModifier)
+                .OnEntryFrom(invokeTrigger, HandleErrorModifierSanityCheck)
+                .OnEntryFrom(doneTrigger, HandleErrorModifier)
+                .Permit(Trigger.Invoke, State.StringQuote)
+                .Permit(Trigger.Done, State.Modifier)
+                .Permit(Trigger.Error, State.Error);
 
             return machine;
         }
@@ -814,9 +827,9 @@ namespace Stethoscope.Printers.Internal.PrintMode
                 state.StateMachine.Fire(errorTrigger, state.SetError("Attribute reference is empty and doesn't exist"));
                 return;
             }
-            else if (state.CurrentFormatChar != '{')
+            else if (state.CurrentFormatChar != SPECIAL_CHAR_ATT_START)
             {
-                state.StateMachine.Fire(errorTrigger, state.SetError("Attribute reference has no starting '{'"));
+                state.StateMachine.Fire(errorTrigger, state.SetError($"Attribute reference has no starting '{SPECIAL_CHAR_ATT_START}'"));
                 return;
             }
 
@@ -831,11 +844,11 @@ namespace Stethoscope.Printers.Internal.PrintMode
             if (newState.TestCharLength(1))
             {
                 // Invoke = Attribute Format, Done = Done with reference
-                newState.StateMachine.Fire(newState.CurrentFormatChar == '|' ? invokeTrigger : doneTrigger, newState.IncrementIndex(1));
+                newState.StateMachine.Fire(newState.CurrentFormatChar == SPECIAL_CHAR_ATT_FORMAT ? invokeTrigger : doneTrigger, newState.IncrementIndex(1));
             }
             else
             {
-                newState.StateMachine.Fire(errorTrigger, newState.SetError("Unexpected end of attribute. Expected '}'"));
+                newState.StateMachine.Fire(errorTrigger, newState.SetError($"Unexpected end of attribute. Expected '{SPECIAL_CHAR_ATT_END}'"));
             }
         }
         
@@ -851,7 +864,7 @@ namespace Stethoscope.Printers.Internal.PrintMode
                 {
                     if (state.TestCharLength(1))
                     {
-                        if (state.CurrentFormatChar == '}')
+                        if (state.CurrentFormatChar == SPECIAL_CHAR_ATT_END)
                         {
                             state.StateMachine.Fire(doneTrigger, state.SetFormatForCurrentElement(string.Empty).IncrementIndex(1));
                         }
@@ -862,7 +875,7 @@ namespace Stethoscope.Printers.Internal.PrintMode
                     }
                     else
                     {
-                        state.StateMachine.Fire(errorTrigger, state.SetError("Unexpected end of attribute format. Expected '}'"));
+                        state.StateMachine.Fire(errorTrigger, state.SetError($"Unexpected end of attribute format. Expected '{SPECIAL_CHAR_ATT_END}'"));
                     }
                 }
                 return;
@@ -871,13 +884,13 @@ namespace Stethoscope.Printers.Internal.PrintMode
             var format = state.FormatSubstring(partLength);
 
             var newState = state.SetFormatForCurrentElement(format.Replace("{}", "{0}")).IncrementIndex(partLength);
-            if (newState.TestCharLength(1) && newState.CurrentFormatChar == '}')
+            if (newState.TestCharLength(1) && newState.CurrentFormatChar == SPECIAL_CHAR_ATT_END)
             {
                 newState.StateMachine.Fire(doneTrigger, newState.IncrementIndex(1));
             }
             else
             {
-                newState.StateMachine.Fire(errorTrigger, newState.SetError("Unexpected end of attribute format. Expected '}'"));
+                newState.StateMachine.Fire(errorTrigger, newState.SetError($"Unexpected end of attribute format. Expected '{SPECIAL_CHAR_ATT_END}'"));
             }
         }
 
@@ -889,6 +902,11 @@ namespace Stethoscope.Printers.Internal.PrintMode
 
                 if (GetSpecialCharsForFlagsEn(SpecialCharFlags.Modifier | SpecialCharFlags.ForAttribute).Contains(type))
                 {
+                    if (SpecialChars[type].ModifierElement == ModifierElement.ErrorHandler)
+                    {
+                        state.StateMachine.Fire(invokeTrigger, state);
+                        return;
+                    }
                     var modifier = state.ElementFactory.CreateModifier(SpecialChars[type].ModifierElement);
                     if (modifier == null)
                     {
@@ -938,6 +956,36 @@ namespace Stethoscope.Printers.Internal.PrintMode
                     state.StateMachine.Fire(doneTrigger, state.AddElement(element).ResetCurrentElementValues());
                 }
             }
+        }
+
+        private void HandleErrorModifierSanityCheck(SMState state)
+        {
+            if (state.TestCharLength(2))
+            {
+                if (state.CurrentFormatChar != SPECIAL_CHAR_MOD_ERROR_HANDLER)
+                {
+                    state.StateMachine.Fire(errorTrigger, state.SetError("Error handler modifier was specified but is not an error handler"));
+                    return;
+                }
+                var newState = state.IncrementIndex(1);
+                if (newState.CurrentFormatChar != '"')
+                {
+                    newState.StateMachine.Fire(errorTrigger, newState.SetError("Missing quoted error string"));
+                }
+                else
+                {
+                    newState.StateMachine.Fire(invokeTrigger, newState);
+                }
+            }
+            else
+            {
+                state.StateMachine.Fire(errorTrigger, state.SetError($"Unexpected end of error handler. Expected {SPECIAL_CHAR_MOD_ERROR_HANDLER}\"<format>\""));
+            }
+        }
+
+        private void HandleErrorModifier(SMState state)
+        {
+            //TODO: Done, Error (it's basically parsing a new format and returning the result as the handler)
         }
 
         #endregion

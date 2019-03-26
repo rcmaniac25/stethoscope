@@ -3019,6 +3019,18 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - How do I know {!"hello \" world"} is complete or not? (using {} instead of '"')
 - But that's for another time... for now, the main parsing body is done.
 
+#347.2. 03/25/2019:
+- Oh snap... so, this got screwed up.
+- So, I didn't want to spend a lot of time as I had a lot of things to do today...
+- ...and then I got sick. I really shouldn't be up right now. I feel kind of terrible.
+- I got a bunch done though and set everything up with the intention that I would work on the string handler... later (I would usually be saying "I may not have a lot of time tomorrow...")
+- And then the bombshell hit me: the error handler isn't a conditional... it's a modifer.
+- "Oh snap... so, this got screwed up."
+- So I switched things over from conditional to modifier and... I'm stopping there.
+- If I get to this tomorrow, I need to re-evaluate the format because the log can have a a log-level error handler... so, do I have log-level modifiers? Or is this something that's unique?
+- Oh snap... (round two). As I typed that, I realized "my parser goes through as if there's a log-level conditional... but it's really a log-level modifier." This is a can of worms I didn't expect to open...
+- For another day...
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
