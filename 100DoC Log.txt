@@ -3031,6 +3031,15 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - Oh snap... (round two). As I typed that, I realized "my parser goes through as if there's a log-level conditional... but it's really a log-level modifier." This is a can of worms I didn't expect to open...
 - For another day...
 
+#348.2. 03/26/2019:
+- So, what was not mentioned in yesterday's log: I got really sick and was barely functioning
+- So I decided to look at the problem discovered... and my mind is too out of it to do anything
+- The best I thought of is "have (log) conditional, then (log) modifier, then start attributes"
+- The benefit of that is we can still have conditionals, get the modifier parts that would apply to logs, and it allow a minor (but not perfect) fix for "what if the log has a conditional and the attribute has a conditional?"
+- I think the solution for the double conditional would be (since I have the count till marker) to count till a marker, and say "stop at the first one" and then just make sure the conditionals are unique (when processing logs).
+- Attribute conditionals: I'm content with there being duplicates, as we fix that when finalizing the conditional.
+- Something to hopefully plan out tomorrow...
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
