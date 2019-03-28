@@ -3040,6 +3040,11 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - Attribute conditionals: I'm content with there being duplicates, as we fix that when finalizing the conditional.
 - Something to hopefully plan out tomorrow...
 
+#349.2. 03/27/2019:
+- Well, I did plan to do something...
+- Problem is, I bit off a bit more then I could chew and it's now time for me to go (joy of remenents of sickness), and I haven't done anything
+- Next couple days will be like this, because I am busy. Hopefully by the weekend, we'll be good again
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
