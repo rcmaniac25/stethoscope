@@ -3045,6 +3045,25 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - Problem is, I bit off a bit more then I could chew and it's now time for me to go (joy of remenents of sickness), and I haven't done anything
 - Next couple days will be like this, because I am busy. Hopefully by the weekend, we'll be good again
 
+#350.2. 03/28/2019:
+- Ok, I decided to go with what was mentioned in #348.2
+- Basically:
+-- check for conditionals
+--- if found, add
+--- if duplicate; check if raw, if so then move to normal execution, if only conditionals are followed by an attribute, then move to normal execution, else, error
+--- if not conditional, move to modifiers
+-- check for modifiers
+--- if found, add
+--- if duplicate; check if raw, if so then move to normal execution, else, error
+--- if not modifier, move to normal execution
+-- normal execution...
+- This should result in log-level conditionals and modifiers and handling cases where conditionals are next to each other
+- Note: there was a 2.5h gap between when I wrote "Ok, I decided to..." and when I wrote the single line above...
+- As such, I'm going to (plan to) review that "Basically" writeup (which I redid like 3 times over the course of that 2.5h gap + distractions) to ensure it's sane
+- Also, I need to update/redo a few unit tests... joy
+- Bonus: I realized I could probably have an optimization stage somewhere.
+- Think: the log will only run with valid logs... so all attributes that will only print with invalid logs, remove. All attributes that will only print with valid logs, remove that check as it's not needed.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2

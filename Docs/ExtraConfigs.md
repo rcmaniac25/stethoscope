@@ -34,7 +34,7 @@ Custom modes can be defined with a "format" while pre-defined modes can be used,
 	- DifferentFunctionOnly = @${Function}!"@+Log is missing Function attribute: {Timestamp} -- {Message}"
 
 - "format"
-    - format = `@[<conditional>...]<part>[<part>...]` | `<mode>`
+    - format = `@[<conditional>...][<modifier>...]<part>[<part>...]` | `<mode>`
     - `<part>` = `<raw>` | `<attribute>`
     - `<raw>` = (any charecter except `+ - ^ $ ~ ! { }`. Special chars need to be duplicated to print)
     - `<attribute>` = `[<conditional>]<attribute reference>[<modifier>]` (note: order matters for evaluation purposes. So a condition will always be evaluated before a modifier, while which modifier gets tested first will depend on where it is in the format)

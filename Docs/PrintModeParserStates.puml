@@ -9,7 +9,11 @@ Setup --> Setup
 Setup --> LogConditional
 
 LogConditional --> LogConditional
+LogConditional --> LogModifier
 LogConditional --> Part
+
+LogModifier --> LogModifier
+LogModifier --> Part
 
 Part --> Raw
 Part --> Attribute
@@ -36,8 +40,11 @@ Modifier --> FinalizePart
 FinalizePart --> Part
 
 ' TODO
-Modifier --> ErrorHandlerModifier : Attribute Conditional
-ErrorHandlerModifier --> Modifier : Attribute Conditional
+LogModifier --> ErrorHandlerModifier
+ErrorHandlerModifier --> LogModifier
+
+Modifier --> ErrorHandlerModifier
+ErrorHandlerModifier --> Modifier
 
 ErrorHandlerModifier --> StringQuote : Found a quote in string\nis this the end or a sub-string/random quote
 
