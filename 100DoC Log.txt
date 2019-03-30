@@ -3064,6 +3064,13 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - Bonus: I realized I could probably have an optimization stage somewhere.
 - Think: the log will only run with valid logs... so all attributes that will only print with invalid logs, remove. All attributes that will only print with valid logs, remove that check as it's not needed.
 
+#351.2. 03/29/2019:
+- So I'm half asleep right now, but I did get a chance to look at the format design...
+- It works, though there are edge cases (if we get an attribute conditional, do we go right to "normal execution" or throw an exception if an attribute isn't there?)\
+- I also realized that the attribute format has an issue in my implementation: once in an attribute format, we read until we hit '}'... well "{Message|Something {} isn't right}" is gonna say the format is "Something {" instead of "Something {} isn't right"
+- So besides implementing the updated format, fixing the attribute format, and adding unit tests... I still need to implement the error handler
+- Bonus: I realized all my examples for the place holder in the attribute format is "{}" (quotes included). I never say if quotes are needed... and I can't focus enough to make a decision now
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
