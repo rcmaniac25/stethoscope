@@ -3071,6 +3071,11 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - So besides implementing the updated format, fixing the attribute format, and adding unit tests... I still need to implement the error handler
 - Bonus: I realized all my examples for the place holder in the attribute format is "{}" (quotes included). I never say if quotes are needed... and I can't focus enough to make a decision now
 
+#352.2. 03/30/2019:
+- Ok, I actually have the time to work on this... but I have a couple more pressing things that I have also been procrastinating and should work on.
+- In addition, I'm running a program in the background that happens to be making programs like Visual Studio lag when typing... which is bothering me.
+- (Hopefully) tomorrow!
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
