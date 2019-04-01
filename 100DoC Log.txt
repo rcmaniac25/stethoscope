@@ -3076,6 +3076,12 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - In addition, I'm running a program in the background that happens to be making programs like Visual Studio lag when typing... which is bothering me.
 - (Hopefully) tomorrow!
 
+#353.2. 03/31/2019:
+- And... it's not happening today.
+- I spend the day being extremely casual, and that's not changing now.
+- I know nothing has been done for this project that has much of a "code" change, but it's mainly been because I was busy with other tasks.
+- But doing a ton of stuff sometimes leaves you... I just want to veg today. So I did.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
