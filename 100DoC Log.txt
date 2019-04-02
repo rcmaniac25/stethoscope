@@ -3066,7 +3066,7 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 
 #351.2. 03/29/2019:
 - So I'm half asleep right now, but I did get a chance to look at the format design...
-- It works, though there are edge cases (if we get an attribute conditional, do we go right to "normal execution" or throw an exception if an attribute isn't there?)\
+- It works, though there are edge cases (if we get an attribute conditional, do we go right to "normal execution" or throw an exception if an attribute isn't there?)
 - I also realized that the attribute format has an issue in my implementation: once in an attribute format, we read until we hit '}'... well "{Message|Something {} isn't right}" is gonna say the format is "Something {" instead of "Something {} isn't right"
 - So besides implementing the updated format, fixing the attribute format, and adding unit tests... I still need to implement the error handler
 - Bonus: I realized all my examples for the place holder in the attribute format is "{}" (quotes included). I never say if quotes are needed... and I can't focus enough to make a decision now
@@ -3081,6 +3081,16 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - I spend the day being extremely casual, and that's not changing now.
 - I know nothing has been done for this project that has much of a "code" change, but it's mainly been because I was busy with other tasks.
 - But doing a ton of stuff sometimes leaves you... I just want to veg today. So I did.
+
+#354.2. 04/01/2019:
+- So I got to this late, again, and will have to skip tonight. Tomorrow...
+- April Fools!
+- I actually managed to do one planned and one unplanned task today.
+- Planned: fixed the state machine so it now will properly handle conditionals, modifiers, etc. for log and attribute.
+- Unplanned: while working on that, I noticed I didn't have some states correct (ex. count till marker is invoked and then returns on "done", but it would always go to Part instead of whatever invoked it).
+- Fixed that and a number of other state issues. That probably saved future-me a bit of time debugging.
+- Still need to do the attribute format fix and unit tests.
+- That's all today.
 
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2

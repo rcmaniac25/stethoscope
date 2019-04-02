@@ -34,7 +34,9 @@ namespace Stethoscope.Printers.Internal.PrintMode
 
             public List<IElement> Elements { get; private set; }
             public List<IConditional> LogConditionals { get; private set; }
+            public List<IModifier> LogModifiers { get; private set; }
 
+            public State PriorState { get; private set; }
             public StateMachine<State, Trigger> StateMachine { get; private set; }
             public Action<SMState> DoneHandler { get; private set; }
 
@@ -53,7 +55,9 @@ namespace Stethoscope.Printers.Internal.PrintMode
 
                 Elements = null;
                 LogConditionals = null;
+                LogModifiers = null;
 
+                PriorState = State.Uninitialized;
                 StateMachine = stateMachine;
                 DoneHandler = doneHandler;
             }
@@ -91,6 +95,17 @@ namespace Stethoscope.Printers.Internal.PrintMode
                     clone.LogConditionals = new List<IConditional>();
                 }
                 clone.LogConditionals.Add(conditional);
+                return clone;
+            }
+
+            public SMState AddLogModifier(IModifier modifier)
+            {
+                var clone = (SMState)Clone();
+                if (clone.LogModifiers == null)
+                {
+                    clone.LogModifiers = new List<IModifier>();
+                }
+                clone.LogModifiers.Add(modifier);
                 return clone;
             }
 
@@ -140,6 +155,13 @@ namespace Stethoscope.Printers.Internal.PrintMode
                 return clone;
             }
 
+            public SMState SetPriorState(State state)
+            {
+                var clone = (SMState)Clone();
+                clone.PriorState = state;
+                return clone;
+            }
+
             public bool TestCharLength(int charCount)
             {
                 return (ParsingIndex + charCount) <= Format.Length;
@@ -166,9 +188,10 @@ namespace Stethoscope.Printers.Internal.PrintMode
             public object Clone()
             {
                 var cloneCurrentElementConditionals = CurrentElementConditionals != null ? new List<IConditional>(CurrentElementConditionals) : null;
-                var cloneElements = Elements != null ? new List<IElement>(Elements) : null;
-                var cloneLogConditionals = Elements != null ? new List<IConditional>(LogConditionals) : null;
                 var cloneCurrentElementModifiers = CurrentElementModifiers != null ? new List<IModifier>(CurrentElementModifiers) : null;
+                var cloneElements = Elements != null ? new List<IElement>(Elements) : null;
+                var cloneLogConditionals = LogConditionals != null ? new List<IConditional>(LogConditionals) : null;
+                var cloneLogModifiers = LogModifiers != null ? new List<IModifier>(LogModifiers) : null;
 
                 return new SMState()
                 {
@@ -185,7 +208,9 @@ namespace Stethoscope.Printers.Internal.PrintMode
 
                     Elements = cloneElements,
                     LogConditionals = cloneLogConditionals,
+                    LogModifiers = cloneLogModifiers,
 
+                    PriorState = PriorState,
                     StateMachine = StateMachine,
                     DoneHandler = DoneHandler
                 };
@@ -205,6 +230,7 @@ namespace Stethoscope.Printers.Internal.PrintMode
 
             // Main sections
             LogConditional,
+            LogModifier,
             Raw,
             Part,
 
@@ -309,7 +335,7 @@ namespace Stethoscope.Printers.Internal.PrintMode
             { '$', SpecialCharValues.Create(SpecialCharFlags.Conditional | SpecialCharFlags.ForAttribute | SpecialCharFlags.StartAttribute, ConditionalElement.AttributeValueChanged) },
             { '~', SpecialCharValues.Create(SpecialCharFlags.Conditional | SpecialCharFlags.ForAttribute | SpecialCharFlags.StartAttribute, ConditionalElement.AttributeValueNew) },
 
-            { SPECIAL_CHAR_MOD_ERROR_HANDLER, SpecialCharValues.Create(SpecialCharFlags.Modifier | SpecialCharFlags.ForAttribute | SpecialCharFlags.EndAttribute, ModifierElement.ErrorHandler) },
+            { SPECIAL_CHAR_MOD_ERROR_HANDLER, SpecialCharValues.Create(SpecialCharFlags.Modifier | SpecialCharFlags.ForLog | SpecialCharFlags.ForAttribute | SpecialCharFlags.EndAttribute, ModifierElement.ErrorHandler) },
 
             { SPECIAL_CHAR_ATT_START, SpecialCharValues.Create(SpecialCharFlags.Attribute | SpecialCharFlags.StartAttribute) },
             { SPECIAL_CHAR_ATT_END, SpecialCharValues.Create(SpecialCharFlags.Attribute | SpecialCharFlags.EndAttribute) }
@@ -499,21 +525,26 @@ namespace Stethoscope.Printers.Internal.PrintMode
             machine.Configure(State.LogConditional)
                 .OnEntryFrom(doneTrigger, HandleLogConditional)
                 .PermitReentry(Trigger.FoundConditional)
+                .Permit(Trigger.Done, State.LogModifier)
+                .Permit(Trigger.Invoke, State.Part)
+                .Permit(Trigger.Error, State.Error);
+
+            machine.Configure(State.LogModifier)
+                .OnEntryFrom(doneTrigger, HandleLogModifier)
+                .OnEntryFrom(foundModifierTrigger, HandleLogModifier)
+                .PermitReentry(Trigger.FoundModifier)
                 .Permit(Trigger.Done, State.Part)
+                .Permit(Trigger.Invoke, State.ErrorHandlerModifier)
                 .Permit(Trigger.Error, State.Error);
 
             machine.Configure(State.Part)
-                .OnEntryFrom(doneTrigger, state => state.StateMachine.Fire(countTillMarkerTrigger, state, GetSpecialCharsForFlags(SpecialCharFlags.StartAttribute), CountTillFlag.LastMarker))
+                .OnEntryFrom(doneTrigger, state => state.StateMachine.Fire(countTillMarkerTrigger, state.SetPriorState(State.Part), GetSpecialCharsForFlags(SpecialCharFlags.StartAttribute), CountTillFlag.LastMarker))
                 .OnEntryFrom(doneIntTrigger, HandlePart)
                 .Permit(Trigger.Invoke, State.CountTillMarker)
                 .Permit(Trigger.ProcessRaw, State.Raw)
                 .Permit(Trigger.ProcessAttribute, State.Attribute)
                 .Permit(Trigger.Done, State.Done)
                 .Permit(Trigger.Error, State.Error);
-
-            machine.Configure(State.CountTillMarker)
-                .OnEntryFrom(countTillMarkerTrigger, CountTillMarker)
-                .Permit(Trigger.Done, State.Part);
 
             machine.Configure(State.Raw)
                 .OnEntryFrom(processRawTrigger, ProcessRaw)
@@ -533,7 +564,7 @@ namespace Stethoscope.Printers.Internal.PrintMode
                 .Permit(Trigger.Error, State.Error);
 
             machine.Configure(State.AttributeReference)
-                .OnEntryFrom(doneTrigger, state => state.StateMachine.Fire(countTillMarkerTrigger, state, GetSpecialCharsForFlagsEn(SpecialCharFlags.EndAttribute).Concat(new char[] { SPECIAL_CHAR_ATT_FORMAT }).ToArray(), CountTillFlag.FirstMarker))
+                .OnEntryFrom(doneTrigger, state => state.StateMachine.Fire(countTillMarkerTrigger, state.SetPriorState(State.AttributeReference), GetSpecialCharsForFlagsEn(SpecialCharFlags.EndAttribute).Concat(new char[] { SPECIAL_CHAR_ATT_FORMAT }).ToArray(), CountTillFlag.FirstMarker))
                 .OnEntryFrom(doneIntTrigger, HandleAttributeReference)
                 .Permit(Trigger.Invoke, State.CountTillMarker)
                 .Permit(Trigger.Done, State.Modifier)
@@ -541,7 +572,7 @@ namespace Stethoscope.Printers.Internal.PrintMode
                 .Permit(Trigger.Error, State.Error);
 
             machine.Configure(State.AttributeFormat)
-                .OnEntryFrom(invokeTrigger, state => state.StateMachine.Fire(countTillMarkerTrigger, state, GetSpecialCharsForFlags(SpecialCharFlags.EndAttribute), CountTillFlag.LastMarker))
+                .OnEntryFrom(invokeTrigger, state => state.StateMachine.Fire(countTillMarkerTrigger, state.SetPriorState(State.AttributeFormat), GetSpecialCharsForFlags(SpecialCharFlags.EndAttribute), CountTillFlag.LastMarker))
                 .OnEntryFrom(doneIntTrigger, HandleAttributeFormat)
                 .Permit(Trigger.Invoke, State.CountTillMarker)
                 .Permit(Trigger.Done, State.Modifier)
@@ -549,6 +580,7 @@ namespace Stethoscope.Printers.Internal.PrintMode
 
             machine.Configure(State.Modifier)
                 .OnEntryFrom(doneTrigger, HandleModifer)
+                .OnEntryFrom(foundModifierTrigger, HandleModifer)
                 .PermitReentry(Trigger.FoundModifier)
                 .Permit(Trigger.Invoke, State.ErrorHandlerModifier)
                 .Permit(Trigger.Done, State.FinalizePart)
@@ -576,12 +608,16 @@ namespace Stethoscope.Printers.Internal.PrintMode
                     }
                 }).PermitIf(processTrigger, State.Setup);
 
+            machine.Configure(State.CountTillMarker)
+                .OnEntryFrom(countTillMarkerTrigger, CountTillMarker)
+                .PermitDynamic(doneTrigger, state => state.PriorState);
+
             machine.Configure(State.ErrorHandlerModifier)
                 .OnEntryFrom(invokeTrigger, HandleErrorModifierSanityCheck)
                 .OnEntryFrom(doneTrigger, HandleErrorModifier)
                 .Permit(Trigger.Invoke, State.StringQuote)
-                .Permit(Trigger.Done, State.Modifier)
-                .Permit(Trigger.Error, State.Error);
+                .Permit(Trigger.Error, State.Error)
+                .PermitDynamic(doneTrigger, state => state.PriorState);
 
             return machine;
         }
@@ -592,7 +628,8 @@ namespace Stethoscope.Printers.Internal.PrintMode
 
         private void HandleLogConditional(SMState state)
         {
-            //XXX need to support error handler conditional
+            // See #350.2 for overview of what's happening
+
             if (state.TestCharLength(1))
             {
                 var type = state.CurrentFormatChar;
@@ -606,12 +643,22 @@ namespace Stethoscope.Printers.Internal.PrintMode
                 }
                 if (count % 2 == 1 && GetSpecialCharsForFlagsEn(SpecialCharFlags.Conditional | SpecialCharFlags.ForLog).Contains(type))
                 {
-                    if (state.LogConditionals?.Count != 0)
+                    var conditionalElement = SpecialChars[type].ConditionalElement;
+
+                    if (state.LogConditionals?.Where(c => c.Type == conditionalElement).Count() > 0)
                     {
-                        state.StateMachine.Fire(errorTrigger, state.SetError("Only one log-level conditional is allowed"));
+                        if (count > 1)
+                        {
+                            state.StateMachine.Fire(invokeTrigger, state);
+                        }
+                        else
+                        {
+                            state.StateMachine.Fire(errorTrigger, state.SetError($"Only one condition is allowed of each type. This type: {type}"));
+                        }
                         return;
                     }
-                    var conditional = state.ElementFactory.CreateConditional(SpecialChars[type].ConditionalElement);
+                    
+                    var conditional = state.ElementFactory.CreateConditional(conditionalElement);
                     if (conditional == null)
                     {
                         state.StateMachine.Fire(errorTrigger, state.SetError($"Could not create log conditional: {type}"));
@@ -621,6 +668,55 @@ namespace Stethoscope.Printers.Internal.PrintMode
                         state.StateMachine.Fire(foundConditionalTrigger, state.AddLogConditional(conditional).IncrementIndex(1));
                     }
                     return;
+                }
+            }
+            state.StateMachine.Fire(doneTrigger, state);
+        }
+
+        private void HandleLogModifier(SMState state)
+        {
+            // See #350.2 for overview of what's happening
+
+            if (state.TestCharLength(1))
+            {
+                var type = state.CurrentFormatChar;
+
+                // Need to test that we're not looking at a raw that is using the special chars (+ means conditional, ++ means it's a raw char of '+')
+                // As such, only passes if an odd number of chars match. + = conditional, ++ = raw, +++ = conditional + raw, ++++ = 2x raw, etc.
+                var count = 1;
+                while (state.TestCharLength(count + 1) && state.Format[state.ParsingIndex + count] == type)
+                {
+                    count++;
+                }
+                if (count % 2 == 1 && GetSpecialCharsForFlagsEn(SpecialCharFlags.Modifier | SpecialCharFlags.ForLog).Contains(type))
+                {
+                    var modifierElement = SpecialChars[type].ModifierElement;
+
+                    if (state.LogModifiers?.Where(c => c.Type == modifierElement).Count() > 0)
+                    {
+                        if (count == 1)
+                        {
+                            state.StateMachine.Fire(errorTrigger, state.SetError($"Only one modifier is allowed of each type. This type: {type}"));
+                        }
+                    }
+                    else
+                    {
+                        if (modifierElement == ModifierElement.ErrorHandler)
+                        {
+                            state.StateMachine.Fire(invokeTrigger, state.SetPriorState(State.LogModifier));
+                            return;
+                        }
+                        var modifier = state.ElementFactory.CreateModifier(modifierElement);
+                        if (modifier == null)
+                        {
+                            state.StateMachine.Fire(errorTrigger, state.SetError($"Could not create log modifier: {type}"));
+                        }
+                        else
+                        {
+                            state.StateMachine.Fire(foundModifierTrigger, state.AddLogModifier(modifier).IncrementIndex(1));
+                        }
+                        return;
+                    }
                 }
             }
             state.StateMachine.Fire(doneTrigger, state);
@@ -904,7 +1000,7 @@ namespace Stethoscope.Printers.Internal.PrintMode
                 {
                     if (SpecialChars[type].ModifierElement == ModifierElement.ErrorHandler)
                     {
-                        state.StateMachine.Fire(invokeTrigger, state);
+                        state.StateMachine.Fire(invokeTrigger, state.SetPriorState(State.Modifier));
                         return;
                     }
                     var modifier = state.ElementFactory.CreateModifier(SpecialChars[type].ModifierElement);
