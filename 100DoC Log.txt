@@ -3092,6 +3092,10 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - Still need to do the attribute format fix and unit tests.
 - That's all today.
 
+#355.2. 04/02/2019:
+- I wanted to do something quick, but I didn't get to this until late and I need to be up early.
+- So I will skip for today...
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
