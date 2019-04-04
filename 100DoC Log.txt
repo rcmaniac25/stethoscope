@@ -3096,6 +3096,10 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - I wanted to do something quick, but I didn't get to this until late and I need to be up early.
 - So I will skip for today...
 
+#356.2. 04/03/2019:
+- This was a weird day... basically, I planned to do one thing, and a quick day of code.
+- Instead, I did something completely different, and it's too late now.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
