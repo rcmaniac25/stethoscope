@@ -3100,6 +3100,9 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - This was a weird day... basically, I planned to do one thing, and a quick day of code.
 - Instead, I did something completely different, and it's too late now.
 
+#357.2. 04/04/2019:
+- Ended up crashing today and didn't get work done...
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
