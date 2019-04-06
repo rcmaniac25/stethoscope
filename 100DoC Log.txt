@@ -3103,6 +3103,12 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 #357.2. 04/04/2019:
 - Ended up crashing today and didn't get work done...
 
+#358.2. 04/05/2019:
+- It's late, but I still wanted to do something... except, I can't.
+- I've been running an application in the background for most of the evening, and it's been causing my computer to freeze for ~5 sec, every 30 sec or so.
+- It's infuriating... I would rather not have the computer freeze while I'm coding, but I also can't pause the program.
+- So... tomorrow.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
