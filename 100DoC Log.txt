@@ -3109,6 +3109,12 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - It's infuriating... I would rather not have the computer freeze while I'm coding, but I also can't pause the program.
 - So... tomorrow.
 
+#359.2. 04/06/2019:
+- I determined that "{}" would not require quotes
+- While I didn't get to code it, I think my plan is to have the count till marker have an extra parameter of a skip-list of sorts.
+- Something that I can say "skip the first n of particular marker"
+- Not 100% sure how well it would work, and how well I can modify the count* state to handle "overloading", but that is for tomorrow.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2

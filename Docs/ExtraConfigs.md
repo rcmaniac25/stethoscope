@@ -50,4 +50,4 @@ Custom modes can be defined with a "format" while pre-defined modes can be used,
 		- //FUTURE-TODO (failure handler: on error, don't print attribute; on error, don't print log; on error, print attribute error handler; on error, log-format error handler; on error, throw exception/error; on error, report error [Default])
     - `<attribute reference>` - `{<attribute name>[<attribute format>]}`
     - `<attribute name>` - (any of the LogAttribute enum value names)
-    - `<attribute format>` - `|<raw>` (inside `<raw>`, any "{}" will be replaced with the value from the attribute)
+    - `<attribute format>` - `|<raw>` (inside `<raw>`, any "{}" (quotes not included) will be replaced with the value from the attribute)
