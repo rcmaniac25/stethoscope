@@ -494,6 +494,7 @@ namespace Stethoscope.Printers.Internal.PrintMode
         private readonly StateMachine<State, Trigger>.TriggerWithParameters<string, IPrinterElementFactory, Action<SMState>> processTrigger = new StateMachine<State, Trigger>.TriggerWithParameters<string, IPrinterElementFactory, Action<SMState>>(Trigger.Invoke);
         private readonly StateMachine<State, Trigger>.TriggerWithParameters<SMState> invokeTrigger = new StateMachine<State, Trigger>.TriggerWithParameters<SMState>(Trigger.Invoke);
         private readonly StateMachine<State, Trigger>.TriggerWithParameters<SMState, char[], CountTillFlag> countTillMarkerTrigger = new StateMachine<State, Trigger>.TriggerWithParameters<SMState, char[], CountTillFlag>(Trigger.Invoke);
+        private readonly StateMachine<State, Trigger>.TriggerWithParameters<SMState, char[], (CountTillFlag flags, IDictionary<char, int> skip)> countTillMarkerWithSkipTrigger = new StateMachine<State, Trigger>.TriggerWithParameters<SMState, char[], (CountTillFlag flags, IDictionary<char, int> skip)>(Trigger.Invoke);
         private readonly StateMachine<State, Trigger>.TriggerWithParameters<SMState> doneTrigger = new StateMachine<State, Trigger>.TriggerWithParameters<SMState>(Trigger.Done);
         private readonly StateMachine<State, Trigger>.TriggerWithParameters<SMState, int> doneIntTrigger = new StateMachine<State, Trigger>.TriggerWithParameters<SMState, int>(Trigger.Done);
         private readonly StateMachine<State, Trigger>.TriggerWithParameters<SMState> errorTrigger = new StateMachine<State, Trigger>.TriggerWithParameters<SMState>(Trigger.Error);
@@ -572,7 +573,7 @@ namespace Stethoscope.Printers.Internal.PrintMode
                 .Permit(Trigger.Error, State.Error);
 
             machine.Configure(State.AttributeFormat)
-                .OnEntryFrom(invokeTrigger, state => state.StateMachine.Fire(countTillMarkerTrigger, state.SetPriorState(State.AttributeFormat), GetSpecialCharsForFlags(SpecialCharFlags.EndAttribute), CountTillFlag.LastMarker))
+                .OnEntryFrom(invokeTrigger, state => state.StateMachine.Fire(countTillMarkerWithSkipTrigger, state.SetPriorState(State.AttributeFormat), GetSpecialCharsForFlags(SpecialCharFlags.EndAttribute), (CountTillFlag.LastMarker, new Dictionary<char, int>() { { '}', 2 } })))
                 .OnEntryFrom(doneIntTrigger, HandleAttributeFormat)
                 .Permit(Trigger.Invoke, State.CountTillMarker)
                 .Permit(Trigger.Done, State.Modifier)
@@ -609,7 +610,9 @@ namespace Stethoscope.Printers.Internal.PrintMode
                 }).PermitIf(processTrigger, State.Setup);
 
             machine.Configure(State.CountTillMarker)
-                .OnEntryFrom(countTillMarkerTrigger, CountTillMarker)
+                .OnEntryFrom(countTillMarkerWithSkipTrigger, CountTillMarker)
+                .OnEntryFrom(countTillMarkerTrigger, (SMState state, char[] termChars, CountTillFlag flags) => state.StateMachine.Fire(countTillMarkerWithSkipTrigger, state, termChars, (flags, new Dictionary<char, int>())))
+                .PermitReentry(Trigger.Invoke)
                 .PermitDynamic(doneTrigger, state => state.PriorState);
 
             machine.Configure(State.ErrorHandlerModifier)
@@ -758,9 +761,11 @@ namespace Stethoscope.Printers.Internal.PrintMode
             }
             return null;
         }
-
-        private void CountTillMarker(SMState state, char[] termChars, CountTillFlag flag)
+        
+        private void CountTillMarker(SMState state, char[] termChars, (CountTillFlag flag, IDictionary<char, int> skipChars) extraArguments)
         {
+            var skipableChars = new Dictionary<char, int>(extraArguments.skipChars);
+
             var len = 0;
             var testLen = 1;
             while (state.TestCharLength(testLen))
@@ -768,11 +773,20 @@ namespace Stethoscope.Printers.Internal.PrintMode
                 var c = state.Format[state.ParsingIndex + testLen - 1];
                 if (termChars.Contains(c))
                 {
-                    var finalLen = CountTillMarkerCalculateLength(state, testLen, c, flag);
-                    if (finalLen.HasValue)
+                    var skip = false;
+                    if (skipableChars.ContainsKey(c) && skipableChars[c] > 0)
                     {
-                        len = finalLen.Value;
-                        break;
+                        skipableChars[c]--;
+                        skip = true;
+                    }
+                    if (!skip)
+                    {
+                        var finalLen = CountTillMarkerCalculateLength(state, testLen, c, extraArguments.flag);
+                        if (finalLen.HasValue)
+                        {
+                            len = finalLen.Value;
+                            break;
+                        }
                     }
                 }
                 testLen++;

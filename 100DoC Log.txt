@@ -3115,6 +3115,17 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - Something that I can say "skip the first n of particular marker"
 - Not 100% sure how well it would work, and how well I can modify the count* state to handle "overloading", but that is for tomorrow.
 
+#360.2. 04/07/2019:
+- Day 360. 360 days of continuious logging... I went back and counted how many actually had code, and it was ?? <todo later... :P>.
+- I was hoping to say "the state machine, except for the error handler, unit tests, and the factory... is done" but upon implementing my skip list, I realized an issue
+- I didn't think it was right to have "skip every one of these chars" because a naive implementation would then never find the terminating chars...
+- So I made it into a count. Skip no more then n chars. But upon writing it, I realized that the first one is better.
+- It may be a "don't skip, skip n, and skip all", but also need to actually keep track of the ones skipped.
+- Perhaps... skip implies "LastMarker" flag, because instead of going "we will give you the char and, because it has a raw, we will give you the last one"...
+- ...it instead becomes "we will follow skip + raw..." (which needs to be implemented) "...but then the last non-raw we find, we're marking that as the last one once skips are taken into account"
+- It will require some work, but it's an idea to implement... another time.
+- I have one dead computer, and it will prevent me from being able to do this project when I'm not at my computer... so I may skip the next few days so I can try to actually fix it.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
