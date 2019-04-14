@@ -3142,6 +3142,15 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - Still...
 - See #361.2
 
+#366.2. 04/13/2019:
+- Minor update/PSA: I had some "challenges" a few days ago. If you ever feel in life that you're overwhelmed and can't cope, reach out to someone... and just "stop" doing things.
+- You can always recover from "doing nothing", you can't recover from feeling of control unless you let go of what you think you are in control of. If that makes sense (it's late for me... so it's not the most sensical time for me)
+- I had some challenges, talked to people, stopped doing things for a couple days, felt better, needed to do "1 more thing" before I could work on my computer... slept instead.
+- Went "1 more thing..." did it (mostly), and the event that went along with it... I couldn't make it. The person I was going with got sick and we skipped the whole thing.
+- I took advantage of the day and did a bunch of small things... and slept some more.
+- I've said I "crash" sometimes, and that's usually just going to sleep when I least expect to. That happened again, so I still didn't work on the computer today... tomorrow I hope to work on it.
+- See #361.2
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
