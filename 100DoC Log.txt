@@ -3151,6 +3151,9 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - I've said I "crash" sometimes, and that's usually just going to sleep when I least expect to. That happened again, so I still didn't work on the computer today... tomorrow I hope to work on it.
 - See #361.2
 
+#367.2. 04/14/2019:
+- See #361.2
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
