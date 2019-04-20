@@ -3166,6 +3166,10 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 #371.2. 04/18/2019:
 - See #361.2
 
+#372.2. 04/19/2019:
+- I'm at the point where I got my files back and am now arguing with UEFI because it doesn't want to start the installer (it's actually taken a few hours to do. I've never had that happen before and it's very frustrating)
+- See #361.2
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
