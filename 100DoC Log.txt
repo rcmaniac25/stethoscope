@@ -3177,6 +3177,9 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - See #361.2
 
 #375.2. 04/22/2019:
+- So... I purchased the parts I needed and was told it would arrive today. Meaning I could work on it today and tomorrow...
+- They never arrived. >:(
+- Means that I'll be working on the computer tomorrow instead...
 - See #361.2
 
 ==Design/Plan Days==
