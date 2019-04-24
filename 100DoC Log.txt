@@ -3182,6 +3182,12 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - Means that I'll be working on the computer tomorrow instead...
 - See #361.2
 
+#376.2. 04/23/2019:
+- Drive came in... and I get to be "old guy yells at cloud" because they decided to use the metric system for measurement and go "1GB = 1000MB" while every computer an electronic system knows "1GB = 1024MB" because of this Base 2 stuff...
+- End result, what I expected to be "run Clonezilla to clone from drive A to drive B" became "Clonezilla and other programs won't go near it with a 10 ft pole"
+- Joy
+- See #361.2
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
