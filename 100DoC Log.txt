@@ -3193,6 +3193,10 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - I will be starting on the computer in a bit...
 - See #361.2
 
+#378.2. 04/25/2019:
+- Computer now has an OS... though I need to do a bunch work to set it up
+- See #361.2
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
