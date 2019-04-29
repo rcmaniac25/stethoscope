@@ -3204,6 +3204,12 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 380.2. 04/27/2019:
 - See #361.2
 
+381.2. 04/28/2019:
+- Still need to do some work on the computer (it's been slow going)
+- Tomorrow and the following day will be busy and won't have anything done either
+- ...maybe after that
+- See #361.2
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
