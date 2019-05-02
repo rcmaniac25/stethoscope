@@ -3216,6 +3216,10 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 383.2. 04/30/2019:
 - See #361.2
 
+384.2. 05/01/2019:
+- Still need a bit more time...
+- See #361.2
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
