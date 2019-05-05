@@ -3227,6 +3227,10 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - I planned to do a "hey, I did something!" moment... but weekend plans got messed up, so it's not happening
 - But I will stop referencing #361.2 because, while the computer is not back to it's original state, it's usable again
 
+387.2. 05/04/2019:
+- I also planned to do something, but I ran into an issue: what the heck was I doing last?
+- So I'm just going to go through what I was doing and maybe I can do work tomorrow...
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
