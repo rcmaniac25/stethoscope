@@ -3231,6 +3231,12 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - I also planned to do something, but I ran into an issue: what the heck was I doing last?
 - So I'm just going to go through what I was doing and maybe I can do work tomorrow...
 
+388.2. 05/05/2019:
+- Sleep in + unplanned shopping trips + this week requires me to be very on time into the office = I don't have time tonight
+- I also might not have time for a couple days
+- There might also be an unexpected event (personal thing... but there's a feeling it will happen)
+- TL:DR - can't work on it tonight and might be tough to work on it other days...
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
