@@ -3237,6 +3237,14 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - There might also be an unexpected event (personal thing... but there's a feeling it will happen)
 - TL:DR - can't work on it tonight and might be tough to work on it other days...
 
+389.2. 05/06/2019:
+- So I wanted to at least do some thinking about this...
+- I did, and I went "ah, I remember where I was": I needed to support the error handler
+- Then I did some reading and found out "um, yes... but also no"
+- So I do need the error handler, but I also need unit tests, and factory implementation.
+- Then I saw that I had an "issue" with my skip count, especially with the new "skip-list" system.
+- I will have to do more reading, but I'm catching up...
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
