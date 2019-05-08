@@ -3245,6 +3245,10 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - Then I saw that I had an "issue" with my skip count, especially with the new "skip-list" system.
 - I will have to do more reading, but I'm catching up...
 
+390.2. 05/07/2019:
+- Slight delay...
+- Was going to do this today but realized I need to do something "really late" and plan to go to sleep early so I can do it.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
