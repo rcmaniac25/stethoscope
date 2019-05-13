@@ -3264,6 +3264,29 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - Fell asleep before I was able to get to this.
 - It's been a wacky couple days recently...
 
+395.2. 05/12/2019:
+- Let's see if I don't ramble...
+- So I thought about the count-till code. There's a primary flaw with how this is to be done: text parsing is hard.
+- "yea... others do it though" Do they? I've read a number of documents over the years about how text processing is done, and the most common solution is strict formatting.
+- This is where I'm thinking: I specified a generally strict parsing, but also had something akin to recursive code: my_code = "the_code = \"some_code = \\\"this_is_a_pain = 10;\\\";\";"
+- Now, the good news is that each of those is seperatable.
+- The bad news is that it introduces state.
+- Get a count wrong or do something wrong and, because of state, you end up messing things up.
+- The best solution I could come up with was to know a handful of special chars and count them so I know when they start and stop.
+- What chars in particular? Quotes.
+- "Wait, isn't that StringQuote?" yep!
+- So the idea I'm running with, and hope to implement (so long as I don't suddenly end up with crazy-wacky life events occuring):
+-- Specify chars to count till (no per-char counters)
+-- Count until I hit one...
+-- If I find a quote, run the QuoteString state (so it should return the raw string and not process it).
+-- At the end of the quote, I can count the chars it found and skip that amount... and continue counting.
+- This would allow me to ignore any char if it's in a quote.
+- So instead of "oh no, I need to find a '{', but there's a quote... so I need to say "ignore the next 5 '{'" and find out that the quote ended after 2 '{' and I'm now screwed up..."
+- It becomes "find '{', there's a quote... ok, on the other side of the quote is a '{', so continue processing"
+- I'm hoping it works...
+- The one thing, as noted in #360.2, is that I still need to take "raws" into account.
+- Now those only apply to special chars, and not quotes, but it still is something to note.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
