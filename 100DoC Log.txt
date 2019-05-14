@@ -3287,6 +3287,10 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - The one thing, as noted in #360.2, is that I still need to take "raws" into account.
 - Now those only apply to special chars, and not quotes, but it still is something to note.
 
+396.2. 05/13/2019:
+- Too late today (needed to stop distracting myself and do something else, ate of time to work on this)
+- Will have to skip tomorrow do to other plans
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
