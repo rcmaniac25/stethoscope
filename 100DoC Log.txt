@@ -3291,6 +3291,9 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - Too late today (needed to stop distracting myself and do something else, ate of time to work on this)
 - Will have to skip tomorrow do to other plans
 
+397.2. 05/14/2019:
+- As stated, skipping today
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
