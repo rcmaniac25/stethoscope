@@ -3294,6 +3294,16 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 397.2. 05/14/2019:
 - As stated, skipping today
 
+398.2. 05/15/2019:
+- I ran out of time today, but I wanted to at least double check my plans.
+- So the one thing I wondered: "what if there is only one quote?
+- The answer to that question is "do I care?"
+- The only spots it matters is when there's a plain text.
+- ...
+- Actually, hold that thought. My (tired) mind just casually went "quotes don't mean anything in plane text... only for the error conditional. Everything else is just a char"
+- Darn you mind...
+- Ok, I will have to think this over again tomorrow. It may simplify some work, but not sure yet
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
