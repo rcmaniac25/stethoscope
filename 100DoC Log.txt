@@ -3304,6 +3304,10 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - Darn you mind...
 - Ok, I will have to think this over again tomorrow. It may simplify some work, but not sure yet
 
+399.2. 05/16/2019:
+- I distracted myself until I realized I still didn't get anything done and should be done for the day
+- So I'm going to have to skip until tomorrow
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
