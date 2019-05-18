@@ -3308,6 +3308,14 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - I distracted myself until I realized I still didn't get anything done and should be done for the day
 - So I'm going to have to skip until tomorrow
 
+400.2. 05/17/2019:
+- I own a 3D printer.
+- This is important because I often print stuff.
+- Today, by the time I got to working on this, I opened up files and was about to do some reading...
+- ...and the printer started to have issues.
+- An hour later, the printer is running again... but I now don't have the time to work on this. Tomorrow...
+- Pity, because I really wanted to be like "day 400... I did something!"
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
