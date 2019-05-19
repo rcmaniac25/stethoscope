@@ -3316,6 +3316,10 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - An hour later, the printer is running again... but I now don't have the time to work on this. Tomorrow...
 - Pity, because I really wanted to be like "day 400... I did something!"
 
+401.2. 05/18/2019:
+- And punt again...
+- Trying to bring my sleep back in line, one hour at a time...
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
