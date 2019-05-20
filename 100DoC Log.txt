@@ -3320,6 +3320,25 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - And punt again...
 - Trying to bring my sleep back in line, one hour at a time...
 
+402.2. 05/19/2019:
+- I am well past when I should be up, but I wanted to do something quick and it didn't go quick
+- I looked into what the counter needs to do and broke it down to two key types of counting:
+-- Raw: Unless it's a term char, keep reading. If the term char is "special", then we need to count chars (and determine if we stop on start or end)
+-- Attribute Reference: No special chars allowed. Stop on term char.
+- This can be turned into a set of flags: IgnoreSpecialChars (otherwise it's default to pay attention to them), StopOnStart, StopOnEnd
+- The idea is that just iterate over everything. If it's a terminal char, then stop.
+- But, if "IgnoreSpecialChars" is not there, and the terminal char found is a special char, then start counting them to determine if actually a raw char or not.
+- For "special char is not raw" cases, then StopOnStart and StopOnEnd are usable flags.
+- Basically: ^^^ = the raw ^ and a special char ^.
+- If StopOnEnd, then the order is "raw" followed by "special char"
+- If StopOnStart, then the order is "special char" followed by "raw".
+- Since the terminal char is a special char, it would change where it stops and if there's a "raw" in the count.
+- The only open question I have is for "Attribute Format" where it's a "raw"... but there's a "replace {} with the attribute".
+- The question: is {} written as is? Or does it follow "raw" rules and has to be written as "{{}}"?
+- I like consistancy, which would indicate "{{}}" but as a dev/user, I'd prefer "{}".
+- Perhaps the answer is "both"... but then I need for the counter to "know" about this...
+- It's late. For tomorrow.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
