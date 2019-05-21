@@ -493,8 +493,8 @@ namespace Stethoscope.Printers.Internal.PrintMode
 
         private readonly StateMachine<State, Trigger>.TriggerWithParameters<string, IPrinterElementFactory, Action<SMState>> processTrigger = new StateMachine<State, Trigger>.TriggerWithParameters<string, IPrinterElementFactory, Action<SMState>>(Trigger.Invoke);
         private readonly StateMachine<State, Trigger>.TriggerWithParameters<SMState> invokeTrigger = new StateMachine<State, Trigger>.TriggerWithParameters<SMState>(Trigger.Invoke);
-        private readonly StateMachine<State, Trigger>.TriggerWithParameters<SMState, char[], CountTillFlag> countTillMarkerTrigger = new StateMachine<State, Trigger>.TriggerWithParameters<SMState, char[], CountTillFlag>(Trigger.Invoke);
-        private readonly StateMachine<State, Trigger>.TriggerWithParameters<SMState, char[], (CountTillFlag flags, IDictionary<char, int> skip)> countTillMarkerWithSkipTrigger = new StateMachine<State, Trigger>.TriggerWithParameters<SMState, char[], (CountTillFlag flags, IDictionary<char, int> skip)>(Trigger.Invoke);
+        private readonly StateMachine<State, Trigger>.TriggerWithParameters<SMState, char[], CountTillFlag> countTillMarkerTriggerWithFlags = new StateMachine<State, Trigger>.TriggerWithParameters<SMState, char[], CountTillFlag>(Trigger.Invoke);
+        private readonly StateMachine<State, Trigger>.TriggerWithParameters<SMState, char[]> countTillMarkerTrigger = new StateMachine<State, Trigger>.TriggerWithParameters<SMState, char[]>(Trigger.Invoke);
         private readonly StateMachine<State, Trigger>.TriggerWithParameters<SMState> doneTrigger = new StateMachine<State, Trigger>.TriggerWithParameters<SMState>(Trigger.Done);
         private readonly StateMachine<State, Trigger>.TriggerWithParameters<SMState, int> doneIntTrigger = new StateMachine<State, Trigger>.TriggerWithParameters<SMState, int>(Trigger.Done);
         private readonly StateMachine<State, Trigger>.TriggerWithParameters<SMState> errorTrigger = new StateMachine<State, Trigger>.TriggerWithParameters<SMState>(Trigger.Error);
@@ -539,7 +539,7 @@ namespace Stethoscope.Printers.Internal.PrintMode
                 .Permit(Trigger.Error, State.Error);
 
             machine.Configure(State.Part)
-                .OnEntryFrom(doneTrigger, state => state.StateMachine.Fire(countTillMarkerTrigger, state.SetPriorState(State.Part), GetSpecialCharsForFlags(SpecialCharFlags.StartAttribute), CountTillFlag.LastMarker))
+                .OnEntryFrom(doneTrigger, state => state.StateMachine.Fire(countTillMarkerTriggerWithFlags, state.SetPriorState(State.Part), GetSpecialCharsForFlags(SpecialCharFlags.StartAttribute), CountTillFlag.LastMarker))
                 .OnEntryFrom(doneIntTrigger, HandlePart)
                 .Permit(Trigger.Invoke, State.CountTillMarker)
                 .Permit(Trigger.ProcessRaw, State.Raw)
@@ -565,7 +565,7 @@ namespace Stethoscope.Printers.Internal.PrintMode
                 .Permit(Trigger.Error, State.Error);
 
             machine.Configure(State.AttributeReference)
-                .OnEntryFrom(doneTrigger, state => state.StateMachine.Fire(countTillMarkerTrigger, state.SetPriorState(State.AttributeReference), GetSpecialCharsForFlagsEn(SpecialCharFlags.EndAttribute).Concat(new char[] { SPECIAL_CHAR_ATT_FORMAT }).ToArray(), CountTillFlag.FirstMarker))
+                .OnEntryFrom(doneTrigger, state => state.StateMachine.Fire(countTillMarkerTrigger, state.SetPriorState(State.AttributeReference), GetSpecialCharsForFlagsEn(SpecialCharFlags.EndAttribute).Concat(new char[] { SPECIAL_CHAR_ATT_FORMAT }).ToArray()))
                 .OnEntryFrom(doneIntTrigger, HandleAttributeReference)
                 .Permit(Trigger.Invoke, State.CountTillMarker)
                 .Permit(Trigger.Done, State.Modifier)
@@ -573,7 +573,7 @@ namespace Stethoscope.Printers.Internal.PrintMode
                 .Permit(Trigger.Error, State.Error);
 
             machine.Configure(State.AttributeFormat)
-                .OnEntryFrom(invokeTrigger, state => state.StateMachine.Fire(countTillMarkerWithSkipTrigger, state.SetPriorState(State.AttributeFormat), GetSpecialCharsForFlags(SpecialCharFlags.EndAttribute), (CountTillFlag.LastMarker, new Dictionary<char, int>() { { '}', 2 } })))
+                .OnEntryFrom(invokeTrigger, state => state.StateMachine.Fire(countTillMarkerTriggerWithFlags, state.SetPriorState(State.AttributeFormat), GetSpecialCharsForFlags(SpecialCharFlags.EndAttribute), CountTillFlag.LastMarker))
                 .OnEntryFrom(doneIntTrigger, HandleAttributeFormat)
                 .Permit(Trigger.Invoke, State.CountTillMarker)
                 .Permit(Trigger.Done, State.Modifier)
@@ -610,8 +610,8 @@ namespace Stethoscope.Printers.Internal.PrintMode
                 }).PermitIf(processTrigger, State.Setup);
 
             machine.Configure(State.CountTillMarker)
-                .OnEntryFrom(countTillMarkerWithSkipTrigger, CountTillMarker)
-                .OnEntryFrom(countTillMarkerTrigger, (SMState state, char[] termChars, CountTillFlag flags) => state.StateMachine.Fire(countTillMarkerWithSkipTrigger, state, termChars, (flags, new Dictionary<char, int>())))
+                .OnEntryFrom(countTillMarkerTriggerWithFlags, CountTillMarker)
+                .OnEntryFrom(countTillMarkerTrigger, (SMState state, char[] termChars) => state.StateMachine.Fire(countTillMarkerTriggerWithFlags, state, termChars, CountTillFlag.ObserveSpecialChars | CountTillFlag.FirstMarker))
                 .PermitReentry(Trigger.Invoke)
                 .PermitDynamic(doneTrigger, state => state.PriorState);
 
@@ -725,16 +725,44 @@ namespace Stethoscope.Printers.Internal.PrintMode
             state.StateMachine.Fire(doneTrigger, state);
         }
 
+        [Flags]
         private enum CountTillFlag
         {
             /// <summary>
+            /// If a char is a special char, treat it as something that may be raw char (repeating itself to excape itself) or if it is a terminator marker (not repeated).
+            /// </summary>
+            ObserveSpecialChars = 0x00,
+            /// <summary>
+            /// If a char is a special char, ignore that it's a special char and treat it a single, non-repeated char.
+            /// </summary>
+            IgnoreSpecialChars = 0x01,
+
+            /// <summary>
+            /// Mask to get special char flags
+            /// </summary>
+            SpecialCharMask = 0x01,
+            /// <summary>
+            /// Bit shift for special char flags
+            /// </summary>
+            SpecialCharOffset = 0,
+
+            /// <summary>
             /// Stop at the first marker. So ^ (raw = ^^) of "abc^^^" would return 3
             /// </summary>
-            FirstMarker,
+            FirstMarker = 0x00,
             /// <summary>
             /// Stop at the last marker. So ^ (raw = ^^) of "abc^^^" would return 5
             /// </summary>
-            LastMarker
+            LastMarker = 0x02,
+
+            /// <summary>
+            /// Mask to get marker location
+            /// </summary>
+            MarkerLocationMask = 0x02,
+            /// <summary>
+            /// Not shift for marker location flags
+            /// </summary>
+            MarkerLocationOffset = 1
         }
 
         private static int? CountTillMarkerCalculateLength(SMState state, int testLen, char c, CountTillFlag flag)
@@ -762,8 +790,9 @@ namespace Stethoscope.Printers.Internal.PrintMode
             return null;
         }
         
-        private void CountTillMarker(SMState state, char[] termChars, (CountTillFlag flag, IDictionary<char, int> skipChars) extraArguments)
+        private void CountTillMarker(SMState state, char[] termChars, CountTillFlag flag)
         {
+#if false
             var skipableChars = new Dictionary<char, int>(extraArguments.skipChars);
 
             var len = 0;
@@ -792,6 +821,7 @@ namespace Stethoscope.Printers.Internal.PrintMode
                 testLen++;
             }
             state.StateMachine.Fire(doneIntTrigger, state, len);
+#endif
         }
 
         private void HandlePart(SMState state, int partLength)
@@ -1098,6 +1128,6 @@ namespace Stethoscope.Printers.Internal.PrintMode
             //TODO: Done, Error (it's basically parsing a new format and returning the result as the handler)
         }
 
-        #endregion
+#endregion
     }
 }

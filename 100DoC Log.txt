@@ -3339,6 +3339,12 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - Perhaps the answer is "both"... but then I need for the counter to "know" about this...
 - It's late. For tomorrow.
 
+403.2. 05/20/2019:
+- Code!
+- I changed the state machine prototype for count till marker...
+- ...but don't have the time to do the implementation.
+- Tomorrow may be busy, but we'll see.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
