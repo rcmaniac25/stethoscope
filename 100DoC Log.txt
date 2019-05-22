@@ -3345,6 +3345,10 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - ...but don't have the time to do the implementation.
 - Tomorrow may be busy, but we'll see.
 
+404.2. 05/21/2019:
+- I thought "maybe I can do something" but I'm very tired from the day and from getting some poor sleep yesterday.
+- Also, this is a little more work/brain power then I can muster right now.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
