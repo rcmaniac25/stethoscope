@@ -3349,6 +3349,10 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - I thought "maybe I can do something" but I'm very tired from the day and from getting some poor sleep yesterday.
 - Also, this is a little more work/brain power then I can muster right now.
 
+405.2. 05/22/2019:
+- I procrastinated too much today and didn't get to this.
+- I have more time tomorrow and should be able to get something done then.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
