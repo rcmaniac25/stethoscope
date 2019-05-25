@@ -3357,6 +3357,23 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - Well, I did have more time... and then about an hour vaporized, the week took a toll (I'm not usually tired by this time), and I bought shelves of such a specific size that I thought I would need to build them myself
 - I'm now so relieved to have found those shelves (maybe it's just me being tired), that I'm gonna push this to tomorrow where I most certainly have time...
 
+407.2. 05/24/2019:
+- Code!
+- I reverted the CountTillMarker main call to pre-skipList.
+- I went to review it and the only thing I needed to do was make sure we read the flags right.
+- I did one more mental review and found one issue: observed special chars + last marker flags would fail
+- Looking into it, because we would say "nah, we want the last char" we would say we didn't find the end and wait for the next count iteration to get to us...
+- Instead, the next iteration would move us an index further and we wouldn't even hit the char.
+- I thought it would be an east fix, but it quickly became a "you have to repeat a if statement with 2 elements (||/&&/==/etc.) flipped" and there were already 2-5 elements.
+- So, I abstracted it a small amount to a variable and mentially checked it and this time it worked out.
+- Good thing I didn't work on it some of the other days I was tired...
+- So now.. looking at 389.2, I can now say "this piece is done" and move onto: error handler (+ quote reader), unit tests, and factory impl.
+- I think I will do unit tests next.
+- It's a pain and "not fun", but while I have my "a}b", "a}}b", "a}}b}", "a}}}b" test on my mind (which is the mental check I went through) and because I kinda put it off for a bit, it would be good to have.
+- Plus, I think doing the factory impl. after that would be good... because then I can run tests, and the only tests that should fail are the ones that use the error handler.
+- With test passing (sans error handler), I can then do the error handler and, what I expect to be painful..., the quote reader.
+- But... put it in the books: parser (sans error handler) is done.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2

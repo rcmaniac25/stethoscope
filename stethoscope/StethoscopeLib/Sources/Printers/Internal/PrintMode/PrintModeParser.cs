@@ -539,7 +539,7 @@ namespace Stethoscope.Printers.Internal.PrintMode
                 .Permit(Trigger.Error, State.Error);
 
             machine.Configure(State.Part)
-                .OnEntryFrom(doneTrigger, state => state.StateMachine.Fire(countTillMarkerTriggerWithFlags, state.SetPriorState(State.Part), GetSpecialCharsForFlags(SpecialCharFlags.StartAttribute), CountTillFlag.LastMarker))
+                .OnEntryFrom(doneTrigger, state => state.StateMachine.Fire(countTillMarkerTriggerWithFlags, state.SetPriorState(State.Part), GetSpecialCharsForFlags(SpecialCharFlags.StartAttribute), CountTillFlag.ObserveSpecialChars | CountTillFlag.LastMarker))
                 .OnEntryFrom(doneIntTrigger, HandlePart)
                 .Permit(Trigger.Invoke, State.CountTillMarker)
                 .Permit(Trigger.ProcessRaw, State.Raw)
@@ -565,7 +565,7 @@ namespace Stethoscope.Printers.Internal.PrintMode
                 .Permit(Trigger.Error, State.Error);
 
             machine.Configure(State.AttributeReference)
-                .OnEntryFrom(doneTrigger, state => state.StateMachine.Fire(countTillMarkerTrigger, state.SetPriorState(State.AttributeReference), GetSpecialCharsForFlagsEn(SpecialCharFlags.EndAttribute).Concat(new char[] { SPECIAL_CHAR_ATT_FORMAT }).ToArray()))
+                .OnEntryFrom(doneTrigger, state => state.StateMachine.Fire(countTillMarkerTriggerWithFlags, state.SetPriorState(State.AttributeReference), GetSpecialCharsForFlagsEn(SpecialCharFlags.EndAttribute).Concat(new char[] { SPECIAL_CHAR_ATT_FORMAT }).ToArray(), CountTillFlag.IgnoreSpecialChars | CountTillFlag.FirstMarker))
                 .OnEntryFrom(doneIntTrigger, HandleAttributeReference)
                 .Permit(Trigger.Invoke, State.CountTillMarker)
                 .Permit(Trigger.Done, State.Modifier)
@@ -573,7 +573,7 @@ namespace Stethoscope.Printers.Internal.PrintMode
                 .Permit(Trigger.Error, State.Error);
 
             machine.Configure(State.AttributeFormat)
-                .OnEntryFrom(invokeTrigger, state => state.StateMachine.Fire(countTillMarkerTriggerWithFlags, state.SetPriorState(State.AttributeFormat), GetSpecialCharsForFlags(SpecialCharFlags.EndAttribute), CountTillFlag.LastMarker))
+                .OnEntryFrom(invokeTrigger, state => state.StateMachine.Fire(countTillMarkerTriggerWithFlags, state.SetPriorState(State.AttributeFormat), GetSpecialCharsForFlags(SpecialCharFlags.EndAttribute), CountTillFlag.ObserveSpecialChars | CountTillFlag.LastMarker))
                 .OnEntryFrom(doneIntTrigger, HandleAttributeFormat)
                 .Permit(Trigger.Invoke, State.CountTillMarker)
                 .Permit(Trigger.Done, State.Modifier)
@@ -765,21 +765,27 @@ namespace Stethoscope.Printers.Internal.PrintMode
             MarkerLocationOffset = 1
         }
 
-        private static int? CountTillMarkerCalculateLength(SMState state, int testLen, char c, CountTillFlag flag)
+        private static int? CountTillMarkerCalculateLength(SMState state, ref int testLen, char c, CountTillFlag flag)
         {
             var notRaw = true;
-            if (SpecialChars.ContainsKey(c))
+            if ((flag & CountTillFlag.SpecialCharMask) == CountTillFlag.ObserveSpecialChars && SpecialChars.ContainsKey(c))
             {
                 var innerCount = 1;
                 while (state.TestCharLength(innerCount + testLen) && state.Format[state.ParsingIndex + innerCount + testLen - 1] == c)
                 {
                     innerCount++;
                 }
-                if (innerCount % 2 == 0 ||
-                    flag == CountTillFlag.LastMarker)
+                var testLastMarker = innerCount > 1 && (flag & CountTillFlag.MarkerLocationMask) == CountTillFlag.LastMarker;
+                if (innerCount % 2 == 0 || testLastMarker)
                 {
                     notRaw = false;
                     testLen += innerCount - 1;
+
+                    if (innerCount % 2 != 0 && testLastMarker)
+                    {
+                        // In the case we want the last marker, we don't want the outer loop to skip over it, so we subtract 1 from the test length, so the next call will hit it
+                        testLen--;
+                    }
                 }
             }
 
@@ -789,12 +795,9 @@ namespace Stethoscope.Printers.Internal.PrintMode
             }
             return null;
         }
-        
+
         private void CountTillMarker(SMState state, char[] termChars, CountTillFlag flag)
         {
-#if false
-            var skipableChars = new Dictionary<char, int>(extraArguments.skipChars);
-
             var len = 0;
             var testLen = 1;
             while (state.TestCharLength(testLen))
@@ -802,26 +805,16 @@ namespace Stethoscope.Printers.Internal.PrintMode
                 var c = state.Format[state.ParsingIndex + testLen - 1];
                 if (termChars.Contains(c))
                 {
-                    var skip = false;
-                    if (skipableChars.ContainsKey(c) && skipableChars[c] > 0)
+                    var finalLen = CountTillMarkerCalculateLength(state, ref testLen, c, flag);
+                    if (finalLen.HasValue)
                     {
-                        skipableChars[c]--;
-                        skip = true;
-                    }
-                    if (!skip)
-                    {
-                        var finalLen = CountTillMarkerCalculateLength(state, testLen, c, extraArguments.flag);
-                        if (finalLen.HasValue)
-                        {
-                            len = finalLen.Value;
-                            break;
-                        }
+                        len = finalLen.Value;
+                        break;
                     }
                 }
                 testLen++;
             }
             state.StateMachine.Fire(doneIntTrigger, state, len);
-#endif
         }
 
         private void HandlePart(SMState state, int partLength)
