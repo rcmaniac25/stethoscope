@@ -3374,6 +3374,9 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - With test passing (sans error handler), I can then do the error handler and, what I expect to be painful..., the quote reader.
 - But... put it in the books: parser (sans error handler) is done.
 
+408.2. 05/25/2019:
+- Had an unexpectedly long day and need to be up early tomorrow, so push back till tomorrow.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
