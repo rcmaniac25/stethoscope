@@ -3377,6 +3377,11 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 408.2. 05/25/2019:
 - Had an unexpectedly long day and need to be up early tomorrow, so push back till tomorrow.
 
+409.2. 05/26/2019:
+- Ok, didn't do much, but I at least took the couple test cases from 407.2 and turned them into a TODO comment.
+- I want to review the existing tests (do things need to be updated/modified? Are they named correctly?)
+- Then I want to fill in the missing tests
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2

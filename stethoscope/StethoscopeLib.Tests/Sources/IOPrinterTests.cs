@@ -700,6 +700,20 @@ namespace Stethoscope.Tests
             Assert.That(data, Is.EqualTo(expectedLogPrintout));
         }
 
+        /* TODO:
+         * 
+         * test following char arrangements:
+         * - "a}b"
+         * - "a}}b"
+         * - "a}}b}"
+         * - "a}}}b"
+         * 
+         * Test areas:
+         * - Before/between Parts
+         * - Attribute reference (this will throw exceptions as no special char is in a valid attribute reference
+         * - Attribute format
+         */
+
         [Test]
         public void PrintModeCustomAttributeConditionExists()
         {
