@@ -3382,6 +3382,9 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - I want to review the existing tests (do things need to be updated/modified? Are they named correctly?)
 - Then I want to fill in the missing tests
 
+410.2. 05/27/2019:
+- Some issues occured today and I spent a lot of time doing some things I didn't plan for... now it's late and I need to go
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
