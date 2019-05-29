@@ -28,10 +28,10 @@ Custom modes can be defined with a "format" while pre-defined modes can be used,
 
 - "mode":
     - General = @!"Problem printing log. Timestamp=^{Timestamp}, Message=^{Message}"[{Timestamp}] -- {Message}^{LogSource|, LogSource="{}"}^{ThreadID|, ThreadID="{}"}...^{Context|, Context="{}"}
-	    - Every attribute is printed
+        - Every attribute is printed
     - FunctionOnly = @{Function}!"@+Log is missing Function attribute: {Timestamp} -- {Message}"
     - FirstFunctionOnly = @~{Function}!"@+Log is missing Function attribute: {Timestamp} -- {Message}"
-	- DifferentFunctionOnly = @${Function}!"@+Log is missing Function attribute: {Timestamp} -- {Message}"
+    - DifferentFunctionOnly = @${Function}!"@+Log is missing Function attribute: {Timestamp} -- {Message}"
 
 - "format"
     - format = `@[<conditional>...][<modifier>...]<part>[<part>...]` | `<mode>`
@@ -39,15 +39,15 @@ Custom modes can be defined with a "format" while pre-defined modes can be used,
     - `<raw>` = (any charecter except `+ - ^ $ ~ ! { }`. Special chars need to be duplicated to print)
     - `<attribute>` = `[<conditional>]<attribute reference>[<modifier>]` (note: order matters for evaluation purposes. So a condition will always be evaluated before a modifier, while which modifier gets tested first will depend on where it is in the format)
     - `<conditional>`
-		- `^` (only print if attribute exists. Only applies to attributes)
+        - `^` (only print if attribute exists. Only applies to attributes)
         - `$` (print only when the value changes from the last log entry. Not applicable per-log. So a,a,a,b,a,b,b,a -> a,b,a,b,a. Only applies to attributes)
-		- `~` (print only if the value hasn't been printed before. Only applies to attributes)
+        - `~` (print only if the value hasn't been printed before. Only applies to attributes)
         - `+` (only print if a valid log)
         - `-` (only print if an invalid log)
     - `<modifier>`
-		- `!"<format>"` (if an error occurs with this log, print the following error message. Limitations: must be contained within quotes, double quotes needs to be escaped `\"`)
-		- //FUTURE-TODO (something to do if it fails the conditional check)
-		- //FUTURE-TODO (failure handler: on error, don't print attribute; on error, don't print log; on error, print attribute error handler; on error, log-format error handler; on error, throw exception/error; on error, report error [Default])
+        - `!"<format>"` (if an error occurs with this log, print the following error message. Limitations: must be contained within quotes, double quotes needs to be escaped `\"`)
+        - //FUTURE-TODO (something to do if it fails the conditional check)
+        - //FUTURE-TODO (failure handler: on error, don't print attribute; on error, don't print log; on error, print attribute error handler; on error, log-format error handler; on error, throw exception/error; on error, report error [Default])
     - `<attribute reference>` - `{<attribute name>[<attribute format>]}`
     - `<attribute name>` - (any of the LogAttribute enum value names)
     - `<attribute format>` - `|<raw>` (inside `<raw>`, any "{}" (quotes not included) will be replaced with the value from the attribute)

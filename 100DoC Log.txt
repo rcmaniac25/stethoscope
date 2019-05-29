@@ -3385,6 +3385,15 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 410.2. 05/27/2019:
 - Some issues occured today and I spent a lot of time doing some things I didn't plan for... now it's late and I need to go
 
+411.2. 05/28/2019:
+- So, checking the unit tests was actually not too bad
+- Basiclly:
+-- Raw/terminator tests
+-- Log + attribute tests
+-- Ensuring that "general" formats are correct for what they're supposed to be.
+- I'm delayed on a couple tasks I need to complete, so I'm doing very small chunks...
+- Tomorrow, unless things go wrong, I should be able to figure out the general formats and hopefully start on the raw/terminator tests.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
