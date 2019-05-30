@@ -3394,6 +3394,26 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - I'm delayed on a couple tasks I need to complete, so I'm doing very small chunks...
 - Tomorrow, unless things go wrong, I should be able to figure out the general formats and hopefully start on the raw/terminator tests.
 
+412.2. 05/29/2019:
+- First thing: the general formats are fine and don't need modification.
+- So we know about the tests (see 411.2) but there was one set I was concerned about: log attributes.
+- So valid (+)/invalid (-) conditionals are valid on logs AND attributes.
+- So how do we know if a validity conditional is for a log or for an attribute?
+- Check for disputes.
+- Huh? Think of this: if we say "@+{Message}" and it applies to the log, then message is printed only for valid logs. But the same happens if applied to the attribute.
+- What about "@+{Message}+{Timestamp}"? Same.
+- What about "@+{Message}-{Timestamp}"? See, here we have a conflict. This would be at the attribute level so they don't remove the whole log.
+- I'm wondering if there should be a post process step where this can be evaluated (combine multiple raws next to each other, remove empty attributes and raws, swap log and attribute conditionals, etc.)
+- One worry is how to deal with weirder cases...
+-- "@+{Message} {Timestamp}" - Oh, it's an attribute conditional. "Correct"
+-- "@-+{Message} {Timestamp}" - Wait... that's not valid. "Correct"
+-- "@++{Message} {Timestamp}" - Uh... I see a raw "+" and then the attributes. "See... is that what we want? Or should it evalute to a log conditional and a attribute conditional?"
+- I will have to do more thinking of the weird cases... maybe something to escape it?
+- Bonus: realized that we may want a bit of some additional check before switching to a new "part"
+-- "@{Message} - {Timestamp}" - Is this an invalid format, or valid and simply has a "raw" in the middle? Right now, we'd saw "raw ' ', start of an attribute... but it's invalid because there's no#############
+- Please ignore the bonus: "-" is a special char, so it needs to be escaped before it will be seen as a "raw".
+- Carry on... will see what happens tomorrow.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
