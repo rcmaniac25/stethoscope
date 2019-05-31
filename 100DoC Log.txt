@@ -3414,6 +3414,9 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - Please ignore the bonus: "-" is a special char, so it needs to be escaped before it will be seen as a "raw".
 - Carry on... will see what happens tomorrow.
 
+413.2. 05/30/2019:
+- I needed to finish some work, so that took up my "coding" time.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
