@@ -3417,6 +3417,16 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 413.2. 05/30/2019:
 - I needed to finish some work, so that took up my "coding" time.
 
+414.2. 05/31/2019:
+- So I'm behind on a project that I really want done...
+- ...and spent the past 2 hours reading about (and trying to wrap my head around) Boost Spirit (Qi).
+- I'm not using it... but an app I use was, and I needed to figure out how to get some of my settings to work.
+- Let me tell you: just because you can, doesn't mean you should.
+- Code should be understandable and not require hours of research to understand.
+- I want to try and keep mine as simple as I can, even with something as complex as a parser-state machine.
+- Hopefully that's the case, but I'm the person writing it... so I don't know if it's the case.
+- If I have the time, I will be enumerating all the tests I want to write tomorrow. Either then or later, I'll implement them.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
