@@ -3427,6 +3427,9 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - Hopefully that's the case, but I'm the person writing it... so I don't know if it's the case.
 - If I have the time, I will be enumerating all the tests I want to write tomorrow. Either then or later, I'll implement them.
 
+415.2. 06/01/2019:
+- <crashed>
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
