@@ -3434,6 +3434,12 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - I'm back with another delay... I was out for a long time today, and spent the rest of the day relaxing and doing something completely unrelated to programming...
 - So I'll push back today, just so I can continue to relax :P
 
+417.2. 06/03/2019:
+- ...and, who didn't see this coming, this didn't work.
+- I took a look at the unit tests and then went "wait, I have like 20 other things I need to do" and now it's late and I can't do things today
+- Didn't help that I'm an hour later to things then I planned.
+- *sigh*
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
