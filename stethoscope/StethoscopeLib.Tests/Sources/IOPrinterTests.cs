@@ -700,6 +700,16 @@ namespace Stethoscope.Tests
             Assert.That(data, Is.EqualTo(expectedLogPrintout));
         }
 
+        //TODO: @Hello{Message} -> Hello<message>
+        //TODO: @{Message}Hello{{World -> <message>Hello{World
+        //TODO: @Hello{{World{Message} -> Hello{World<message>
+        //TODO: @Hello{{{Message} -> Hello{<message>
+        //TODO: @{Message||} -> <exception>
+        //TODO: @{Message|Hello{}World} -> Hello<message>World
+        //TODO: @{Message|Hello}}World} -> Hello}}World
+        //TODO: @{Message|Hello{{{}}}World} -> Hello{<message>}World
+        //TODO: @{Message|Hello{{{}} -> Hello{<message>
+        
         /* TODO:
          * 
          * test following char arrangements:
