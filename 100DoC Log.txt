@@ -3444,6 +3444,10 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - Wrote up the test cases for char. counting.
 - Might look into the log-level tests... but can't think to well right now. So will figure that out tomorrow.
 
+419.2. 06/05/2019:
+- Timing... though, one "nifty" thing is I have been told that if I can get a working demo of this, my company may let me work on this full time.
+- ...at least for a bit. But, let me get this working first.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
