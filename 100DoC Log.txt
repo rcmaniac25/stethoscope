@@ -3448,6 +3448,9 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - Timing... though, one "nifty" thing is I have been told that if I can get a working demo of this, my company may let me work on this full time.
 - ...at least for a bit. But, let me get this working first.
 
+420.2. 06/06/2019:
+- More poor timing. Was hoping to do something...
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
