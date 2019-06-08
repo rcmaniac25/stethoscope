@@ -3451,6 +3451,11 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 420.2. 06/06/2019:
 - More poor timing. Was hoping to do something...
 
+421.2. 06/07/2019:
+- Wrote a set of log level tests (todo)
+- But... I'm tired, so I didn't write what the result should be. Oops.
+- Tomorrow...
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2

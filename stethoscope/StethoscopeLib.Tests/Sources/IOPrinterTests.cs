@@ -848,8 +848,15 @@ namespace Stethoscope.Tests
 
             Assert.That(data, Is.EqualTo(expectedLogPrintout));
         }
-
-        //TODO: log-level tests of + and -. Similar to PrintModeCustomAttributeConditionCombo: ex. +/- conditional is put on different attributes within the same log. This is to test that the +/- isn't applied to the log but instead to the attributes. Maybe special case for doubles? See 412.2
+        
+        //TODOx: @+{Message} -> <message>
+        //TODO: @+{Message}-{Message} -> <message> , <message>
+        //TODO: @++{Message} -> ??
+        //TODO: @++{Message}-{Message} -> ??
+        //TODO: @-+{Message} -> ??
+        //TODO: @+++{Message} -> ??
+        //TODO: @+++{Message}-{Message} -> ??
+        //TODO: @++-{Message}+{Message} -> ??
 
         // Only test a couple combos as all combos are a non-repetitious permutation (5 fields, in different orders, could result in as many as 5! = 120 combos. Not writing 120 tests...)
 
