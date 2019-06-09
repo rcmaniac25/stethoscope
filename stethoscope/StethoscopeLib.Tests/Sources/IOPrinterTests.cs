@@ -848,15 +848,15 @@ namespace Stethoscope.Tests
 
             Assert.That(data, Is.EqualTo(expectedLogPrintout));
         }
-        
-        //TODOx: @+{Message} -> <message>
-        //TODO: @+{Message}-{Message} -> <message> , <message>
-        //TODO: @++{Message} -> ??
-        //TODO: @++{Message}-{Message} -> ??
-        //TODO: @-+{Message} -> ??
-        //TODO: @+++{Message} -> ??
-        //TODO: @+++{Message}-{Message} -> ??
-        //TODO: @++-{Message}+{Message} -> ??
+
+        //XXX - valid log , invalid log
+        //TODO: @+{Message}-{Message} -> <+message> , <-message>
+        //TODO: @++{Message} -> <+message>
+        //TODO: @++{Message}-{Message} -> +<+message> , +<-message><-message>
+        //TODO: @-+{Message} -> <error from parser>
+        //TODO: @+++{Message} -> +<+message> , +
+        //TODO: @+++{Message}-{Message} -> +<+message> , +<-message>
+        //TODO: @++-{Message}+{Message} -> +<+message><+message>
 
         // Only test a couple combos as all combos are a non-repetitious permutation (5 fields, in different orders, could result in as many as 5! = 120 combos. Not writing 120 tests...)
 
@@ -926,12 +926,8 @@ namespace Stethoscope.Tests
             };
 
             AddLog("testentry1", 123, "myFunc", "path/to/location.cpp");
-            
-            var expectedLogPrintout = "testentry1";
 
-            var data = PrintData();
-
-            Assert.That(data, Is.Not.EqualTo(expectedLogPrintout));
+            Assert.Throws<ArgumentException>(() => PrintData());
         }
 
         [Test]
