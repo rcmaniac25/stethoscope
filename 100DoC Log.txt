@@ -3466,6 +3466,10 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - It makes me think "Perhaps, log and part format elements should be different"
 - I may go with that, but not today. I want to consult some friends first.
 
+423.2. 06/09/2019:
+- I did not get to talk with anyone, and instead worked on a different program for most of the day.
+- For another time.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
