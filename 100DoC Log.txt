@@ -3470,6 +3470,18 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - I did not get to talk with anyone, and instead worked on a different program for most of the day.
 - For another time.
 
+424.2. 06/10/2019:
+- Still didn't talk with people yet.
+- More importantly: I've said a few times "don't kill yourself with code".
+- You can also say "Don't kill yourself..."
+- In my case, I tend to get poor sleep. Not because I can't stay asleep, but because I stay up so late.
+- Generally, it just meant I was tired... but I started to worry.
+- Fast forward: between many of the real world events, family events, work, and poor sleep. I've been becoming depressed and increasingly unable to cope with... the world.
+- I realized: the best thing I can do to try and "fix" this is get better sleep.
+- It's not the only thing that can be done, but it's one that probably sets a good foundation for everything else.
+- As such... today I was late with doing a lot of stuff, realized the sleep thing, and went "err... sleep is higher priority"
+- Tomorrow will be busy in general, so unlikely
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
