@@ -3486,6 +3486,11 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - Never got to chat with the friend. Tried to, but they were distracted...
 - Wasn't gonna have time today to work on this anyway.
 
+426.2. 06/12/2019:
+- I sent messages to friend, who responded.
+- But I still need to discuss with them for a bit first.
+- So nothing today...
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
