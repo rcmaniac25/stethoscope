@@ -3491,6 +3491,14 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - But I still need to discuss with them for a bit first.
 - So nothing today...
 
+427.2. 06/13/2019:
+- So, I went through the comments and responded.
+- This time, they were busy and didn't respond back. :P
+- I think my plan is to leave the special char escaping, and just change the value to be something different.
+- I don't want to use up tons of special chars, but it's also a weird and wacky mix of scenarios that comes to a head with valid/invalid conditionals
+- So hopefully, it won't be many additional chars
+- I'm still going to wait for a response before going off to do it (and I'm distracted/busy)
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
