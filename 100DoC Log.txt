@@ -3499,6 +3499,9 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - So hopefully, it won't be many additional chars
 - I'm still going to wait for a response before going off to do it (and I'm distracted/busy)
 
+428.2. 06/14/2019:
+- Busy/lazy day...
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
