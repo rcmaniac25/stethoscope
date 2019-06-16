@@ -3502,6 +3502,22 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 428.2. 06/14/2019:
 - Busy/lazy day...
 
+429.2. 06/15/2019:
+- I had a long conversation with my friend
+- Basically: my 2 options are
+-- switch from repeating char escape to using a special escape char. Think \x -> x, \\ -> \, etc.
+-- change the log-level chars to be something else (don't share special chars for similar functionality)
+- I opted for the latter
+- Reasons:
+-- Most of the repeating char escaping code is done already
+-- Faster key-presses for the dev since repeating chars means your finger is already over the key
+-- Doing a special escape char uses a _new_ special char
+-- The log-specific special char only apply to conditionals AND only exist for the duration of the log-conditional segment
+- So, the last one was an "oh yea" moment
+- The instant the log parsing moves from "log conditional" to "log modifier" or "raw" or "attribute", those chars become free to be used by anyone again
+- So, it doesn't _use_ additional chars, reduces dev work (both for me and the person writing the format), and prevents the weird "how do I handle this combo of conditionals?"
+- Now, tomorrow may be busy, so I may not be able to do too much, but we'll see.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
