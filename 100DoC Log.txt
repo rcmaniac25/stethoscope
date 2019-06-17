@@ -3518,6 +3518,9 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - So, it doesn't _use_ additional chars, reduces dev work (both for me and the person writing the format), and prevents the weird "how do I handle this combo of conditionals?"
 - Now, tomorrow may be busy, so I may not be able to do too much, but we'll see.
 
+430.2. 06/16/2019:
+- Yea, I was too busy today... tomorrow (hopefully)
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
