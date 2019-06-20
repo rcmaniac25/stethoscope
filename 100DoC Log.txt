@@ -3527,6 +3527,9 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 432.2. 06/18/2019:
 - I crashed last night...
 
+433.2. 06/19/2019:
+- Crashed again... not a good habit to get into, but it is getting me sleep...
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
