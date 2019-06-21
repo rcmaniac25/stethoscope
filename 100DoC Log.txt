@@ -3530,6 +3530,24 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 433.2. 06/19/2019:
 - Crashed again... not a good habit to get into, but it is getting me sleep...
 
+434.2. 06/20/2019:
+- I didn't crash! But I am tired... so let me see if I can keep this short
+- So I picked 'v' to replace '+' and 'i' to replace '-'.
+- "But... those are normal chars. How are we supposed to know when it's no longer a special char?"
+- Well, right now, I'm planning on it being a special char until one of 4 things happens:
+-- A modifier is found
+-- An attribute is found
+-- A char that isn't a log entry conditional is found
+-- The char is escaped
+- That should mean the instant anything that is not a 'v' or an 'i' will instantly revert the chars back to normal and no more thought needs to be applied
+- I don't think 'v' will cause problems, but I do have a bit of concern about 'i'...
+- If I want to specify an invalid log only, and then say "incorrect parameters in log:", it would have to be written "@iiincorrect parameters in log: ..." which is a little wacky.
+- I haven't decided (and won't, for tonight) if I want it to be "@iiincorrect parameters in log: ..." or "@iiincorrect parameters iin log: ..."
+- The former would be an "exit ASAP" case, while the latter is "consistancy until we switch what we're parsing"
+- I'm worried that both cases aren't ideal.
+- I like consistancy, but I'd like to reduce the amount of time someone (and the parser) needs to know what is a special char.
+- But this is the most I can muster at this point... something to think about tomorrow.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
