@@ -3548,6 +3548,13 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - I like consistancy, but I'd like to reduce the amount of time someone (and the parser) needs to know what is a special char.
 - But this is the most I can muster at this point... something to think about tomorrow.
 
+435.2. 06/21/2019:
+- Ok, bad time managament and a collection of cooking videos later, it's late for me to do too much
+- I thought about the issue from yesterday, and I think the best option is to do the first escape of the conditional instead of waiting until we reach an attribute.
+- This keeps parsing and "what do I need to escape" to a minimal.
+- That's all I have for now.
+- Tomorrow I'd like to update tests, general formats, and the parser code... we'll see how far I can get.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
