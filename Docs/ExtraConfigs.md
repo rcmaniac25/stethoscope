@@ -29,9 +29,9 @@ Custom modes can be defined with a "format" while pre-defined modes can be used,
 - "mode":
     - General = @!"Problem printing log. Timestamp=^{Timestamp}, Message=^{Message}"[{Timestamp}] -- {Message}^{LogSource|, LogSource="{}"}^{ThreadID|, ThreadID="{}"}...^{Context|, Context="{}"}
         - Every attribute is printed, order may differ then what is shown, but timestamp and message will be where they are shown.
-    - FunctionOnly = @{Function}!"@+Log is missing Function attribute: {Timestamp} -- {Message}"
-    - FirstFunctionOnly = @~{Function}!"@+Log is missing Function attribute: {Timestamp} -- {Message}"
-    - DifferentFunctionOnly = @${Function}!"@+Log is missing Function attribute: {Timestamp} -- {Message}"
+    - FunctionOnly = @{Function}!"@vLog is missing Function attribute: {Timestamp} -- {Message}"
+    - FirstFunctionOnly = @~{Function}!"@vLog is missing Function attribute: {Timestamp} -- {Message}"
+    - DifferentFunctionOnly = @${Function}!"@vLog is missing Function attribute: {Timestamp} -- {Message}"
 
 - "format"
     - format = `@[<conditional>...][<modifier>...]<part>[<part>...]` | `<mode>`

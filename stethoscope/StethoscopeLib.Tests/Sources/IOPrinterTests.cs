@@ -1060,19 +1060,19 @@ namespace Stethoscope.Tests
         [Test]
         public void PrintModeCompareFunctionOnly()
         {
-            CompareFormats("FunctionOnly", "@{Function}!\"@+Log is missing Function attribute: {Timestamp} -- {Message}\"");
+            CompareFormats("FunctionOnly", "@{Function}!\"@vLog is missing Function attribute: {Timestamp} -- {Message}\"");
         }
 
         [Test]
         public void PrintModeCompareFirstFunctionOnly()
         {
-            CompareFormats("FirstFunctionOnly", "@~{Function}!\"@+Log is missing Function attribute: {Timestamp} -- {Message}\"");
+            CompareFormats("FirstFunctionOnly", "@~{Function}!\"@vLog is missing Function attribute: {Timestamp} -- {Message}\"");
         }
 
         [Test]
         public void PrintModeCompareDifferentFunctionOnly()
         {
-            CompareFormats("DifferentFunctionOnly", "@${Function}!\"@+Log is missing Function attribute: {Timestamp} -- {Message}\"");
+            CompareFormats("DifferentFunctionOnly", "@${Function}!\"@vLog is missing Function attribute: {Timestamp} -- {Message}\"");
         }
         
 #endregion

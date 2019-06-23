@@ -179,7 +179,7 @@ namespace Stethoscope.Printers.Internal
 
         private static void PrintModeFunctionOnly(TextWriter textWriter, ILogEntry log, object state)
         {
-            // Equiv: @{Function}!"@+Log is missing Function attribute: {Timestamp} -- {Message}"
+            // Equiv: @{Function}!"@vLog is missing Function attribute: {Timestamp} -- {Message}"
             
             if (log.HasAttribute(LogAttribute.Function))
             {
@@ -195,7 +195,7 @@ namespace Stethoscope.Printers.Internal
 
         private static void PrintModeFirstFunctionOnly(TextWriter textWriter, ILogEntry log, object state)
         {
-            // Equiv: @{Function}~!"@+Log is missing Function attribute: {Timestamp} -- {Message}"
+            // Equiv: @{Function}~!"@vLog is missing Function attribute: {Timestamp} -- {Message}"
 
             if (log.HasAttribute(LogAttribute.Function))
             {
@@ -217,7 +217,7 @@ namespace Stethoscope.Printers.Internal
 
         private static void PrintModeDifferentFunctionOnly(TextWriter textWriter, ILogEntry log, object state)
         {
-            // Equiv: @{Function}$!"@+Log is missing Function attribute: {Timestamp} -- {Message}"
+            // Equiv: @{Function}$!"@vLog is missing Function attribute: {Timestamp} -- {Message}"
 
             if (log.HasAttribute(LogAttribute.Function))
             {

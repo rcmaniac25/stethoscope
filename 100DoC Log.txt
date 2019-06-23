@@ -3555,6 +3555,12 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - That's all I have for now.
 - Tomorrow I'd like to update tests, general formats, and the parser code... we'll see how far I can get.
 
+436.2. 06/22/2019:
+- I intended to do stuff earlier, but never got around to it
+- The most I did today is update the general formats
+- I don't have the mental capacity right now to come up with new/alt tests (which are todos right now)
+- Using it, it does seem a bit weird. I'm iffy on it... but my challenge is I want complimentry symbols and can easily mean good/bad, and most/all of them are already used for normal conditionals... which can't conflict with the log conditionals
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
