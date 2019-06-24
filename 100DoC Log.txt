@@ -3561,6 +3561,10 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - I don't have the mental capacity right now to come up with new/alt tests (which are todos right now)
 - Using it, it does seem a bit weird. I'm iffy on it... but my challenge is I want complimentry symbols and can easily mean good/bad, and most/all of them are already used for normal conditionals... which can't conflict with the log conditionals
 
+437.2. 06/23/2019:
+- Err... I had the time. Then I got into discussing desserts with people and catching up on E3...
+- Tomorrow...
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
