@@ -850,14 +850,22 @@ namespace Stethoscope.Tests
         }
 
         //XXX - valid log , invalid log
-        //TODO: @+{Message}-{Message} -> <+message> , <-message>
-        //TODO: @++{Message} -> <+message>
-        //TODO: @++{Message}-{Message} -> +<+message> , +<-message><-message>
-        //TODO: @-+{Message} -> <error from parser>
-        //TODO: @+++{Message} -> +<+message> , +
-        //TODO: @+++{Message}-{Message} -> +<+message> , +<-message>
-        //TODO: @++-{Message}+{Message} -> +<+message><+message>
-
+        //TODO: @v{Message} -> <+message>
+        //TODO: @i{Message} -> <-message>
+        //TODO: @vi{Message} -> <error from parser>
+        //TODO: @v+{Message} -> <+message>
+        //TODO: @v-{Message} -> ??
+        //TODO: @i+{Message} -> ??
+        //TODO: @i-{Message} -> <-message>
+        //TODO: @v+{Message}-{Message} -> <+message>
+        //TODO: @i+{Message}-{Message} -> <-message>
+        //TODO: @vv{Message} -> v<+message> , v<-message>
+        //TODO: @ii{Message} -> i<+message> , i<-message>
+        //TODO: @vvv{Message} -> v<+message>
+        //TODO: @iii{Message} -> i<-message>
+        //TODO: @vii{Message} -> ii<+message> , ii<-message>
+        //TODO: @ivv{Message} -> vv<+message> , vv<-message>
+        
         // Only test a couple combos as all combos are a non-repetitious permutation (5 fields, in different orders, could result in as many as 5! = 120 combos. Not writing 120 tests...)
 
         [TestCase("@^${SourceFile}", ExpectedResult = "path/to/location.cpp\npath/to/location2.cpp\npath/to/location.cpp\npath/to/location2.cpp\npath/to/location.cpp")]

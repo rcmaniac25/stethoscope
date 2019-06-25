@@ -3565,6 +3565,12 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - Err... I had the time. Then I got into discussing desserts with people and catching up on E3...
 - Tomorrow...
 
+438.2. 06/24/2019:
+- Couple unexected events today... and was a bit late.
+- I rewrote the test cases (all todos) for the log-level tests
+- This week will be a (more then a) little wacky, so I may not be able to do things for a few days (not that it really matters, since I seem to do one or two non-status updates a week at this point)
+- But, we'll see
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
