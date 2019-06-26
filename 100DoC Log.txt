@@ -3571,6 +3571,9 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - This week will be a (more then a) little wacky, so I may not be able to do things for a few days (not that it really matters, since I seem to do one or two non-status updates a week at this point)
 - But, we'll see
 
+439.2. 06/25/2019:
+- Skipping today
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
