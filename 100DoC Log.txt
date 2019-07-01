@@ -3586,6 +3586,9 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 443.2. 06/29/2019:
 - Hopefully the last "skip" of this week. We'll see
 
+444.2. 06/30/2019:
+- And see we did... One task for the day took about 4x longer then planned, and now I don't have time
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
