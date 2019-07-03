@@ -3593,6 +3593,14 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - This is a weird one: I got half way through the parser work, but I'm also half asleep.
 - So, since I don't want commit a half-finished change, I will simply commit the log and leave the rest of the code for tomorrow.
 
+446.2. 07/02/2019:
+- I didn't finish due to a couple questions/issues that need to be addressed:
+-- Conditionals vs. raw is a bit weord at the log level, so the "what do we do if we already have that log conditional" needs to be updated
+-- Are the values incremented properly
+-- I realized that any of the states that support re-entry may never function or may loop because the expected re-entry trigger doesn't exist
+- I will hopefully finish tomorrow
+- I did answer a couple test questions (what is the result of this input?)
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2

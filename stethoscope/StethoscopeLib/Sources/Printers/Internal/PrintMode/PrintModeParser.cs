@@ -329,8 +329,11 @@ namespace Stethoscope.Printers.Internal.PrintMode
 
         private static readonly Dictionary<char, SpecialCharValues> SpecialChars = new Dictionary<char, SpecialCharValues>()
         {
-            { '+', SpecialCharValues.Create(SpecialCharFlags.Conditional | SpecialCharFlags.ForLog | SpecialCharFlags.ForAttribute | SpecialCharFlags.StartAttribute, ConditionalElement.ValidLog) },
-            { '-', SpecialCharValues.Create(SpecialCharFlags.Conditional | SpecialCharFlags.ForLog | SpecialCharFlags.ForAttribute | SpecialCharFlags.StartAttribute, ConditionalElement.InvalidLog) },
+            { 'v', SpecialCharValues.Create(SpecialCharFlags.Conditional | SpecialCharFlags.ForLog, ConditionalElement.ValidLog) },
+            { 'i', SpecialCharValues.Create(SpecialCharFlags.Conditional | SpecialCharFlags.ForLog, ConditionalElement.InvalidLog) },
+
+            { '+', SpecialCharValues.Create(SpecialCharFlags.Conditional | SpecialCharFlags.ForAttribute | SpecialCharFlags.StartAttribute, ConditionalElement.ValidLog) },
+            { '-', SpecialCharValues.Create(SpecialCharFlags.Conditional | SpecialCharFlags.ForAttribute | SpecialCharFlags.StartAttribute, ConditionalElement.InvalidLog) },
             { '^', SpecialCharValues.Create(SpecialCharFlags.Conditional | SpecialCharFlags.ForAttribute | SpecialCharFlags.StartAttribute, ConditionalElement.AttributeExists) },
             { '$', SpecialCharValues.Create(SpecialCharFlags.Conditional | SpecialCharFlags.ForAttribute | SpecialCharFlags.StartAttribute, ConditionalElement.AttributeValueChanged) },
             { '~', SpecialCharValues.Create(SpecialCharFlags.Conditional | SpecialCharFlags.ForAttribute | SpecialCharFlags.StartAttribute, ConditionalElement.AttributeValueNew) },
@@ -522,7 +525,7 @@ namespace Stethoscope.Printers.Internal.PrintMode
                 })
                 .PermitReentry(Trigger.Invoke)
                 .Permit(Trigger.Done, State.LogConditional);
-
+            
             machine.Configure(State.LogConditional)
                 .OnEntryFrom(doneTrigger, HandleLogConditional)
                 .PermitReentry(Trigger.FoundConditional)
@@ -637,6 +640,7 @@ namespace Stethoscope.Printers.Internal.PrintMode
             {
                 var type = state.CurrentFormatChar;
 
+                //XXX: rewrite
                 // Need to test that we're not looking at a raw that is using the special chars (+ means conditional, ++ means it's a raw char of '+')
                 // As such, only passes if an odd number of chars match. + = conditional, ++ = raw, +++ = conditional + raw, ++++ = 2x raw, etc.
                 var count = 1;
@@ -644,7 +648,7 @@ namespace Stethoscope.Printers.Internal.PrintMode
                 {
                     count++;
                 }
-                if (count % 2 == 1 && GetSpecialCharsForFlagsEn(SpecialCharFlags.Conditional | SpecialCharFlags.ForLog).Contains(type))
+                if (GetSpecialCharsForFlagsEn(SpecialCharFlags.Conditional | SpecialCharFlags.ForLog).Contains(type))
                 {
                     var conditionalElement = SpecialChars[type].ConditionalElement;
 
@@ -652,6 +656,7 @@ namespace Stethoscope.Printers.Internal.PrintMode
                     {
                         if (count > 1)
                         {
+                            //XXX: does this need an increment?
                             state.StateMachine.Fire(invokeTrigger, state);
                         }
                         else
@@ -668,11 +673,13 @@ namespace Stethoscope.Printers.Internal.PrintMode
                     }
                     else
                     {
+                        //XXX: is this the right increment?
                         state.StateMachine.Fire(foundConditionalTrigger, state.AddLogConditional(conditional).IncrementIndex(1));
                     }
                     return;
                 }
             }
+            //XXX: does this need an increment?
             state.StateMachine.Fire(doneTrigger, state);
         }
 
