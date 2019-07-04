@@ -3601,6 +3601,11 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - I will hopefully finish tomorrow
 - I did answer a couple test questions (what is the result of this input?)
 
+447.2. 07/03/2019:
+- Long weekend... and I'm already exhausted.
+- This is a good thing, because I've gotten bad sleep for a while and having a lot of "wake up early" moments has knocked my bio-clock to "hey, it's late" and I'd like to keep it that way
+- Tomorrow will be a casual day, so I should be able to do something
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
