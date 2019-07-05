@@ -3595,7 +3595,7 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 
 446.2. 07/02/2019:
 - I didn't finish due to a couple questions/issues that need to be addressed:
--- Conditionals vs. raw is a bit weord at the log level, so the "what do we do if we already have that log conditional" needs to be updated
+-- Conditionals vs. raw is a bit weird at the log level, so the "what do we do if we already have that log conditional" needs to be updated
 -- Are the values incremented properly
 -- I realized that any of the states that support re-entry may never function or may loop because the expected re-entry trigger doesn't exist
 - I will hopefully finish tomorrow
@@ -3605,6 +3605,10 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - Long weekend... and I'm already exhausted.
 - This is a good thing, because I've gotten bad sleep for a while and having a lot of "wake up early" moments has knocked my bio-clock to "hey, it's late" and I'd like to keep it that way
 - Tomorrow will be a casual day, so I should be able to do something
+
+448.2. 07/04/2019:
+- I have a time commitment to finish something else tomorrow. I've been working on it all day.
+- Hopefully tomorrow I can answer the questions and do something
 
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
