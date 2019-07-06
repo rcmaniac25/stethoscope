@@ -3610,6 +3610,9 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - I have a time commitment to finish something else tomorrow. I've been working on it all day.
 - Hopefully tomorrow I can answer the questions and do something
 
+449.2. 07/05/2019:
+- Err... I didn't get to this today
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
