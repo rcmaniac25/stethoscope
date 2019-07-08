@@ -3616,6 +3616,10 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 450.2. 07/06/2019:
 - I forgot to say yesterday that I was going to be busy today and wouldn't be able to get this today.
 
+451.2. 07/07/2019:
+- ...and today was bad timing.
+- When am I going to finish this code change? It's been days since I started it...
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
