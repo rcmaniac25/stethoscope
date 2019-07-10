@@ -3624,6 +3624,10 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - More joys of timing... and tomorrow will be weird so I may not get to this tomorrow.
 - I'd like too... but can't right now.
 
+453.2. 07/09/2019:
+- Yea, today was weird.
+- I technically have time... but it's been a weird couple days for me and I needed to take some time off from work, so I'd rather keep it casual today.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2

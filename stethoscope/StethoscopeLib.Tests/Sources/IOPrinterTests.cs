@@ -854,8 +854,8 @@ namespace Stethoscope.Tests
         //TODO: @i{Message} -> <-message>
         //TODO: @vi{Message} -> <error from parser>
         //TODO: @v+{Message} -> <+message>
-        //TODO: @v-{Message} -> ??
-        //TODO: @i+{Message} -> ??
+        //TODO: @v-{Message} -> <error from parser>
+        //TODO: @i+{Message} -> <error from parser>
         //TODO: @i-{Message} -> <-message>
         //TODO: @v+{Message}-{Message} -> <+message>
         //TODO: @i+{Message}-{Message} -> <-message>
@@ -865,7 +865,7 @@ namespace Stethoscope.Tests
         //TODO: @iii{Message} -> i<-message>
         //TODO: @vii{Message} -> ii<+message> , ii<-message>
         //TODO: @ivv{Message} -> vv<+message> , vv<-message>
-        
+
         // Only test a couple combos as all combos are a non-repetitious permutation (5 fields, in different orders, could result in as many as 5! = 120 combos. Not writing 120 tests...)
 
         [TestCase("@^${SourceFile}", ExpectedResult = "path/to/location.cpp\npath/to/location2.cpp\npath/to/location.cpp\npath/to/location2.cpp\npath/to/location.cpp")]
