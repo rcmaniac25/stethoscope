@@ -3628,6 +3628,13 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - Yea, today was weird.
 - I technically have time... but it's been a weird couple days for me and I needed to take some time off from work, so I'd rather keep it casual today.
 
+454.2. 07/10/2019:
+- Fun fact... I realized I actually commited the code I was working on a few days ago, when I commited the wrong file. Well... it's half there then :P
+- I started off with "I will do this!"
+- And I could barely stay awake...
+- I thought at least a bit and decided to re-write main section of the function.
+- Otherwise, need to review #446.2 after doing that work.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
