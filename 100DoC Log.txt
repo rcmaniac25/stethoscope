@@ -3630,10 +3630,13 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 
 454.2. 07/10/2019:
 - Fun fact... I realized I actually commited the code I was working on a few days ago, when I commited the wrong file. Well... it's half there then :P
-- I started off with "I will do this!"
+- I started off with "I will do this!"m
 - And I could barely stay awake...
 - I thought at least a bit and decided to re-write main section of the function.
 - Otherwise, need to review #446.2 after doing that work.
+
+455.2. 07/11/2019:
+- I crashed... so nothing got done
 
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
