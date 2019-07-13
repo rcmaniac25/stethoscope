@@ -3638,6 +3638,17 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 455.2. 07/11/2019:
 - I crashed... so nothing got done
 
+456.2. 07/12/2019:
+- ...and recovery!
+- I have finished the conditional code!
+- It's there. Code. I actually wrote code again.
+- Yes, I've had longer stretches of "not writing code", but this was particularly frustrating...
+- It took a bit to figure out, and then I started and... didn't finish.
+- Half-finished work doesn't make me happy.
+- Now I'm happy.
+- Now, not everything is rosey... I still need to implement support for re-entry
+- But that... is for later.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2

@@ -634,13 +634,12 @@ namespace Stethoscope.Printers.Internal.PrintMode
 
         private void HandleLogConditional(SMState state)
         {
-            // See #350.2 for overview of what's happening
+            // See #350.2 and #434.2 for overview of what's happening
 
             if (state.TestCharLength(1))
             {
                 var type = state.CurrentFormatChar;
-
-                //XXX: rewrite
+                
                 // Need to test that we're not looking at a raw that is using the special chars (+ means conditional, ++ means it's a raw char of '+')
                 // As such, only passes if an odd number of chars match. + = conditional, ++ = raw, +++ = conditional + raw, ++++ = 2x raw, etc.
                 var count = 1;
@@ -651,35 +650,34 @@ namespace Stethoscope.Printers.Internal.PrintMode
                 if (GetSpecialCharsForFlagsEn(SpecialCharFlags.Conditional | SpecialCharFlags.ForLog).Contains(type))
                 {
                     var conditionalElement = SpecialChars[type].ConditionalElement;
-
-                    if (state.LogConditionals?.Where(c => c.Type == conditionalElement).Count() > 0)
-                    {
-                        if (count > 1)
-                        {
-                            //XXX: does this need an increment?
-                            state.StateMachine.Fire(invokeTrigger, state);
-                        }
-                        else
-                        {
-                            state.StateMachine.Fire(errorTrigger, state.SetError($"Only one condition is allowed of each type. This type: {type}"));
-                        }
-                        return;
-                    }
                     
-                    var conditional = state.ElementFactory.CreateConditional(conditionalElement);
-                    if (conditional == null)
+                    if (count % 2 == 0)
                     {
-                        state.StateMachine.Fire(errorTrigger, state.SetError($"Could not create log conditional: {type}"));
+                        // Escaped chars can be processed by the Part state, and since it's a doubling of chars, having it parse half them
+                        state.StateMachine.Fire(invokeTrigger, state.IncrementIndex(count / 2));
                     }
                     else
                     {
-                        //XXX: is this the right increment?
-                        state.StateMachine.Fire(foundConditionalTrigger, state.AddLogConditional(conditional).IncrementIndex(1));
+                        var conditional = state.ElementFactory.CreateConditional(conditionalElement);
+                        if (conditional == null)
+                        {
+                            state.StateMachine.Fire(errorTrigger, state.SetError($"Could not create log conditional: {type}"));
+                        }
+                        else if (count == 1)
+                        {
+                            // Only one conditional was found
+                            state.StateMachine.Fire(foundConditionalTrigger, state.AddLogConditional(conditional).IncrementIndex(1));
+                        }
+                        else
+                        {
+                            // A conditional was found, but so was escape chars... so we need to escape the right amount (letting the Part state do the work)
+                            int inc = 1 + ((count - 1) / 2);
+                            state.StateMachine.Fire(invokeTrigger, state.AddLogConditional(conditional).IncrementIndex(inc));
+                        }
                     }
                     return;
                 }
             }
-            //XXX: does this need an increment?
             state.StateMachine.Fire(doneTrigger, state);
         }
 

@@ -863,8 +863,8 @@ namespace Stethoscope.Tests
         //TODO: @ii{Message} -> i<+message> , i<-message>
         //TODO: @vvv{Message} -> v<+message>
         //TODO: @iii{Message} -> i<-message>
-        //TODO: @vii{Message} -> ii<+message> , ii<-message>
-        //TODO: @ivv{Message} -> vv<+message> , vv<-message>
+        //TODO: @vii{Message} -> i<+message>
+        //TODO: @ivv{Message} -> v<-message>
 
         // Only test a couple combos as all combos are a non-repetitious permutation (5 fields, in different orders, could result in as many as 5! = 120 combos. Not writing 120 tests...)
 
