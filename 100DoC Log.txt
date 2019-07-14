@@ -3649,6 +3649,10 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - Now, not everything is rosey... I still need to implement support for re-entry
 - But that... is for later.
 
+457.2. 07/13/2019:
+- Got distracted reading about the internals of "Stateless" (the state machine we use)
+- Tomorrow...
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
