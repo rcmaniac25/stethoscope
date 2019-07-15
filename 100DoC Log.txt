@@ -3653,6 +3653,17 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - Got distracted reading about the internals of "Stateless" (the state machine we use)
 - Tomorrow...
 
+458.2. 07/14/2019:
+- Fixed re-entry and updated dependencies
+- Also, found a bug!
+- "Um... ok?"
+- I wanted to see how a couple formats would go through everything, and ended up picking the one test where I got a false positive.
+- Expected (completed code): parse the format, run through the element factory, check the created elements and... EXCEPTION! (valid and invalid format conditions at the same time)
+- Expected (code in current state): parse the format, run through the element factory, EXCEPTION! (element factory isn't implemented)
+- Actual (code in current state): parse the form... EXCEPTION! (state machine could not unbox a specific argument for the next state)
+- What was funny is that it showed up as a passing test, because both the failed unboxing and the "final" code would produce the same exception.
+- That's all for now...
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2

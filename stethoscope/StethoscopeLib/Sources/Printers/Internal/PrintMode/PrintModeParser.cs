@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
+
 using Stethoscope.Common;
 
 namespace Stethoscope.Printers.Internal.PrintMode
@@ -523,11 +524,11 @@ namespace Stethoscope.Printers.Internal.PrintMode
                     }
                     machine.Fire(doneTrigger, internalState);
                 })
-                .PermitReentry(Trigger.Invoke)
                 .Permit(Trigger.Done, State.LogConditional);
             
             machine.Configure(State.LogConditional)
                 .OnEntryFrom(doneTrigger, HandleLogConditional)
+                .OnEntryFrom(foundConditionalTrigger, HandleLogConditional)
                 .PermitReentry(Trigger.FoundConditional)
                 .Permit(Trigger.Done, State.LogModifier)
                 .Permit(Trigger.Invoke, State.Part)
