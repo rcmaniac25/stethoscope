@@ -3664,6 +3664,32 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - What was funny is that it showed up as a passing test, because both the failed unboxing and the "final" code would produce the same exception.
 - That's all for now...
 
+459.2. 07/15/2019:
+- So, this wasn't what I was expecting...
+- So I debugged the issue and found what was happening: it's an issue (in my mind) with Stateless (the state machine library we're using)
+- Basically: I expected the issue was that I finish checking the log modifier, I go to tell the state machine to do a "count till marker" and it unboxed the enum wrong to an `int`.
+-- Note: I have both done, and seen, dynamic argument handling/boxing/unboxing try to get the internal representation of the type and end up saying an enum is an `int` or some other numeric type. Usually depends on how the enum was written, but could happen... I think...
+- Reality: I finish checking the log modifier, I go to tell the state machine to do a "count till marker", then I return from telling that to fire... and Stateless tries to trigger the doneIntTrigger (having previously finished doneTrigger) and it says "hey, there's no int as needed by this trigger"
+- Turns out, paramaterized triggers don't really matter for entry/exit from actions. They are simply invoked if the underlying trigger matches.
+- This is an issue for me... see. https://github.com/dotnet-state-machine/stateless/issues/64
+- Could I change my code to have different underlying triggers? Yes.
+- Could I re-write states so they only have one entry/exit per-underlying trigger? Yes.
+- But there is nothing that says I can't have multiple underlying triggers... in fact, it could be a useful feature to be able to say "I have a trigger for an entry/exit that updates a display, and another for the same trigger that updates statistics, etc."
+- But I don't get an error for having multiple with the same underlying trigger, there are no docs that say I can't, and I don't know how popular the library is... but nobody seems to have tried besides the one other person in the thread I replied to.
+- Long story short: I'm not changing my code.
+- So... what to do?
+- I've worked with OSS code before. I will see what/if someone replies to my question/request with.
+- My 2 expected responses:
+-- Nope, not supporting that
+-- If you'd like to contribute the change, please do
+- If they say "actually, yea... give me a week" I'd be suprised.
+- But each has a reaction:
+-- "Nope": then please either implement an exception, docs, etc. to make this known or I can do it
+-- "Please contribute": Ok, I'll start working on that
+-- "Yea": sweet... I'm gonna take some time off while they work on that (and probably write the tests)
+- But for now... we wait.
+- Helps, because, I'm busy tomorrow and probably won't be able to do anything anyway.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2

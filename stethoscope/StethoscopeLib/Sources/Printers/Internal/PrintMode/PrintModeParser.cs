@@ -541,7 +541,7 @@ namespace Stethoscope.Printers.Internal.PrintMode
                 .Permit(Trigger.Done, State.Part)
                 .Permit(Trigger.Invoke, State.ErrorHandlerModifier)
                 .Permit(Trigger.Error, State.Error);
-
+            
             machine.Configure(State.Part)
                 .OnEntryFrom(doneTrigger, state => state.StateMachine.Fire(countTillMarkerTriggerWithFlags, state.SetPriorState(State.Part), GetSpecialCharsForFlags(SpecialCharFlags.StartAttribute), CountTillFlag.ObserveSpecialChars | CountTillFlag.LastMarker))
                 .OnEntryFrom(doneIntTrigger, HandlePart)
