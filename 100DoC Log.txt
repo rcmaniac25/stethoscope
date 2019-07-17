@@ -3690,6 +3690,10 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - But for now... we wait.
 - Helps, because, I'm busy tomorrow and probably won't be able to do anything anyway.
 
+460.2. 07/16/2019:
+- Yea, not getting anything done today
+- No responses on the ticket either (experience with OSS tells me I may not get a response for days to months)
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
