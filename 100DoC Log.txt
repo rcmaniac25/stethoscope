@@ -3694,6 +3694,10 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - Yea, not getting anything done today
 - No responses on the ticket either (experience with OSS tells me I may not get a response for days to months)
 
+461.2. 07/17/2019:
+- Started opening files in Stateless prep for doing my "fix"
+- Might be busy tomorrow, but not sure yet
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
