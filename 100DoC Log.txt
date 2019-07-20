@@ -3701,6 +3701,16 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 462.2. 07/18/2019:
 - Yea, ran out of time today
 
+463.2. 07/19/2019:
+- I forked the stateless repo (https://github.com/rcmaniac25/stateless) and setup the files
+- Everything (untouched) compiles and tests pass...
+- First up:
+-- Q: where do I put tests for this?
+-- A: No idea.
+- All the areas that I found OnEntry getting used (and thus, assumed "this is one of/the OnEntry test(s)") was really testing something else.
+- I will have to look and see where to put tests, make sure everything except my tests pass and then... I can work on the fix
+- Tomorrow I should be able to do something, but as a precaution, I'll say "maybe"
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
