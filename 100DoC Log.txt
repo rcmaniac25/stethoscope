@@ -3711,6 +3711,12 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - I will have to look and see where to put tests, make sure everything except my tests pass and then... I can work on the fix
 - Tomorrow I should be able to do something, but as a precaution, I'll say "maybe"
 
+464.2. 07/20/2019:
+- Good thing I said "maybe"
+- Had an event that I expected to take 2-3 hours
+- It took 6-7 hours
+- I'm tired and it's late. Tomorrow
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
