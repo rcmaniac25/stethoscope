@@ -3717,6 +3717,20 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - It took 6-7 hours
 - I'm tired and it's late. Tomorrow
 
+465.2. 07/21/2019:
+<stateless library>
+- I didn't really have time to do things, but I wanted to at least find where I could write the tests I need
+- I'm not sure... but StateMachineFixture seems good...
+- I pause because "this tests the StateMachine" and the thing I need to test would probably be the StateRepresentation.
+- But, this is the weird part: will that be where the change occurs?
+- Right now, StateRepresentation goes through each entry/exit action and simply executes it.
+- I want it to only execute the ones that it supports
+- "But wait, so it isn't really the StateRepresentation, but the Entry/ExitActionBehaviors"
+- Yes! Or is it? What if this is actually a validator (not related to their existing validator) for Triggers?
+- StateMachine? StateRepresentation?, *ActionHehaviors?, What if it's somewhere else?
+- It's possible I won't know until after I do the work...
+- I'll double check again tomorrow, but worse case, I write them in StateMachineFixture and move it to/create the correct test fixture
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
