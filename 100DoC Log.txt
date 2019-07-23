@@ -3731,6 +3731,9 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - It's possible I won't know until after I do the work...
 - I'll double check again tomorrow, but worse case, I write them in StateMachineFixture and move it to/create the correct test fixture
 
+466.2. 07/22/2019:
+- I instead went to bed early and didn't get anything I wanted to get done, in any subject, done last night
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
