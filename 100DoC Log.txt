@@ -3734,6 +3734,19 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 466.2. 07/22/2019:
 - I instead went to bed early and didn't get anything I wanted to get done, in any subject, done last night
 
+467.2. 07/23/2019:
+- First, I wrote the unit tests
+- Second, unit tests save the day (again)... because it uncovered something I didn't expect
+- So when I first started working with Stateless, which was a while ago, the method you made a parameterized trigger was as follows: "new StateMachine<State, Trigger>.TriggerWithParameters<P1, P2, P3>(Trigger.Thing);"
+- Either it wasn't documented, I missed it, used a different source, or it was introduced after I started using stateless... but this is the new way you do it: "sm.SetTriggerParameters<P1, P2, P3>(Trigger.Thing);"
+- I'm fine with either, though I wanted a static trigger (so I could have external functions that invoked triggers).
+- But I learned 2 benefits of the other/new method:
+-- 1. It means parameter validation will occur so if you do my trigger creation, but one is generic (object) and one is specific (not-object) for the same trigger, and configure the specific one while using the generic one, it will validate it's a value that can be unboxed for the trigger.
+-- 2. It makes sure that you only have one trigger (enum) per trigger (TriggerWithParameters)
+- Now, that may work for some automated state machine creation, but if you are doing something similar to me, where you say "Done (string)" and "Done (int)" and ... then you have an issue.
+- Looking at the code a bit, I need to do a bit of work so both methods of trigger creation work.
+- So for now, just unit tests.
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
