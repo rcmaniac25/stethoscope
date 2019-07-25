@@ -3747,6 +3747,17 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - Looking at the code a bit, I need to do a bit of work so both methods of trigger creation work.
 - So for now, just unit tests.
 
+468.2. 07/24/2019:
+- So... I don't really have time today...
+- ...but I did stare at the code for a bit.
+- I'm a little stumped on how to handle multiple triggers with the same underlying trigger, but different parameters.
+- Their code isn't terribly complex, so I'd rather not make it complex with Dictionary<Trigger, List<??>> where ?? is some value type.
+- "That's not complex", well... experience tells me it still doubles the amount of code that is needed due to boilerplate.
+- Alt. is making some special key-type that takes parameters into account...
+- All this is before even pointing out that the internal parameter list for TriggerWithParameters is private and would have to be exposed somehow.
+- This also all assumes the devs won't just go "meh, we have no interest in this" (again, OSS is done as a hobby usually and doesn't necessarily get full on attention. You want an OSS devs attention, pay them. Bonus: responding to a closed issue makes it even more unlikely to get a response)
+- At least while I'm half-asleep, I do question if I should just try to re-write my SM creation... but that is for less-tired me to figure out
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
