@@ -3758,6 +3758,10 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - This also all assumes the devs won't just go "meh, we have no interest in this" (again, OSS is done as a hobby usually and doesn't necessarily get full on attention. You want an OSS devs attention, pay them. Bonus: responding to a closed issue makes it even more unlikely to get a response)
 - At least while I'm half-asleep, I do question if I should just try to re-write my SM creation... but that is for less-tired me to figure out
 
+469.2. 07/25/2019:
+- Took a much needed nap...
+- ...and ran out of time today
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
