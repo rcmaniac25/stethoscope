@@ -3762,6 +3762,16 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - Took a much needed nap...
 - ...and ran out of time today
 
+470.2. 07/26/2019:
+- Err... no time today
+- I'm busy with a lot of things.
+- When something doesn't go right, I'm usually unable to do other tasks/projects <-- Happened a few times today
+- In addition to that, I planned to go out for a few hours today... and then ended up adding a few more on top of that.
+- Not on purpose, mind you.
+- Result: it's later then I desire and can't do anything today.
+- I'll still post my usual "not today" posts, but I need to catch up on things and don't know when I'll get back to this.
+- Especially since the next big task is "is it worth changing stateless? Or should I just change how I do my state machine?"
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
