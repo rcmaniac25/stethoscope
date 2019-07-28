@@ -3772,6 +3772,15 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - I'll still post my usual "not today" posts, but I need to catch up on things and don't know when I'll get back to this.
 - Especially since the next big task is "is it worth changing stateless? Or should I just change how I do my state machine?"
 
+471.2. 07/27/2019:
+- So, changing my state machine is indeed easier...
+- But I still think it should be supported in Stateless
+- Result: "why not both"
+- Basically, I'll #if the code so it's "the nice way" and then "the working way".
+- Then I'll work on Stateless for a while to try and support multiple triggers.
+- I'll open a PR and move on.
+- If they eventually merge it, I'll update and switch back to "the nice way"
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
