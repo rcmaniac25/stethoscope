@@ -3781,6 +3781,9 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - I'll open a PR and move on.
 - If they eventually merge it, I'll update and switch back to "the nice way"
 
+472.2. 07/28/2019:
+- Ran out of time today, maybe tomorrow
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
