@@ -3784,6 +3784,9 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 472.2. 07/28/2019:
 - Ran out of time today, maybe tomorrow
 
+473.2. 07/29/2019:
+- Still no time...
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
