@@ -3787,6 +3787,10 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 473.2. 07/29/2019:
 - Still no time...
 
+474.2. 07/30/2019:
+- Forgot to say the usual weekly "won't be able to do it tomorrow" in reference to today
+- Might be busy this week in general...
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
