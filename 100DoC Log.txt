@@ -3791,6 +3791,10 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - Forgot to say the usual weekly "won't be able to do it tomorrow" in reference to today
 - Might be busy this week in general...
 
+475.2. 07/31/2019:
+- Today was simply exhausting... I didn't actually start doing things until maybe right before I wrote this.
+- Basic/expected thing: no time tonight
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
