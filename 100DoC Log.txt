@@ -3808,6 +3808,13 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 479.2. 08/04/2019:
 - Again, no time.
 
+480.2. 08/05/2019:
+- Did the "temp fix" in the parser.
+- I started to test but ran into various real-world tasks that needed to be completed...
+- ...and that the element factory isn't implemented yet.
+- So I need to write a mock or implement it (mock would probably be faster...)
+- Another time (maybe tomorrow)
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2

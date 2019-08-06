@@ -253,8 +253,17 @@ namespace Stethoscope.Printers.Internal.PrintMode
 
         private enum Trigger
         {
+#if RCMSTATELESS
             Done,
             Invoke,
+#else
+            Done,
+            DoneWithCount,
+            Process,
+            Invoke,
+            CountTillWithFlags,
+            CountTill,
+#endif
             Error,
 
             FoundConditional,
@@ -495,12 +504,23 @@ namespace Stethoscope.Printers.Internal.PrintMode
 
         #region Create State Machine
 
+#if RCMSTATELESS
         private readonly StateMachine<State, Trigger>.TriggerWithParameters<string, IPrinterElementFactory, Action<SMState>> processTrigger = new StateMachine<State, Trigger>.TriggerWithParameters<string, IPrinterElementFactory, Action<SMState>>(Trigger.Invoke);
         private readonly StateMachine<State, Trigger>.TriggerWithParameters<SMState> invokeTrigger = new StateMachine<State, Trigger>.TriggerWithParameters<SMState>(Trigger.Invoke);
         private readonly StateMachine<State, Trigger>.TriggerWithParameters<SMState, char[], CountTillFlag> countTillMarkerTriggerWithFlags = new StateMachine<State, Trigger>.TriggerWithParameters<SMState, char[], CountTillFlag>(Trigger.Invoke);
         private readonly StateMachine<State, Trigger>.TriggerWithParameters<SMState, char[]> countTillMarkerTrigger = new StateMachine<State, Trigger>.TriggerWithParameters<SMState, char[]>(Trigger.Invoke);
+#else
+        private readonly StateMachine<State, Trigger>.TriggerWithParameters<string, IPrinterElementFactory, Action<SMState>> processTrigger = new StateMachine<State, Trigger>.TriggerWithParameters<string, IPrinterElementFactory, Action<SMState>>(Trigger.Process);
+        private readonly StateMachine<State, Trigger>.TriggerWithParameters<SMState> invokeTrigger = new StateMachine<State, Trigger>.TriggerWithParameters<SMState>(Trigger.Invoke);
+        private readonly StateMachine<State, Trigger>.TriggerWithParameters<SMState, char[], CountTillFlag> countTillMarkerTriggerWithFlags = new StateMachine<State, Trigger>.TriggerWithParameters<SMState, char[], CountTillFlag>(Trigger.CountTillWithFlags);
+        private readonly StateMachine<State, Trigger>.TriggerWithParameters<SMState, char[]> countTillMarkerTrigger = new StateMachine<State, Trigger>.TriggerWithParameters<SMState, char[]>(Trigger.CountTill);
+#endif
         private readonly StateMachine<State, Trigger>.TriggerWithParameters<SMState> doneTrigger = new StateMachine<State, Trigger>.TriggerWithParameters<SMState>(Trigger.Done);
+#if RCMSTATELESS
         private readonly StateMachine<State, Trigger>.TriggerWithParameters<SMState, int> doneIntTrigger = new StateMachine<State, Trigger>.TriggerWithParameters<SMState, int>(Trigger.Done);
+#else
+        private readonly StateMachine<State, Trigger>.TriggerWithParameters<SMState, int> doneIntTrigger = new StateMachine<State, Trigger>.TriggerWithParameters<SMState, int>(Trigger.DoneWithCount);
+#endif
         private readonly StateMachine<State, Trigger>.TriggerWithParameters<SMState> errorTrigger = new StateMachine<State, Trigger>.TriggerWithParameters<SMState>(Trigger.Error);
         private readonly StateMachine<State, Trigger>.TriggerWithParameters<SMState, int> processRawTrigger = new StateMachine<State, Trigger>.TriggerWithParameters<SMState, int>(Trigger.ProcessRaw);
         private readonly StateMachine<State, Trigger>.TriggerWithParameters<SMState> processAttributeTrigger = new StateMachine<State, Trigger>.TriggerWithParameters<SMState>(Trigger.ProcessAttribute);
@@ -512,7 +532,11 @@ namespace Stethoscope.Printers.Internal.PrintMode
             var machine = new StateMachine<State, Trigger>(State.Uninitialized);
 
             machine.Configure(State.Uninitialized)
+#if RCMSTATELESS
                 .Permit(Trigger.Invoke, State.Setup);
+#else
+                .Permit(Trigger.Process, State.Setup);
+#endif
 
             machine.Configure(State.Setup)
                 .OnEntryFrom(processTrigger, (string format, IPrinterElementFactory factory, Action<SMState> doneHandler) =>
@@ -545,7 +569,11 @@ namespace Stethoscope.Printers.Internal.PrintMode
             machine.Configure(State.Part)
                 .OnEntryFrom(doneTrigger, state => state.StateMachine.Fire(countTillMarkerTriggerWithFlags, state.SetPriorState(State.Part), GetSpecialCharsForFlags(SpecialCharFlags.StartAttribute), CountTillFlag.ObserveSpecialChars | CountTillFlag.LastMarker))
                 .OnEntryFrom(doneIntTrigger, HandlePart)
+#if RCMSTATELESS
                 .Permit(Trigger.Invoke, State.CountTillMarker)
+#else
+                .Permit(Trigger.CountTillWithFlags, State.CountTillMarker)
+#endif
                 .Permit(Trigger.ProcessRaw, State.Raw)
                 .Permit(Trigger.ProcessAttribute, State.Attribute)
                 .Permit(Trigger.Done, State.Done)
@@ -571,7 +599,11 @@ namespace Stethoscope.Printers.Internal.PrintMode
             machine.Configure(State.AttributeReference)
                 .OnEntryFrom(doneTrigger, state => state.StateMachine.Fire(countTillMarkerTriggerWithFlags, state.SetPriorState(State.AttributeReference), GetSpecialCharsForFlagsEn(SpecialCharFlags.EndAttribute).Concat(new char[] { SPECIAL_CHAR_ATT_FORMAT }).ToArray(), CountTillFlag.IgnoreSpecialChars | CountTillFlag.FirstMarker))
                 .OnEntryFrom(doneIntTrigger, HandleAttributeReference)
+#if RCMSTATELESS
                 .Permit(Trigger.Invoke, State.CountTillMarker)
+#else
+                .Permit(Trigger.CountTillWithFlags, State.CountTillMarker)
+#endif
                 .Permit(Trigger.Done, State.Modifier)
                 .Permit(Trigger.Invoke, State.AttributeFormat)
                 .Permit(Trigger.Error, State.Error);
@@ -579,7 +611,11 @@ namespace Stethoscope.Printers.Internal.PrintMode
             machine.Configure(State.AttributeFormat)
                 .OnEntryFrom(invokeTrigger, state => state.StateMachine.Fire(countTillMarkerTriggerWithFlags, state.SetPriorState(State.AttributeFormat), GetSpecialCharsForFlags(SpecialCharFlags.EndAttribute), CountTillFlag.ObserveSpecialChars | CountTillFlag.LastMarker))
                 .OnEntryFrom(doneIntTrigger, HandleAttributeFormat)
+#if RCMSTATELESS
                 .Permit(Trigger.Invoke, State.CountTillMarker)
+#else
+                .Permit(Trigger.CountTillWithFlags, State.CountTillMarker)
+#endif
                 .Permit(Trigger.Done, State.Modifier)
                 .Permit(Trigger.Error, State.Error);
 
@@ -616,8 +652,11 @@ namespace Stethoscope.Printers.Internal.PrintMode
             machine.Configure(State.CountTillMarker)
                 .OnEntryFrom(countTillMarkerTriggerWithFlags, CountTillMarker)
                 .OnEntryFrom(countTillMarkerTrigger, (SMState state, char[] termChars) => state.StateMachine.Fire(countTillMarkerTriggerWithFlags, state, termChars, CountTillFlag.ObserveSpecialChars | CountTillFlag.FirstMarker))
-                .PermitReentry(Trigger.Invoke)
+#if RCMSTATELESS
                 .PermitDynamic(doneTrigger, state => state.PriorState);
+#else
+                .PermitDynamic(doneIntTrigger, (state, _) => state.PriorState);
+#endif
 
             machine.Configure(State.ErrorHandlerModifier)
                 .OnEntryFrom(invokeTrigger, HandleErrorModifierSanityCheck)
