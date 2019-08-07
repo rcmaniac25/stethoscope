@@ -3815,6 +3815,9 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - So I need to write a mock or implement it (mock would probably be faster...)
 - Another time (maybe tomorrow)
 
+481.2. 08/06/2019:
+- ...no time today. Might not have time tomorrow either
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
