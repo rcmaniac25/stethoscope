@@ -35,9 +35,28 @@ namespace Stethoscope.Printers.Internal
         }
 
         /// <summary>
+        /// Create a new IOPrinter
+        /// </summary>
+        /// <param name="factory">The element factory to use when parsing formats.</param>
+        protected IOPrinter(IPrinterElementFactory factory = null)
+        {
+            printerElementFactory = factory;
+        }
+
+        /// <summary>
         /// The log registry that logs will be retrieved from.
         /// </summary>
         protected ILogRegistry logRegistry;
+
+        /// <summary>
+        /// Element factory returned by <see cref="ElementFactory"/>.
+        /// </summary>
+        protected IPrinterElementFactory printerElementFactory;
+
+        /// <summary>
+        /// Get the element factory.
+        /// </summary>
+        public override IPrinterElementFactory ElementFactory => printerElementFactory;
 
         /// <summary>
         /// The TextWriter which will be printed to.

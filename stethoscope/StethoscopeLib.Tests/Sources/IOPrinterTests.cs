@@ -1,8 +1,10 @@
-﻿using Stethoscope.Log.Internal;
-using Stethoscope.Printers.Internal;
-using Stethoscope.Log.Internal.Storage;
+﻿using NSubstitute;
 
 using NUnit.Framework;
+
+using Stethoscope.Log.Internal;
+using Stethoscope.Log.Internal.Storage;
+using Stethoscope.Printers.Internal;
 
 using System;
 using System.Linq;
@@ -18,6 +20,7 @@ namespace Stethoscope.Tests
         [SetUp]
         public virtual void Setup()
         {
+            ElementFactory = null;
             logRegistry = new LogRegistry(new ListStorage());
             logConfig = new LogConfig()
             {
@@ -26,11 +29,19 @@ namespace Stethoscope.Tests
             };
         }
 
+        [TearDown]
+        public virtual void Teardown()
+        {
+            ElementFactory = null;
+        }
+
         protected abstract string PrintedDataNewLine { get; }
 
         protected abstract void ResetPrintedData();
         protected abstract string GetPrintedData();
         protected abstract IOPrinter GetIOPrinter();
+
+        protected IPrinterElementFactory ElementFactory { get; set; }
 
         private string PrintData()
         {
@@ -843,6 +854,20 @@ namespace Stethoscope.Tests
             logRegistry.NotifyFailedLogParsed(failedLog);
 
             var expectedLogPrintout = "testentry2";
+
+#if false
+            var element = Substitute.For<Printers.Internal.PrintMode.IElement>();
+            var modifier = Substitute.For<Printers.Internal.PrintMode.IModifier>();
+            var conditional = Substitute.For<Printers.Internal.PrintMode.IConditional>();
+            ElementFactory = Substitute.For<IPrinterElementFactory>();
+
+            ElementFactory.CreateRaw(null).ReturnsForAnyArgs(element);
+            ElementFactory.CreateElement(Arg.Any<Common.LogAttribute>(), null, null, null).ReturnsForAnyArgs(element);
+            ElementFactory.CreateModifier(Arg.Any<ModifierElement>()).ReturnsForAnyArgs(modifier);
+            ElementFactory.CreateConditional(Arg.Any<ConditionalElement>()).ReturnsForAnyArgs(conditional);
+
+            conditional.ShouldProcess(null, null).ReturnsForAnyArgs(false);
+#endif
 
             var data = PrintData();
 

@@ -14,9 +14,9 @@ namespace Stethoscope.Printers.Internal
     public abstract class BaseIPrinter : IPrinter
     {
         /// <summary>
-        /// Get the default element factory (by returning <c>null</c>.
+        /// Get the default element factory (by returning <c>null</c>).
         /// </summary>
-        public IPrinterElementFactory ElementFactory => null;
+        public virtual IPrinterElementFactory ElementFactory => null;
 
         /// <summary>
         /// Invoke a print operation (sync)

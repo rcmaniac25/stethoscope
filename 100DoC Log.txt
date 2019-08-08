@@ -3818,6 +3818,22 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 481.2. 08/06/2019:
 - ...no time today. Might not have time tomorrow either
 
+482.2. 08/07/2019:
+- What's this? Code?
+- Yea, it hasn't been too long, but it still feels like it's been a lot longer.
+- So the main thing I did was figure out how to pipe the element factory into the tests.
+- Then I implemented a mock for the main test I was working on and tested it.
+- Function worked! (test failed, but that was expected)
+- So next up would be to implement the...
+- So, probably more tests... but as I had to (temporarily) add a mock, it made me realize I need "something" to get the tests to run.
+- So next thing I'd like to implement is the element factory.
+- Comically, I don't think I need to implement the elements themselves... just the factory.
+- It will fail upon execution, but my goal is to test the parsing first and foremost.
+- If it fails to parse, it's gonna give me the wrong printout anyway.
+- This should lead to finishing the parser.
+- Then I can implement the elements themselves... and see if everything passes.
+- Finally... finally! We could move onto doing some logic with the elements that have been found and try to make this be "smart"
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2

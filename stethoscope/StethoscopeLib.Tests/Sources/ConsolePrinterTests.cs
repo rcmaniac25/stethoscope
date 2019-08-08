@@ -53,7 +53,7 @@ namespace Stethoscope.Tests
         {
             //XXX Should we just use a factory?
 
-            var printer = new ConsolePrinter();
+            var printer = new ConsolePrinter(ElementFactory);
             printer.SetConfig(logConfig);
             printer.SetRegistry(logRegistry);
             return printer;
