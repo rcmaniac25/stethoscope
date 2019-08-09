@@ -3834,6 +3834,10 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - Then I can implement the elements themselves... and see if everything passes.
 - Finally... finally! We could move onto doing some logic with the elements that have been found and try to make this be "smart"
 
+483.2. 08/08/2019:
+- Forgot my original plan was, once the swap out occured, to work on stateless :P
+- Also, no time today
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
