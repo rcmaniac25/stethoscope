@@ -3841,6 +3841,20 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 484.2. 08/09/2019:
 - Still no time today
 
+485.2. 08/09/2019:
+- Started to do work on stateless
+- I'm already worried... I have little positive opinion that this would get considered for merger
+- It may require a larger re-work then I originally intended
+- Originally: change from using the ITrigger value as a key for things to using some composite key so that different Type array arguments would produce a different key
+- Reality: I did that... and then I was reminded that getting the hash code of an array is a pain.
+- GetHashCode on an array will return a unique ID that represents the array object internally to the GC (IIRC).
+- As such, arr1.GetHashCode() == arr1.GetHashCode(), but creating an identical deep copy of arr1 and doing arr1.GetHashCode() == arr2.GetHashCode() will be false.
+- So, that's one bug I encountered (didn't know about the unit test that ensured only 1 target existed, updated it to take arguments into account... and it didn't fail... so I knew I had a code bug)
+- The other issue is what came next: state representation and entry action
+- The basics, and this is the most I'll say, is unlike StateMachine and TriggerWithParameters... the other types have public functions with these triggers.
+- So... I'll either need to publicize the composite key, make a generic key-type, or rewrite a fair amount of components to make this all work.
+- Joy...
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
