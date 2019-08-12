@@ -3855,6 +3855,13 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - So... I'll either need to publicize the composite key, make a generic key-type, or rewrite a fair amount of components to make this all work.
 - Joy...
 
+486.2. 08/10/2019:
+- As a programmer/software engineer, a common action is to go "this isn't right" and to try and fix whatever isn't working
+- In my case, a website I use has a utility that isn't working and the offline version (open source) has a bug.
+- As I can't get the website to work, it's quite frustrating and I will put this project off to fix it so I can have sanity again
+- Spending hours trying to get something to work that isn't is one of the biggest time wastes I can handle...
+- Another time...
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
