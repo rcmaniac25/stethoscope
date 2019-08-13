@@ -3862,6 +3862,9 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - Spending hours trying to get something to work that isn't is one of the biggest time wastes I can handle...
 - Another time...
 
+487.2. 08/11/2019:
+- Again, skipping
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
