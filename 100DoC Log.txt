@@ -3841,7 +3841,7 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 484.2. 08/09/2019:
 - Still no time today
 
-485.2. 08/09/2019:
+485.2. 08/10/2019:
 - Started to do work on stateless
 - I'm already worried... I have little positive opinion that this would get considered for merger
 - It may require a larger re-work then I originally intended
@@ -3855,26 +3855,29 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - So... I'll either need to publicize the composite key, make a generic key-type, or rewrite a fair amount of components to make this all work.
 - Joy...
 
-486.2. 08/10/2019:
+486.2. 08/11/2019:
 - As a programmer/software engineer, a common action is to go "this isn't right" and to try and fix whatever isn't working
 - In my case, a website I use has a utility that isn't working and the offline version (open source) has a bug.
 - As I can't get the website to work, it's quite frustrating and I will put this project off to fix it so I can have sanity again
 - Spending hours trying to get something to work that isn't is one of the biggest time wastes I can handle...
 - Another time...
 
-487.2. 08/11/2019:
+487.2. 08/12/2019:
 - Again, skipping
 
-488.2. 08/12/2019:
+488.2. 08/13/2019:
 - Again, skipping
 
-489.2. 08/13/2019:
+489.2. 08/14/2019:
 - Again, skipping (this is gonna keep happening)
 
-490.2. 08/14/2019:
+490.2. 08/15/2019:
 - Again, skipping
 
-491.2. 08/15/2019:
+491.2. 08/16/2019:
+- Again, skipping
+
+492.2. 08/17/2019:
 - Again, skipping
 
 ==Design/Plan Days==
