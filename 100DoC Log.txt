@@ -3883,6 +3883,13 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 493.2. 08/18/2019:
 - Again, skipping
 
+494.2. 08/19/2019:
+- Again, skipping
+- And I'm busy tomorrow
+- Why is that important if I'm skipping?
+- Because I got "far enough" with the fix in a utility I was working on
+- So I go back to this!
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
