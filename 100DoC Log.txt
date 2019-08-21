@@ -3890,6 +3890,9 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - Because I got "far enough" with the fix in a utility I was working on
 - So I go back to this!
 
+495.2. 08/20/2019:
+- Yep, no time today
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
