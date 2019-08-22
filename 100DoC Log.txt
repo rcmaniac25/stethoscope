@@ -3893,6 +3893,9 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 495.2. 08/20/2019:
 - Yep, no time today
 
+496.2. 08/21/2019:
+- Ended up staying out later then planned... now no time
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
