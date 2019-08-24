@@ -3902,6 +3902,12 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - It's tiring to do nothing :P
 - Hopefully tomorrow
 
+498.2. 08/23/2019:
+- And tomorrow never came... like, nearly a reality
+- "uh..." I slept nearly to the next day
+- I'm now up and doing some things... and ironically, I'm tired
+- I'm probably going to go BACK to sleep and try to get sleep schedule back in order
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
