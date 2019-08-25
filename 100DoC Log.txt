@@ -3908,6 +3908,13 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - I'm now up and doing some things... and ironically, I'm tired
 - I'm probably going to go BACK to sleep and try to get sleep schedule back in order
 
+499.2. 08/24/2019:
+- "Ok! Let's do this"
+- <looks at code>
+- I have... very little interest in the amount of work needed to do this change
+- Not sure right now if it's just because I have a bunch of other things I'm interested in, or I'm just like "this isn't my code... I don't want to spend weeks and weeks on this"
+- As such, I'm pushing this off again...
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
