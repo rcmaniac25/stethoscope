@@ -3915,6 +3915,24 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - Not sure right now if it's just because I have a bunch of other things I'm interested in, or I'm just like "this isn't my code... I don't want to spend weeks and weeks on this"
 - As such, I'm pushing this off again...
 
+500.2. 08/25/2019:
+- I said to myself "#500 log! I need to do something for this!"
+- Ran out of time and said "at least let me look at the code..."
+- I like Stateless, but it's a bit messy*
+- *now, it's not bad. I've seen worse, and the issue stems more from the templates.
+- But as with most code, this happens over time
+- They probably started out with just something basic, probably no "trigger with parameters". So just a "here is an enum key" and went from there
+- Later, trigger with parameters appeared and they went "well... it's a lot of work to replace that single enum key, so we'll just have something that encapsulates the parameters and whatnot... and can expose the trigger enum key"
+- That works, but by relying on that enum, little ole me is now looking at that legacy and saying "well... it's a lot of work to replace that single enum key"
+- And the solution I'm looking at is "...so we'll just have something that encapsulates the key and whatnot"
+- This is a bit grand, and a lot of work. More then I want...
+- So as a heads up (to myself and for anyone that has actually found this project and is reading it in the blog-post style I've been writing)...
+- ...the next 2 weeks will be wacky and I may not be able to do any work on things
+- I probably "can" do work, but my head will be elsewhere.
+- During that time, I will probably look at this and go "I should revisit 471.2" where I decide between "is it worth it?"
+- The thing is, I kinda want to do the work on stateless... but I also have so many other projects, my inner-manager (who keeps yelling at me to go to bed) is like "the goal is to get Steth working, not spend the next month on Stateless" and it's true
+- So I need to probably decide "can I make this work quickly", "is it worth the time spent?", or "let me do more work on Steth before doing work on stateless"
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
