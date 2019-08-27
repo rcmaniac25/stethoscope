@@ -3933,6 +3933,11 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - The thing is, I kinda want to do the work on stateless... but I also have so many other projects, my inner-manager (who keeps yelling at me to go to bed) is like "the goal is to get Steth working, not spend the next month on Stateless" and it's true
 - So I need to probably decide "can I make this work quickly", "is it worth the time spent?", or "let me do more work on Steth before doing work on stateless"
 
+501.2. 08/26/2019:
+- I'm very out of it right now
+- I can't even get some of my simple tasks done...
+- So, skipping tonight. Probably tomorrow too
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
