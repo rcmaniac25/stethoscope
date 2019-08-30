@@ -3944,6 +3944,9 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 503.2. 08/28/2019:
 - Won't have the time today
 
+504.2. 08/29/2019:
+- Skipping today for more time-sensitive stuff
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
