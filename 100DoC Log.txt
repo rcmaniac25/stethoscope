@@ -3947,6 +3947,11 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 504.2. 08/29/2019:
 - Skipping today for more time-sensitive stuff
 
+505.2. 08/30/2019:
+- Yes I keep skipping... but I've had some time sensative things to complete
+- I have to skip today...
+- And after tonight, I may not go to sleep for 36 hours... so I'm certently not doing it tomorrow
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
