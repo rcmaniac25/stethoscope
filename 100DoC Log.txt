@@ -3955,6 +3955,10 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 506.2. 08/31/2019:
 - Skipping today as foretold...
 
+507.2. 09/01/2019:
+- Uh... well this is a little more info then I intend, but it's interesting none the less...
+- I'm evacuating my residence right now, so I will be busy and unable to work on this and probably won't be able to do it tomorrow either
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
