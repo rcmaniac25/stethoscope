@@ -3959,6 +3959,11 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - Uh... well this is a little more info then I intend, but it's interesting none the less...
 - I'm evacuating my residence right now, so I will be busy and unable to work on this and probably won't be able to do it tomorrow either
 
+508.2. 09/02/2019:
+- Well... this is a weird cituation to be in...
+- I'm not sure I'll get to work on this at all this week
+- I'll have to see later in the week
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
