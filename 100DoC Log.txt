@@ -3968,6 +3968,10 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - And the twists keep coming...
 - Skipping today
 
+510.2. 09/04/2019:
+- Well, I'm no longer in the wacky places I was before...
+- ...but I don't have time today and may skip the rest of the week to recover
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
