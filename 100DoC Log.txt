@@ -3972,6 +3972,9 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - Well, I'm no longer in the wacky places I was before...
 - ...but I don't have time today and may skip the rest of the week to recover
 
+511.2. 09/05/2019:
+- Skipping today
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
