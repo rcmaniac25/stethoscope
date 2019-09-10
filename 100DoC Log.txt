@@ -3987,6 +3987,11 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - I then thought "maybe tomorrow" but I screwed up my backup software a couple days ago, and I need to get it working
 - *it's open source, so there's no support outside of a forum and doing it yourself... and the forum isn't helping right now
 
+515.2. 09/09/2019:
+- Still skipping
+- Bit of wacky busy-ness, and need to fix the backup software first
+- Will be skipping tomorrow too
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
