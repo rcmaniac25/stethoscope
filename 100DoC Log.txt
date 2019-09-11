@@ -3992,6 +3992,9 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - Bit of wacky busy-ness, and need to fix the backup software first
 - Will be skipping tomorrow too
 
+516.2. 09/10/2019:
+- Skipping
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
