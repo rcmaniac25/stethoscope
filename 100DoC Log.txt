@@ -4007,6 +4007,10 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 520.2. 09/14/2019:
 - Still skipping
 
+521.2. 09/15/2019:
+- Nother day
+- Nother skip
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
