@@ -4029,6 +4029,10 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 527.2. 09/21/2019:
 - Skip
 
+528.2. 09/22/2019:
+- Skip
+- Been very busy and just need to get through some things that are taking forever to finish...
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
