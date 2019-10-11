@@ -4085,6 +4085,13 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 545.2. 10/09/2019:
 - Skip
 
+546.2. 10/10/2019:
+- Skip
+- So... I've been doing a lot of skips
+- Life and work have just been really wacky... and I shot my sleep schedule and it's been very hard to get back to something good
+- On top of that, the next week or so is going to be even more busy, so getting to this is going to be quite low priority right now
+- Would like to do something, but can't right now
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
