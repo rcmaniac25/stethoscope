@@ -4092,6 +4092,9 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - On top of that, the next week or so is going to be even more busy, so getting to this is going to be quite low priority right now
 - Would like to do something, but can't right now
 
+547.2. 10/11/2019:
+- Skip
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
