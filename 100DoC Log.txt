@@ -4252,6 +4252,31 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 599.2. 12/02/2019:
 - Skip
 
+600.2. 12/03/2019:
+- So... I wanted to do something so "day 600" wasn't just another skip
+- I only really upgraded dependencies
+- I actually hit an issue with this, as moving from Microsoft.NET.Test.Sdk 16.2.0 -> 16.4.0 resulted in "testhost.dll" not being found
+- From everything I saw, people's response was "well, you have to install Microsoft.NET.Test.Sdk"
+- Um... literally, that changing was what have me issues
+- "Make sure you have <*Unit Visual Stufio adapters> install"
+- Yep...
+- Ah, the issue was I didn't run xunit
+- Uh... I'm not running xunit. Anyone with NUnit?
+- Nope...
+- My solution for now was to downgrade back to 16.2.0
+- So, while I'm here... basically: I took a break because I had a project not realted to this, and it had a deadline
+- While working on the project, the equipment I was using broke.
+- While fixing the equipment, I got more responsability at work
+- While fixing the equipment and spending more time at work, I started learning a couple new programs
+- While doing all that, I aquired a whole bunch of new devices/materials for various projects
+- While this happened, holidays, vacation, various other things came up
+- While... I went "how long is it gonna take to get back up to speed?"
+- I bit off more then I could chew. I'm trying to work my way backwards...
+- And the biggest part: I'm trying to get on a more regular sleep schedule (not doing well, but trying)
+- All of this means the project is still on hold... I may try to do a PoC thing again
+- Basically: let me skip the formality and just try to make something work
+- It may not happen, but one todo list at a time...
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
