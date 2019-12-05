@@ -4277,6 +4277,9 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - Basically: let me skip the formality and just try to make something work
 - It may not happen, but one todo list at a time...
 
+601.2. 12/04/2019:
+- Skip
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
