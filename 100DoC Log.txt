@@ -4344,6 +4344,9 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - Merry Christmas and Happy Holidays
 - Skip
 
+623.2. 12/26/2019:
+- Skip
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
