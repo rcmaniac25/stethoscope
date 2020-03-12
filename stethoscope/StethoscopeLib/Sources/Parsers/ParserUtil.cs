@@ -52,7 +52,7 @@ namespace Stethoscope.Parsers
 
         #region Cast (Key-Value)
 
-        private static char[] KV_DELIMITERS = new char[] { ';', ',' }; //XXX config value for what to use for splits?
+        private static char[] KV_DELIMITERS = new char[] { ';', ',', ' ' }; //XXX config value for what to use for splits?
         private const char KV_SEPERATOR = '='; //XXX config?
 
         private static IEnumerable<Tuple<bool, string>> QuoteGroup(string rawValue)
