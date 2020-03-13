@@ -4579,6 +4579,9 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - I fixed one line of code.
 - I was looking around and noticed that I had space-delimited key-value pairs, so I ensured ' ' was a value
 
+699.2. 03/12/2020:
+- Skip
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
