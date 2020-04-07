@@ -4654,6 +4654,9 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 723.2. 04/05/2020:
 - Skip
 
+724.2. 04/06/2020:
+- Skip
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
