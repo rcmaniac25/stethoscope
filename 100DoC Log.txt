@@ -9,7 +9,6 @@ Note 2: I think outloud, so the posts may be wordier then others, because I'm th
 #1.1. 3/19/2018:
 - Fleshing out docs and making a main function. Plan for the first couple days is to get the project started, do some parsing, how to get some values from logs, and building habits
 - I'm not exactly promoting this with the hashtag right now, just to get this going. I don't feel I need motivation, just less stuff to do. I constantly have ideas and write them down, but lack the time to work on it. It makes me easy to distract, so I want to build a habit naturally with everything else I have going on before I start getting "keep going!" tweets and messages.
-
 #2.1. 3/20/2018:
 - Almost missed this day (the commit for yesterday and today say they're a day later, but it's because I start late the prior day). #HabitForming
 - Already a bit overthinking it because I started trying to do streaming log parsing... just parse the log right now.
@@ -4883,6 +4882,9 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - Skip
 
 800.2. 06/21/2020:
+- Skip
+
+801.2. 06/22/2020:
 - Skip
 
 ==Design/Plan Days==
