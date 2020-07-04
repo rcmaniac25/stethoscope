@@ -78,7 +78,7 @@ namespace Stethoscope.Tests
         }
 
         [Test]
-        public void ConsoleSanityTest()
+        public void ConsoleConfidenceTest()
         {
             Console.WriteLine("test msg");
             Assert.That(GetConsoleOutput(), Is.EqualTo("test msg"));

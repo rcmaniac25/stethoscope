@@ -414,7 +414,7 @@ namespace Stethoscope.Tests
         }
 
         [Test(TestOf = typeof(ListCollectionIndexOffsetTracker<>))]
-        public void IndexTrackerSanityTest()
+        public void IndexTrackerConfidenceTest()
         {
             var index = new ListCollectionIndexOffsetTracker<int>();
             Assert.That(index.OriginalIndex, Is.Zero);

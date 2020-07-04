@@ -137,7 +137,7 @@ namespace Stethoscope.Tests
         }
         
         [Test]
-        public void SchedulerSanityCheck()
+        public void SchedulerConfidenceCheck()
         {
             bool hasRegularScheduler = false;
             bool hasLongScheduler = false;

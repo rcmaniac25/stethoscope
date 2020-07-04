@@ -245,7 +245,7 @@ void doSomethingCool(std::ifstream& input)
 - Nevermind. I wrote the remaining tests.
 - Next up: ConsolePrinter. I want to test this over IOPrinter because it will actually be used. If something gets changed in IOPrinter, suddenly there will be X tests breaking, where X is every implementor of IOPrinter.
 - Actually, writing that, I probably should do it for IOPrinter... Or at least have some tests "for" IOPrinter derived classes, but use the implementation (IOTester.Test(impl, outputGrabberDelegate)). This way I can run the tests on the impl, which will actually get used directly, and NOT have to write 10 tests the same way.
-- First tests are... sanity tests. What if there are no logs, and just make sure I can grab console output.
+- First tests are... confidence tests. What if there are no logs, and just make sure I can grab console output.
 - Both work, but the console output test is... not plesent. Can you imagine every test needing to check the NewLine? Probably be best to specify a new line...
 - But wait, there's more! I was under the impression that NUnit ran in parallel (at work, we started non-parallel, then wanted tests to run faster, switched to parallel, and watched many break).
 - As such, I wrote all the tests (at least I think so) with the expectation that they would run in parallel. Since the ConsolePrinter test would be changing the global Console.Out param, I couldn't have that run in parallel.
@@ -1121,7 +1121,7 @@ void doSomethingCool(std::ifstream& input)
 - When I had my "oh no, when something gets inserted before the current index, the index needs to move!" resulted in basically writing a small framework to handle changes to a list.
 - As such, I can to a classic academic producer-consumer. Run like normal, then when we run out of items, instead of calling OnCompleted, we instead Wait. When either the observable has been disposed or the list changes, we wake the sleeping threads and check if we are done or have new element(s), and either finish, return elements, or go back to sleep.
 - So... for me to writeup tomorrow in Tasks:
--- Merge poc back into master since the goal of poc isn't even remotely close
+-- Merge poc back into main since the goal of poc isn't even remotely close
 -- Write never-ending LiveListObservable (either updating the existing, or writing something new... probably write new and merge if similar enough). May be useful to have some way to switch from Live to LiveInfinite and back. That way we can return a nice default (Live) from Logs and then the user can say "never end". Most likely a "AsInfinite" which switches internally but for LiveList but is otherwise `obs.Concat(Qbservable.Never())` for everything else.
 -- One more bout of unit tests for all the work I've done since poc branch-off
 -- Make simple constant Qbservable provider/expression/etc. that just executes and doesn't do anything special.
@@ -1130,7 +1130,7 @@ void doSomethingCool(std::ifstream& input)
 -- May need to write my own DB observable... after a DB is found that can be embeded OR external AND has notifications of when things changed (otherwise we'll never know if we're supposed to return something)
 
 #103.2. 7/23/2018:
-- In the name of "sleep", I updated Tasks.md (it... didn't change too much. Just a bit) and merged back into master
+- In the name of "sleep", I updated Tasks.md (it... didn't change too much. Just a bit) and merged back into main
 
 #104.2. 7/24/2018:
 - Plan for InfiniteLiveListObservable work:
@@ -1380,14 +1380,14 @@ void doSomethingCool(std::ifstream& input)
 - So I got the idea "just have the schedulers be arguments" and proceeded to write some initial tests where the schedulers are passed in as an argument.
 - This allows us to write the tests we want, and then if there's any difference between schedulers, it will be discovered upon execution of the test with that scheduler.
 - Now I can simply write the test
-- I didn't have time to do more then the initial experiments. Also, remembered I wanted a sanity-check test (tests that go "I'm testing a scheduler that is long running, and one that isn't... right?")
+- I didn't have time to do more then the initial experiments. Also, remembered I wanted a confidence-check test (tests that go "I'm testing a scheduler that is long running, and one that isn't... right?")
 
 #147.2. 9/05/2018:
 - I was up too late last night, so I didn't want to spend too much time tonight working on this.
 - Also, infinite and finite observables will have different implementations.
 - So before I go kicking myself on trying to test something that "doesn't end", I wanted to do the finite cases.
 - I drew the line before testing "insert" functionality, because that will be both with and without threading... and that will be it's own pain.
-- So, to save time, and sanity: no threads or infinite observables today.
+- So, to save time, and my sanity: no threads or infinite observables today.
 
 #148.2. 9/06/2018:
 - I did the finite insert function.
@@ -1692,7 +1692,7 @@ void doSomethingCool(std::ifstream& input)
 - What is happening?
 - Basically, I iterate through the tree, then when I realize I need to skip functions, I start to skip them. All other functions get pushed into a stack.
 - As I finish iteration, I pop expressions off the stack. If there was an expression to use, I return it. Else, I return the `Visit`'s child.
-- It works and meets all my test cases... but man is it hard to understand from looking at, and there is probably a better way. No, there is a better way... I just need to think about it.
+- It works and meets all my test cases... but it is hard to understand from looking at, and there is probably a better way. No, there is a better way... I just need to think about it.
 - The "better way" that popped into my head is to do 2-3 passes. First pass I just determine if there are nodes I can skip (ironically, called Skip).
 - The last pass I re-visit the tree, but if I encounter a node I don't need, then I return the prior visit's child. There's probably a bit of state so that if I have started to modify the tree, I know to modify the arguments again, otherwise I'll get the original tree again.
 - The "maybe" middle step? Just look at the list of method calls and determine if there's anything to remove.
@@ -2122,8 +2122,8 @@ File browser (connect to multiple remote machines, then use a file browser to ba
 - Tests for async...
 - Need to change UserConfigs to AdditionalConfigs or something (needs a better name)
 - Need to formalize config values (will these be globals? I'm thinking yes because other configs can be created)
-- Need way to clone config (this way a master config can exist and extra configs can be added later without affecting the master config)
-- Need way to clone an ILogEntry to another registry (masterRegistry.Logs.<query>.Subscribe(log => queryRegistry.CloneLog(log));)
+- Need way to clone config (this way a primary config can exist and extra configs can be added later without affecting the primary config)
+- Need way to clone an ILogEntry to another registry (primaryRegistry.Logs.<query>.Subscribe(log => queryRegistry.CloneLog(log));)
 =======
 - So I want to finish async code for IOPrinter tomorrow, then I'll move onto the other tasks.
 
@@ -2253,7 +2253,7 @@ File browser (connect to multiple remote machines, then use a file browser to ba
 #244.2. 12/12/2018:
 - And... ran out of time. But I wanted to do something.
 - So I did a naive implementation of CloneLog.
-- My expectation is his is what most people would assume is what CloneLog would look like implemented.
+- My expectation is this is what most people would assume is what CloneLog would look like implemented.
 - Reality is, TDD. Of the tests I wrote, this implementation took me from 8 failing tests to... 6.
 - Yes, there is enough missing functionality that of the 9 tests I wrote, 6 still don't pass. 2/3.
 - I hope to be able to work tomorrow, but it will actually be a busy evening and I might have to push proper work to the next day.
@@ -2428,7 +2428,7 @@ File browser (connect to multiple remote machines, then use a file browser to ba
 
 #262.2. 12/30/2018:
 - I was able to get in today...
-- For sanity and time, I decided to define the printMode in documentation.
+- For my sanity and time, I decided to define the printMode in documentation.
 - I will write the code later (starting with predefined modes, then defining the custom modes)
 - Ironically, I have experience with this. (https://bitbucket.org/rcmaniac25/blackberry-10-extensions/src/b6a36515c733ee8465b9b831e6cf30106c60fa4d/BBX/src/rebuild/util/text/StringUtilities.java#StringUtilities.java-773)
 -- The real meat of that is https://bitbucket.org/rcmaniac25/blackberry-10-extensions/src/b6a36515c733ee8465b9b831e6cf30106c60fa4d/BBX/src/rebuild/util/text/PrintUtility.java
@@ -4916,6 +4916,41 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 
 811.2. 07/02/2020:
 - Skip
+
+812.2. 07/03/2020:
+-What's this? Code? Oh my...
+-Ok, not really any content, but something. So what is it?
+-For some: a welcome change. For other: PC BS
+-It's namely name and word changes that have been created, gained, been slandered, etc. by history. The easiest to cover: master.
+-"It's the source, the original, the controlling item/device/service, etc." yea, and while there are many definitions of it, think about how we often use it in programming...
+-In almost every usage (top of head: master list, master/slave) either come to reference the aftermentioned master/slave context or have been since redefined in the context of it
+-It's easy to brush it aside because that's not what comes to mind when you say it, but here's the thing... that's privilege.
+-Maybe someone reads this comment 20 years from now and goes "this was a waste of time" or "I still can't believe people thought this naming was something to defend"
+-But right now, a vast majority of this industry is white. I am white. I have been able to do things that others could not or were steered away reom.
+-A company of "yes men" usually sinks the company.
+-A group of people who all think the same can create something amazing... and then it encounters the world at large and the Picasso was found to be a sheet of paper with some spilled wine on it
+-Meanwhile, the greatest monuments society have ever created, from the extended historical background that led to it's creation and the decisions, rules, and mental mindset that led to it were never singular thoughts
+-You need an outside view, some discomfort, variety, and diversity to make something that is not only goood, but great and will stand the test of time.
+-Real talk for a moment: the world is on fire and the "this is fine" meme is very applicable.
+-Those who get annoyed at this stuff: get over yourself.
+-Every action has a reaction, and unlike physics, some reactions are not equal to the action taken.
+-Society isn't a singular experience.
+-You created "it", but what shaped you is the society you were raised in.
+-The one I was raised in lacked variety and diversity.
+-But that's not entierly true, my schooling had lots of variety (and a bit diversity).
+-It's then that I realized the discomfort I had when everything was the same.
+-When things were too clean, too basic, too organized, it was ripe for change.
+-I dislike the status quo, people who always say yes to some boss of theirs all the time, people who are self-centered or narcissistic.
+-Seeing that in the world today makes my blood boil.
+-So when people complain about "seriously, changing master to main?" and these little terms? Guess what: there's a status quo that's ripe for change...
+-As I read recently... "Replacing loaded words in codebases might not change much, but opposing those changes speaks volumes."
+-Grow up, be a bigger person, put on your mask first before assisting others... but do help others, especially if they need it.
+-We don't speak "old English" anymore, we've invented and redefined words just within the last 5 years, society changes.
+-Black Lives Matter, be kind, wear your mask (for goodness sake...)
+-It's time to make a stand and I can do it in 100 small ways (such as this) that make a big impact even if not seen that way by some.
+-<mic drop>
+-Oh, but really: wear a mask. It's not to prevent you from getting sick, it's to prevent you from getting others sick if you happen to be sick. Don't go out if you don't have to (drinks with friends aren't required)
+-Peace and "do better"
 
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2

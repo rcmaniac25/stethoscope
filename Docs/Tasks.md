@@ -37,7 +37,7 @@ What needs to get done. Should make some of them tickets... (some of these may b
 - The weird thought: do we want to abstract the processing? For the most part it's: ```log -> log parser -> log registry -> funny query to get logs as desired -> print```. Can we/should we add something between log registry and the query? What would it do? What is "processing"?
 - Make decision on GUI work. Read 100DoC log #24.2 as it could be a reason to work on the GUI now, make a framework wrapper, port wrapper to C++, and then work on GUI the way I want to without needing to do a crazy rewrite in Qt or something else. Can also keep syntax modern, instead of dealing with 10-20 years of legacy design.
 - Port to C++
-    - Pre Req. Start doing branches (master, develop, feature). This allows there to exist a "stable" system that people may be interested in, while develop has all the new logic in it. (RCM) Feature branches will come about if people start contributing... but my gut feeling is that until the "fun" stuff is done, most won't see this as a project to contribute to. So it won't happen yet. Once I start to see some/any interest (that isn't verbally told to me by those that know me already), I need a Code of Conduct, and philosophy written out. "Extreme" but it's too easy to kill projects these days with one bad apple. Stay down to Earth, it's not just about code, and make sure how people can be sure it works, it's maintainable, and it's implemented are useful. (/RCM)
+    - Pre Req. Start doing branches (main, develop, feature). This allows there to exist a "stable" system that people may be interested in, while develop has all the new logic in it. (RCM) Feature branches will come about if people start contributing... but my gut feeling is that until the "fun" stuff is done, most won't see this as a project to contribute to. So it won't happen yet. Once I start to see some/any interest (that isn't verbally told to me by those that know me already), I need a Code of Conduct, and philosophy written out. "Extreme" but it's too easy to kill projects these days with one bad apple. Stay down to Earth, it's not just about code, and make sure how people can be sure it works, it's maintainable, and it's implemented are useful. (/RCM)
     - v1. Just make a VS project for C++
     - v2. CMake/Bazel files
     - v3. Make .Net wrapper around it (can either CMake/Bazel make C# wrappers?), and get rid of original project so everything is now generated
@@ -62,7 +62,7 @@ What needs to get done. Should make some of them tickets... (some of these may b
 
 Tasks that are out of scope, but nice to have
 
-- Contribute to NUnit for docs (bring more emphesis to "you can't use .Net Standard, only .Net Core and .Net Framework for tests") and try to add an automated sanity check that looks at the TargetFrameworkAttribute that assemblies can have, that states what it was built under, in an effort to early exit and say "tests won't be run for that library because it's not a supported library: {link to docs}"
+- Contribute to NUnit for docs (bring more emphesis to "you can't use .Net Standard, only .Net Core and .Net Framework for tests") and try to add an automated confidence check that looks at the TargetFrameworkAttribute that assemblies can have, that states what it was built under, in an effort to early exit and say "tests won't be run for that library because it's not a supported library: {link to docs}"
 
 ## Architecture
 

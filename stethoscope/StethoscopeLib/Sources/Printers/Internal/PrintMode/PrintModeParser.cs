@@ -659,7 +659,7 @@ namespace Stethoscope.Printers.Internal.PrintMode
 #endif
 
             machine.Configure(State.ErrorHandlerModifier)
-                .OnEntryFrom(invokeTrigger, HandleErrorModifierSanityCheck)
+                .OnEntryFrom(invokeTrigger, HandleErrorModifierConfidenceCheck)
                 .OnEntryFrom(doneTrigger, HandleErrorModifier)
                 .Permit(Trigger.Invoke, State.StringQuote)
                 .Permit(Trigger.Error, State.Error)
@@ -1136,7 +1136,7 @@ namespace Stethoscope.Printers.Internal.PrintMode
             }
         }
 
-        private void HandleErrorModifierSanityCheck(SMState state)
+        private void HandleErrorModifierConfidenceCheck(SMState state)
         {
             if (state.TestCharLength(2))
             {

@@ -2,7 +2,7 @@
 
 LogConfig contains all config values to use when parsing.
 
-Now, for a bit of added control, multiple LogConfigs can be created or one master one can be cloned and modifed, and then each used as needed.
+Now, for a bit of added control, multiple LogConfigs can be created or one primary one can be cloned and modifed, and then each used as needed.
 
 This allows for configs for different logs to be created if needed.
 
