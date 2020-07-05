@@ -4952,6 +4952,9 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 -Oh, but really: wear a mask. It's not to prevent you from getting sick, it's to prevent you from getting others sick if you happen to be sick. Don't go out if you don't have to (drinks with friends aren't required)
 -Peace and "do better"
 
+813.2. 07/04/2020:
+- Skip
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
