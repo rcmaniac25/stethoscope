@@ -5081,6 +5081,19 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 855.2. 08/15/2020:
 - Skip
 
+856.2. 08/16/2020:
+- What's this? Something?
+- Ok, not much
+- Basically, many of the projects I have an interest on contributing to are requiring VS2019...
+- ...so I finally upgraded.
+- I'm generally behind on VS versions.
+- I found some IDE/compiler people to follow on Twitter and they always post the bugs/issues they run into when new VS versions come out
+- ...but they never say when things look good
+- So having multiple projects switching to it is probably a sign it's stable enough.
+- To the point, I updated StethLib to .Net Standard 2.1 and the tests/Tracker to .Net Core 3.1.
+- I also updated all dependencies except Stateless (to it's lates. I did update it a minor)
+- Apparently Stateless made a breaking change, so I need to make sure my code will handle it properly/won't break before I go and upgrade it
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2
