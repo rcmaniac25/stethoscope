@@ -17,7 +17,7 @@ namespace Stethoscope.Parsers.Internal.XML
     /// <summary>
     /// Log parser for XML logs.
     /// </summary>
-    public class XMLLogParser : BaseILogParser
+    public class XMLLogParser : ILogParser
     {
         private struct TransientParserConfigs
         {
@@ -460,7 +460,7 @@ namespace Stethoscope.Parsers.Internal.XML
         /// <param name="logStream">The stream of log data.</param>
         /// <param name="cancellationToken">A cancellation token that can be used to cancel the work</param>
         /// <returns>Task representing the parse operation.</returns>
-        public override Task ParseAsync(Stream logStream, CancellationToken cancellationToken)
+        public Task ParseAsync(Stream logStream, CancellationToken cancellationToken)
         {
             parseCounter.Increment();
             return XMLLogParser.InternalParse(this, defaultTransientConfig, logStream, cancellationToken);
@@ -547,7 +547,7 @@ namespace Stethoscope.Parsers.Internal.XML
 
         #region XMLContextParser
 
-        private sealed class XMLContextParser : BaseILogParser
+        private sealed class XMLContextParser : ILogParser
         {
             private readonly XMLLogParser parser;
             private TransientParserConfigs config;
@@ -634,14 +634,14 @@ namespace Stethoscope.Parsers.Internal.XML
                 #endregion
             }
             
-            public override void ApplyContextConfig(IDictionary<ContextConfigs, object> config, Action<ILogParser> context)
+            public void ApplyContextConfig(IDictionary<ContextConfigs, object> config, Action<ILogParser> context)
             {
                 CheckUsability();
                 contextApplyContextConfigCounter.Increment();
                 XMLLogParser.InternalApplyContextConfig(parser, this.config, config, context);
             }
 
-            public override Task ParseAsync(Stream logStream, CancellationToken cancellationToken)
+            public Task ParseAsync(Stream logStream, CancellationToken cancellationToken)
             {
                 CheckUsability();
                 contextParseCounter.Increment();
@@ -676,7 +676,7 @@ namespace Stethoscope.Parsers.Internal.XML
         /// </summary>
         /// <param name="config">A collection of configs to modify the parser with.</param>
         /// <param name="context">The context that the modified parser will execute in. If the scope of this parser is exited, as in the Action delegate finishes execution, then the modified parser becomes invalid and won't run.</param>
-        public override void ApplyContextConfig(IDictionary<ContextConfigs, object> config, Action<ILogParser> context)
+        public void ApplyContextConfig(IDictionary<ContextConfigs, object> config, Action<ILogParser> context)
         {
             applyContextConfigCounter.Increment();
             InternalApplyContextConfig(this, defaultTransientConfig, config, context);

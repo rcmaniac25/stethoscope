@@ -82,12 +82,19 @@ namespace Stethoscope.Tests
             return ms;
         }
 
+        // Note, the usage of "default implementations" means that XMLLogParser must be cast to ILogParser otherwise compile errors will occur
+        private static (XMLLogParser, ILogParser) CreateXMLLogParser()
+        {
+            var parser = new XMLLogParser();
+            return (parser, parser);
+        }
+
         [Test]
         public void BasicTest()
         {
-            var parser = new XMLLogParser();
-            parser.SetConfig(logConfig);
-            parser.SetRegistry(logRegistry);
+            var (xparser, parser) = CreateXMLLogParser();
+            xparser.SetConfig(logConfig);
+            xparser.SetRegistry(logRegistry);
 
             logRegistry.AddLog("goodtime", "my log").Returns(logEntry);
 
@@ -104,9 +111,9 @@ namespace Stethoscope.Tests
         [Test]
         public void BasicTestAsync()
         {
-            var parser = new XMLLogParser();
-            parser.SetConfig(logConfig);
-            parser.SetRegistry(logRegistry);
+            var (xparser, parser) = CreateXMLLogParser();
+            xparser.SetConfig(logConfig);
+            xparser.SetRegistry(logRegistry);
 
             logRegistry.AddLog("goodtime", "my log").Returns(logEntry);
 
@@ -144,9 +151,9 @@ namespace Stethoscope.Tests
         [Test]
         public void MultipleBasicLogs()
         {
-            var parser = new XMLLogParser();
-            parser.SetConfig(logConfig);
-            parser.SetRegistry(logRegistry);
+            var (xparser, parser) = CreateXMLLogParser();
+            xparser.SetConfig(logConfig);
+            xparser.SetRegistry(logRegistry);
 
             logRegistry.AddLog("goodtime", Arg.Any<string>()).Returns(logEntry);
 
@@ -165,9 +172,9 @@ namespace Stethoscope.Tests
         {
             logConfig.LogHasRoot = true;
 
-            var parser = new XMLLogParser();
-            parser.SetConfig(logConfig);
-            parser.SetRegistry(logRegistry);
+            var (xparser, parser) = CreateXMLLogParser();
+            xparser.SetConfig(logConfig);
+            xparser.SetRegistry(logRegistry);
 
             logRegistry.AddLog("goodtime", "my log").Returns(logEntry);
 
@@ -186,9 +193,9 @@ namespace Stethoscope.Tests
         {
             logConfig.LogHasRoot = true;
 
-            var parser = new XMLLogParser();
-            parser.SetConfig(logConfig);
-            parser.SetRegistry(logRegistry);
+            var (xparser, parser) = CreateXMLLogParser();
+            xparser.SetConfig(logConfig);
+            xparser.SetRegistry(logRegistry);
 
             logRegistry.AddLog("goodtime", "my log").Returns(logEntry);
 
@@ -205,8 +212,8 @@ namespace Stethoscope.Tests
         [Test]
         public void NoConfig()
         {
-            var parser = new XMLLogParser();
-            parser.SetRegistry(logRegistry);
+            var (xparser, parser) = CreateXMLLogParser();
+            xparser.SetRegistry(logRegistry);
 
             logRegistry.AddLog("goodtime", "my log").Returns(logEntry);
 
@@ -223,8 +230,8 @@ namespace Stethoscope.Tests
         [Test]
         public void NoRegistry()
         {
-            var parser = new XMLLogParser();
-            parser.SetConfig(logConfig);
+            var (xparser, parser) = CreateXMLLogParser();
+            xparser.SetConfig(logConfig);
 
             var log = "<fakelog time=\"goodtime\" log=\"my log\"></fakelog>";
             using (var ms = CreateStream(log))
@@ -238,9 +245,9 @@ namespace Stethoscope.Tests
         {
             logConfig.TimestampPath = "!";
 
-            var parser = new XMLLogParser();
-            parser.SetConfig(logConfig);
-            parser.SetRegistry(logRegistry);
+            var (xparser, parser) = CreateXMLLogParser();
+            xparser.SetConfig(logConfig);
+            xparser.SetRegistry(logRegistry);
 
             logRegistry.AddLog("goodtime", "my log").Returns(logEntry);
 
@@ -259,9 +266,9 @@ namespace Stethoscope.Tests
         {
             logConfig.LogMessagePath = "!";
 
-            var parser = new XMLLogParser();
-            parser.SetConfig(logConfig);
-            parser.SetRegistry(logRegistry);
+            var (xparser, parser) = CreateXMLLogParser();
+            xparser.SetConfig(logConfig);
+            xparser.SetRegistry(logRegistry);
 
             logRegistry.AddLog("goodtime", "my log").Returns(logEntry);
 
@@ -286,9 +293,9 @@ namespace Stethoscope.Tests
         {
             var config = attr.Item2(logConfig, "custAttr");
 
-            var parser = new XMLLogParser();
-            parser.SetConfig(config);
-            parser.SetRegistry(logRegistry);
+            var (xparser, parser) = CreateXMLLogParser();
+            xparser.SetConfig(config);
+            xparser.SetRegistry(logRegistry);
 
             logRegistry.AddLog("goodtime", "my log").Returns(logEntry);
             logRegistry.AddValueToLog(logEntry, attr.Item1, "colorful").Returns(true);
@@ -308,9 +315,9 @@ namespace Stethoscope.Tests
         {
             logConfig.LogTypePath = "";
 
-            var parser = new XMLLogParser();
-            parser.SetConfig(logConfig);
-            parser.SetRegistry(logRegistry);
+            var (xparser, parser) = CreateXMLLogParser();
+            xparser.SetConfig(logConfig);
+            xparser.SetRegistry(logRegistry);
 
             logRegistry.AddLog("goodtime", "my log").Returns(logEntry);
             logRegistry.AddValueToLog(logEntry, LogAttribute.Type, "nope").Returns(true);
@@ -330,9 +337,9 @@ namespace Stethoscope.Tests
         {
             logConfig.LogTypePath = "!";
 
-            var parser = new XMLLogParser();
-            parser.SetConfig(logConfig);
-            parser.SetRegistry(logRegistry);
+            var (xparser, parser) = CreateXMLLogParser();
+            xparser.SetConfig(logConfig);
+            xparser.SetRegistry(logRegistry);
 
             logRegistry.AddLog("goodtime", "my log").Returns(logEntry);
             logRegistry.AddValueToLog(logEntry, LogAttribute.Type, "nope").Returns(true);
@@ -352,9 +359,9 @@ namespace Stethoscope.Tests
         {
             logConfig.LogTypePath = "!type";
 
-            var parser = new XMLLogParser();
-            parser.SetConfig(logConfig);
-            parser.SetRegistry(logRegistry);
+            var (xparser, parser) = CreateXMLLogParser();
+            xparser.SetConfig(logConfig);
+            xparser.SetRegistry(logRegistry);
 
             logRegistry.AddLog("goodtime", "my log").Returns(logEntry);
             logRegistry.AddValueToLog(logEntry, LogAttribute.Type, "nope").Returns(true);
@@ -372,9 +379,9 @@ namespace Stethoscope.Tests
         [Test]
         public void ParseNullLog()
         {
-            var parser = new XMLLogParser();
-            parser.SetConfig(logConfig);
-            parser.SetRegistry(logRegistry);
+            var (xparser, parser) = CreateXMLLogParser();
+            xparser.SetConfig(logConfig);
+            xparser.SetRegistry(logRegistry);
 
             Assert.Catch(() => parser.Parse((Stream)null));
 
@@ -384,9 +391,9 @@ namespace Stethoscope.Tests
         [Test]
         public void ParseNoLog()
         {
-            var parser = new XMLLogParser();
-            parser.SetConfig(logConfig);
-            parser.SetRegistry(logRegistry);
+            var (xparser, parser) = CreateXMLLogParser();
+            xparser.SetConfig(logConfig);
+            xparser.SetRegistry(logRegistry);
 
             var log = "";
             using (var ms = CreateStream(log))
@@ -400,9 +407,9 @@ namespace Stethoscope.Tests
         [Test]
         public void ParseNoInvalidLog()
         {
-            var parser = new XMLLogParser();
-            parser.SetConfig(logConfig);
-            parser.SetRegistry(logRegistry);
+            var (xparser, parser) = CreateXMLLogParser();
+            xparser.SetConfig(logConfig);
+            xparser.SetRegistry(logRegistry);
 
             var log = "<chocolate";
             using (var ms = CreateStream(log))
@@ -416,9 +423,9 @@ namespace Stethoscope.Tests
         [Test]
         public void ParseFailureStopIsDefault()
         {
-            var parser = new XMLLogParser();
-            parser.SetConfig(logConfig);
-            parser.SetRegistry(logRegistry);
+            var (xparser, parser) = CreateXMLLogParser();
+            xparser.SetConfig(logConfig);
+            xparser.SetRegistry(logRegistry);
 
             logRegistry.AddLog(Arg.Any<string>(), Arg.Any<string>()).Returns(logEntry);
 
@@ -439,9 +446,9 @@ namespace Stethoscope.Tests
         {
             logConfig.ParsingFailureHandling = LogParserFailureHandling.StopParsing;
 
-            var parser = new XMLLogParser();
-            parser.SetConfig(logConfig);
-            parser.SetRegistry(logRegistry);
+            var (xparser, parser) = CreateXMLLogParser();
+            xparser.SetConfig(logConfig);
+            xparser.SetRegistry(logRegistry);
 
             logRegistry.AddLog(Arg.Any<string>(), Arg.Any<string>()).Returns(logEntry);
 
@@ -462,9 +469,9 @@ namespace Stethoscope.Tests
         {
             logConfig.ParsingFailureHandling = LogParserFailureHandling.StopParsing;
 
-            var parser = new XMLLogParser();
-            parser.SetConfig(logConfig);
-            parser.SetRegistry(logRegistry);
+            var (xparser, parser) = CreateXMLLogParser();
+            xparser.SetConfig(logConfig);
+            xparser.SetRegistry(logRegistry);
 
             logRegistry.AddLog(Arg.Any<string>(), Arg.Any<string>()).Returns(logEntry);
 
@@ -484,9 +491,9 @@ namespace Stethoscope.Tests
         {
             logConfig.ParsingFailureHandling = LogParserFailureHandling.SkipEntries;
 
-            var parser = new XMLLogParser();
-            parser.SetConfig(logConfig);
-            parser.SetRegistry(logRegistry);
+            var (xparser, parser) = CreateXMLLogParser();
+            xparser.SetConfig(logConfig);
+            xparser.SetRegistry(logRegistry);
 
             logRegistry.AddLog(Arg.Any<string>(), Arg.Any<string>()).Returns(logEntry);
 
@@ -508,9 +515,9 @@ namespace Stethoscope.Tests
         {
             logConfig.ParsingFailureHandling = LogParserFailureHandling.SkipEntries;
 
-            var parser = new XMLLogParser();
-            parser.SetConfig(logConfig);
-            parser.SetRegistry(logRegistry);
+            var (xparser, parser) = CreateXMLLogParser();
+            xparser.SetConfig(logConfig);
+            xparser.SetRegistry(logRegistry);
 
             logRegistry.AddLog(Arg.Any<string>(), Arg.Any<string>()).Returns(logEntry);
 
@@ -532,9 +539,9 @@ namespace Stethoscope.Tests
         {
             logConfig.ParsingFailureHandling = LogParserFailureHandling.MarkEntriesAsFailed;
 
-            var parser = new XMLLogParser();
-            parser.SetConfig(logConfig);
-            parser.SetRegistry(logRegistry);
+            var (xparser, parser) = CreateXMLLogParser();
+            xparser.SetConfig(logConfig);
+            xparser.SetRegistry(logRegistry);
 
             logRegistry.AddLog(Arg.Any<string>(), Arg.Any<string>()).Returns(logEntry);
             logRegistry.AddFailedLog().Returns(failedLogEntry);
@@ -557,9 +564,9 @@ namespace Stethoscope.Tests
         {
             logConfig.ParsingFailureHandling = LogParserFailureHandling.MarkEntriesAsFailed;
 
-            var parser = new XMLLogParser();
-            parser.SetConfig(logConfig);
-            parser.SetRegistry(logRegistry);
+            var (xparser, parser) = CreateXMLLogParser();
+            xparser.SetConfig(logConfig);
+            xparser.SetRegistry(logRegistry);
 
             logRegistry.AddLog(Arg.Any<string>(), Arg.Any<string>()).Returns(logEntry);
             logRegistry.AddFailedLog().Returns(failedLogEntry);
@@ -582,9 +589,9 @@ namespace Stethoscope.Tests
         {
             logConfig.ParsingFailureHandling = LogParserFailureHandling.MarkEntriesAsFailed;
 
-            var parser = new XMLLogParser();
-            parser.SetConfig(logConfig);
-            parser.SetRegistry(logRegistry);
+            var (xparser, parser) = CreateXMLLogParser();
+            xparser.SetConfig(logConfig);
+            xparser.SetRegistry(logRegistry);
 
             logRegistry.AddLog(Arg.Any<string>(), Arg.Any<string>()).Returns(logEntry);
             logRegistry.AddFailedLog().Returns(failedLogEntry);
@@ -874,9 +881,9 @@ namespace Stethoscope.Tests
         {
             logConfig.LogTypePath = "/";
 
-            var parser = new XMLLogParser();
-            parser.SetConfig(logConfig);
-            parser.SetRegistry(logRegistry);
+            var (xparser, parser) = CreateXMLLogParser();
+            xparser.SetConfig(logConfig);
+            xparser.SetRegistry(logRegistry);
 
             logRegistry.AddLog(Arg.Any<string>(), Arg.Any<string>()).Returns(logEntry);
 
@@ -894,9 +901,9 @@ namespace Stethoscope.Tests
         {
             logConfig.LogTypePath = "!type";
 
-            var parser = new XMLLogParser();
-            parser.SetConfig(logConfig);
-            parser.SetRegistry(logRegistry);
+            var (xparser, parser) = CreateXMLLogParser();
+            xparser.SetConfig(logConfig);
+            xparser.SetRegistry(logRegistry);
 
             logRegistry.AddLog(Arg.Any<string>(), Arg.Any<string>()).Returns(logEntry);
 
@@ -914,9 +921,9 @@ namespace Stethoscope.Tests
         {
             logConfig.LogTypePath = "!type";
 
-            var parser = new XMLLogParser();
-            parser.SetConfig(logConfig);
-            parser.SetRegistry(logRegistry);
+            var (xparser, parser) = CreateXMLLogParser();
+            xparser.SetConfig(logConfig);
+            xparser.SetRegistry(logRegistry);
 
             logRegistry.AddLog(Arg.Any<string>(), Arg.Any<string>()).Returns(logEntry);
 
@@ -937,9 +944,9 @@ namespace Stethoscope.Tests
 
             logConfig.LogTypePath = $"/#{index}";
 
-            var parser = new XMLLogParser();
-            parser.SetConfig(logConfig);
-            parser.SetRegistry(logRegistry);
+            var (xparser, parser) = CreateXMLLogParser();
+            xparser.SetConfig(logConfig);
+            xparser.SetRegistry(logRegistry);
 
             logRegistry.AddLog(Arg.Any<string>(), Arg.Any<string>()).Returns(logEntry);
             
@@ -957,9 +964,9 @@ namespace Stethoscope.Tests
         {
             logConfig.LogTypePath = "/#2";
 
-            var parser = new XMLLogParser();
-            parser.SetConfig(logConfig);
-            parser.SetRegistry(logRegistry);
+            var (xparser, parser) = CreateXMLLogParser();
+            xparser.SetConfig(logConfig);
+            xparser.SetRegistry(logRegistry);
 
             logRegistry.AddLog(Arg.Any<string>(), Arg.Any<string>()).Returns(logEntry);
 
@@ -977,9 +984,9 @@ namespace Stethoscope.Tests
         {
             logConfig.LogTypePath = "/$cdata";
 
-            var parser = new XMLLogParser();
-            parser.SetConfig(logConfig);
-            parser.SetRegistry(logRegistry);
+            var (xparser, parser) = CreateXMLLogParser();
+            xparser.SetConfig(logConfig);
+            xparser.SetRegistry(logRegistry);
 
             logRegistry.AddLog(Arg.Any<string>(), Arg.Any<string>()).Returns(logEntry);
 
@@ -997,9 +1004,9 @@ namespace Stethoscope.Tests
         {
             logConfig.LogTypePath = $"/${pathKeyword}";
 
-            var parser = new XMLLogParser();
-            parser.SetConfig(logConfig);
-            parser.SetRegistry(logRegistry);
+            var (xparser, parser) = CreateXMLLogParser();
+            xparser.SetConfig(logConfig);
+            xparser.SetRegistry(logRegistry);
 
             logRegistry.AddLog(Arg.Any<string>(), Arg.Any<string>()).Returns(logEntry);
 
@@ -1017,9 +1024,9 @@ namespace Stethoscope.Tests
         {
             logConfig.LogTypePath = "/$text";
 
-            var parser = new XMLLogParser();
-            parser.SetConfig(logConfig);
-            parser.SetRegistry(logRegistry);
+            var (xparser, parser) = CreateXMLLogParser();
+            xparser.SetConfig(logConfig);
+            xparser.SetRegistry(logRegistry);
 
             logRegistry.AddLog(Arg.Any<string>(), Arg.Any<string>()).Returns(logEntry);
 
@@ -1037,9 +1044,9 @@ namespace Stethoscope.Tests
         {
             logConfig.LogTypePath = "/$text";
 
-            var parser = new XMLLogParser();
-            parser.SetConfig(logConfig);
-            parser.SetRegistry(logRegistry);
+            var (xparser, parser) = CreateXMLLogParser();
+            xparser.SetConfig(logConfig);
+            xparser.SetRegistry(logRegistry);
 
             logRegistry.AddLog(Arg.Any<string>(), Arg.Any<string>()).Returns(logEntry);
 
@@ -1057,9 +1064,9 @@ namespace Stethoscope.Tests
         {
             logConfig.LogTypePath = "/!type";
 
-            var parser = new XMLLogParser();
-            parser.SetConfig(logConfig);
-            parser.SetRegistry(logRegistry);
+            var (xparser, parser) = CreateXMLLogParser();
+            xparser.SetConfig(logConfig);
+            xparser.SetRegistry(logRegistry);
 
             logRegistry.AddLog(Arg.Any<string>(), Arg.Any<string>()).Returns(logEntry);
 
@@ -1077,9 +1084,9 @@ namespace Stethoscope.Tests
         {
             logConfig.LogTypePath = "/!type";
 
-            var parser = new XMLLogParser();
-            parser.SetConfig(logConfig);
-            parser.SetRegistry(logRegistry);
+            var (xparser, parser) = CreateXMLLogParser();
+            xparser.SetConfig(logConfig);
+            xparser.SetRegistry(logRegistry);
 
             logRegistry.AddLog(Arg.Any<string>(), Arg.Any<string>()).Returns(logEntry);
 
@@ -1097,9 +1104,9 @@ namespace Stethoscope.Tests
         {
             logConfig.LogTypePath = "/!type";
 
-            var parser = new XMLLogParser();
-            parser.SetConfig(logConfig);
-            parser.SetRegistry(logRegistry);
+            var (xparser, parser) = CreateXMLLogParser();
+            xparser.SetConfig(logConfig);
+            xparser.SetRegistry(logRegistry);
 
             logRegistry.AddLog(Arg.Any<string>(), Arg.Any<string>()).Returns(logEntry);
 
@@ -1117,9 +1124,9 @@ namespace Stethoscope.Tests
         {
             logConfig.LogTypePath = "/$cdata";
 
-            var parser = new XMLLogParser();
-            parser.SetConfig(logConfig);
-            parser.SetRegistry(logRegistry);
+            var (xparser, parser) = CreateXMLLogParser();
+            xparser.SetConfig(logConfig);
+            xparser.SetRegistry(logRegistry);
 
             logRegistry.AddLog(Arg.Any<string>(), Arg.Any<string>()).Returns(logEntry);
 
@@ -1137,9 +1144,9 @@ namespace Stethoscope.Tests
         {
             logConfig.LogTypePath = "/$elem/#2/!type";
 
-            var parser = new XMLLogParser();
-            parser.SetConfig(logConfig);
-            parser.SetRegistry(logRegistry);
+            var (xparser, parser) = CreateXMLLogParser();
+            xparser.SetConfig(logConfig);
+            xparser.SetRegistry(logRegistry);
 
             logRegistry.AddLog(Arg.Any<string>(), Arg.Any<string>()).Returns(logEntry);
 
@@ -1157,9 +1164,9 @@ namespace Stethoscope.Tests
         {
             logConfig.LogTypePath = "/$elem/#1/!type";
 
-            var parser = new XMLLogParser();
-            parser.SetConfig(logConfig);
-            parser.SetRegistry(logRegistry);
+            var (xparser, parser) = CreateXMLLogParser();
+            xparser.SetConfig(logConfig);
+            xparser.SetRegistry(logRegistry);
 
             logRegistry.AddLog(Arg.Any<string>(), Arg.Any<string>()).Returns(logEntry);
 
@@ -1177,9 +1184,9 @@ namespace Stethoscope.Tests
         {
             logConfig.LogTypePath = "/$elem/$cdata";
 
-            var parser = new XMLLogParser();
-            parser.SetConfig(logConfig);
-            parser.SetRegistry(logRegistry);
+            var (xparser, parser) = CreateXMLLogParser();
+            xparser.SetConfig(logConfig);
+            xparser.SetRegistry(logRegistry);
 
             logRegistry.AddLog(Arg.Any<string>(), Arg.Any<string>()).Returns(logEntry);
 
@@ -1197,9 +1204,9 @@ namespace Stethoscope.Tests
         {
             logConfig.LogTypePath = "/$elem/$cdata/!dat";
 
-            var parser = new XMLLogParser();
-            parser.SetConfig(logConfig);
-            parser.SetRegistry(logRegistry);
+            var (xparser, parser) = CreateXMLLogParser();
+            xparser.SetConfig(logConfig);
+            xparser.SetRegistry(logRegistry);
 
             logRegistry.AddLog(Arg.Any<string>(), Arg.Any<string>()).Returns(logEntry);
 
@@ -1217,9 +1224,9 @@ namespace Stethoscope.Tests
         {
             logConfig.LogTypePath = "/#1/#2/#0/#1";
 
-            var parser = new XMLLogParser();
-            parser.SetConfig(logConfig);
-            parser.SetRegistry(logRegistry);
+            var (xparser, parser) = CreateXMLLogParser();
+            xparser.SetConfig(logConfig);
+            xparser.SetRegistry(logRegistry);
 
             logRegistry.AddLog(Arg.Any<string>(), Arg.Any<string>()).Returns(logEntry);
 
@@ -1239,9 +1246,9 @@ namespace Stethoscope.Tests
             logConfig.ThreadIDPath = "/#1/#1";
             logConfig.LogLinePath = "/#1/#3&int";
 
-            var parser = new XMLLogParser();
-            parser.SetConfig(logConfig);
-            parser.SetRegistry(logRegistry);
+            var (xparser, parser) = CreateXMLLogParser();
+            xparser.SetConfig(logConfig);
+            xparser.SetRegistry(logRegistry);
 
             logRegistry.AddLog(Arg.Any<string>(), Arg.Any<string>()).Returns(logEntry);
 

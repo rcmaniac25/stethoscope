@@ -17,7 +17,7 @@ namespace Stethoscope.Printers.Internal
     /// <summary>
     /// Log printer that prints to an I/O object of type <see cref="TextReader"/>.
     /// </summary>
-    public abstract class IOPrinter : BaseIPrinter
+    public abstract class IOPrinter : IPrinter
     {
         private const string DefaultPrinterName = "General";
 
@@ -56,7 +56,7 @@ namespace Stethoscope.Printers.Internal
         /// <summary>
         /// Get the element factory.
         /// </summary>
-        public override IPrinterElementFactory ElementFactory => printerElementFactory;
+        public IPrinterElementFactory ElementFactory => printerElementFactory;
 
         /// <summary>
         /// The TextWriter which will be printed to.
@@ -67,6 +67,16 @@ namespace Stethoscope.Printers.Internal
         /// Cancellable print function invoked by <see cref="IPrinter.Print"/> or <see cref="IPrinter.PrintAsync()"/> or <see cref="IPrinter.PrintAsync(CancellationToken)"/>.
         /// </summary>
         protected Action<CancellationToken> LogPrintHandler { get; set; }
+
+        /// <summary>
+        /// Setup the printer. Call before invoking <see cref="IPrinter.Print"/> or <see cref="IPrinter.PrintAsync()"/>/<see cref="IPrinter.PrintAsync(CancellationToken)"/>
+        /// </summary>
+        public abstract void Setup();
+
+        /// <summary>
+        /// Teardown the printer. Call once all printing is complete.
+        /// </summary>
+        public abstract void Teardown();
 
         /// <summary>
         /// Produce indentation for printing strings.
@@ -286,7 +296,7 @@ namespace Stethoscope.Printers.Internal
         /// </summary>
         /// <param name="cancellationToken">A cancellation token that can be used to cancel the work</param>
         /// <remarks>This is too simplistic and will be replaced or augmented at some point in the future. Don't build logic around a simple Print call.</remarks>
-        public override Task PrintAsync(CancellationToken cancellationToken)
+        public Task PrintAsync(CancellationToken cancellationToken)
         {
             printCounter.Increment();
 

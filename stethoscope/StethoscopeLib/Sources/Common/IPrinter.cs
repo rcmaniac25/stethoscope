@@ -13,13 +13,19 @@ namespace Stethoscope.Common
         /// <summary>
         /// Invoke a print operation (sync)
         /// </summary>
-        void Print(); //TODO: C# 8 default impl. for interfaces
+        public virtual void Print()
+        {
+            PrintAsync().Wait();
+        }
 
         /// <summary>
         /// Invoke a print operation (async)
         /// </summary>
         /// <returns>Task representing the print operation.</returns>
-        Task PrintAsync(); //TODO: C# 8 default impl. for interfaces
+        public virtual Task PrintAsync()
+        {
+            return PrintAsync(new CancellationToken());
+        }
 
         /// <summary>
         /// Invoke a print operation (async)
@@ -40,6 +46,6 @@ namespace Stethoscope.Common
         /// <summary>
         /// (Mostly for Internal use) Factory for specialized print mode format elements. Return <c>null</c> to use default factory.
         /// </summary>
-        IPrinterElementFactory ElementFactory { get; }
+        IPrinterElementFactory ElementFactory => null;
     }
 }

@@ -1,7 +1,7 @@
 ﻿using NSubstitute;
 
 using NUnit.Framework;
-
+using Stethoscope.Common;
 using Stethoscope.Log.Internal;
 using Stethoscope.Log.Internal.Storage;
 using Stethoscope.Printers.Internal;
@@ -45,7 +45,8 @@ namespace Stethoscope.Tests
 
         private string PrintData()
         {
-            var printer = GetIOPrinter();
+            // Cannot use "var" here as it returns IOPrinter, and that doesn't have the "default implementations" so it errors
+            IPrinter printer = GetIOPrinter();
             printer.Setup();
             printer.Print();
             printer.Teardown();
@@ -57,7 +58,8 @@ namespace Stethoscope.Tests
         {
             // Yes, this could be rewritten as an async/await but I wanted to be explcit and not let the compiler do things it's way... but my way
 
-            var printer = GetIOPrinter();
+            // Cannot use "var" here as it returns IOPrinter, and that doesn't have the "default implementations" so it errors
+            IPrinter printer = GetIOPrinter();
             printer.Setup();
 
             System.Threading.Tasks.Task printTask;

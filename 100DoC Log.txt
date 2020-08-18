@@ -5094,6 +5094,166 @@ Ah, ok; user=John Jacob Jingleheimer Schmidt
 - I also updated all dependencies except Stateless (to it's lates. I did update it a minor)
 - Apparently Stateless made a breaking change, so I need to make sure my code will handle it properly/won't break before I go and upgrade it
 
+857.2. 08/17/2020:
+- More upgrades!
+- Today's goal was C# 8 default interface implementation (tomorrow is hopefully going to be Stateless)
+- So the benefit of "C# 8 default interface implementation" or default impl.:
+-- You want to keep a minimal number of functions
+-- You want to keep a minimal amount of boilerplate
+-- Combine the two and you end up with a handful of functions that do exactly what they are expected to do and don't duplicate functionality
+-- Bonus (issue): default arguments cannot be instance values (string a = "hello" <-- fine, IDictionary<string, int> a = new Dictionary... <- error)
+-- Instead of needing to add additional functions, extension functions, or boilerplate, a default impl. can be added
+- So I went to edit my two cases (ILogParser + BaseLogParser (which handled boilerplate), IPrinter + BasePriner) and everything seemed peachy...
+- ...until the classes and tests that used them ran.
+- So, I've yet to find the reason for it, but it seems like default impl. cause the methods/properties to be treated as explicit interface implementations (other's wording) of internal interfaces (my additional wording)
+- Plan:
+===
+interface A
+{
+    void DoSomething();
+    void Dance();
+}
+
+abstract class BaseA : A
+{
+    public virtual void DoSomething()
+    {
+        Dance(); // For now, we dance
+    }
+
+    public abstract void Dance();
+}
+
+class Bard : BaseA
+{
+    public override void DoSomething() // Note to self: not needed... remove when upgrading to default impl.
+    {
+        Sing();
+    }
+
+    public override void Dance()
+    {
+        Sing();
+    }
+
+    public void Sing()
+    {
+        //...
+    }
+}
+
+class MusicTroupe
+{
+    public void DoSomething()
+    {
+        var bard = new Bard();
+        bard.DoSomething();
+    }
+
+    public void EntertainPeople()
+    {
+        var bard = new Bard();
+        bard.Dance();
+    }
+}
+
+|||
+ v
+
+interface A
+{
+    public void DoSomething()
+    {
+         Dance(); // For now, we dance
+    }
+    void Dance();
+}
+
+class Bard : A
+{
+    public void Dance()
+    {
+        Sing();
+    }
+
+    public void Sing()
+    {
+        //...
+    }
+}
+
+class MusicTroupe
+{
+    public void DoSomething()
+    {
+        var bard = new Bard();
+        bard.DoSomething();
+    }
+
+    public void EntertainPeople()
+    {
+        var bard = new Bard();
+        bard.Dance();
+    }
+}
+===
+- Reality (just the implementation part):
+===
+interface A
+{
+    public void DoSomething()
+    {
+         Dance(); // For now, we dance
+    }
+    void Dance();
+}
+
+class Bard : A
+{
+    public void Dance()
+    {
+        Sing();
+    }
+
+    public void Sing()
+    {
+        //...
+    }
+}
+
+class MusicTroupe
+{
+    public void DoSomething()
+    {
+        var bard = new Bard();
+        bard.DoSomething(); //ERROR: what's DoSomething?
+    }
+
+    public void DoSomethingv2()
+    {
+        A bard = new Bard(); // Note the cast
+        bard.DoSomething();
+    }
+
+    public void EntertainPeople()
+    {
+        var bard = new Bard();
+        bard.Dance();
+    }
+}
+===
+- It's as if "A" has "DoSomething" and "Dance"...
+- ...but Bard went from having "DoSomething", "Dance", and "Sing" to "Dance" and "Sing" once "DoSomething" became a default impl.
+- People online said "it's more like an explicit interface" but the only time I see that occur is when a method/property gets hidden.
+-- Example: List<T>.GetEnumerator():IEnumerator<T> -> IEnumerable<T>.GetEnumerator():IEnumerator<T> -> IEnumerable.GetEnumerator():IEnumerator
+-- IEnumerable.GetEnumerator is hidden in by IEnumerable<T>.GetEnumerator, so you have to explicitly implement the IEnumerable.GetEnumerator if you want it
+-- ...and you have to do the cast to explicitly call it.
+- But this is not hiding DoSomething
+- This is not creating "A" and "AWithDefaultImpl"
+- This is saying "A" has a default impl. and I would like a class that implements "A" to have said function.
+- I'll need to see if I hear back from anyone about it (I poked someone on Twitter. If anything, I'd like to find the conversation on the logic behind this choice)
+- Until then, instead of "just" touching the interface (and removing some override keywords), I had to touch implementation (including a whole lot of test functions...)
+
 ==Design/Plan Days==
 - Observable/Qbservable summary: #220.2
 - Initial stages of program completion (plan): #223.2

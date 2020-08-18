@@ -15,14 +15,20 @@ namespace Stethoscope.Common
         /// Parse (sync) a stream of data to get applicable logs.
         /// </summary>
         /// <param name="logStream">The stream of log data.</param>
-        void Parse(Stream logStream); //TODO: C# 8 default impl. for interfaces
+        public void Parse(Stream logStream)
+        {
+            ParseAsync(logStream).Wait();
+        }
 
         /// <summary>
         /// Parse (async) a stream of data to get applicable logs.
         /// </summary>
         /// <param name="logStream">The stream of log data.</param>
         /// <returns>Task representing the parse operation.</returns>
-        Task ParseAsync(Stream logStream); //TODO: C# 8 default impl. for interfaces
+        public Task ParseAsync(Stream logStream)
+        {
+            return ParseAsync(logStream, new CancellationToken());
+        }
 
         /// <summary>
         /// Parse (async) a stream of data to get applicable logs.
